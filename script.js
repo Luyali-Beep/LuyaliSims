@@ -1,4 +1,6 @@
-// 1. DATA IS EMBEDDED DIRECTLY
+// ===================================================
+// 1. DATA REPOSITORY
+// ===================================================
 const simulatorsData = [
   {
     id: "sim-1",
@@ -50,12 +52,16 @@ const simulatorsData = [
   }
 ];
 
-// 2. PAGINATION & STATE
+// ===================================================
+// 2. PAGINATION & FILTER STATE
+// ===================================================
 const CARDS_PER_PAGE = 6;
 let currentVisibleCount = CARDS_PER_PAGE;
 let currentFilteredData = [...simulatorsData]; 
 
-// 3. RENDER CARDS
+// ===================================================
+// 3. RENDER CARDS FUNCTION
+// ===================================================
 function displaySimulators(simulators) {
     const grid = document.getElementById('simulatorGrid');
     const loadMoreContainer = document.getElementById('loadMoreContainer');
@@ -64,7 +70,16 @@ function displaySimulators(simulators) {
     grid.innerHTML = ''; 
 
     if (!simulators || simulators.length === 0) {
-        grid.innerHTML = '<p style="text-align:center; grid-column: 1/-1; color: #00f3ff; font-size: 1.2rem; padding: 2rem;">No simulators found matching your criteria.</p>';
+        grid.innerHTML = `
+            <div style="text-align:center; grid-column: 1/-1; padding: 3rem 1rem;">
+                <p style="color: var(--neon-cyan); font-size: 1.25rem; font-family: 'Orbitron', sans-serif; margin-bottom: 0.5rem;">
+                    No Simulators Found
+                </p>
+                <p style="color: var(--text-muted); font-size: 1rem;">
+                    Try adjusting your search query or selecting a different category filter.
+                </p>
+            </div>
+        `;
         if (loadMoreContainer) loadMoreContainer.style.display = 'none';
         return;
     }
@@ -91,7 +106,9 @@ function displaySimulators(simulators) {
     }
 }
 
-// 4. SEARCH AND FILTER FUNCTION
+// ===================================================
+// 4. SEARCH AND CATEGORY FILTERING
+// ===================================================
 function filterSims() {
     const searchInput = document.getElementById('searchInput');
     const categoryFilter = document.getElementById('categoryFilter');
@@ -109,16 +126,45 @@ function filterSims() {
     displaySimulators(currentFilteredData);
 }
 
-// 5. LOAD MORE FUNCTION
+// ===================================================
+// 5. LOAD MORE PAGINATION HANDLER
+// ===================================================
 function loadMoreCards() {
     currentVisibleCount += CARDS_PER_PAGE;
     displaySimulators(currentFilteredData);
 }
 
-// 6. INITIALIZE ON LOAD
+// ===================================================
+// 6. POLICY MODAL CONTROLS (AdSense & Accessibility)
+// ===================================================
+function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Lock background scrolling
+    }
+}
+
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = 'auto'; // Restore background scrolling
+    }
+}
+
+// Ensure functions are globally attached for inline onclick attributes in HTML
+window.openModal = openModal;
+window.closeModal = closeModal;
+
+// ===================================================
+// 7. EVENT LISTENERS & INITIALIZATION
+// ===================================================
 document.addEventListener('DOMContentLoaded', () => {
+    // Initial Render
     displaySimulators(simulatorsData);
     
+    // Search & Filter Listeners
     const searchInput = document.getElementById('searchInput');
     const categoryFilter = document.getElementById('categoryFilter');
     const loadMoreBtn = document.getElementById('loadMoreBtn');
@@ -126,4 +172,21 @@ document.addEventListener('DOMContentLoaded', () => {
     if (searchInput) searchInput.addEventListener('input', filterSims);
     if (categoryFilter) categoryFilter.addEventListener('change', filterSims);
     if (loadMoreBtn) loadMoreBtn.addEventListener('click', loadMoreCards);
+
+    // Backdrop Click Listener for Modals
+    window.addEventListener('click', (e) => {
+        if (e.target.classList.contains('policy-modal')) {
+            closeModal(e.target.id);
+        }
+    });
+
+    // Keyboard ESC Key to Close Modals (Accessibility Compliance)
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' || e.key === 'Esc') {
+            const activeModal = document.querySelector('.policy-modal.active');
+            if (activeModal) {
+                closeModal(activeModal.id);
+            }
+        }
+    });
 });
