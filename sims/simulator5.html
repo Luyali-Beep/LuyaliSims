@@ -2,248 +2,415 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Radiation Detectors Simulator - LuyaliSims</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Interactive 3D Radiation Detectors Laboratory Simulator: Explore Geiger-Müller tubes, scintillation crystals, HPGe semiconductors, and cloud chambers with real-time physics tracking.">
+    <title>3D Radiation Detectors Simulator & Laboratory - LuyaliSims</title>
     
     <!-- Import Futuristic Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Rajdhani:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     
     <style>
-        /* =========================================
-           1. BASE THEME (Template Styles)
-           ========================================= */
+        /* Base Reset & Variables */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --neon-cyan: #00f3ff;
+            --neon-magenta: #bc13fe;
+            --neon-green: #00ff88;
+            --neon-amber: #ffb703;
+            --bg-dark: #070a12;
+            --panel-bg: rgba(16, 24, 43, 0.85);
+            --border-glow: rgba(0, 243, 255, 0.35);
+        }
+
         body {
             font-family: 'Rajdhani', sans-serif;
-            background-color: #0a0e17;
-            background-image: radial-gradient(circle at top right, rgba(0, 243, 255, 0.05), transparent 40%),
-                              radial-gradient(circle at bottom left, rgba(188, 19, 254, 0.05), transparent 40%);
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 85% 15%, rgba(0, 243, 255, 0.08), transparent 45%),
+                radial-gradient(circle at 15% 85%, rgba(188, 19, 254, 0.08), transparent 45%),
+                linear-gradient(180deg, #05070e 0%, #0a0e1a 100%);
             color: #e2e8f0;
             margin: 0;
-            padding: 30px;
+            padding: 16px 20px;
             min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* 1. HEADER & TOP NAVIGATION */
+        header {
+            max-width: 1200px;
+            margin: 0 auto 15px auto;
+        }
+
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 12px;
         }
 
         .back-btn {
             display: inline-flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-            padding: 10px 20px;
-            background: rgba(16, 24, 43, 0.6);
+            gap: 8px;
+            padding: 9px 18px;
+            background: rgba(16, 24, 43, 0.7);
             backdrop-filter: blur(8px);
             border: 1px solid rgba(188, 19, 254, 0.5);
             color: #e580ff;
             text-decoration: none;
             border-radius: 8px;
             font-weight: 600;
-            font-size: 1.1rem;
+            font-size: 0.95rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             transition: all 0.3s ease;
         }
 
         .back-btn:hover {
-            background: rgba(188, 19, 254, 0.15);
-            border-color: #bc13fe;
+            background: rgba(188, 19, 254, 0.2);
+            border-color: var(--neon-magenta);
             color: #fff;
             box-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
-            transform: translateX(-5px);
+            transform: translateX(-3px);
         }
-
-        .back-btn svg { transition: transform 0.3s ease; }
-        .back-btn:hover svg { transform: translateX(-3px); }
 
         h1 {
             font-family: 'Orbitron', sans-serif;
-            color: #00f3ff;
-            text-shadow: 0px 0px 15px rgba(0, 243, 255, 0.3);
-            margin-top: 0;
-        }
-        
-        h2, h3 {
-            font-family: 'Orbitron', sans-serif;
-            color: #bc13fe;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+            margin: 6px 0 10px 0;
+            font-size: clamp(1.4rem, 3.8vw, 2.3rem);
+            letter-spacing: 1.5px;
+            text-align: center;
         }
 
-        /* =========================================
-           2. THE SIMULATOR APP CONTAINER
-           ========================================= */
+        .lead-summary {
+            max-width: 900px;
+            margin: 0 auto 20px auto;
+            text-align: center;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: #cbd5e1;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* 2. SIMULATOR WORKSPACE */
         #simulator-container {
+            background: linear-gradient(135deg, rgba(16, 24, 43, 0.85) 0%, rgba(8, 12, 22, 0.9) 100%);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-glow);
+            border-radius: 16px;
+            padding: 22px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 25px rgba(0, 243, 255, 0.12);
+            margin-bottom: 25px;
             position: relative;
-            background: #0a0a10;
-            border: 1px solid rgba(0, 243, 255, 0.3);
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            margin-bottom: 40px;
-            max-width: 1100px;
-            height: 700px; /* Fixed height to contain the 3D app */
-            overflow: hidden; /* Hide anything outside the container */
-            user-select: none;
         }
 
-        /* =========================================
-           3. SIMULATOR INNER UI (Adapted from original)
-           ========================================= */
-        :root {
-            --bg: #12121a; --panel: rgba(30,30,40,0.9); --accent: #00ffcc; --text: #eee;
+        .hud-telemetry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(4, 8, 16, 0.8);
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            border-radius: 10px;
+            padding: 10px 16px;
+            margin-bottom: 18px;
+            font-family: 'Share Tech Mono', monospace;
+            flex-wrap: wrap;
+            gap: 12px;
         }
 
-        .sim-header {
-            position: absolute; top: 0; left: 0; width: 100%; height: 60px;
-            background: var(--panel); border-bottom: 1px solid #444;
-            display: flex; align-items: center; justify-content: space-between; z-index: 100;
+        .telemetry-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.92rem;
         }
-        .nav-btns { margin-left: 20px; display: flex; gap: 10px; }
+
+        .tele-label {
+            color: #8da4be;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .tele-val {
+            color: var(--neon-cyan);
+            font-weight: 700;
+        }
+
+        .tele-val.pink {
+            color: #ff55bb;
+        }
+
+        .tele-val.green {
+            color: var(--neon-green);
+        }
+
+        .tele-val.amber {
+            color: var(--neon-amber);
+        }
+
+        .sim-layout {
+            display: grid;
+            grid-template-columns: 1.8fr 1fr;
+            gap: 20px;
+            align-items: stretch;
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            width: 100%;
+            background: radial-gradient(circle at 50% 50%, #0c1527 0%, #03060d 100%);
+            border-radius: 12px;
+            overflow: hidden;
+            touch-action: none;
+            border: 4px solid #1e293b;
+            box-shadow: 
+                0 0 0 2px rgba(0, 243, 255, 0.4),
+                0 15px 35px rgba(0, 0, 0, 0.8),
+                inset 0 0 35px rgba(0, 0, 0, 0.95);
+        }
+
+        .canvas-wrapper::before {
+            content: " ";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: 
+                linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+                repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.18) 0px, rgba(0, 0, 0, 0.18) 1px, transparent 1px, transparent 3px);
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16 / 10;
+            cursor: crosshair;
+        }
+
+        .controls-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: linear-gradient(145deg, rgba(11, 17, 30, 0.9) 0%, rgba(6, 9, 16, 0.95) 100%);
+            padding: 16px 18px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        }
+
+        .panel-heading {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border-bottom: 1px solid rgba(0, 243, 255, 0.25);
+            padding-bottom: 6px;
+            margin: 0;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .control-group label {
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: #cbd5e1;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .control-group label span {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--neon-green);
+        }
+
+        select, input[type="range"] {
+            min-height: 44px;
+        }
+
+        select {
+            background: #060c18;
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            color: #e2e8f0;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding: 8px 12px;
+            border-radius: 8px;
+            outline: none;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        select:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.4);
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            background: #0c1527;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            height: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 6px 0;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #00f3ff 30%, #0088aa 100%);
+            border: 2px solid #fff;
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.8);
+            cursor: pointer;
+        }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 4px;
+        }
+
         .sim-btn {
-            background: #333; color: #fff; border: 1px solid #555; padding: 8px 15px;
-            border-radius: 4px; cursor: pointer; transition: 0.2s; font-weight: bold;
-            display: flex; align-items: center; gap: 5px; font-family: 'Rajdhani', sans-serif;
+            background: linear-gradient(180deg, rgba(16, 28, 54, 0.9) 0%, rgba(8, 14, 28, 0.95) 100%);
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            color: var(--neon-cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 10px;
+            min-height: 48px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
         }
-        .sim-btn:hover, .sim-btn.active { background: var(--accent); color: #000; border-color: var(--accent); }
-        
-        .toolbar {
-            position: absolute; top: 75px; left: 20px; z-index: 100;
-            display: flex; gap: 5px; background: rgba(0,0,0,0.6); padding: 5px;
-            border-radius: 5px; border: 1px solid #444;
+
+        .sim-btn:hover {
+            border-color: var(--neon-cyan);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
+            transform: translateY(-2px);
         }
-        .tool-btn {
-            background: #222; color: #fff; border: 1px solid #444; padding: 6px 12px;
-            cursor: pointer; border-radius: 3px; font-size: 0.9rem; transition: 0.2s;
+
+        .sim-btn.running {
+            background: linear-gradient(180deg, rgba(0, 243, 255, 0.3) 0%, rgba(0, 180, 220, 0.5) 100%);
+            color: #03101a;
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 18px rgba(0, 243, 255, 0.7);
         }
-        .tool-btn:hover { background: #444; }
-        .tool-btn.active { background: var(--accent); color: #000; font-weight: bold; border-color: var(--accent); }
-        
-        .instructions { position: absolute; top: 120px; left: 20px; color: #aaa; font-size: 0.85rem; z-index: 50; pointer-events:none;}
 
-        .sim-controls {
-            position: absolute; bottom: 0; left: 0; width: 100%; height: 80px;
-            background: var(--panel); border-top: 1px solid #444;
-            display: flex; align-items: center; justify-content: center; gap: 20px; z-index: 100;
+        .sim-btn.secondary {
+            border-color: rgba(188, 19, 254, 0.5);
+            color: #e580ff;
         }
-        .control-group { display: flex; flex-direction: column; align-items: center; gap: 5px; }
-        .control-group label { font-size: 0.8rem; color: #aaa; text-transform: uppercase; }
-        .sim-controls select, .sim-controls input[type="range"] { background: #222; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px; }
-        
-        .action-btn { background: #bc13fe; color: #fff; font-size: 1.1rem; padding: 10px 20px; border:none; border-radius: 5px; cursor:pointer; font-family: 'Orbitron', sans-serif; font-weight:bold;}
-        .action-btn.running { background: #00f3ff; color: #000;}
 
-        /* Theory Panel */
-        #theory-panel {
-            position: absolute; top: 60px; right: 0; width: 320px; bottom: 80px;
-            background: rgba(20,20,25,0.95); border-left: 1px solid var(--accent);
-            padding: 20px; overflow-y: auto; z-index: 90; box-shadow: -5px 0 15px rgba(0,0,0,0.5);
+        .sim-btn.secondary:hover {
+            border-color: var(--neon-magenta);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
         }
-        #theory-panel h2 { color: var(--accent); margin-top: 0; font-size: 1.2rem;}
-        #theory-panel h3 { color: #aaa; border-bottom: 1px solid #444; padding-bottom: 5px; font-size: 1rem; }
-        #theory-panel ul { padding-left: 20px; line-height: 1.5; color: #ccc; font-size: 0.95rem; }
-        #theory-panel p { color: #ccc; font-size: 0.95rem;}
 
-        /* --- 3D ENGINE CSS --- */
-        #scene {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            perspective: 1000px; overflow: hidden; cursor: grab;
-            background: radial-gradient(circle at center, #2a2a3a 0%, #0a0a10 100%);
+        .sim-btn.warning {
+            border-color: rgba(255, 183, 3, 0.5);
+            color: #ffb703;
         }
-        #scene:active { cursor: grabbing; }
-        #world {
-            position: absolute; top: 50%; left: 50%;
-            width: 0; height: 0; transform-style: preserve-3d;
+
+        .sim-btn.warning:hover {
+            border-color: var(--neon-amber);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(255, 183, 3, 0.6);
         }
-        .detector-3d { position: absolute; transform-style: preserve-3d; display: none; }
-        .detector-3d.active { display: block; }
-        
-        /* 3D Box Helper Classes */
-        .box { position: absolute; transform-style: preserve-3d; }
-        .face { position: absolute; border: 1px solid #333; display: flex; align-items: center; justify-content: center; }
-        
-        /* 1. Geiger Tube */
-        #det-gm { transform: translate3d(-150px, -50px, 0); }
-        .gm-back { width: 400px; height: 120px; background: linear-gradient(#444, #222, #444); transform: translateZ(-30px); border-radius: 10px; }
-        .gm-front { width: 400px; height: 120px; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3); transform: translateZ(30px); border-radius: 10px; backdrop-filter: blur(2px); }
-        .gm-wire { width: 380px; height: 2px; background: #ffcc00; transform: translate3d(10px, 60px, 0); box-shadow: 0 0 10px #ffcc00; }
-        .gm-gas-atom { width: 10px; height: 10px; background: #00d2ff; border-radius: 50%; position: absolute; transform: translateZ(0); transition: 0.2s; }
-        .gm-gas-atom.ionized { background: #ff3333; box-shadow: 0 0 10px red; transform: translateY(-20px) scale(1.2); opacity: 0; }
-        
-        /* Counter Box */
-        .counter-box { width: 150px; height: 100px; transform: translate3d(300px, 150px, 50px); }
-        .cb-f { width: 150px; height: 100px; background: #bbb; transform: translateZ(25px); flex-direction: column; }
-        .cb-b { width: 150px; height: 100px; background: #888; transform: rotateY(180deg) translateZ(25px); }
-        .cb-l { width: 50px; height: 100px; background: #999; transform: rotateY(-90deg) translateZ(25px); }
-        .cb-r { width: 50px; height: 100px; background: #999; transform: rotateY(90deg) translateZ(125px); }
-        .cb-t { width: 150px; height: 50px; background: #ccc; transform: rotateX(90deg) translateZ(25px); }
-        .lcd { background: #111; color: red; font-family: monospace; font-size: 30px; padding: 5px 10px; border-radius: 3px; border: inset 2px #444; margin-top: 10px;}
 
-        /* 2. Scintillator */
-        #det-scintillator { transform: translate3d(-200px, -50px, 0); }
-        .sci-crys { width: 150px; height: 100px; transform: translate3d(0,0,0); }
-        .sci-f { width: 150px; height: 100px; background: rgba(0, 150, 255, 0.8); transform: translateZ(25px); border: 2px solid #00d2ff; }
-        .sci-b { width: 150px; height: 100px; background: #004488; transform: rotateY(180deg) translateZ(25px); }
-        .sci-t, .sci-bot { width: 150px; height: 50px; background: #0066aa; }
-        .sci-t { transform: rotateX(90deg) translateZ(25px); }
-        .sci-bot { transform: rotateX(-90deg) translateZ(75px); }
-        
-        .sci-pmt { width: 250px; height: 80px; transform: translate3d(150px, 10px, 0); }
-        .pmt-f { width: 250px; height: 80px; background: rgba(255,255,255,0.2); transform: translateZ(25px); }
-        .pmt-b { width: 250px; height: 80px; background: #444; transform: rotateY(180deg) translateZ(25px); }
-        .pmt-t { width: 250px; height: 50px; background: #666; transform: rotateX(90deg) translateZ(25px); }
-        
-        /* 3. Semiconductor */
-        #det-semiconductor { transform: translate3d(-100px, 50px, 0); }
-        .semi-dewar { width: 150px; height: 200px; transform: translate3d(0, 0, 0); }
-        .dew-f { width: 150px; height: 200px; background: #ccc; transform: translateZ(50px); }
-        .dew-b { width: 150px; height: 200px; background: #999; transform: rotateY(180deg) translateZ(50px); }
-        .dew-l, .dew-r { width: 100px; height: 200px; background: #aaa; }
-        .dew-l { transform: rotateY(-90deg) translateZ(50px); }
-        .dew-r { transform: rotateY(90deg) translateZ(100px); }
-        .dew-t { width: 150px; height: 100px; background: #ddd; transform: rotateX(90deg) translateZ(50px); }
-        
-        .semi-crys { width: 80px; height: 80px; transform: translate3d(35px, -100px, 10px); }
-        .cry-f { width: 80px; height: 80px; background: #2c3e50; transform: translateZ(15px); border: 1px solid #111; }
-        
-        /* 4. Cloud Chamber */
-        #det-cloud { transform: translate3d(-150px, -50px, 0); }
-        .cc-base { width: 300px; height: 100px; transform: translate3d(0, 100px, 0); }
-        .cc-bf { width: 300px; height: 100px; background: #d35400; transform: translateZ(100px); }
-        .cc-bb { width: 300px; height: 100px; background: #a04000; transform: rotateY(180deg) translateZ(100px); }
-        .cc-bl, .cc-br { width: 200px; height: 100px; background: #ba4a00; }
-        .cc-bl { transform: rotateY(-90deg) translateZ(100px); }
-        .cc-br { transform: rotateY(90deg) translateZ(200px); }
-        .cc-bt { width: 300px; height: 200px; background: #b87333; transform: rotateX(90deg) translateZ(100px); box-shadow: inset 0 0 30px #000; } 
-        
-        .cc-glass { width: 280px; height: 120px; transform: translate3d(10px, -20px, 0); }
-        .cg-f { width: 280px; height: 120px; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3); transform: translateZ(90px); }
-        .cg-b { width: 280px; height: 120px; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3); transform: rotateY(180deg) translateZ(90px); }
-        .cg-l, .cg-r { width: 180px; height: 120px; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3); }
-        .cg-l { transform: rotateY(-90deg) translateZ(90px); }
-        .cg-r { transform: rotateY(90deg) translateZ(190px); }
-        .cg-t { width: 280px; height: 180px; background: #111; border: 4px solid #0055ff; transform: rotateX(90deg) translateZ(60px); }
+        /* 3. POLICY-COMPLIANT AD CONTAINER */
+        .ad-slot-wrapper {
+            margin: 30px auto;
+            text-align: center;
+            clear: both;
+        }
 
-        /* Animation Canvases */
-        .anim-canvas { position: absolute; pointer-events: none; }
-        #canvas-gm { transform: translate3d(0, 0, 0); width: 400px; height: 120px; }
-        #canvas-scint { transform: translate3d(0, 0, 10px); width: 400px; height: 120px; }
-        #canvas-semi { transform: translate3d(35px, -100px, 16px); width: 80px; height: 80px; }
-        #canvas-cloud { transform: rotateX(90deg) translateZ(99px); width: 300px; height: 200px; }
+        .ad-disclaimer {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            margin-bottom: 6px;
+        }
 
-        .wire { position: absolute; background: #e74c3c; transform-style: preserve-3d; }
+        .ad-box-placeholder {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            min-height: 90px;
+            max-width: 970px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #475569;
+            font-size: 0.85rem;
+            border-radius: 8px;
+        }
 
-        /* =========================================
-           4. EDUCATIONAL CONTENT
-           ========================================= */
+        /* 4. EDUCATIONAL CONTENT SECTION */
         .educational-content {
-            max-width: 1100px;
-            line-height: 1.7;
-            font-size: 1.1rem;
+            line-height: 1.75;
+            font-size: 1.05rem;
             color: #94a3b8;
-            background: rgba(10, 14, 23, 0.8);
+            background: rgba(10, 14, 23, 0.85);
             padding: 30px;
-            border-radius: 15px;
-            border-left: 4px solid #00f3ff;
-            margin-bottom: 50px;
+            border-radius: 16px;
+            border-left: 4px solid var(--neon-cyan);
+            border-top: 1px solid rgba(0, 243, 255, 0.2);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin-bottom: 35px;
         }
 
-        .educational-content h2, .educational-content h3 {
-            margin-top: 1.5em;
+        .educational-content h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-magenta);
+            border-bottom: 1px solid rgba(188, 19, 254, 0.3);
+            padding-bottom: 8px;
+            margin-top: 1.8em;
+            margin-bottom: 0.6em;
+            font-size: 1.45rem;
+        }
+
+        .educational-content h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: #38bdf8;
+            margin-top: 1.4em;
+            margin-bottom: 0.4em;
+            font-size: 1.15rem;
         }
 
         .educational-content strong {
@@ -252,555 +419,1484 @@
             padding: 2px 6px;
             border-radius: 4px;
         }
-        
-        .qa-box {
-            background: rgba(188, 19, 254, 0.05);
-            border: 1px solid rgba(188, 19, 254, 0.3);
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 20px;
+
+        .formula-box {
+            background: rgba(4, 9, 20, 0.7);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-left: 3px solid var(--neon-green);
+            padding: 14px 18px;
+            margin: 14px 0;
+            border-radius: 6px;
+            font-family: 'Share Tech Mono', monospace;
+            color: #a7f3d0;
+            font-size: 1.05rem;
+            line-height: 1.6;
         }
-        .qa-box h4 {
-            color: #00f3ff;
+
+        .task-card {
+            background: rgba(15, 23, 42, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 18px;
+        }
+
+        .task-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            color: var(--neon-cyan);
+            margin-bottom: 8px;
+        }
+
+        details {
+            margin-top: 25px;
+            background: rgba(5, 10, 20, 0.8);
+            border: 1px solid rgba(188, 19, 254, 0.4);
+            border-radius: 10px;
+            padding: 15px 20px;
+        }
+
+        summary {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            color: #e580ff;
+            cursor: pointer;
+            padding: 6px 0;
+            user-select: none;
+        }
+
+        .solution-step {
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+            padding: 12px 0;
+        }
+
+        .solution-step:last-child {
+            border-bottom: none;
+        }
+
+        /* 5. FOOTER & ACCURATE ALIGNED LINKS */
+        footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px 20px 20px 20px;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .footer-nav {
+            display: flex;
+            justify-content: center;
+            gap: 22px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .footer-nav a, .footer-modal-trigger {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.2s, text-shadow 0.2s;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .footer-nav a:hover, .footer-modal-trigger:hover {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
+        }
+
+        /* 6. SELF-CONTAINED POLICY MODALS (Zero 404s, Exact Match with Home) */
+        .policy-modal {
+            position: fixed !important;
+            top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
+            width: 100vw !important; height: 100vh !important;
+            background: rgba(4, 7, 15, 0.92) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 99999 !important;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-body {
+            background: linear-gradient(145deg, #0b111e 0%, #060913 100%);
+            border: 2px solid var(--neon-cyan);
+            border-radius: 16px;
+            max-width: 820px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 35px 30px;
+            color: #cbd5e1;
+            box-shadow: 0 0 40px rgba(0, 243, 255, 0.25);
+            line-height: 1.75;
+            position: relative;
+            text-align: left;
+        }
+
+        .modal-body h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-cyan);
             margin-top: 0;
+            font-size: 1.6rem;
+        }
+
+        .modal-body h3 {
+            color: var(--neon-magenta);
+            font-family: 'Orbitron', sans-serif;
+            margin-top: 24px;
+            margin-bottom: 8px;
             font-size: 1.15rem;
         }
-        .answer-key {
-            margin-top: 30px;
-            border-top: 1px dashed rgba(255, 255, 255, 0.2);
-            padding-top: 20px;
+
+        .modal-date {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--neon-green);
+            font-size: 0.9rem;
+            margin-top: -6px;
+            margin-bottom: 16px;
+        }
+
+        .modal-close-btn {
+            background: linear-gradient(180deg, rgba(188, 19, 254, 0.4), rgba(188, 19, 254, 0.15));
+            border: 1px solid var(--neon-magenta);
+            color: #fff;
+            padding: 8px 18px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            float: right;
+            margin-bottom: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close-btn:hover {
+            background: var(--neon-magenta);
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.8);
+        }
+
+        @media (max-width: 860px) {
+            body { padding: 10px; }
+            #simulator-container, .educational-content { padding: 14px; }
+            .sim-layout { grid-template-columns: 1fr; }
+            .btn-grid { grid-template-columns: 1fr; }
+            .hud-telemetry { flex-direction: column; align-items: flex-start; }
+            .modal-body { padding: 22px 18px; }
         }
     </style>
 </head>
 <body>
-    
-    <!-- 1. NAVIGATION -->
-    <a href="../index.html" class="back-btn">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
-        </svg>
-        Back to LuyaliSims
-    </a>
-    
-    <h1>3D Radiation Detectors Simulator</h1>
 
-    <!-- 2. THE SIMULATOR APP CONTAINER -->
-    <div id="simulator-container">
+    <!-- 1. HEADER & TOP NAVIGATION -->
+    <header>
+        <nav class="top-nav">
+            <a href="../index.html" class="back-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Back to LuyaliSims
+            </a>
+            <span style="font-family: 'Share Tech Mono', monospace; font-size: 0.85rem; color: #64748b;">
+                MODULE ID: NUC-DET-305
+            </span>
+        </nav>
         
-        <!-- Headers and Toolbars scoped inside the container -->
-        <div class="sim-header">
-            <div class="nav-btns">
-                <button class="sim-btn active" onclick="setDet('gm', event)">Geiger-Müller</button>
-                <button class="sim-btn" onclick="setDet('scintillator', event)">Scintillation</button>
-                <button class="sim-btn" onclick="setDet('semiconductor', event)">Semiconductor</button>
-                <button class="sim-btn" onclick="setDet('cloud', event)">Cloud Chamber</button>
-            </div>
-            <div style="font-size: 1.2rem; font-weight:bold; color:var(--accent); margin-right: 20px;">
-                ⚛️ 3D Lab View
-            </div>
-        </div>
+        <h1>3D Radiation Detectors Simulator</h1>
+        
+        <!-- Contextual Summary: 60-80 words above the fold -->
+        <p class="lead-summary">
+            Explore ionizing radiation detection mechanics across four cutting-edge laboratory instruments: Geiger-Müller ionization tubes, Thallium-activated Sodium Iodide scintillation crystals with photomultiplier cascades, High-Purity Germanium cryogenic semiconductors, and supersaturated alcohol vapor cloud chambers. Modulate incident isotope particle types, radiation flux, applied bias voltages, and shielding configurations to directly observe Townsend avalanches, secondary photoemission, electron-hole drift, and visible condensation particle tracks in real time.
+        </p>
+    </header>
 
-        <div class="toolbar">
-            <button class="tool-btn active" id="btn-rotate" onclick="setTool('rotate')">🔄 Rotate</button>
-            <button class="tool-btn" id="btn-pan" onclick="setTool('pan')">✋ Pan</button>
-            <button class="tool-btn" onclick="resetView()">🎯 Reset View</button>
-        </div>
-
-        <div class="instructions">
-            🖱️ <b>Click & Drag</b> on the dark space to move | 🖱️ <b>Scroll</b> to Zoom
-        </div>
-
-        <!-- 3D Environment -->
-        <div id="scene">
-            <div id="world">
-                <!-- 1. Geiger-Muller Tube -->
-                <div id="det-gm" class="detector-3d active">
-                    <div class="gm-back face"></div>
-                    <div class="gm-wire face"></div>
-                    <div id="gm-atoms" style="position:absolute; width:400px; height:120px; transform:translateZ(0);"></div>
-                    <canvas id="canvas-gm" class="anim-canvas" width="400" height="120"></canvas>
-                    <div class="gm-front face"></div>
-                    <div class="wire" style="width:200px; height:4px; top:60px; left:200px; transform: rotateZ(30deg) translateZ(25px);"></div>
-                    <div class="box counter-box">
-                        <div class="face cb-b"></div><div class="face cb-l"></div><div class="face cb-r"></div><div class="face cb-t"></div>
-                        <div class="face cb-f">
-                            <div style="font-size:10px; color:#000; font-weight:bold;">Scaler / Counter</div>
-                            <div class="lcd" id="gm-lcd">0000</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 2. Scintillator -->
-                <div id="det-scintillator" class="detector-3d">
-                    <div class="box sci-crys">
-                        <div class="face sci-b"></div><div class="face sci-t"></div><div class="face sci-bot"></div>
-                        <div class="face sci-f"><b style="color:#fff;">NaI(Tl)</b></div>
-                    </div>
-                    <div class="box sci-pmt">
-                        <div class="face pmt-b"></div><div class="face pmt-t"></div>
-                        <div class="face pmt-f">
-                            <div style="position:absolute; left:20px; width:5px; height:60px; background:#f39c12;"></div>
-                            <div style="position:absolute; left:50px; top:10px; width:4px; height:30px; background:#ccc; transform:rotate(-30deg);"></div>
-                            <div style="position:absolute; left:90px; top:40px; width:4px; height:30px; background:#ccc; transform:rotate(30deg);"></div>
-                            <div style="position:absolute; left:130px; top:10px; width:4px; height:30px; background:#ccc; transform:rotate(-30deg);"></div>
-                            <div style="position:absolute; left:170px; top:40px; width:4px; height:30px; background:#ccc; transform:rotate(30deg);"></div>
-                            <div style="position:absolute; right:20px; width:10px; height:40px; background:gold;"></div>
-                        </div>
-                    </div>
-                    <canvas id="canvas-scint" class="anim-canvas" width="400" height="120"></canvas>
-                </div>
-
-                <!-- 3. Semiconductor -->
-                <div id="det-semiconductor" class="detector-3d">
-                    <div class="box semi-dewar">
-                        <div class="face dew-b"></div><div class="face dew-l"></div><div class="face dew-r"></div><div class="face dew-t"></div>
-                        <div class="face dew-f"><b style="color:#000;">LN2 (-196°C)</b></div>
-                    </div>
-                    <div class="box semi-crys">
-                        <div class="face cry-f"></div>
-                    </div>
-                    <div class="face" style="width:40px; height:100px; background:#888; left:55px; top:-100px; transform:translateZ(25px);"></div>
-                    <canvas id="canvas-semi" class="anim-canvas" width="80" height="80"></canvas>
-                </div>
-
-                <!-- 4. Cloud Chamber -->
-                <div id="det-cloud" class="detector-3d">
-                    <div class="box cc-base">
-                        <div class="face cc-bb"></div><div class="face cc-bl"></div><div class="face cc-br"></div>
-                        <div class="face cc-bf"><b style="color:#fff;">Peltier Cooling</b></div>
-                        <div class="face cc-bt"></div>
-                    </div>
-                    <div class="box cc-glass">
-                        <div class="face cg-b"></div><div class="face cg-l"></div><div class="face cg-r"></div>
-                        <div class="face cg-t"><div style="color:#aaa; font-size:12px;">Evaporator Lid</div></div>
-                        <canvas id="canvas-cloud" class="anim-canvas" width="300" height="200"></canvas>
-                        <div class="face cg-f"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Overlays -->
-        <div id="theory-panel">
-            <h2 id="t-title">Geiger-Müller Tube</h2>
-            <h3>Working Principle</h3>
-            <p id="t-principle">A high voltage is applied across a gas-filled cylinder. When radiation enters, it ionizes a gas atom, creating an electron. The extreme voltage pulls this electron violently to the central wire, causing a cascade of secondary ionizations (an avalanche). This creates a single measurable pulse.</p>
+    <main>
+        <!-- 2. SIMULATOR APP WORKSPACE -->
+        <section id="simulator-container" aria-label="Interactive Simulator Workspace">
             
-            <h3>Observation Tasks</h3>
-            <ul id="t-tasks">
-                <li>Observe the blue gas atoms. Watch them turn red (ionized) when hit.</li>
-                <li>Note the yellow electron shooting to the central wire.</li>
-                <li>Change radiation to Gamma. Notice how rarely it interacts with the gas compared to Alpha/Beta.</li>
+            <!-- Telemetry Status Bar -->
+            <div class="hud-telemetry">
+                <div class="telemetry-item">
+                    <span class="tele-label">Detector:</span>
+                    <span id="tele-detector" class="tele-val">Geiger-Müller Tube</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Count Rate:</span>
+                    <span id="readout-cpm" class="tele-val pink">0000 CPM</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Total Scaler:</span>
+                    <span id="readout-scaler" class="tele-val green">0 Pulses</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Signal Metric:</span>
+                    <span id="readout-metric" class="tele-val amber">0.00 V Pulse</span>
+                </div>
+            </div>
+
+            <div class="sim-layout">
+                <!-- 3D CRT Holographic Canvas Display -->
+                <div class="canvas-wrapper" id="canvasFrame">
+                    <canvas id="simCanvas" width="800" height="500"></canvas>
+                </div>
+
+                <!-- Controls Console -->
+                <div class="controls-panel">
+                    <h3 class="panel-heading">Instrument Console</h3>
+
+                    <div class="control-group">
+                        <label for="detector-select">Detector Technology:</label>
+                        <select id="detector-select">
+                            <option value="gm" selected>1. Geiger-Müller (Townsend Avalanche)</option>
+                            <option value="scintillator">2. Scintillation Crystal + PMT</option>
+                            <option value="semiconductor">3. Cryogenic Semiconductor (HPGe)</option>
+                            <option value="cloud">4. Wilson Supersaturated Cloud Chamber</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="source-select">Radiation Source:</label>
+                        <select id="source-select">
+                            <option value="alpha">Alpha (α) - 5.5 MeV He-4 Core (+2e)</option>
+                            <option value="beta">Beta (β) - 1.2 MeV High-Speed Electron (-1e)</option>
+                            <option value="gamma" selected>Gamma (γ) - 662 keV EM Photon (0e)</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="param-intensity">Emitter Activity: <span id="val-intensity">18 kBq</span></label>
+                        <input type="range" id="param-intensity" min="2" max="60" step="2" value="18">
+                    </div>
+
+                    <div class="control-group">
+                        <label for="param-voltage">Applied Potential / Bias: <span id="val-voltage">500 V</span></label>
+                        <input type="range" id="param-voltage" min="100" max="1200" step="50" value="500">
+                    </div>
+
+                    <div class="control-group">
+                        <label for="param-shield">Absorber / Window Shielding:</label>
+                        <select id="param-shield">
+                            <option value="none" selected>None (Open Aperture / Thin Mica)</option>
+                            <option value="paper">Paper Sheet (0.1 mm Cellulose)</option>
+                            <option value="aluminum">Aluminum Sheet (3.0 mm)</option>
+                            <option value="lead">Lead Brick (15.0 mm Pb)</option>
+                        </select>
+                    </div>
+
+                    <!-- Action Controls -->
+                    <div class="btn-grid">
+                        <button id="runBtn" class="sim-btn">▶ Start Emitter</button>
+                        <button id="resetBtn" class="sim-btn secondary">↺ Clear Scaler</button>
+                    </div>
+                    <div class="btn-grid">
+                        <button id="audioBtn" class="sim-btn warning">🔊 Audio: ON</button>
+                        <button id="fullscreenBtn" class="sim-btn secondary">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                            </svg>
+                            Fullscreen
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. SAFE AD PLACEMENT SLOT -->
+        <div class="ad-slot-wrapper">
+            <div class="ad-disclaimer">Advertisement</div>
+            <div class="ad-box-placeholder">
+                <!-- Google AdSense Responsive Unit Goes Here -->
+                <span>[AdSense Responsive Display Unit - Module NUC-DET-305]</span>
+            </div>
+        </div>
+
+        <!-- 4. EDUCATIONAL REFERENCE ARTICLE -->
+        <article class="educational-content">
+            <section>
+                <h2>How to Operate the Simulator</h2>
+                <p>
+                    This simulator replicates the microscopic and macroscopic physics occurring inside modern radiation laboratory sensors. Follow these procedural steps to conduct quantitative investigations:
+                </p>
+                <ul>
+                    <li><strong>Instrument Selector:</strong> Choose between a gas-filled cylindrical <em>Geiger-Müller Tube</em>, an inorganic crystal <em>NaI(Tl) Scintillation Detector</em> with an electron-multiplying photomultiplier tube, a solid-state <em>HPGe Cryogenic Semiconductor</em>, or a visual <em>Wilson Cloud Chamber</em>.</li>
+                    <li><strong>Source Radiation:</strong> Select an ionizing emission type. <em>Alpha</em> particles carry high linear energy transfer (LET) and massive charge (+2e), <em>Beta</em> particles represent relativistic leptons (-1e), while <em>Gamma</em> rays simulate energetic electromagnetic quanta (photons) with zero charge.</li>
+                    <li><strong>Emitter Activity Slider:</strong> Modulate the source radioactivity from 2 kBq up to 60 kBq to control incident particle flux. Observe dead-time saturation and pulse pileup at elevated activity rates.</li>
+                    <li><strong>Applied Potential (Voltage) Slider:</strong> Adjust detector high voltage. For the Geiger tube, examine the ionization chamber regime (&lt; 250 V), the proportional region (300 V - 600 V), and the continuous Geiger discharge plateau (800 V - 1100 V).</li>
+                    <li><strong>Shielding Medium:</strong> Insert physical attenuators (paper, aluminum, or lead) directly into the particle trajectory to observe penetration depth, photo-electric absorption, Compton scattering, and range limits.</li>
+                    <li><strong>Interactive Canvas:</strong> Click or tap anywhere inside the active detector cross-section to inject an individual radiation quantum on demand. Observe physical collisions, secondary electron avalanches, scintillation fluor emission, or condensed cloud droplet tracks.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Scientific Theory & Working Principles</h2>
+                <p>
+                    Because ionizing radiation cannot be directly perceived by human sensory organs, experimental nuclear physics relies on transforming the kinetic energy lost by passing particles into macroscopic electrical, optical, or thermodynamic signals. The primary mechanisms governing our four simulated instruments include:
+                </p>
+
+                <h3>1. Townsend Avalanche & Gas Ionization (Geiger-Müller Tube)</h3>
+                <p>
+                    A Geiger-Müller detector consists of a grounded cylindrical cathode filled with an inert gas (typically 90% Argon at low pressure, ~0.1 atm) and a tiny fraction of a halogen quenching agent (e.g., Bromine, 10%), surrounding a micro-thin central tungsten anode wire held at hundreds of positive volts. When an incident photon or charged particle strikes an argon atom, it liberates an electron:
+                </p>
+                <div class="formula-box">
+                    Primary Ionization: Radiation + Ar → Ar⁺ + e⁻
+                </div>
+                <p>
+                    The radial electric field increases exponentially toward the central wire. As free electrons accelerate through this intense field, their acquired kinetic energy exceeds the first ionization potential of surrounding gas atoms, triggering secondary collisions. This cascading multiplication is termed a <strong>Townsend avalanche</strong>. Because ultraviolet photons emitted during de-excitation spread throughout the entire tube, the discharge spreads along the full length of the anode wire. Consequently, Geiger-Müller tubes yield identical output pulse amplitudes regardless of whether the initiating particle possessed 50 keV or 5 MeV, rendering them exceptional counters but incapable of direct energy spectroscopy.
+                </p>
+
+                <h3>2. Luminescence & Dynode Multiplication (Scintillation Detectors)</h3>
+                <p>
+                    Scintillation spectrometers utilize an inorganic single crystal such as Sodium Iodide doped with Thallium activator atoms, denoted <strong>NaI(Tl)</strong>. Incoming radiation ionizes crystal lattice valence electrons into the conduction band, forming bound electron-hole pairs called excitons. These excitons migrate to Tl⁺ impurity energy levels positioned within the forbidden band gap. Radiative de-excitation releases visible/UV photons (around 415 nm wavelength).
+                </p>
+                <p>
+                    The scintillation photons enter an optically coupled <strong>Photomultiplier Tube (PMT)</strong>. First, they strike a thin photocathode (e.g., Sb-Cs alloy), ejecting photoelectrons via the external photoelectric effect. These electrons are electrostatically focused onto a series of 10 to 14 sequential electrodes known as <strong>dynodes</strong>, each maintained at a successively higher potential (+100 V per stage). Each impacting electron knocks out 3 to 6 secondary electrons. Across n stages, the initial photoelectron charge is multiplied by a total gain factor:
+                </p>
+                <div class="formula-box">
+                    Overall PMT Multiplication Gain: G = δ^n
+                </div>
+                <p>
+                    Because the total number of light flashes produced in the crystal is strictly proportional to the energy deposited by the incident radiation, the resultant electrical current pulse height serves as an exquisite gamma-ray spectrometer.
+                </p>
+
+                <h3>3. Solid-State Electron-Hole Creation (High-Purity Germanium - HPGe)</h3>
+                <p>
+                    Semiconductor radiation detectors function as solid-state equivalents of ionization chambers. Germanium has a very narrow band gap (0.67 eV at room temperature, 0.74 eV at 77 K). The average energy required to create an electron-hole pair in germanium (ε) is only <strong>2.96 eV</strong>, compared to ~30 eV required to ionize a gas atom in a GM tube or ~100 eV per photoelectron in a scintillator-PMT system. Because the number of charge carriers created is 10 to 30 times higher, statistical fluctuations are drastically reduced, bestowing HPGe detectors with unmatched energy resolution (peak broadening under 0.2%).
+                </p>
+                <p>
+                    However, because Germanium's thermal band gap is so diminutive, ambient thermal energy (kT = 0.026 eV at 300 K) would continuously elevate thousands of valence electrons into the conduction band, causing an immense leakage current that completely drowns radiation signals. Consequently, HPGe detectors must be cryogenically cooled to <strong>77 Kelvin (-196 °C)</strong> using liquid nitrogen (LN2) dewar flasks or closed-cycle mechanical Stirling cryo-coolers.
+                </p>
+
+                <h3>4. Wilson Cloud Chamber Condensation Tracking</h3>
+                <p>
+                    The Wilson cloud chamber operates on thermodynamic supersaturation. A closed chamber containing air and vaporized isopropyl alcohol is cooled at its base plate (via dry ice at -78.5 °C or thermoelectric Peltier cooling modules), creating a steep vertical temperature gradient. Near the cold black bottom plate, the alcohol vapor enters a metastable <em>supersaturated</em> state where the partial pressure exceeds the equilibrium vapor pressure.
+                </p>
+                <p>
+                    Because condensation requires nucleation seeds, passing ionizing radiation serves as instant focal points: the ions produced along the particle trajectory electrostatically stabilize droplet embryonic radii below the Kelvin critical threshold. Alcohol droplets rapidly condense along the ionized path, creating brilliant, visible white vapor tracks illuminated under lateral light sources.
+                </p>
+            </section>
+
+            <section>
+                <h2>Mathematical Foundations & Formulas</h2>
+                <p>
+                    Quantitative analysis of radiation detection relies on exact formulations relating charge multiplication, dead time counting loss, beam attenuation, and semiconductor carrier generation:
+                </p>
+                
+                <div class="formula-box">
+                    1. Total Collected Ionization Charge:<br>
+                    Q = N x e x M<br>
+                    where N = number of initial ion pairs, e = 1.602 x 10^(-19) C, M = avalanche multiplication factor.<br><br>
+
+                    2. Non-Paralyzable Dead Time Counting Correction:<br>
+                    N_true = N_obs / (1 - (N_obs x τ))<br>
+                    where N_true = actual true event rate (cps), N_obs = recorded count rate (cps), τ = dead time of the detector (seconds).<br><br>
+
+                    3. Narrow-Beam Exponential Radiation Attenuation (Beer-Lambert Law):<br>
+                    I(x) = I_0 x e^(-μ x)<br>
+                    where I_0 = unattenuated radiation intensity, x = absorber thickness (cm), μ = linear attenuation coefficient (cm^(-1)).<br><br>
+
+                    4. Total Charge Generated in Cryogenic Semiconductor:<br>
+                    Q_semi = (E_dep / ε) x e<br>
+                    where E_dep = deposited radiation energy (eV), ε = average pair creation energy (2.96 eV for Ge at 77 K).<br><br>
+
+                    5. PMT Anode Pulse Voltage Amplitude:<br>
+                    V_pulse = (N_pe x G x e) / C_anode<br>
+                    where N_pe = photoelectrons liberated at cathode, G = dynode multiplication gain, C_anode = output collection capacitance (Farads).
+                </div>
+            </section>
+
+            <section>
+                <h2>Real-World Industrial & Engineering Applications</h2>
+                <p>
+                    Ionizing radiation sensors form the bedrock of public safety, energy generation, advanced medicine, and aerospace infrastructure:
+                </p>
+                <ul>
+                    <li><strong>Nuclear Power Plant Health Physics:</strong> Commercial fission reactors employ arrays of pressurized ionization chambers, Boron-10 lined proportional neutron counters, and GM tube area monitors to detect shielding degradation, track fuel integrity, and maintain occupational exposure below strict ALARA (As Low As Reasonably Achievable) regulatory limits.</li>
+                    <li><strong>Clinical Oncology & Diagnostic Imaging (PET/SPECT):</strong> Positron Emission Tomography (PET) scanners employ dense rings of LSO/BGO scintillation crystals coupled to silicon photomultipliers (SiPMs). When a positron emitted from injected fluorodeoxyglucose (FDG-18) annihilates an electron, it produces two back-to-back 511 keV gamma photons detected via nanosecond coincidence timing to reconstruct metastatic tumor geometry.</li>
+                    <li><strong>Homeland Security & Border Isotope Identification:</strong> Handheld and portal-mounted Radioisotope Identification Devices (RIIDs) utilize HPGe and NaI(Tl) spectrometers at cargo seaports to instantly differentiate harmless naturally occurring radioactive materials (NORM like potassium fertilizers or cat litter) from weapons-grade isotopes such as Highly Enriched Uranium (HEU-235) and Plutonium-239.</li>
+                    <li><strong>Deep-Space Cosmic Ray Dosimetry:</strong> Spacecraft such as the International Space Station and Mars rovers utilize solid-state silicon telescope detectors and Cherenkov radiators to monitor Solar Particle Events (SPEs) and Galactic Cosmic Rays (GCRs), safeguarding astronauts and sensitive microprocessor electronics from single-event upsets (SEUs).</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Practice Problems & Diagnostic Tasks</h2>
+                <p>Validate your theoretical and quantitative mastery by solving the following five graded laboratory scenarios:</p>
+
+                <div class="task-card">
+                    <div class="task-title">Task 1: Charge Collection in Geiger-Müller Avalanche</div>
+                    <p>
+                        A single 1.5 MeV beta particle enters an Argon-filled Geiger tube and expends 90 keV of its kinetic energy ionizing gas atoms before exiting. If producing one primary ion pair in Argon requires an average energy of 26.4 eV, and the tube operates at an applied bias yielding a Townsend multiplication factor of M = 4.0 x 10^7, calculate:
+                        (a) the number of primary ion pairs formed, and (b) the total electrical charge Q collected at the anode wire.
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 2: Non-Paralyzable Dead Time Saturation Correction</div>
+                    <p>
+                        A health physics GM survey meter with a measured non-paralyzable resolving dead time of τ = 180 microseconds (1.80 x 10^(-4) s) displays an observed count rate of 2,400 counts per second (cps) near a spent fuel transfer flask. Compute the true incident radiation event rate (N_true) striking the detector window, and calculate the counting loss percentage.
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 3: Photomultiplier Dynode Gain and Pulse Voltage Output</div>
+                    <p>
+                        A NaI(Tl) scintillation detector absorbs a 662 keV gamma ray from Cesium-137. The crystal emits 25,000 scintillation photons per MeV of absorbed energy, with an optical transfer efficiency of 80% to a bialkali photocathode possessing a 20% quantum efficiency. The resulting photoelectrons enter a PMT containing 10 successive dynodes, each having a secondary emission factor of δ = 4.2. Assuming an output load capacitance of C = 35 pF, calculate the total electron gain G of the tube and the resulting peak voltage amplitude V_pulse of the signal.
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 4: High-Purity Germanium (HPGe) Energy Resolution Comparison</div>
+                    <p>
+                        An HPGe cryogenic semiconductor detector (ε = 2.96 eV per electron-hole pair) and a gas proportional counter (W = 26.0 eV per ion pair) each completely absorb a 1.332 MeV gamma ray from Cobalt-60.
+                        (a) Calculate the total number of fundamental charge carrier pairs created in both detectors.
+                        (b) By what factor does the statistical theoretical charge carrier creation in HPGe surpass that of the gas chamber?
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 5: Multi-Stage Shielding Attenuation for Radiation Protection</div>
+                    <p>
+                        A high-intensity narrow-beam industrial Gamma source (I_0 = 80,000 photons/sec) passes through a composite shield consisting of 6.0 mm of Aluminum (linear attenuation coefficient μ_Al = 0.54 cm^(-1)) followed by 12.0 mm of Lead (linear attenuation coefficient μ_Pb = 1.15 cm^(-1)).
+                        Calculate the transmitted gamma intensity exiting the rear face of the lead barrier.
+                    </p>
+                </div>
+
+                <!-- Collapsible Solutions -->
+                <details>
+                    <summary>Click to Reveal Solutions and Step-by-Step Proofs</summary>
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 1:</strong></p>
+                        <p>
+                            (a) Number of primary ion pairs formed:<br>
+                            E_deposited = 90 keV = 90,000 eV<br>
+                            N = E_deposited / W_ion = 90,000 eV / 26.4 eV ≈ <strong>3,409 primary ion pairs</strong>.<br>
+                            (b) Total collected electrical charge Q:<br>
+                            Q = N x e x M = 3,409 x (1.602 x 10^(-19) C) x (4.0 x 10^7)<br>
+                            Q = 3,409 x 6.408 x 10^(-12) C ≈ <strong>2.18 x 10^(-8) Coulombs (21.8 nC)</strong>.
+                        </p>
+                    </div>
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 2:</strong></p>
+                        <p>
+                            Apply the non-paralyzable dead time correction formula:<br>
+                            N_true = N_obs / (1 - (N_obs x τ))<br>
+                            N_obs x τ = 2,400 cps x 1.80 x 10^(-4) s = 0.432<br>
+                            N_true = 2,400 / (1 - 0.432) = 2,400 / 0.568 ≈ <strong>4,225 counts per second (cps)</strong>.<br>
+                            Counting Loss Percentage = ((N_true - N_obs) / N_true) x 100% = ((4,225 - 2,400) / 4,225) x 100% ≈ <strong>43.2% loss</strong> due to dead time resolving delay.
+                        </p>
+                    </div>
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 3:</strong></p>
+                        <p>
+                            (1) Calculate initial scintillation photons produced:<br>
+                            Photons = 0.662 MeV x 25,000 photons/MeV = 16,550 photons.<br>
+                            (2) Photons reaching photocathode = 16,550 x 0.80 = 13,240 photons.<br>
+                            (3) Photoelectrons liberated = 13,240 x 0.20 = 2,648 photoelectrons (N_pe).<br>
+                            (4) PMT multiplication gain across 10 dynodes:<br>
+                            G = δ^n = 4.2^10 ≈ <strong>1,708,020 (1.71 x 10^6)</strong>.<br>
+                            (5) Total charge reaching anode Q_anode = N_pe x G x e:<br>
+                            Q_anode = 2,648 x 1.708 x 10^6 x 1.602 x 10^(-19) C ≈ 7.245 x 10^(-10) C.<br>
+                            (6) Voltage pulse amplitude V = Q / C:<br>
+                            V_pulse = (7.245 x 10^(-10) C) / (35 x 10^(-12) F) ≈ <strong>20.7 Volts</strong>.
+                        </p>
+                    </div>
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 4:</strong></p>
+                        <p>
+                            Total absorbed gamma energy E = 1.332 MeV = 1,332,000 eV.<br>
+                            (a) For HPGe semiconductor:<br>
+                            N_semi = E / ε = 1,332,000 eV / 2.96 eV = <strong>450,000 electron-hole pairs</strong>.<br>
+                            For gas proportional chamber:<br>
+                            N_gas = E / W = 1,332,000 eV / 26.0 eV = <strong>51,231 ion pairs</strong>.<br>
+                            (b) Carrier Ratio = 450,000 / 51,231 ≈ <strong>8.78 times more carriers</strong>.<br>
+                            Because statistical fluctuation scales inversely with √N, the HPGe detector provides nearly 3 times smaller statistical peak variance, enabling ultra-fine gamma spectroscopy.
+                        </p>
+                    </div>
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 5:</strong></p>
+                        <p>
+                            Convert thicknesses to centimeters: x_Al = 6.0 mm = 0.60 cm; x_Pb = 12.0 mm = 1.20 cm.<br>
+                            Apply the combined multi-layer attenuation law:<br>
+                            I_final = I_0 x e^(-(μ_Al x x_Al + μ_Pb x x_Pb))<br>
+                            Exponent = -((0.54 cm^(-1) x 0.60 cm) + (1.15 cm^(-1) x 1.20 cm))<br>
+                            Exponent = -(0.324 + 1.380) = -1.704.<br>
+                            e^(-1.704) ≈ 0.18195.<br>
+                            I_final = 80,000 photons/sec x 0.18195 ≈ <strong>14,556 photons/second</strong>.
+                        </p>
+                    </div>
+                </details>
+            </section>
+        </article>
+    </main>
+
+    <!-- 5. SYNCHRONIZED COMPLIANCE FOOTER (Zero 404s, Exact Alignment with Home) -->
+    <footer>
+        <nav class="footer-nav">
+            <a href="../index.html">Home</a>
+            <a href="../index.html#about-section">About Us</a>
+            <button type="button" class="footer-modal-trigger" onclick="openSimModal('simPrivacyModal')">Privacy Policy</button>
+            <button type="button" class="footer-modal-trigger" onclick="openSimModal('simTermsModal')">Terms of Service</button>
+            <a href="../index.html#contact-section">Contact Us</a>
+            <a href="https://forms.gle/fYxxaNKAh21dPUoBA" target="_blank" rel="noopener noreferrer">Simulator Suggestions</a>
+        </nav>
+        <p>&copy; 2026 LuyaliSims | Engineered by Click & Draft | Dedicated to Open STEM Education</p>
+    </footer>
+
+    <!-- 6. IDENTICAL PRIVACY POLICY MODAL (Matches Home Exactly) -->
+    <div id="simPrivacyModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="privacyTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeSimModal('simPrivacyModal')">Close [✕]</button>
+            <h2 id="privacyTitle">Privacy Policy</h2>
+            <p class="modal-date">Last Updated: September 2026</p>
+            <p>Welcome to LuyaliSims. We respect your privacy and are committed to protecting your personal data. This privacy policy explains how we treat information when you interact with our educational simulators.</p>
+            
+            <h3>1. Educational Purpose & Information Collection</h3>
+            <p>LuyaliSims is a free educational portal. We do not require account registration, passwords, or personal login information to run any simulation. All simulation calculations occur locally within your browser using client-side JavaScript.</p>
+
+            <h3>2. Google AdSense & Third-Party Cookies</h3>
+            <p>We may display advertisements served by Google AdSense to fund our free educational tools. Google, as a third-party vendor, uses cookies to serve ads on our site based on users' visits to this and other sites on the Internet.</p>
+            <ul>
+                <li>Google's use of advertising cookies enables it and its partners to serve ads based on your visit to LuyaliSims and other sites.</li>
+                <li>Users may opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" style="color: var(--neon-cyan);">Google Ads Settings</a>.</li>
             </ul>
-        </div>
 
-        <div class="sim-controls">
-            <div class="control-group">
-                <label>Radiation Source</label>
-                <select id="source" onchange="resetCounts()">
-                    <option value="alpha">Alpha (α) - Heavy, +2 Charge</option>
-                    <option value="beta">Beta (β) - Light, -1 Charge</option>
-                    <option value="gamma">Gamma (γ) - Photon, No Charge</option>
-                </select>
-            </div>
-            <div class="control-group">
-                <label>Intensity</label>
-                <input type="range" id="intensity" min="1" max="50" value="10">
-            </div>
-            <button id="sim-btn" class="action-btn" onclick="toggleSim()">▶ START RADIATION</button>
-        </div>
+            <h3>3. Log Files & Analytics</h3>
+            <p>Like standard websites, our hosting servers collect anonymous log records (including IP addresses, browser types, and timestamp references) to monitor server uptime, fix script errors, and optimize simulator performance.</p>
 
+            <h3>4. Children's Online Privacy (COPPA Compliance)</h3>
+            <p>Our educational simulators are built for students and educators of all ages. We do not knowingly solicit or collect personally identifiable information from children under 13.</p>
+
+            <h3>5. Contact Regarding Privacy</h3>
+            <p>If you have any questions regarding this policy, contact us at: <a href="mailto:luyashliz@gmail.com" style="color: var(--neon-cyan);">luyashliz@gmail.com</a>.</p>
+        </div>
     </div>
 
-    <!-- 3. EDUCATIONAL CONTENT -->
-    <div class="educational-content">
-        
-        <h2>Understanding Radiation Detection</h2>
-        <p>Ionizing radiation is invisible to the human eye, meaning scientists and engineers must rely on specialized devices to observe, measure, and analyze it. This simulator provides an interactive, 3D look into the mechanics behind the four most vital radiation detection technologies used in modern physics, medicine, and nuclear engineering.</p>
+    <!-- 7. IDENTICAL TERMS OF SERVICE MODAL (Matches Home Exactly) -->
+    <div id="simTermsModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="termsTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeSimModal('simTermsModal')">Close [✕]</button>
+            <h2 id="termsTitle">Terms of Service</h2>
+            <p class="modal-date">Effective Date: September 2026</p>
 
-        <h2>The Physics of Detection Mechanisms</h2>
-        <p>Regardless of the detector type, the foundational theory remains the same: incoming radiation deposits energy into a medium (gas, solid crystal, or liquid vapor), and this deposited energy is converted into a readable electronic signal or visual track.</p>
-        
-        <h3>1. Gas Ionization (Geiger-Müller Tube)</h3>
-        <p>The most common detector, relying on Townsend avalanches. When ionizing radiation passes through the low-pressure inert gas (like Argon) inside the tube, it creates an ion pair by knocking an electron loose. A massive potential difference (voltage) accelerates this electron, which then hits other atoms, causing a cascading avalanche. Formulaically, the electrical charge collected, denoted as Q, can be calculated using <strong>Q = N &times; e &times; M</strong>, where N is the initial number of ion pairs, e is the elementary charge, and M is the multiplication factor caused by the avalanche.</p>
+            <h3>1. Permitted Educational Use</h3>
+            <p>All interactive models, simulations, practice problems, and laboratory worksheets on LuyaliSims are made freely available for classroom demonstrations, academic study, tutoring, and self-paced individual learning.</p>
 
-        <h3>2. Luminescence (Scintillation Detector)</h3>
-        <p>Instead of gas, Scintillators use dense materials like Thallium-doped Sodium Iodide crystals. Radiation excites the atomic lattice, and as the atoms de-excite, they release photons (light). This light enters a Photomultiplier Tube (PMT). The number of photons emitted is proportional to the energy of the incident radiation. The energy calculation is fundamentally related to Planck's constant, given by the expression <strong>E = h &times; f</strong>, where h is Planck's constant and f is the frequency of the emitted light.</p>
-        
-        <h3>3. Solid-State Electron-Hole Pairs (Semiconductor HPGe)</h3>
-        <p>Semiconductor detectors function similarly to gas chambers but use a solid Germanium crystal. They offer incredibly precise energy resolution because creating an electron-hole pair in Germanium takes very little energy (about 3 electron-volts). To prevent normal room heat from triggering false signals, these crystals must be actively cooled using liquid nitrogen (LN2) down to -196 degrees Celsius.</p>
+            <h3>2. Intellectual Property</h3>
+            <p>The code architecture, layout designs, and custom interactive engines are the intellectual property of Ian Luyali and Click & Draft. You may use our simulators online in academic settings, but mirroring or re-hosting our code for commercial resale without permission is prohibited.</p>
 
-        <h3>4. Condensation Tracking (Cloud Chamber)</h3>
-        <p>The cloud chamber provides a direct physical visualization. It operates using a supersaturated vapor of alcohol. Because radiation creates an ionized path as it moves, the vapor condenses rapidly around these ions, forming a thick, cloud-like trail tracing the exact route of the particle.</p>
+            <h3>3. Disclaimer of Scientific Warranty</h3>
+            <p>While simulations are engineered to accurately replicate classical mechanics, thermodynamics, and electronics, they are provided as conceptual learning aids. LuyaliSims is not liable for outcomes in real-world high-voltage or hazardous laboratory environments constructed without professional teacher supervision.</p>
 
-        <!-- Practice Questions & Answers -->
-        <div class="qa-box">
-            <h2>Practice Scenarios & Tasks</h2>
-            <p>Use the simulator above to answer the following questions. Observe how different particles (Alpha, Beta, Gamma) behave in different detector environments.</p>
-
-            <h4>Questions</h4>
-            <ol>
-                <li>In the Cloud Chamber, which radiation type leaves thick, short tracks, and what physical property causes this?</li>
-                <li>Why does the Semiconductor detector require a large Dewar filled with liquid nitrogen?</li>
-                <li>When using the Geiger-Müller Tube, explain why Gamma rays rarely trigger a count compared to Beta particles.</li>
-                <li>What is the specific role of the Photomultiplier Tube (PMT) in a Scintillation detector once the radiation hits the crystal?</li>
-                <li>Which type of radiation is completely blocked by the outer casing of the Scintillator or Semiconductor detector and fails to trigger a reading?</li>
-            </ol>
-
-            <div class="answer-key">
-                <h4>Answer Key</h4>
-                <ol>
-                    <li><strong>Alpha (α) Particles.</strong> Because Alpha particles are relatively massive and carry a +2 charge, they interact violently with air molecules, causing massive ionization over a very short distance, generating a thick, heavy condensation track.</li>
-                    <li><strong>To prevent thermal noise.</strong> Creating an electron-hole pair in a semiconductor requires so little energy that ordinary room-temperature heat can cause spontaneous excitations, leading to false readings. Cooling it to -196 degrees Celsius eliminates this thermal interference.</li>
-                    <li><strong>Density and Charge.</strong> Gamma rays are highly energetic photons with no mass and no electrical charge. Because the gas inside a Geiger tube is low-density, a Gamma ray is highly likely to pass straight through the tube without ever colliding with a gas atom.</li>
-                    <li><strong>Light amplification.</strong> The crystal only emits a very faint flash of visible light. The PMT absorbs this light, knocks loose an electron via the photoelectric effect, and multiplies that electron across charged dynodes to create a measurable electrical pulse.</li>
-                    <li><strong>Alpha particles.</strong> Alpha radiation has terrible penetrating power and can be stopped by a simple sheet of paper or human skin. In the simulator, the thick metal casings of the solid-state detectors completely absorb the Alpha particles before they can reach the internal active medium.</li>
-                </ol>
-            </div>
+            <h3>4. Updates to Terms</h3>
+            <p>We reserve the right to refine these terms as new laboratory modules and features are introduced.</p>
         </div>
-
     </div>
 
-    <!-- 4. JAVASCRIPT FOR THE SIMULATOR -->
+    <!-- 8. SIMULATOR CORE SCRIPT & INTERACTIVE 3D/CANVAS ENGINE -->
     <script>
-        // Data Dictionary for Theory Panel
-        const db = {
-            'gm': {
-                t: 'Geiger-Müller Tube',
-                p: 'A high voltage is applied across a gas-filled cylinder. When radiation enters, it ionizes a gas atom, creating an electron. The extreme voltage pulls this electron violently to the central wire, causing a cascade of secondary ionizations (an avalanche). This creates a single measurable pulse.',
-                tasks: ['Observe the blue gas atoms. Watch them turn red (ionized) when hit.','Note the yellow electron shooting to the central wire.','Change radiation to Gamma. Notice how rarely it interacts with the low-density gas compared to Beta.']
-            },
-            'scintillator': {
-                t: 'Scintillation Detector',
-                p: 'Uses a solid NaI crystal. Radiation energy is absorbed and converted into a flash of visible light. A Photomultiplier Tube (PMT) absorbs this light, ejects an electron, and multiplies it across charged plates (dynodes) to create a large electrical pulse.',
-                tasks: ['Notice Alpha particles are blocked by the metal casing and do not trigger a count.','Switch to Gamma. See the light flash in the crystal.','Trace the electron avalanche bouncing between the dynodes in the PMT.']
-            },
-            'semiconductor': {
-                t: 'Semiconductor (HPGe)',
-                p: 'Acts as a solid-state ionization chamber. Radiation creates electron-hole pairs inside a Germanium crystal. Because it requires very little energy to create a pair, it offers incredibly precise energy resolution. Must be kept at -196°C to prevent false thermal signals.',
-                tasks: ['Observe the complete lack of light flashes. The signal is purely electrical.','See how the interaction is contained entirely within the tiny active region.','Note the large Dewar below, holding liquid nitrogen to cool the detector.']
-            },
-            'cloud': {
-                t: 'Cloud Chamber',
-                p: 'A sealed chamber cooled at the bottom to create a "supersaturated" alcohol vapor. When ionizing radiation passes through, it knocks electrons off air molecules. The vapor rapidly condenses onto these ions, drawing a visible physical track of the particle\'s exact path.',
-                tasks: ['Select Alpha. Observe the thick, short, straight tracks due to their heavy +2 charge causing massive ionization.','Select Beta. Observe the thin, longer, erratic tracks as the light electrons bounce off air molecules.','Select Gamma. Notice they barely leave tracks at all unless they hit an electron perfectly.']
+        // --- LEGAL MODALS LOGIC ---
+        function openSimModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
             }
-        };
+        }
 
-        // --- 3D CAMERA CONTROLS (PAN & ROTATE) ---
-        let rotX = -15, rotY = -25, scale = 1.2;
-        let panX = 0, panY = 0;
-        let isDragging = false, lastX, lastY;
-        let activeTool = 'rotate'; 
-        
-        const world = document.getElementById('world');
-        const sceneContainer = document.getElementById('scene');
+        function closeSimModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('policy-modal')) {
+                closeSimModal(e.target.id);
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' || e.key === 'Esc') {
+                document.querySelectorAll('.policy-modal').forEach(m => {
+                    m.style.display = 'none';
+                });
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // --- FULLSCREEN IMPLEMENTATION ---
         const simContainer = document.getElementById('simulator-container');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
 
-        function setTool(tool) {
-            activeTool = tool;
-            document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('btn-' + tool).classList.add('active');
-        }
-
-        function resetView() {
-            panX = 0; panY = 0;
-            if(currentDet === 'cloud') { rotX = -45; rotY = -25; scale = 1.3; } 
-            else { rotX = -15; rotY = -25; scale = 1.2; }
-            updateTransform();
-        }
-
-        function updateTransform() {
-            world.style.transform = `translate3d(${panX}px, ${panY}px, 0) rotateX(${rotX}deg) rotateY(${rotY}deg) scale(${scale})`;
-        }
-
-        // Restrict mouse listeners to the simulator container so it doesn't break page scroll
-        simContainer.addEventListener('mousedown', (e) => {
-            if(e.target.closest('.sim-controls') || e.target.closest('#theory-panel') || e.target.closest('.sim-header') || e.target.closest('.toolbar')) return;
-            isDragging = true; lastX = e.clientX; lastY = e.clientY;
-        });
-        
-        window.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
-            let dx = e.clientX - lastX;
-            let dy = e.clientY - lastY;
-
-            if (activeTool === 'pan' || e.buttons === 4) { 
-                panX += dx;
-                panY += dy;
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                if (simContainer.requestFullscreen) simContainer.requestFullscreen();
+                else if (simContainer.webkitRequestFullscreen) simContainer.webkitRequestFullscreen();
+                fullscreenBtn.innerHTML = 'Exit Screen';
             } else {
-                rotY += dx * 0.5; 
-                rotX -= dy * 0.5;
-                rotX = Math.max(-80, Math.min(80, rotX));
+                if (document.exitFullscreen) document.exitFullscreen();
+                fullscreenBtn.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                    </svg> Fullscreen`;
             }
-            updateTransform();
-            lastX = e.clientX; lastY = e.clientY;
         });
-        
-        window.addEventListener('mouseup', () => isDragging = false);
-        
-        simContainer.addEventListener('wheel', (e) => {
-            if(e.target.closest('#theory-panel')) return;
-            e.preventDefault(); // Prevent page scroll when hovering over the simulator 3D space
-            scale += e.deltaY * -0.001;
-            scale = Math.max(0.4, Math.min(3.0, scale));
-            updateTransform();
-        }, {passive: false});
 
-        // --- AUDIO SYNTHESIZER ---
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        let audioCtx;
-        function playClick(type) {
-            if(!audioCtx) audioCtx = new AudioContext();
-            if(audioCtx.state === 'suspended') audioCtx.resume();
-            
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            
-            if(type === 'gm') {
-                osc.type = 'square'; osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
-                gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
-            } else {
-                osc.type = 'sine'; osc.frequency.setValueAtTime(1000 + Math.random()*500, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                fullscreenBtn.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                    </svg> Fullscreen`;
             }
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+        });
+
+        // --- WEB AUDIO API SOUND GENERATOR ---
+        let audioCtx = null;
+        let isAudioEnabled = true;
+        const audioBtn = document.getElementById('audioBtn');
+
+        audioBtn.addEventListener('click', () => {
+            isAudioEnabled = !isAudioEnabled;
+            if (isAudioEnabled) {
+                audioBtn.innerHTML = '🔊 Audio: ON';
+                audioBtn.classList.remove('secondary');
+                audioBtn.classList.add('warning');
+            } else {
+                audioBtn.innerHTML = '🔇 Audio: MUTED';
+                audioBtn.classList.remove('warning');
+                audioBtn.classList.add('secondary');
+            }
+        });
+
+        function playDetectorAudio(type, pitchMultiplier = 1) {
+            if (!isAudioEnabled) return;
+            try {
+                if (!audioCtx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    audioCtx = new AudioContext();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                if (type === 'gm') {
+                    // Sharp Geiger click with rapid square decay
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(800 * pitchMultiplier, now);
+                    osc.frequency.exponentialRampToValueAtTime(40, now + 0.04);
+                    gain.gain.setValueAtTime(0.35, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.04);
+                } else if (type === 'scint') {
+                    // Crystalline resonant ping
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(1400 * pitchMultiplier, now);
+                    osc.frequency.exponentialRampToValueAtTime(600, now + 0.07);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.07);
+                } else if (type === 'semi') {
+                    // Solid-state electronic blip
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(2200 * pitchMultiplier, now);
+                    osc.frequency.exponentialRampToValueAtTime(900, now + 0.035);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.035);
+                } else if (type === 'cloud') {
+                    // Soft condensation hiss
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(450 * pitchMultiplier, now);
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.09);
+                }
+            } catch (err) {
+                // Ignore silent audio interruptions on early page load
+            }
         }
 
         // --- SIMULATION ENGINE ---
-        let currentDet = 'gm';
-        let isSimulating = false;
-        let reqAnim;
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // UI Element References
+        const detectorSelect = document.getElementById('detector-select');
+        const sourceSelect = document.getElementById('source-select');
+        const paramIntensity = document.getElementById('param-intensity');
+        const valIntensity = document.getElementById('val-intensity');
+        const paramVoltage = document.getElementById('param-voltage');
+        const valVoltage = document.getElementById('val-voltage');
+        const paramShield = document.getElementById('param-shield');
+        const runBtn = document.getElementById('runBtn');
+        const resetBtn = document.getElementById('resetBtn');
+
+        // Readout References
+        const teleDetector = document.getElementById('tele-detector');
+        const readoutCpm = document.getElementById('readout-cpm');
+        const readoutScaler = document.getElementById('readout-scaler');
+        const readoutMetric = document.getElementById('readout-metric');
+
+        // Simulation State
+        let isRunning = false;
+        let totalCount = 0;
+        let cpm = 0;
+        let cpmTimer = 0;
+        let countInWindow = 0;
         let particles = [];
-        let totalCounts = 0;
-        let frame = 0;
+        let secondaryEvents = [];
+        let cloudTracks = [];
+        let gasAtoms = [];
+        let frameCount = 0;
 
-        const ctxs = {
-            'gm': document.getElementById('canvas-gm').getContext('2d'),
-            'scintillator': document.getElementById('canvas-scint').getContext('2d'),
-            'semiconductor': document.getElementById('canvas-semi').getContext('2d'),
-            'cloud': document.getElementById('canvas-cloud').getContext('2d')
-        };
-
-        const gmAtomsContainer = document.getElementById('gm-atoms');
-        let atoms = [];
-        for(let i=0; i<30; i++) {
-            let el = document.createElement('div');
-            el.className = 'gm-gas-atom';
-            let x = 20 + Math.random()*360; let y = 20 + Math.random()*80;
-            el.style.left = x + 'px'; el.style.top = y + 'px';
-            gmAtomsContainer.appendChild(el);
-            atoms.push({x, y, el, ionized: false});
+        // Initialize Gas Atoms for GM Tube
+        function initGasAtoms() {
+            gasAtoms = [];
+            for (let i = 0; i < 48; i++) {
+                gasAtoms.push({
+                    x: 180 + Math.random() * 480,
+                    y: 160 + Math.random() * 180,
+                    ionized: 0,
+                    radius: 4 + Math.random() * 2,
+                    vx: (Math.random() - 0.5) * 0.4,
+                    vy: (Math.random() - 0.5) * 0.4
+                });
+            }
         }
+        initGasAtoms();
 
-        function setDet(id, e) {
-            currentDet = id;
-            document.querySelectorAll('.detector-3d').forEach(el => el.classList.remove('active'));
-            document.getElementById('det-' + id).classList.add('active');
-            
-            document.querySelectorAll('.nav-btns .sim-btn').forEach(el => el.classList.remove('active'));
-            if(e) e.target.classList.add('active');
-            
-            // Update Theory
-            document.getElementById('t-title').innerText = db[id].t;
-            document.getElementById('t-principle').innerText = db[id].p;
-            let ul = document.getElementById('t-tasks'); ul.innerHTML = '';
-            db[id].tasks.forEach(t => { let li = document.createElement('li'); li.innerText = t; ul.appendChild(li); });
-            
-            resetView(); 
-            resetCounts(); 
-            clearCanvases();
-        }
+        // Control Listeners
+        paramIntensity.addEventListener('input', () => {
+            valIntensity.textContent = `${paramIntensity.value} kBq`;
+        });
 
-        function resetCounts() {
-            totalCounts = 0;
-            document.getElementById('gm-lcd').innerText = "0000";
+        paramVoltage.addEventListener('input', () => {
+            valVoltage.textContent = `${paramVoltage.value} V`;
+        });
+
+        detectorSelect.addEventListener('change', () => {
+            const labels = {
+                gm: 'Geiger-Müller Tube',
+                scintillator: 'Scintillation Crystal + PMT',
+                semiconductor: 'Cryogenic Semiconductor (HPGe)',
+                cloud: 'Wilson Cloud Chamber'
+            };
+            teleDetector.textContent = labels[detectorSelect.value];
             particles = [];
-            atoms.forEach(a => { a.ionized = false; a.el.classList.remove('ionized'); });
-        }
+            secondaryEvents = [];
+            cloudTracks = [];
+            initGasAtoms();
+            updateReadoutMetric(0);
+        });
 
-        function clearCanvases() {
-            for(let key in ctxs) {
-                let c = ctxs[key].canvas;
-                ctxs[key].clearRect(0,0,c.width,c.height);
-            }
-        }
+        resetBtn.addEventListener('click', () => {
+            totalCount = 0;
+            countInWindow = 0;
+            cpm = 0;
+            readoutScaler.textContent = '0 Pulses';
+            readoutCpm.textContent = '0000 CPM';
+            particles = [];
+            secondaryEvents = [];
+            cloudTracks = [];
+        });
 
-        function toggleSim() {
-            isSimulating = !isSimulating;
-            const btn = document.getElementById('sim-btn');
-            if(isSimulating) {
-                if(!audioCtx) audioCtx = new AudioContext(); 
-                btn.innerText = "■ STOP RADIATION"; btn.classList.add('running');
-                loop();
+        runBtn.addEventListener('click', () => {
+            isRunning = !isRunning;
+            if (isRunning) {
+                runBtn.textContent = '■ Stop Emitter';
+                runBtn.classList.add('running');
             } else {
-                btn.innerText = "▶ START RADIATION"; btn.classList.remove('running');
-                cancelAnimationFrame(reqAnim);
-                clearCanvases();
+                runBtn.textContent = '▶ Start Emitter';
+                runBtn.classList.remove('running');
+            }
+        });
+
+        function updateReadoutMetric(pulseVal) {
+            const det = detectorSelect.value;
+            if (det === 'gm') {
+                readoutMetric.textContent = `${pulseVal.toFixed(2)} V GM Plateau`;
+            } else if (det === 'scintillator') {
+                readoutMetric.textContent = `${pulseVal.toFixed(1)} keV Photopeak`;
+            } else if (det === 'semiconductor') {
+                readoutMetric.textContent = `${(pulseVal * 1.33).toFixed(2)} keV FWHM:0.18%`;
+            } else if (det === 'cloud') {
+                readoutMetric.textContent = `${pulseVal.toFixed(0)} Track Droplets`;
             }
         }
 
-        function drawGamma(ctx, x, y) {
-            ctx.beginPath(); ctx.strokeStyle = '#ffcc00'; ctx.lineWidth = 2;
-            ctx.moveTo(x, y);
-            for(let i=0; i<40; i+=5) ctx.lineTo(x+i, y + Math.sin(i*0.8)*5);
+        // Penetration & Shielding Filter
+        function passesShielding(type, shield) {
+            if (shield === 'none') return true;
+            if (type === 'alpha') {
+                // Alpha is blocked completely by even thin paper or any higher barrier
+                return false;
+            }
+            if (type === 'beta') {
+                // Beta penetrates paper, but is stopped by aluminum and lead
+                if (shield === 'paper') return Math.random() < 0.85;
+                if (shield === 'aluminum') return Math.random() < 0.05;
+                return false;
+            }
+            if (type === 'gamma') {
+                // Gamma penetrates paper with zero attenuation, easily penetrates aluminum, partially penetrates lead
+                if (shield === 'paper') return true;
+                if (shield === 'aluminum') return Math.random() < 0.92;
+                if (shield === 'lead') return Math.random() < 0.32;
+            }
+            return true;
+        }
+
+        // Particle Spawner
+        function spawnParticle(forcedX = null, forcedY = null) {
+            const det = detectorSelect.value;
+            const src = sourceSelect.value;
+            const shield = paramShield.value;
+
+            // Shield check
+            const willPenetrate = passesShielding(src, shield);
+
+            let startX = forcedX !== null ? forcedX : 40;
+            let startY = forcedY !== null ? forcedY : (170 + Math.random() * 160);
+
+            let p = {
+                type: src,
+                det: det,
+                x: startX,
+                y: startY,
+                vx: (src === 'gamma') ? 14 : (src === 'beta' ? 10 : 6),
+                vy: (Math.random() - 0.5) * (src === 'beta' ? 1.5 : 0.4),
+                penetrated: willPenetrate,
+                absorbed: false,
+                energy: (src === 'alpha' ? 5.5 : (src === 'beta' ? 1.2 : 0.662)),
+                life: 140,
+                stage: 0
+            };
+            particles.push(p);
+        }
+
+        // Canvas Pointer Interaction (Click or Tap to inject particle at cursor)
+        canvas.addEventListener('pointerdown', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const clickX = (e.clientX - rect.left) * scaleX;
+            const clickY = (e.clientY - rect.top) * scaleY;
+
+            // Inject radiation particle starting towards click location
+            spawnParticle(40, clickY);
+        });
+
+        // --- RENDER BACKGROUNDS FOR EACH DETECTOR ---
+        function drawChassis() {
+            // High-tech holographic grid
+            ctx.fillStyle = '#060a14';
+            ctx.fillRect(0, 0, 800, 500);
+
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.05)';
+            ctx.lineWidth = 1;
+            const step = 40;
+            for (let x = 0; x < 800; x += step) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, 500);
+                ctx.stroke();
+            }
+            for (let y = 0; y < 500; y += step) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(800, y);
+                ctx.stroke();
+            }
+        }
+
+        function drawShielding() {
+            const shield = paramShield.value;
+            if (shield === 'none') return;
+
+            const shieldX = 130;
+            let fillCol = '#fff';
+            let label = '';
+            let thick = 12;
+
+            if (shield === 'paper') {
+                fillCol = 'rgba(230, 240, 255, 0.4)';
+                label = 'Paper';
+                thick = 6;
+            } else if (shield === 'aluminum') {
+                fillCol = 'rgba(160, 180, 200, 0.7)';
+                label = '3mm Al';
+                thick = 14;
+            } else if (shield === 'lead') {
+                fillCol = 'rgba(100, 110, 130, 0.9)';
+                label = '15mm Pb';
+                thick = 24;
+            }
+
+            ctx.fillStyle = fillCol;
+            ctx.strokeStyle = '#00f3ff';
+            ctx.lineWidth = 1.5;
+            ctx.fillRect(shieldX, 120, thick, 260);
+            ctx.strokeRect(shieldX, 120, thick, 260);
+
+            ctx.fillStyle = '#fff';
+            ctx.font = '10px "Share Tech Mono"';
+            ctx.save();
+            ctx.translate(shieldX + thick / 2 + 3, 250);
+            ctx.rotate(-Math.PI / 2);
+            ctx.fillText(label, 0, 0);
+            ctx.restore();
+        }
+
+        // 1. Geiger-Müller Visual Render
+        function renderGMScene() {
+            const tubeX = 180;
+            const tubeY = 150;
+            const tubeW = 480;
+            const tubeH = 200;
+
+            // Outer Cathode Shell
+            ctx.fillStyle = 'rgba(20, 35, 60, 0.4)';
+            ctx.fillRect(tubeX, tubeY, tubeW, tubeH);
+
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.8)';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(tubeX, tubeY, tubeW, tubeH);
+
+            // Thin Mica Window on Left
+            ctx.fillStyle = 'rgba(255, 183, 3, 0.3)';
+            ctx.fillRect(tubeX - 6, tubeY + 40, 6, tubeH - 80);
+            ctx.strokeStyle = '#ffb703';
+            ctx.strokeRect(tubeX - 6, tubeY + 40, 6, tubeH - 80);
+
+            // Central Anode Wire (+HV)
+            const anodeY = tubeY + tubeH / 2;
+            ctx.strokeStyle = '#ffb703';
+            ctx.lineWidth = 3;
+            ctx.shadowColor = '#ffb703';
+            ctx.shadowBlur = 10;
+            ctx.beginPath();
+            ctx.moveTo(tubeX, anodeY);
+            ctx.lineTo(tubeX + tubeW, anodeY);
             ctx.stroke();
+            ctx.shadowBlur = 0;
+
+            // Anode & Cathode Labels
+            ctx.font = '11px "Share Tech Mono"';
+            ctx.fillStyle = '#ffb703';
+            ctx.fillText('CENTRAL ANODE WIRE (+HV)', tubeX + 160, anodeY - 10);
+            ctx.fillStyle = 'rgba(0, 243, 255, 0.7)';
+            ctx.fillText('CYLINDRICAL CATHODE WALL (GROUND)', tubeX + 140, tubeY + tubeH + 18);
+            ctx.fillText('ARGON + BROMINE GAS (0.1 ATM)', tubeX + 160, tubeY + 25);
+            ctx.fillText('MICA WINDOW', tubeX - 60, tubeY + tubeH / 2);
+
+            // Draw Gas Atoms
+            for (let a of gasAtoms) {
+                a.x += a.vx;
+                a.y += a.vy;
+                if (a.x < tubeX + 15 || a.x > tubeX + tubeW - 15) a.vx *= -1;
+                if (a.y < tubeY + 15 || a.y > tubeY + tubeH - 15) a.vy *= -1;
+
+                ctx.beginPath();
+                ctx.arc(a.x, a.y, a.radius, 0, Math.PI * 2);
+                if (a.ionized > 0) {
+                    ctx.fillStyle = '#ff3366';
+                    ctx.shadowColor = '#ff3366';
+                    ctx.shadowBlur = 8;
+                    a.ionized--;
+                } else {
+                    ctx.fillStyle = 'rgba(0, 243, 255, 0.6)';
+                    ctx.shadowBlur = 0;
+                }
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
         }
 
-        function loop() {
-            if(!isSimulating) return;
-            frame++;
-            
-            let ctx = ctxs[currentDet];
-            let cw = ctx.canvas.width; let ch = ctx.canvas.height;
-            let type = document.getElementById('source').value;
-            let intensity = parseInt(document.getElementById('intensity').value);
-            
-            let spawnDelay = Math.max(2, 60 - intensity);
-            
-            if(currentDet === 'gm' && type === 'gamma') spawnDelay *= 5; 
-            if(currentDet === 'cloud' && type === 'gamma') spawnDelay *= 10;
-            if(currentDet === 'scintillator' && type === 'alpha') spawnDelay = 9999;
+        // 2. Scintillator + PMT Visual Render
+        function renderScintillatorScene() {
+            // NaI(Tl) Crystal
+            const crysX = 180;
+            const crysY = 160;
+            const crysW = 140;
+            const crysH = 180;
 
-            if(frame % spawnDelay === 0) {
-                let p = { type: type, active: true, stage: 0 };
-                if(currentDet === 'gm') {
-                    p.x = 0; p.y = 20 + Math.random()*80;
-                } else if(currentDet === 'scintillator') {
-                    p.x = 0; p.y = 20 + Math.random()*80; p.hitX = 50 + Math.random()*80;
-                } else if(currentDet === 'semiconductor') {
-                    p.x = 0; p.y = 20 + Math.random()*40; p.hitX = 20 + Math.random()*40;
-                } else if(currentDet === 'cloud') {
-                    p.x = cw/2; p.y = ch/2; p.angle = Math.random()*Math.PI*2;
-                    p.history = []; p.life = (type==='alpha') ? 20 : 60;
-                }
-                particles.push(p);
+            ctx.fillStyle = 'rgba(0, 150, 255, 0.25)';
+            ctx.fillRect(crysX, crysY, crysW, crysH);
+            ctx.strokeStyle = '#00f3ff';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(crysX, crysY, crysW, crysH);
+
+            ctx.fillStyle = '#00f3ff';
+            ctx.font = '12px "Orbitron"';
+            ctx.fillText('NaI(Tl) CRYSTAL', crysX + 16, crysY + 30);
+
+            // Optical Coupling Grease
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.fillRect(crysX + crysW, crysY + 10, 8, crysH - 20);
+
+            // PMT Envelope
+            const pmtX = crysX + crysW + 8;
+            const pmtY = crysY + 10;
+            const pmtW = 340;
+            const pmtH = crysH - 20;
+
+            ctx.fillStyle = 'rgba(10, 20, 35, 0.6)';
+            ctx.fillRect(pmtX, pmtY, pmtW, pmtH);
+            ctx.strokeStyle = 'rgba(188, 19, 254, 0.7)';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(pmtX, pmtY, pmtW, pmtH);
+
+            // Photocathode Layer
+            ctx.fillStyle = '#ffb703';
+            ctx.fillRect(pmtX, pmtY, 5, pmtH);
+
+            // Dynode Chain
+            const dynodeCount = 6;
+            for (let d = 0; d < dynodeCount; d++) {
+                let dx = pmtX + 45 + d * 45;
+                let dy = (d % 2 === 0) ? pmtY + 35 : pmtY + pmtH - 45;
+                ctx.strokeStyle = '#e2e8f0';
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.arc(dx, dy, 18, (d % 2 === 0 ? 0.3 : -1.2), (d % 2 === 0 ? 2.8 : 1.2));
+                ctx.stroke();
+
+                ctx.fillStyle = '#8da4be';
+                ctx.font = '10px "Share Tech Mono"';
+                ctx.fillText(`D${d + 1}`, dx - 6, dy + (d % 2 === 0 ? -12 : 24));
             }
 
-            if(currentDet === 'cloud') {
-                ctx.fillStyle = 'rgba(0,0,0,0.03)'; ctx.fillRect(0,0,cw,ch);
-            } else {
-                ctx.clearRect(0,0,cw,ch);
-            }
+            // Anode Collector
+            const anX = pmtX + pmtW - 25;
+            ctx.fillStyle = '#00ff88';
+            ctx.fillRect(anX, pmtY + 30, 8, pmtH - 60);
 
-            for(let i = particles.length - 1; i >= 0; i--) {
+            ctx.font = '11px "Share Tech Mono"';
+            ctx.fillStyle = '#ffb703';
+            ctx.fillText('PHOTOCATHODE', pmtX + 8, pmtY + 20);
+            ctx.fillStyle = '#00ff88';
+            ctx.fillText('ANODE', anX - 35, pmtY + pmtH - 15);
+            ctx.fillStyle = '#e580ff';
+            ctx.fillText('DYNODE CASCADE CHAIN (GAINS: 10^6)', pmtX + 60, pmtY + pmtH + 20);
+        }
+
+        // 3. Semiconductor HPGe Visual Render
+        function renderSemiconductorScene() {
+            // Liquid Nitrogen Dewar Base
+            const dewX = 280;
+            const dewY = 260;
+            const dewW = 240;
+            const dewH = 180;
+
+            ctx.fillStyle = 'rgba(30, 41, 59, 0.7)';
+            ctx.fillRect(dewX, dewY, dewW, dewH);
+            ctx.strokeStyle = '#64748b';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(dewX, dewY, dewW, dewH);
+
+            ctx.fillStyle = '#38bdf8';
+            ctx.font = '12px "Orbitron"';
+            ctx.fillText('CRYOGENIC DEWAR', dewX + 45, dewY + 100);
+            ctx.font = '11px "Share Tech Mono"';
+            ctx.fillText('LIQUID NITROGEN: 77 K (-196 °C)', dewX + 30, dewY + 125);
+
+            // Cold Finger Rod
+            ctx.fillStyle = '#cbd5e1';
+            ctx.fillRect(dewX + dewW / 2 - 15, 170, 30, 90);
+
+            // HPGe High-Purity Germanium Crystal
+            const cryX = dewX + dewW / 2 - 60;
+            const cryY = 90;
+            const cryW = 120;
+            const cryH = 90;
+
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+            ctx.fillRect(cryX, cryY, cryW, cryH);
+            ctx.strokeStyle = '#00f3ff';
+            ctx.lineWidth = 2.5;
+            ctx.strokeRect(cryX, cryY, cryW, cryH);
+
+            // P-N Junction & Electrodes
+            ctx.fillStyle = 'rgba(0, 255, 136, 0.2)';
+            ctx.fillRect(cryX, cryY, cryW, 10);
+            ctx.fillStyle = 'rgba(255, 51, 102, 0.2)';
+            ctx.fillRect(cryX, cryY + cryH - 10, cryW, 10);
+
+            ctx.fillStyle = '#00f3ff';
+            ctx.font = '11px "Orbitron"';
+            ctx.fillText('HPGe CRYSTAL', cryX + 16, cryY + 45);
+            ctx.font = '10px "Share Tech Mono"';
+            ctx.fillStyle = '#00ff88';
+            ctx.fillText('p+ Contact (-Bias)', cryX + 10, cryY + 22);
+            ctx.fillStyle = '#ff3366';
+            ctx.fillText('n+ Contact (+HV)', cryX + 10, cryY + cryH - 15);
+            ctx.fillStyle = '#94a3b8';
+            ctx.fillText('Active Depletion Zone (ε = 2.96 eV)', cryX - 35, cryY - 12);
+        }
+
+        // 4. Cloud Chamber Visual Render
+        function renderCloudScene() {
+            const ccX = 180;
+            const ccY = 120;
+            const ccW = 480;
+            const ccH = 260;
+
+            // Cold Black Base Plate
+            ctx.fillStyle = '#020408';
+            ctx.fillRect(ccX, ccY, ccW, ccH);
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(ccX, ccY, ccW, ccH);
+
+            // Top Felt Ring (Alcohol Evaporator)
+            ctx.fillStyle = 'rgba(255, 183, 3, 0.25)';
+            ctx.fillRect(ccX + 10, ccY + 10, ccW - 20, 15);
+
+            // Cold Bottom Chill Layer
+            const grad = ctx.createLinearGradient(0, ccY + ccH - 70, 0, ccY + ccH);
+            grad.addColorStop(0, 'transparent');
+            grad.addColorStop(1, 'rgba(0, 243, 255, 0.15)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(ccX, ccY + ccH - 70, ccW, 70);
+
+            ctx.font = '11px "Share Tech Mono"';
+            ctx.fillStyle = '#ffb703';
+            ctx.fillText('TOP FELT TROUGH: ISOPROPYL ALCOHOL RESERVOIR (+20 °C)', ccX + 45, ccY + 22);
+            ctx.fillStyle = '#00f3ff';
+            ctx.fillText('SUPERSATURATED VAPOR SENSITIVE LAYER', ccX + 110, ccY + ccH - 45);
+            ctx.fillStyle = '#64748b';
+            ctx.fillText('PELTIER / DRY ICE COOLED BASE PLATE (-78 °C)', ccX + 90, ccY + ccH - 15);
+        }
+
+        // --- DRAW PARTICLES & SECONDARY CASCADE EVENTS ---
+        function updateAndDrawParticles() {
+            const det = detectorSelect.value;
+            const voltage = parseFloat(paramVoltage.value);
+
+            // Particle Radiation Drawing
+            for (let i = particles.length - 1; i >= 0; i--) {
                 let p = particles[i];
-                if(!p.active) { particles.splice(i,1); continue; }
+                p.life--;
 
-                if(currentDet === 'gm') {
-                    if(p.stage === 0) {
-                        p.x += 8;
-                        if(p.type === 'gamma') drawGamma(ctx, p.x-40, p.y);
-                        else { ctx.fillStyle = p.type==='alpha'?'#ff4444':'#00d2ff'; ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI*2); ctx.fill(); }
-                        
-                        for(let a of atoms) {
-                            if(!a.ionized && Math.abs(p.x - a.x) < 15 && Math.abs(p.y - a.y) < 15) {
-                                a.ionized = true; a.el.classList.add('ionized');
-                                setTimeout(() => { a.ionized=false; a.el.classList.remove('ionized'); }, 1000); 
-                                p.stage = 1; p.eX = a.x; p.eY = a.y; 
-                                break;
+                // If blocked by shield
+                if (!p.penetrated && p.x >= 130) {
+                    // Particle absorbed/scattered at the shield
+                    ctx.fillStyle = '#ff3366';
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                    particles.splice(i, 1);
+                    continue;
+                }
+
+                p.x += p.vx;
+                p.y += p.vy;
+
+                // Draw Particle Core
+                if (p.type === 'alpha') {
+                    // Heavy Red Core (+2e)
+                    ctx.fillStyle = '#ff3366';
+                    ctx.shadowColor = '#ff3366';
+                    ctx.shadowBlur = 10;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 5.5, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                } else if (p.type === 'beta') {
+                    // Light Cyan Core (-1e) with erratic deflection
+                    p.vy += (Math.random() - 0.5) * 1.0;
+                    ctx.fillStyle = '#00f3ff';
+                    ctx.shadowColor = '#00f3ff';
+                    ctx.shadowBlur = 6;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                } else if (p.type === 'gamma') {
+                    // High-frequency yellow sine wave packet
+                    ctx.strokeStyle = '#ffb703';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(p.x - 20, p.y);
+                    for (let wx = 0; wx < 24; wx += 3) {
+                        ctx.lineTo(p.x - 20 + wx, p.y + Math.sin((p.x + wx) * 0.7) * 4);
+                    }
+                    ctx.stroke();
+                }
+
+                // --- DETECTOR INTERACTION CHECKS ---
+                // 1. GM Tube Interactions
+                if (det === 'gm' && p.x > 185 && p.x < 650 && p.y > 155 && p.y < 345) {
+                    // Interaction probability based on particle type
+                    let interactProb = (p.type === 'alpha') ? 0.35 : (p.type === 'beta' ? 0.18 : 0.035);
+                    if (Math.random() < interactProb && p.stage === 0) {
+                        p.stage = 1;
+                        totalCount++;
+                        countInWindow++;
+                        readoutScaler.textContent = `${totalCount} Pulses`;
+
+                        // Trigger Townsend Avalanche animation
+                        const anodeY = 250;
+                        const pulseHeight = (voltage / 500) * 1.85;
+                        updateReadoutMetric(pulseHeight);
+                        playDetectorAudio('gm', 1.0 + (voltage - 500) * 0.001);
+
+                        secondaryEvents.push({
+                            type: 'avalanche',
+                            x: p.x,
+                            y: p.y,
+                            targetY: anodeY,
+                            life: 25,
+                            voltageMult: voltage / 500
+                        });
+
+                        // Ionize nearby gas atom
+                        for (let a of gasAtoms) {
+                            if (Math.hypot(a.x - p.x, a.y - p.y) < 45) {
+                                a.ionized = 20;
                             }
                         }
-                        if(p.x > cw) p.active = false;
-                    } 
-                    else if (p.stage === 1) {
-                        ctx.fillStyle = 'yellow'; ctx.beginPath(); ctx.arc(p.eX, p.eY, 3, 0, Math.PI*2); ctx.fill();
-                        p.eY += (p.eY > 60) ? -5 : 5; 
-                        if(Math.abs(p.eY - 60) < 5) {
-                            p.stage = 2; p.wX = p.eX;
-                            totalCounts++;
-                            document.getElementById('gm-lcd').innerText = String(totalCounts).padStart(4, '0');
-                            playClick('gm');
-                        }
-                    }
-                    else if (p.stage === 2) {
-                        ctx.fillStyle = 'yellow'; ctx.beginPath(); ctx.arc(p.wX, 60, 4, 0, Math.PI*2); ctx.fill();
-                        p.wX += 15; 
-                        if(p.wX > cw) p.active = false;
-                    }
-                }
-                
-                else if (currentDet === 'scintillator') {
-                    if(p.stage === 0) {
-                        p.x += 10;
-                        if(p.type === 'gamma') drawGamma(ctx, p.x-30, p.y);
-                        else { ctx.fillStyle = '#00d2ff'; ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI*2); ctx.fill(); }
-                        if(p.x > p.hitX) { p.stage = 1; p.r = 1; }
-                    }
-                    else if (p.stage === 1) {
-                        ctx.strokeStyle = `rgba(0,255,255,${1 - p.r/40})`; ctx.lineWidth=3;
-                        ctx.beginPath(); ctx.arc(p.hitX, p.y, p.r, 0, Math.PI*2); ctx.stroke();
-                        ctx.strokeStyle = '#fff'; ctx.lineWidth=1;
-                        ctx.beginPath(); ctx.moveTo(p.hitX, p.y); ctx.lineTo(p.hitX+p.r*2, p.y); ctx.stroke();
-                        p.r += 4;
-                        if(p.hitX + p.r*2 >= 150) { 
-                            p.stage = 2; p.ex = 150; p.ey = p.y; p.dyn = 0;
-                        }
-                    }
-                    else if (p.stage === 2) {
-                        let numE = Math.min(16, Math.pow(2, p.dyn)); 
-                        ctx.fillStyle = 'yellow';
-                        for(let j=0; j<numE; j++) {
-                            ctx.beginPath(); ctx.arc(p.ex + (Math.random()*10-5), p.ey + (Math.random()*10-5), 2, 0, Math.PI*2); ctx.fill();
-                        }
-                        p.ex += 12; 
-                        p.ey += (p.dyn%2===0)? 8 : -8; 
-                        if(p.ex % 30 < 10) p.dyn++; 
-                        if(p.ex > 350) { 
-                            p.active = false; playClick('scint');
-                        }
                     }
                 }
 
-                else if (currentDet === 'semiconductor') {
-                    if(p.stage === 0) {
-                        p.x += 5;
-                        if(p.type === 'gamma') drawGamma(ctx, p.x-20, p.y);
-                        else { ctx.fillStyle = p.type==='alpha'?'#ff4444':'#00d2ff'; ctx.beginPath(); ctx.arc(p.x, p.y, 3, 0, Math.PI*2); ctx.fill(); }
-                        if(p.x > p.hitX) { p.stage = 1; p.sep = 0; }
-                    }
-                    else if (p.stage === 1) {
-                        ctx.fillStyle = '#00ff00'; ctx.beginPath(); ctx.arc(p.hitX, p.y - p.sep, 2, 0, Math.PI*2); ctx.fill(); 
-                        ctx.fillStyle = '#ffff00'; ctx.beginPath(); ctx.arc(p.hitX, p.y + p.sep, 2, 0, Math.PI*2); ctx.fill(); 
-                        p.sep += 1;
-                        if(p.sep > 20) { p.active = false; playClick('semi'); }
+                // 2. Scintillator Interactions
+                if (det === 'scintillator' && p.x > 180 && p.x < 320 && p.y > 160 && p.y < 340) {
+                    let interactProb = (p.type === 'alpha') ? 0.05 : (p.type === 'beta' ? 0.3 : 0.22);
+                    // In scintillator, alpha is stopped at surface if casing is modeled; here it triggers tiny surface flash
+                    if (Math.random() < interactProb && p.stage === 0) {
+                        p.stage = 1;
+                        totalCount++;
+                        countInWindow++;
+                        readoutScaler.textContent = `${totalCount} Pulses`;
+
+                        const photopeakEnergy = p.type === 'gamma' ? 661.7 : (p.type === 'beta' ? 420.0 : 180.0);
+                        updateReadoutMetric(photopeakEnergy);
+                        playDetectorAudio('scint');
+
+                        // Scintillation Light Burst
+                        secondaryEvents.push({
+                            type: 'scint_flash',
+                            x: p.x,
+                            y: p.y,
+                            radius: 5,
+                            life: 20
+                        });
+
+                        // Propagate photoelectrons into PMT dynode cascade
+                        secondaryEvents.push({
+                            type: 'pmt_cascade',
+                            stageIndex: 0,
+                            x: 330,
+                            y: p.y,
+                            life: 30
+                        });
                     }
                 }
 
-                else if (currentDet === 'cloud') {
-                    let speed = (p.type === 'alpha') ? 3 : 6;
-                    if(p.type === 'beta') p.angle += (Math.random()-0.5)*1.2; 
-                    
-                    p.x += Math.cos(p.angle) * speed;
-                    p.y += Math.sin(p.angle) * speed;
-                    p.history.push({x: p.x, y: p.y});
-                    
-                    ctx.beginPath();
-                    ctx.strokeStyle = '#fff';
-                    ctx.lineWidth = (p.type === 'alpha') ? 4 : 1.5;
-                    ctx.shadowBlur = 8; ctx.shadowColor = '#fff';
-                    
-                    if(p.history.length > 1) {
-                        ctx.moveTo(p.history[p.history.length-2].x, p.history[p.history.length-2].y);
-                        ctx.lineTo(p.x, p.y);
-                        ctx.stroke();
+                // 3. Semiconductor Interactions
+                if (det === 'semiconductor' && p.x > 340 && p.x < 460 && p.y > 90 && p.y < 180) {
+                    let interactProb = (p.type === 'alpha') ? 0.08 : (p.type === 'beta' ? 0.35 : 0.25);
+                    if (Math.random() < interactProb && p.stage === 0) {
+                        p.stage = 1;
+                        totalCount++;
+                        countInWindow++;
+                        readoutScaler.textContent = `${totalCount} Pulses`;
+
+                        const semiEnergy = p.type === 'gamma' ? 1332.5 : 850.0;
+                        updateReadoutMetric(semiEnergy);
+                        playDetectorAudio('semi');
+
+                        // Electron-Hole Pair Generation & Drift
+                        secondaryEvents.push({
+                            type: 'eh_pair',
+                            x: p.x,
+                            y: p.y,
+                            life: 24
+                        });
                     }
-                    ctx.shadowBlur = 0;
-                    
-                    p.life--;
-                    if(p.life <= 0 || p.x<0 || p.x>cw || p.y<0 || p.y>ch) p.active = false;
+                }
+
+                // 4. Cloud Chamber Interactions
+                if (det === 'cloud' && p.x > 185 && p.x < 650 && p.y > 140 && p.y < 370) {
+                    if (p.stage === 0) {
+                        p.stage = 1;
+                        totalCount++;
+                        countInWindow++;
+                        readoutScaler.textContent = `${totalCount} Pulses`;
+
+                        const dropCount = p.type === 'alpha' ? 480 : (p.type === 'beta' ? 120 : 25);
+                        updateReadoutMetric(dropCount);
+                        playDetectorAudio('cloud');
+                    }
+
+                    // Leave condensation cloud droplet track
+                    cloudTracks.push({
+                        x: p.x,
+                        y: p.y,
+                        thick: (p.type === 'alpha' ? 5.5 : (p.type === 'beta' ? 2.0 : 1.0)),
+                        alpha: 1.0,
+                        life: (p.type === 'alpha' ? 65 : 45)
+                    });
+                }
+
+                // Boundary & Life Expiration
+                if (p.x > 800 || p.y < 0 || p.y > 500 || p.life <= 0) {
+                    particles.splice(i, 1);
                 }
             }
-            reqAnim = requestAnimationFrame(loop);
+
+            // Draw Secondary Physics Cascades
+            for (let j = secondaryEvents.length - 1; j >= 0; j--) {
+                let ev = secondaryEvents[j];
+                ev.life--;
+
+                if (ev.type === 'avalanche') {
+                    // Violent electron branch pulling straight to anode wire
+                    ctx.strokeStyle = '#ffff00';
+                    ctx.lineWidth = 2.5;
+                    ctx.beginPath();
+                    ctx.moveTo(ev.x, ev.y);
+                    let currentY = ev.y + (ev.targetY - ev.y) * ((25 - ev.life) / 25);
+                    ctx.lineTo(ev.x + (Math.random() - 0.5) * 12, currentY);
+                    ctx.stroke();
+
+                    // Glow pulse on wire
+                    ctx.fillStyle = '#ffb703';
+                    ctx.beginPath();
+                    ctx.arc(ev.x, ev.targetY, 4 * ev.voltageMult, 0, Math.PI * 2);
+                    ctx.fill();
+                } else if (ev.type === 'scint_flash') {
+                    // Expanding blue-white optical flash
+                    ev.radius += 2.2;
+                    ctx.strokeStyle = `rgba(0, 243, 255, ${ev.life / 20})`;
+                    ctx.lineWidth = 2.5;
+                    ctx.beginPath();
+                    ctx.arc(ev.x, ev.y, ev.radius, 0, Math.PI * 2);
+                    ctx.stroke();
+                } else if (ev.type === 'pmt_cascade') {
+                    // Multiplying yellow electrons jumping through dynodes
+                    ev.x += 8.5;
+                    let dynodePhase = Math.floor((ev.x - 330) / 45);
+                    let targetY = (dynodePhase % 2 === 0) ? 205 : 305;
+                    ev.y += (targetY - ev.y) * 0.25;
+
+                    let countDots = Math.min(24, Math.pow(1.8, Math.min(dynodePhase + 1, 5)));
+                    ctx.fillStyle = '#ffff00';
+                    for (let d = 0; d < countDots; d++) {
+                        ctx.beginPath();
+                        ctx.arc(ev.x + (Math.random() - 0.5) * 12, ev.y + (Math.random() - 0.5) * 12, 1.8, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                } else if (ev.type === 'eh_pair') {
+                    // Electron drifting upward to n+, Hole drifting downward to p+
+                    ctx.fillStyle = '#00ff88'; // Hole
+                    ctx.beginPath();
+                    ctx.arc(ev.x, ev.y - (24 - ev.life) * 1.5, 2.5, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.fillStyle = '#ff3366'; // Electron
+                    ctx.beginPath();
+                    ctx.arc(ev.x, ev.y + (24 - ev.life) * 1.5, 2.5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                if (ev.life <= 0) {
+                    secondaryEvents.splice(j, 1);
+                }
+            }
+
+            // Draw Condensation Cloud Droplets
+            for (let c = cloudTracks.length - 1; c >= 0; c--) {
+                let tr = cloudTracks[c];
+                tr.life--;
+                tr.alpha = tr.life / 65;
+
+                ctx.fillStyle = `rgba(255, 255, 255, ${tr.alpha * 0.85})`;
+                ctx.shadowColor = '#ffffff';
+                ctx.shadowBlur = 6;
+                ctx.beginPath();
+                ctx.arc(tr.x, tr.y, tr.thick, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+
+                if (tr.life <= 0) {
+                    cloudTracks.splice(c, 1);
+                }
+            }
         }
 
-        // Initialize setup
-        resetView();
+        // CPM Rate Recalculation Loop
+        setInterval(() => {
+            if (isRunning) {
+                // Approximate Counts Per Minute = windowed count * 60 / duration
+                cpm = countInWindow * 60;
+                readoutCpm.textContent = `${String(cpm).padStart(4, '0')} CPM`;
+                countInWindow = 0;
+            }
+        }, 1000);
+
+        // --- MAIN ANIMATION & RENDER LOOP ---
+        function render() {
+            frameCount++;
+            drawChassis();
+
+            // Render Active Detector Geometry
+            const det = detectorSelect.value;
+            if (det === 'gm') {
+                renderGMScene();
+            } else if (det === 'scintillator') {
+                renderScintillatorScene();
+            } else if (det === 'semiconductor') {
+                renderSemiconductorScene();
+            } else if (det === 'cloud') {
+                renderCloudScene();
+            }
+
+            // Draw Shielding Barrier
+            drawShielding();
+
+            // Radiation Particle Generation
+            if (isRunning) {
+                const activity = parseInt(paramIntensity.value);
+                const spawnInterval = Math.max(2, Math.floor(65 - activity));
+                if (frameCount % spawnInterval === 0) {
+                    spawnParticle();
+                }
+            }
+
+            // Particle Updates and Physics Intersections
+            updateAndDrawParticles();
+
+            requestAnimationFrame(render);
+        }
+
+        requestAnimationFrame(render);
     </script>
 </body>
 </html>
