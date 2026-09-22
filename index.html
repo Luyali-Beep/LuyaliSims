@@ -8,22 +8,24 @@
     
     <!-- Importing futuristic fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <!-- Version query parameter ?v=2.0 forces browsers/GitHub Pages to fetch the updated CSS immediately -->
+    <link rel="stylesheet" href="style.css?v=2.0">
 </head>
 <body>
 
     <!-- 1. STICKY TOP NAVIGATION BAR -->
     <nav class="site-nav" aria-label="Main Navigation">
         <a href="#top" class="nav-brand">
-            ⚡ LuyaliSims
+            <span class="brand-spark">⚡</span> LUYALISIMS
         </a>
         <ul class="nav-links">
-            <li><a href="#top">Home</a></li>
-            <li><a href="#simulatorGrid">Simulators</a></li>
-            <li><a href="#about-section">About Us</a></li>
-            <li><a href="#contact-section">Contact Us</a></li>
-            <li><a onclick="openModal('privacyModal')">Privacy Policy</a></li>
-            <li><a onclick="openModal('termsModal')">Terms of Service</a></li>
+            <li><a href="#top" class="nav-item">Home</a></li>
+            <li><a href="#simulatorGrid" class="nav-item">Simulators</a></li>
+            <li><a href="#features-strip" class="nav-item">Features</a></li>
+            <li><a href="#about-section" class="nav-item">About Us</a></li>
+            <li><a href="#contact-section" class="nav-item">Contact Us</a></li>
+            <li><button type="button" class="nav-policy-btn" onclick="openModal('privacyModal')">Privacy Policy</button></li>
+            <li><button type="button" class="nav-policy-btn" onclick="openModal('termsModal')">Terms of Service</button></li>
         </ul>
     </nav>
 
@@ -40,6 +42,36 @@
             <h1>LuyaliSims</h1>
         </div>
         <p class="subtitle">Next-Generation Interactive Educational Simulators & Science Labs</p>
+
+        <!-- Top Platform Editorial Summary (AdSense Content Anchor) -->
+        <p class="hero-description">
+            Welcome to LuyaliSims — an open-access virtual laboratory engineering real-time, interactive physics, electronics, and mechanical models. Explore hands-on experiments, manipulate variable parameters, and observe scientific laws through 3D visualization.
+        </p>
+
+        <!-- Above-The-Fold Feature Badges Strip -->
+        <div id="features-strip" class="features-badge-container">
+            <div class="feature-pill">
+                <span class="pill-icon">🔬</span>
+                <div>
+                    <strong>Curriculum-Aligned</strong>
+                    <span>Secondary & University STEM</span>
+                </div>
+            </div>
+            <div class="feature-pill">
+                <span class="pill-icon">⚡</span>
+                <div>
+                    <strong>Real-Time Engines</strong>
+                    <span>Interactive 3D Canvas Math</span>
+                </div>
+            </div>
+            <div class="feature-pill">
+                <span class="pill-icon">📱</span>
+                <div>
+                    <strong>Touch & Mobile Ready</strong>
+                    <span>Universal Responsive UI</span>
+                </div>
+            </div>
+        </div>
         
         <!-- Search and Filter Controls -->
         <div class="controls">
@@ -124,8 +156,8 @@
         <div class="footer-legal-links">
             <a href="#top">Home</a>
             <a href="#about-section">About Us</a>
-            <a onclick="openModal('privacyModal')">Privacy Policy</a>
-            <a onclick="openModal('termsModal')">Terms of Service</a>
+            <button type="button" class="footer-policy-link" onclick="openModal('privacyModal')">Privacy Policy</button>
+            <button type="button" class="footer-policy-link" onclick="openModal('termsModal')">Terms of Service</button>
             <a href="#contact-section">Contact Us</a>
             <a href="https://forms.gle/fYxxaNKAh21dPUoBA" target="_blank" rel="noopener noreferrer">Simulator Suggestions</a>
         </div>
@@ -135,12 +167,12 @@
         </div>
     </footer>
 
-    <!-- 6. POPUP PRIVACY POLICY MODAL (AdSense & GDPR Compliant) -->
-    <div id="privacyModal" class="policy-modal" role="dialog" aria-modal="true" aria-labelledby="privacyTitle">
+    <!-- 6. POPUP PRIVACY POLICY MODAL (Hardcoded display:none prevents bleeding onto page) -->
+    <div id="privacyModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="privacyTitle">
         <div class="modal-body">
             <button class="modal-close-btn" onclick="closeModal('privacyModal')">Close [✕]</button>
             <h2 id="privacyTitle">Privacy Policy</h2>
-            <p><strong>Last Updated: September 2026</strong></p>
+            <p class="modal-date">Last Updated: September 2026</p>
             <p>Welcome to LuyaliSims. We respect your privacy and are committed to protecting your personal data. This privacy policy explains how we treat information when you interact with our educational simulators.</p>
             
             <h3>1. Educational Purpose & Information Collection</h3>
@@ -150,7 +182,7 @@
             <p>We may display advertisements served by Google AdSense to fund our free educational tools. Google, as a third-party vendor, uses cookies to serve ads on our site based on users' visits to this and other sites on the Internet.</p>
             <ul>
                 <li>Google's use of advertising cookies enables it and its partners to serve ads based on your visit to LuyaliSims and other sites.</li>
-                <li>Users may opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" style="color: var(--neon-cyan);">Google Ads Settings</a>.</li>
+                <li>Users may opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer">Google Ads Settings</a>.</li>
             </ul>
 
             <h3>3. Log Files & Analytics</h3>
@@ -160,16 +192,16 @@
             <p>Our educational simulators are built for students and educators of all ages. We do not knowingly solicit or collect personally identifiable information from children under 13.</p>
 
             <h3>5. Contact Regarding Privacy</h3>
-            <p>If you have any questions regarding this policy, contact us at: <a href="mailto:luyashliz@gmail.com" style="color: var(--neon-cyan);">luyashliz@gmail.com</a>.</p>
+            <p>If you have any questions regarding this policy, contact us at: <a href="mailto:luyashliz@gmail.com">luyashliz@gmail.com</a>.</p>
         </div>
     </div>
 
     <!-- 7. POPUP TERMS OF SERVICE MODAL -->
-    <div id="termsModal" class="policy-modal" role="dialog" aria-modal="true" aria-labelledby="termsTitle">
+    <div id="termsModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="termsTitle">
         <div class="modal-body">
             <button class="modal-close-btn" onclick="closeModal('termsModal')">Close [✕]</button>
             <h2 id="termsTitle">Terms of Service</h2>
-            <p><strong>Effective Date: September 2026</strong></p>
+            <p class="modal-date">Effective Date: September 2026</p>
 
             <h3>1. Permitted Educational Use</h3>
             <p>All interactive models, simulations, practice problems, and laboratory worksheets on LuyaliSims are made freely available for classroom demonstrations, academic study, tutoring, and self-paced individual learning.</p>
@@ -186,6 +218,6 @@
     </div>
 
     <!-- 8. EXTERNAL SCRIPT -->
-    <script src="script.js"></script>
+    <script src="script.js?v=2.0"></script>
 </body>
 </html>
