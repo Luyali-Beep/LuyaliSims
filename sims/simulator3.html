@@ -2,99 +2,457 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CRO Voltage Measurement Simulator - LuyaliSims</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Interactive 3D Cathode Ray Oscilloscope (CRO) laboratory simulator. Analyze AC waveforms, measure DC voltages, configure time-base sweeps, and master electronic instrumentation - LuyaliSims STEM Labs.">
+    <title>Cathode Ray Oscilloscope Simulator & Laboratory - LuyaliSims</title>
     
-    <!-- Tailwind CSS for Simulator UI layout -->
-    <script src="https://cdn.tailwindcss.com"></script>
-
     <!-- Import Futuristic Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Rajdhani:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     
     <style>
-        /* Base Theme to match the main page */
-        body {
-            font-family: 'Rajdhani', sans-serif;
-            background-color: #0a0e17;
-            background-image: radial-gradient(circle at top right, rgba(0, 243, 255, 0.05), transparent 40%),
-                              radial-gradient(circle at bottom left, rgba(188, 19, 254, 0.05), transparent 40%);
-            color: #e2e8f0;
-            margin: 0;
-            padding: 30px;
-            min-height: 100vh;
+        /* Base Reset & Variables */
+        *, *::before, *::after {
+            box-sizing: border-box;
         }
 
-        /* 1. NAVIGATION: Futuristic Back Button */
+        :root {
+            --neon-cyan: #00f3ff;
+            --neon-magenta: #bc13fe;
+            --neon-green: #00ff88;
+            --bg-dark: #070a12;
+            --panel-bg: rgba(16, 24, 43, 0.85);
+            --border-glow: rgba(0, 243, 255, 0.35);
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 85% 15%, rgba(0, 243, 255, 0.08), transparent 45%),
+                radial-gradient(circle at 15% 85%, rgba(188, 19, 254, 0.08), transparent 45%),
+                linear-gradient(180deg, #05070e 0%, #0a0e1a 100%);
+            color: #e2e8f0;
+            margin: 0;
+            padding: 16px 20px;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* 1. HEADER & TOP NAVIGATION */
+        header {
+            max-width: 1200px;
+            margin: 0 auto 15px auto;
+        }
+
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
         .back-btn {
             display: inline-flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-            padding: 10px 20px;
-            background: rgba(16, 24, 43, 0.6);
+            gap: 8px;
+            padding: 9px 18px;
+            background: rgba(16, 24, 43, 0.7);
             backdrop-filter: blur(8px);
             border: 1px solid rgba(188, 19, 254, 0.5);
             color: #e580ff;
             text-decoration: none;
             border-radius: 8px;
             font-weight: 600;
-            font-size: 1.1rem;
+            font-size: 0.95rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             transition: all 0.3s ease;
         }
 
         .back-btn:hover {
-            background: rgba(188, 19, 254, 0.15);
-            border-color: #bc13fe;
+            background: rgba(188, 19, 254, 0.2);
+            border-color: var(--neon-magenta);
             color: #fff;
             box-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
-            transform: translateX(-5px);
+            transform: translateX(-3px);
         }
 
-        .back-btn svg { transition: transform 0.3s ease; }
-        .back-btn:hover svg { transform: translateX(-3px); }
-
-        /* Headings */
         h1 {
             font-family: 'Orbitron', sans-serif;
-            color: #00f3ff;
-            text-shadow: 0px 0px 15px rgba(0, 243, 255, 0.3);
-            margin-top: 0;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+            margin: 6px 0 10px 0;
+            font-size: clamp(1.4rem, 3.8vw, 2.3rem);
+            letter-spacing: 1.5px;
             text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        h2, h3 {
-            font-family: 'Orbitron', sans-serif;
-            color: #bc13fe;
-            margin-top: 1.5em;
-            margin-bottom: 0.5em;
         }
 
-        /* 2. THE SIMULATOR APP CONTAINER */
-        #simulator-container {
-            background: rgba(16, 24, 43, 0.6);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(0, 243, 255, 0.3);
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            margin: 0 auto 40px auto;
-            max-width: 1100px; /* Widened slightly to accommodate the CRO interface nicely */
+        /* Above-the-Fold Context: 64 words */
+        .lead-summary {
+            max-width: 900px;
+            margin: 0 auto 20px auto;
+            text-align: center;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: #cbd5e1;
         }
 
-        /* 3. EDUCATIONAL CONTENT */
-        .educational-content {
-            max-width: 1100px;
+        main {
+            max-width: 1200px;
             margin: 0 auto;
-            line-height: 1.7;
-            font-size: 1.1rem;
+        }
+
+        /* 2. SIMULATOR WORKSPACE */
+        #simulator-container {
+            background: linear-gradient(135deg, rgba(16, 24, 43, 0.85) 0%, rgba(8, 12, 22, 0.9) 100%);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-glow);
+            border-radius: 16px;
+            padding: 22px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 25px rgba(0, 243, 255, 0.12);
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .hud-telemetry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(4, 8, 16, 0.8);
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            border-radius: 10px;
+            padding: 10px 16px;
+            margin-bottom: 18px;
+            font-family: 'Share Tech Mono', monospace;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .telemetry-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.92rem;
+        }
+
+        .tele-label {
+            color: #8da4be;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .tele-val {
+            color: var(--neon-cyan);
+            font-weight: 700;
+        }
+
+        .tele-val.pink {
+            color: #ff55bb;
+        }
+
+        .tele-val.green {
+            color: var(--neon-green);
+        }
+
+        .sim-layout {
+            display: grid;
+            grid-template-columns: 1.6fr 1fr;
+            gap: 20px;
+            align-items: stretch;
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            width: 100%;
+            background: radial-gradient(circle at 50% 50%, #08171a 0%, #02070a 100%);
+            border-radius: 12px;
+            overflow: hidden;
+            touch-action: none;
+            border: 4px solid #1e293b;
+            box-shadow: 
+                0 0 0 2px rgba(0, 243, 255, 0.4),
+                0 15px 35px rgba(0, 0, 0, 0.8),
+                inset 0 0 35px rgba(0, 0, 0, 0.95);
+        }
+
+        .canvas-wrapper::before {
+            content: " ";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: 
+                linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, transparent 50%),
+                repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.22) 0px, rgba(0, 0, 0, 0.22) 1px, transparent 1px, transparent 3px);
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .canvas-wrapper::after {
+            content: " ";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            box-shadow: inset 0 0 50px rgba(0, 10, 15, 0.9);
+            pointer-events: none;
+            z-index: 6;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16 / 10;
+            cursor: crosshair;
+        }
+
+        .controls-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 13px;
+            background: linear-gradient(145deg, rgba(11, 17, 30, 0.9) 0%, rgba(6, 9, 16, 0.95) 100%);
+            padding: 18px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        }
+
+        .panel-heading {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border-bottom: 1px solid rgba(0, 243, 255, 0.25);
+            padding-bottom: 6px;
+            margin: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .control-group label {
+            font-size: 0.93rem;
+            font-weight: 600;
+            color: #cbd5e1;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .control-group label span {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--neon-green);
+            font-weight: 700;
+        }
+
+        .mode-toggle-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            background: #050914;
+            padding: 4px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 243, 255, 0.3);
+        }
+
+        .mode-btn {
+            background: transparent;
+            border: none;
             color: #94a3b8;
-            background: rgba(10, 14, 23, 0.8);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 8px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(135deg, rgba(0, 243, 255, 0.3) 0%, rgba(0, 150, 180, 0.4) 100%);
+            color: #ffffff;
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+            border: 1px solid rgba(0, 243, 255, 0.6);
+        }
+
+        select, input[type="range"] {
+            min-height: 44px;
+        }
+
+        select {
+            background: #060c18;
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            color: #e2e8f0;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding: 8px 12px;
+            border-radius: 8px;
+            outline: none;
+            cursor: pointer;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        select:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.35);
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            background: #0c1527;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            height: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 6px 0;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #00f3ff 30%, #0088aa 100%);
+            border: 2px solid #fff;
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.8);
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+        }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .sim-btn {
+            background: linear-gradient(180deg, rgba(16, 28, 54, 0.9) 0%, rgba(8, 14, 28, 0.95) 100%);
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            color: var(--neon-cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 10px;
+            min-height: 48px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 
+                0 4px 10px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .sim-btn:hover {
+            border-color: var(--neon-cyan);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.5), inset 0 0 8px rgba(0, 243, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .sim-btn:active {
+            transform: translateY(1px);
+        }
+
+        .sim-btn.secondary {
+            border-color: rgba(188, 19, 254, 0.5);
+            color: #e580ff;
+        }
+
+        .sim-btn.secondary:hover {
+            border-color: var(--neon-magenta);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
+        }
+
+        .sim-btn.active-state {
+            background: linear-gradient(180deg, rgba(0, 243, 255, 0.3) 0%, rgba(0, 150, 180, 0.4) 100%);
+            border-color: #00f3ff;
+            color: #ffffff;
+            box-shadow: 0 0 16px rgba(0, 243, 255, 0.7);
+        }
+
+        /* 3. POLICY-COMPLIANT AD CONTAINER */
+        .ad-slot-wrapper {
+            margin: 30px auto;
+            text-align: center;
+            clear: both;
+        }
+
+        .ad-disclaimer {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            margin-bottom: 6px;
+        }
+
+        .ad-box-placeholder {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            min-height: 90px;
+            max-width: 970px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #475569;
+            font-size: 0.85rem;
+            border-radius: 8px;
+        }
+
+        /* 4. EDUCATIONAL CONTENT SECTION */
+        .educational-content {
+            line-height: 1.75;
+            font-size: 1.05rem;
+            color: #94a3b8;
+            background: rgba(10, 14, 23, 0.85);
             padding: 30px;
-            border-radius: 15px;
-            border-left: 4px solid #00f3ff;
+            border-radius: 16px;
+            border-left: 4px solid var(--neon-cyan);
+            border-top: 1px solid rgba(0, 243, 255, 0.2);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin-bottom: 35px;
+        }
+
+        .educational-content h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-magenta);
+            border-bottom: 1px solid rgba(188, 19, 254, 0.3);
+            padding-bottom: 8px;
+            margin-top: 1.8em;
+            margin-bottom: 0.6em;
+            font-size: 1.45rem;
+        }
+
+        .educational-content h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: #38bdf8;
+            margin-top: 1.4em;
+            margin-bottom: 0.4em;
+            font-size: 1.15rem;
         }
 
         .educational-content strong {
@@ -104,330 +462,987 @@
             border-radius: 4px;
         }
 
-        .educational-content p {
-            margin-bottom: 1rem;
+        .formula-box {
+            background: rgba(4, 9, 20, 0.7);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-left: 3px solid var(--neon-green);
+            padding: 14px 18px;
+            margin: 14px 0;
+            border-radius: 6px;
+            font-family: 'Share Tech Mono', monospace;
+            color: #a7f3d0;
+            font-size: 1.05rem;
+            line-height: 1.6;
         }
 
-        .educational-content ul {
-            margin-left: 20px;
-            margin-bottom: 1rem;
-            list-style-type: disc;
+        .task-card {
+            background: rgba(15, 23, 42, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 18px;
+            transition: border-color 0.2s;
+        }
+
+        .task-card:hover {
+            border-color: rgba(0, 243, 255, 0.4);
+        }
+
+        .task-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            color: var(--neon-cyan);
+            margin-bottom: 8px;
+        }
+
+        details {
+            margin-top: 25px;
+            background: rgba(5, 10, 20, 0.8);
+            border: 1px solid rgba(188, 19, 254, 0.4);
+            border-radius: 10px;
+            padding: 15px 20px;
+        }
+
+        summary {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            color: #e580ff;
+            cursor: pointer;
+            padding: 6px 0;
+            user-select: none;
+            letter-spacing: 1px;
+            outline: none;
+        }
+
+        summary:hover {
+            color: #fff;
+            text-shadow: 0 0 10px rgba(188, 19, 254, 0.8);
+        }
+
+        .solution-step {
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+            padding: 12px 0;
+        }
+
+        .solution-step:last-child {
+            border-bottom: none;
+        }
+
+        /* 5. FOOTER & ACCURATE ALIGNED LINKS */
+        footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px 20px 20px 20px;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .footer-nav {
+            display: flex;
+            justify-content: center;
+            gap: 22px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .footer-nav a, .footer-modal-trigger {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.2s, text-shadow 0.2s;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .footer-nav a:hover, .footer-modal-trigger:hover {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
+        }
+
+        /* 6. SELF-CONTAINED POLICY MODALS */
+        .policy-modal {
+            position: fixed !important;
+            top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
+            width: 100vw !important; height: 100vh !important;
+            background: rgba(4, 7, 15, 0.92) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 99999 !important;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-body {
+            background: linear-gradient(145deg, #0b111e 0%, #060913 100%);
+            border: 2px solid var(--neon-cyan);
+            border-radius: 16px;
+            max-width: 820px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 35px 30px;
+            color: #cbd5e1;
+            box-shadow: 0 0 40px rgba(0, 243, 255, 0.25);
+            line-height: 1.75;
+            position: relative;
+            text-align: left;
+        }
+
+        .modal-body h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-cyan);
+            margin-top: 0;
+            font-size: 1.6rem;
+        }
+
+        .modal-body h3 {
+            color: var(--neon-magenta);
+            font-family: 'Orbitron', sans-serif;
+            margin-top: 24px;
+            margin-bottom: 8px;
+            font-size: 1.15rem;
+        }
+
+        .modal-date {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--neon-green);
+            font-size: 0.9rem;
+            margin-top: -6px;
+            margin-bottom: 16px;
+        }
+
+        .modal-close-btn {
+            background: linear-gradient(180deg, rgba(188, 19, 254, 0.4), rgba(188, 19, 254, 0.15));
+            border: 1px solid var(--neon-magenta);
+            color: #fff;
+            padding: 8px 18px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            float: right;
+            margin-bottom: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close-btn:hover {
+            background: var(--neon-magenta);
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.8);
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            #simulator-container, .educational-content { padding: 14px; }
+            .sim-layout { grid-template-columns: 1fr; }
+            .btn-grid { grid-template-columns: 1fr; }
+            .hud-telemetry { flex-direction: column; align-items: flex-start; gap: 6px; }
+            .modal-body { padding: 22px 18px; }
         }
     </style>
 </head>
 <body>
-    
-    <!-- 1. NAVIGATION -->
-    <a href="../index.html" class="back-btn">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
-        </svg>
-        Back to LuyaliSims
-    </a>
-    
-    <h1>Cathode Ray Oscilloscope Simulator</h1>
 
-    <!-- 2. THE SIMULATOR APP -->
-    <div id="simulator-container">
+    <!-- 1. HEADER & TOP NAVIGATION -->
+    <header>
+        <nav class="top-nav">
+            <a href="../index.html" class="back-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Back to LuyaliSims
+            </a>
+            <span style="font-family: 'Share Tech Mono', monospace; font-size: 0.85rem; color: #64748b;">
+                MODULE ID: CRO-ELEC-402
+            </span>
+        </nav>
         
-        <div class="flex flex-col gap-6">
-            <!-- Header -->
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-700/50 pb-4 gap-4">
-                <div>
-                    <h2 class="text-xl font-bold tracking-wide text-emerald-400 !font-['Orbitron'] !mt-0 !mb-1 !text-shadow-none">CRO Interface</h2>
-                    <p class="text-sm text-slate-400 font-['Rajdhani']">Voltage & Frequency Measurement Panel</p>
+        <h1>Cathode Ray Oscilloscope Simulator & Laboratory</h1>
+        
+        <!-- Contextual Summary: 64 words, substantial text above the fold -->
+        <p class="lead-summary">
+            Explore electrostatic electron beam deflection, time-base sawtooth sweep calibration, and graticule division quantification using this virtual 3D Cathode Ray Oscilloscope. Seamlessly switch between alternating signals and direct current to measure peak-to-peak voltages, frequency periodicities, and steady DC potential offsets without circuit loading. Master quantitative oscilloscope diagnostics across audio, RF, and power circuits in real time.
+        </p>
+    </header>
+
+    <main>
+        <!-- 2. SIMULATOR APP WORKSPACE -->
+        <section id="simulator-container" aria-label="Interactive Cathode Ray Oscilloscope Laboratory">
+            
+            <!-- Telemetry Status Bar -->
+            <div class="hud-telemetry">
+                <div class="telemetry-item">
+                    <span class="tele-label">Beam State:</span>
+                    <span id="tele-status" class="tele-val">RUNNING (AC)</span>
                 </div>
-                <div class="bg-[#050b14] px-4 py-2 rounded-lg border border-slate-700/50 flex gap-6 text-sm">
-                    <div>Measured V<sub>p-p</sub>: <span id="readout-vpp" class="font-mono text-emerald-400 font-semibold drop-shadow-[0_0_5px_rgba(52,211,153,0.5)]">0.00 V</span></div>
-                    <div>Calculated Peak: <span id="readout-vp" class="font-mono text-cyan-400 font-semibold drop-shadow-[0_0_5px_rgba(34,211,238,0.5)]">0.00 V</span></div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Coupling:</span>
+                    <span id="tele-mode" class="tele-val green">AC COUPLED</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label" id="label-primary-v">Measured V_pp:</span>
+                    <span id="readout-vpp" class="tele-val">10.00 V</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label" id="label-secondary-v">Peak V_p:</span>
+                    <span id="readout-vp" class="tele-val">5.00 V</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Period (T):</span>
+                    <span id="readout-t" class="tele-val pink">10.00 ms</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Frequency (f):</span>
+                    <span id="readout-f" class="tele-val pink">100 Hz</span>
                 </div>
             </div>
 
-            <!-- Main Display & Controls Grid -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                
-                <!-- CRO Screen (2 columns) -->
-                <div class="lg:col-span-2 flex flex-col items-center font-['Rajdhani']">
-                    <div class="relative bg-[#021008] border-4 border-slate-700 rounded-lg w-full aspect-[4/3] overflow-hidden shadow-inner flex items-center justify-center">
-                        <!-- Canvas -->
-                        <canvas id="croCanvas" class="w-full h-full cursor-crosshair"></canvas>
-                        <!-- CRT Grid Overlay Lines (Simulated via Canvas) -->
-                    </div>
-                    <div class="flex justify-between w-full text-sm font-semibold text-slate-400 mt-3 px-1 tracking-widest uppercase">
-                        <span>Y-Axis: Volts / Div</span>
-                        <span>X-Axis: Time / Div</span>
-                    </div>
+            <div class="sim-layout">
+                <!-- 3D Holographic Canvas Display -->
+                <div class="canvas-wrapper" id="canvasFrame">
+                    <canvas id="croCanvas" width="800" height="500"></canvas>
                 </div>
 
-                <!-- Control Panel (1 column) -->
-                <div class="bg-[#0a0e17] border border-slate-700/80 rounded-xl p-5 flex flex-col justify-start gap-6 font-['Rajdhani']">
+                <!-- 3D Controls Console -->
+                <div class="controls-panel">
                     
-                    <!-- Signal Generator Controls -->
-                    <div class="space-y-4">
-                        <h3 class="text-sm font-bold uppercase tracking-widest text-slate-400 border-b border-slate-700 pb-2 !mt-0 !mb-0 !font-['Rajdhani'] !text-slate-400">Input Signal Generator</h3>
-                        
-                        <div>
-                            <div class="flex justify-between text-sm mb-1 text-slate-200">
-                                <span>Peak Voltage (V<sub>p</sub>):</span>
-                                <span id="val-vp" class="font-mono text-emerald-400 font-bold">5.0 V</span>
-                            </div>
-                            <input type="range" id="input-vp" min="1" max="20" step="0.5" value="5" class="w-full h-2 bg-slate-700 rounded appearance-none accent-emerald-500 cursor-pointer">
-                        </div>
+                    <h3 class="panel-heading">
+                        <span>Signal Input Mode</span>
+                        <span style="font-size: 0.72rem; color: #64748b;">CHANNEL 1</span>
+                    </h3>
 
-                        <div>
-                            <div class="flex justify-between text-sm mb-1 text-slate-200">
-                                <span>Frequency (f):</span>
-                                <span id="val-freq" class="font-mono text-emerald-400 font-bold">100 Hz</span>
-                            </div>
-                            <input type="range" id="input-freq" min="10" max="1000" step="10" value="100" class="w-full h-2 bg-slate-700 rounded appearance-none accent-emerald-500 cursor-pointer">
-                        </div>
+                    <!-- AC / DC Mode Switcher Buttons -->
+                    <div class="mode-toggle-group">
+                        <button type="button" id="btn-mode-ac" class="mode-btn active">AC Signal</button>
+                        <button type="button" id="btn-mode-dc" class="mode-btn">DC Voltage</button>
                     </div>
 
-                    <!-- CRO Calibration Controls -->
-                    <div class="space-y-4 mt-2">
-                        <h3 class="text-sm font-bold uppercase tracking-widest text-slate-400 border-b border-slate-700 pb-2 !mt-0 !mb-0 !font-['Rajdhani'] !text-slate-400">CRO Settings</h3>
-                        
-                        <div>
-                            <label class="block text-sm mb-1.5 text-slate-300 font-medium">Y-Sensitivity (Volts/Div):</label>
-                            <select id="volts-div" class="w-full bg-[#050b14] border border-slate-600 rounded px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-emerald-500 cursor-pointer">
-                                <option value="1">1.0 V / div</option>
-                                <option value="2" selected>2.0 V / div</option>
-                                <option value="5">5.0 V / div</option>
-                                <option value="10">10.0 V / div</option>
+                    <!-- AC Controls Group -->
+                    <div id="ac-controls-group" style="display: flex; flex-direction: column; gap: 10px;">
+                        <div class="control-group">
+                            <label for="waveType">Waveform Profile:</label>
+                            <select id="waveType">
+                                <option value="sine" selected>Sinusoidal (AC)</option>
+                                <option value="square">Square Wave</option>
+                                <option value="triangle">Triangular Wave</option>
                             </select>
                         </div>
 
-                        <div>
-                            <label class="block text-sm mb-1.5 text-slate-300 font-medium">Time-Base (Time/Div):</label>
-                            <select id="time-div" class="w-full bg-[#050b14] border border-slate-600 rounded px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-emerald-500 cursor-pointer">
-                                <option value="1">1 ms / div</option>
-                                <option value="2" selected>2 ms / div</option>
-                                <option value="5">5 ms / div</option>
-                            </select>
+                        <div class="control-group">
+                            <label for="input-vp">Peak Voltage (V_p): <span id="val-vp">5.0 V</span></label>
+                            <input type="range" id="input-vp" min="1" max="20" step="0.5" value="5">
+                        </div>
+
+                        <div class="control-group">
+                            <label for="input-freq">Signal Frequency (f): <span id="val-freq">100 Hz</span></label>
+                            <input type="range" id="input-freq" min="20" max="1000" step="10" value="100">
                         </div>
                     </div>
 
-                    <!-- Instructional Hint Box -->
-                    <div class="bg-indigo-900/20 border border-indigo-500/30 p-4 rounded-lg text-sm text-slate-300 leading-relaxed mt-auto">
-                        <strong class="text-indigo-300 block mb-1">Reading Guide:</strong>
-                        Count vertical divisions (h) from peak-to-peak. Multiply h by the <strong>Volts/Div</strong> setting to calculate the peak-to-peak voltage (V<sub>pp</sub>).
+                    <!-- DC Controls Group (Initially hidden) -->
+                    <div id="dc-controls-group" style="display: none; flex-direction: column; gap: 10px;">
+                        <div class="control-group">
+                            <label for="input-vdc">DC Potential (V_dc): <span id="val-vdc">+6.0 V</span></label>
+                            <input type="range" id="input-vdc" min="-20" max="20" step="0.5" value="6">
+                        </div>
+
+                        <!-- Polarity Quick Presets -->
+                        <div style="display: flex; gap: 6px;">
+                            <button type="button" id="btn-dc-pos" class="sim-btn" style="flex: 1; min-height: 38px; font-size: 0.75rem;">+6.0 V</button>
+                            <button type="button" id="btn-dc-zero" class="sim-btn secondary" style="flex: 1; min-height: 38px; font-size: 0.75rem;">0 V (GND)</button>
+                            <button type="button" id="btn-dc-neg" class="sim-btn" style="flex: 1; min-height: 38px; font-size: 0.75rem;">-6.0 V</button>
+                        </div>
                     </div>
 
+                    <h3 class="panel-heading" style="margin-top: 4px;">
+                        <span>Deflection Systems</span>
+                        <span style="font-size: 0.72rem; color: #64748b;">CALIBRATION</span>
+                    </h3>
+
+                    <!-- Y-Sensitivity Dial -->
+                    <div class="control-group">
+                        <label for="volts-div">Y-Sensitivity (Volts/Div):</label>
+                        <select id="volts-div">
+                            <option value="0.5">0.5 V / div</option>
+                            <option value="1">1.0 V / div</option>
+                            <option value="2" selected>2.0 V / div</option>
+                            <option value="5">5.0 V / div</option>
+                            <option value="10">10.0 V / div</option>
+                        </select>
+                    </div>
+
+                    <!-- Time-Base Dial -->
+                    <div class="control-group">
+                        <label for="time-div">Time-Base (Time/Div):</label>
+                        <select id="time-div">
+                            <option value="0.5">0.5 ms / div</option>
+                            <option value="1">1.0 ms / div</option>
+                            <option value="2" selected>2.0 ms / div</option>
+                            <option value="5">5.0 ms / div</option>
+                            <option value="10">10.0 ms / div</option>
+                        </select>
+                    </div>
+
+                    <!-- Y-Shift Position Slider -->
+                    <div class="control-group">
+                        <label for="y-shift">Ground Trace Offset (Y-Shift): <span id="val-yshift">0.0 div</span></label>
+                        <input type="range" id="y-shift" min="-3" max="3" step="0.2" value="0">
+                    </div>
+
+                    <!-- Action Controls -->
+                    <div class="btn-grid">
+                        <button id="freezeBtn" class="sim-btn">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                <rect x="6" y="4" width="4" height="16"></rect>
+                                <rect x="14" y="4" width="4" height="16"></rect>
+                            </svg>
+                            Freeze Trace
+                        </button>
+                        <button id="fullscreenBtn" class="sim-btn secondary">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                            </svg>
+                            Fullscreen
+                        </button>
+                    </div>
                 </div>
+            </div>
+        </section>
+
+        <!-- 3. SAFE AD PLACEMENT SLOT (Separated, labeled, padded) -->
+        <div class="ad-slot-wrapper">
+            <div class="ad-disclaimer">Advertisement</div>
+            <div class="ad-box-placeholder">
+                <!-- Google AdSense Responsive Unit Goes Here -->
+                <span>[AdSense Responsive Display Unit]</span>
             </div>
         </div>
 
-    </div>
-
-    <!-- 3. EDUCATIONAL CONTENT -->
-    <div class="educational-content">
-        
-        <h2>How to Use This Simulator</h2>
-        <p>This simulator provides a realistic, interactive interface for understanding how a Cathode Ray Oscilloscope operates. Follow these steps to master reading waveforms:</p>
-        <ul>
-            <li><strong>Input Signal Generator:</strong> Use the top sliders to simulate injecting a voltage signal into the CRO. You can adjust the exact Peak Voltage (V<sub>p</sub>) and the Frequency (f) of the incoming alternating current.</li>
-            <li><strong>CRO Settings (Calibration):</strong> Real oscilloscopes require the user to scale the graph to fit the screen. 
+        <!-- 4. EDUCATIONAL REFERENCE ARTICLE -->
+        <article class="educational-content">
+            <section>
+                <h2>How to Operate the Simulator</h2>
+                <p>This virtual laboratory recreates the operational physics and controls of an analog/digital Cathode Ray Oscilloscope (CRO) capable of measuring both AC and DC potentials:</p>
                 <ul>
-                    <li>Adjust the <strong>Y-Sensitivity (Volts/Div)</strong> dial. Notice how increasing this value compresses the waveform vertically, allowing higher voltages to fit on the screen.</li>
-                    <li>Adjust the <strong>Time-Base (Time/Div)</strong> dial. Changing this stretches or compresses the wave horizontally, allowing you to view higher or lower frequencies clearly.</li>
+                    <li><strong>Signal Mode Selection:</strong> Choose between <strong>AC Signal</strong> (alternating voltage) and <strong>DC Voltage</strong> (steady direct potential). In AC mode, select Sinusoidal, Square, or Triangular waveforms and adjust the Peak Voltage (V_p) and Frequency (f). In DC mode, vary the DC Voltage Level (V_dc) or use the preset polarity buttons (+6.0 V, 0 V GND, -6.0 V).</li>
+                    <li><strong>Y-Sensitivity Calibration (Volts/Div):</strong> Controls the vertical attenuator/amplifier. Decreasing Volts/Div expands the trace vertically to resolve low voltages; increasing it compresses large voltages to fit within the graticule window.</li>
+                    <li><strong>Time-Base Calibration (Time/Div):</strong> Controls the horizontal sweep oscillator speed. Lower values (e.g., 0.5 ms/div) spread a single wave cycle across multiple horizontal squares, while higher values (e.g., 5.0 ms/div) display multiple cycles simultaneously. In DC mode, changing the time base does not alter the vertical deflection because DC potential remains steady across time.</li>
+                    <li><strong>Ground Baseline Shift (Y-Shift):</strong> Use the Y-Shift slider to relocate the 0 V reference line, modeling the physical vertical position potentiometer on a bench instrument.</li>
+                    <li><strong>Freeze & Fullscreen Controls:</strong> Click <strong>Freeze Trace</strong> to hold the animated phosphor sweep in place for stationary graticule counting. Use <strong>Fullscreen</strong> during lectures or laboratory displays.</li>
                 </ul>
-            </li>
-            <li><strong>Reading the Screen:</strong> Practice reading the screen visually without looking at the digital readout. Count the squares!</li>
-        </ul>
+            </section>
 
-        <h2>The Theory Behind Oscilloscopes</h2>
-        <p>A Cathode Ray Oscilloscope (CRO) is a fundamental diagnostic instrument used in laboratories to display and analyze the waveform of electronic signals. In a traditional analog CRO, an electron gun fires a beam of electrons at a phosphor-coated screen. When the electrons hit the screen, the phosphor glows, creating a visible dot.</p>
-        <p>The device uses deflecting plates to move this dot. The vertical deflecting plates pull the dot up and down based on the incoming voltage (the signal you are measuring). Simultaneously, a "sweep generator" inside the CRO pulls the dot smoothly from left to right at a known, constant speed (set by the Time/Div knob). This combination plots a perfect graph of <strong>Voltage vs. Time</strong>.</p>
-        
-        <h3>The Formulas Used</h3>
-        <p>To extract mathematical data from a CRO screen, you must count the physical grid squares (divisions) and multiply them by the scale factors set on your control knobs:</p>
-        
-        <p><strong>1. Calculating Voltage:</strong></p>
-        <p>To find the Peak-to-Peak Voltage (V<sub>pp</sub>), count the number of vertical grid squares from the very bottom of the wave trough to the very top of the wave peak. Then apply the formula:</p>
-        <p><strong>V<sub>pp</sub> = Vertical Divisions &times; (Volts / Div)</strong></p>
-        <p>To find the Peak Voltage (Amplitude), simply divide the V<sub>pp</sub> by 2.</p>
+            <section>
+                <h2>Scientific Theory & Working Principles</h2>
+                <p>The Cathode Ray Oscilloscope is a high-speed vector graph-plotting instrument. Unlike mechanical moving-coil meters, which suffer from mechanical inertia and low frequency limits, a CRO utilizes an electron beam with negligible mass, responding almost instantaneously to microsecond potential changes.</p>
 
-        <p><strong>2. Calculating Frequency:</strong></p>
-        <p>To find the Time Period (T) of one complete wave cycle, count the number of horizontal grid squares it takes for the wave to repeat itself.</p>
-        <p><strong>T = Horizontal Divisions &times; (Time / Div)</strong></p>
-        <p>Once you have the Time Period (in seconds), you can calculate the signal's frequency (in Hertz):</p>
-        <p><strong>Frequency (f) = 1 / T</strong></p>
-        
-        <h2>Real World Applications</h2>
-        <p>Understanding how to read an oscilloscope is a critical skill across many technical and scientific fields:</p>
-        <ul>
-            <li><strong>Electronics Engineering:</strong> Engineers use oscilloscopes to troubleshoot circuit boards, measure power noise, and verify that digital logic chips are sending the correct high and low voltage pulses at the exact right nanosecond.</li>
-            <li><strong>Medicine (ECG / EKG):</strong> The electrocardiogram machines you see in hospitals are essentially specialized oscilloscopes that map the tiny electrical voltages generated by a patient's beating heart over time.</li>
-            <li><strong>Automotive Diagnostics:</strong> Modern cars are highly computerized. Mechanics use specialized automotive oscilloscopes to check the timing signals from camshaft sensors and the firing pulses of spark plugs.</li>
-        </ul>
-        
+                <h3>1. The Electron Gun Assembly</h3>
+                <p>Located in the evacuated neck of the cathode ray tube (CRT), an indirect heater warms a barium/strontium oxide coated cathode, liberating electrons via <strong>thermionic emission</strong>. A negatively biased control grid surrounds the cathode to modulate electron flow, controlling trace intensity. Successive cylindrical anodes maintained at positive potentials of 1 kV to 20 kV accelerate and collimate the beam into an axial ray.</p>
+
+                <h3>2. Electrostatic Deflection Plates</h3>
+                <p>The electron ray passes between two perpendicular pairs of parallel conducting plates:</p>
+                <ul>
+                    <li><strong>Vertical Deflection (Y-Plates):</strong> Connected to the signal under test through a calibrated attenuator. A potential difference creates a uniform electric field E = V_y / d, exerting a transverse electrostatic force F = e x E. This deflects the beam vertically by a distance directly proportional to the applied test voltage.</li>
+                    <li><strong>Horizontal Deflection (X-Plates):</strong> Fed by an internal relaxation oscillator generating a linear <strong>sawtooth voltage</strong> ramp. The beam is drawn smoothly across the screen from left to right at constant velocity, then quickly returns (flyback) during a blanked interval.</li>
+                </ul>
+
+                <h3>3. Phosphor Screen Luminescence</h3>
+                <p>The front face of the tube is coated internally with zinc sulfide or silicate phosphors. When high-velocity electrons strike the phosphor layer, their kinetic energy excites orbital electrons into higher states. Upon radiative de-excitation, visible light is emitted via fluorescence (immediate emission) and phosphorescence (persistence), producing a bright glowing trace.</p>
+
+                <h3>4. Direct Current vs. Alternating Current Coupling</h3>
+                <p>When measuring <strong>DC potentials</strong>, the electron beam experiences a constant upward or downward force. With the time base active, this draws a straight horizontal line offset from the 0 V center axis by an amount d = V_dc / (Volts/Div). When measuring <strong>AC potentials</strong>, the alternating voltage swings the beam cyclically above and below the baseline, plotting the signal's full wave shape against time.</p>
+            </section>
+
+            <section>
+                <h2>Mathematical Foundations & Formulas</h2>
+                <p>Quantitative analysis on an oscilloscope requires converting visual division counts into dimensional physical units (Volts and Seconds) using calibrated dial ratios:</p>
+
+                <div class="formula-box">
+                    Direct Current Voltage: V_dc = (Vertical Deflection from 0V Baseline in Divisions) x (Volts / Div)<br>
+                    Peak-to-Peak AC Voltage: V_pp = (Vertical Divisions Peak-to-Trough) x (Volts / Div)<br>
+                    Peak AC Voltage (Amplitude): V_p = V_pp / 2<br>
+                    Root-Mean-Square Voltage: V_rms = V_p / √2 = V_p x 0.7071  (for sinusoidal signals)
+                </div>
+
+                <div class="formula-box">
+                    Time Period for One Cycle: T = (Horizontal Divisions for 1 Full Cycle) x (Time / Div)<br>
+                    Signal Frequency: f = 1 / T  (Hertz, where T is expressed in seconds)<br>
+                    Angular Frequency: ω = 2 x π x f  (radians per second)
+                </div>
+            </section>
+
+            <section>
+                <h2>Real-World Industrial & Engineering Applications</h2>
+                <p>The CRO and its modern digital storage equivalent (DSO) serve as foundational instruments across science and engineering:</p>
+                <ul>
+                    <li><strong>Medical Biomedical Instrumentation (ECG & EEG):</strong> Electrocardiographs use differential oscilloscope amplifiers to plot millivolt-level cardiac action potentials over time, enabling diagnosis of arrhythmias and myocardial infarctions.</li>
+                    <li><strong>Automotive Electronic Control Unit (ECU) Diagnostics:</strong> Technicians inspect inductive crankshaft sensor pulses, fuel injector pulse-width modulation (PWM), and CAN bus line voltages to detect timing issues and electrical noise.</li>
+                    <li><strong>Telecommunications & Digital Bus Testing:</strong> RF engineers use eye diagrams on high-bandwidth oscilloscopes to verify signal integrity, measuring rise times, jitter, and propagation delays on multi-gigahertz serial buses.</li>
+                    <li><strong>Acoustic Analysis & Power Electronics:</strong> Audio engineers observe clipping and harmonic distortion in power amplifiers, while electrical power engineers inspect mains harmonics, power factors, and inverter switching transients.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Practice Problems & Diagnostic Tasks</h2>
+                <p>Test your quantitative comprehension using the five laboratory exercises below:</p>
+
+                <div class="task-card">
+                    <div class="task-title">Task 1: Direct Current (DC) Battery Cell Measurement</div>
+                    <p>A battery cell of unknown electromotive force (EMF) is connected to a CRO with the time base running. Before connection, the zero-volt ground line is centered on the middle graticule axis. Upon connection, the horizontal trace shifts steadily upwards by 3.2 divisions. The Y-sensitivity control is calibrated to 0.5 V/div.</p>
+                    <p>(a) Calculate the measured DC voltage (V_dc) of the cell.</p>
+                    <p>(b) State the polarity of the terminal connected to the active input.</p>
+                    <p>(c) If the Y-sensitivity dial is changed to 2.0 V/div, what will be the new vertical deflection in divisions?</p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 2: AC Sinusoidal Voltage & RMS Calculation</div>
+                    <p>An AC step-down transformer secondary is connected to a CRO. The sinusoidal waveform spans 5.6 vertical divisions from its lowest trough to its highest crest. The Y-sensitivity knob is set to 5.0 V/div.</p>
+                    <p>(a) Calculate the peak-to-peak voltage (V_pp).</p>
+                    <p>(b) Determine the peak amplitude (V_p).</p>
+                    <p>(c) Calculate the root-mean-square voltage (V_rms) that a standard digital AC voltmeter would measure across this secondary winding.</p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 3: Periodic Time & Frequency Determination</div>
+                    <p>A function generator produces a square-wave clock signal. On the CRO display, exactly 2 complete cycles occupy a horizontal width of 8.0 divisions when the Time-Base is set to 0.5 ms/div.</p>
+                    <p>(a) Determine the horizontal distance in divisions occupied by one single cycle.</p>
+                    <p>(b) Calculate the periodic time (T) of the clock signal in seconds.</p>
+                    <p>(c) Determine the fundamental operating frequency (f) of the circuit in Hertz.</p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 4: Graticule Boundary & Voltage Clipping Prevention</div>
+                    <p>A signal generator outputs a symmetrical sinusoidal voltage with an amplitude V_p = 16.0 V. The CRO screen has 8 total vertical divisions (4 above the center axis, 4 below).</p>
+                    <p>(a) If an operator selects a Y-sensitivity of 2.0 V/div, calculate the total peak-to-peak deflection in divisions. Will the waveform fit on the screen?</p>
+                    <p>(b) Which standard Y-sensitivity setting (chosen from: 1.0 V/div, 2.0 V/div, 5.0 V/div, or 10.0 V/div) should the operator choose to maximize vertical trace height without clipping off-screen?</p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 5: Multi-Step Audio Tone Diagnostic</div>
+                    <p>An acoustic transducer picks up a musical concert pitch tone. On the oscilloscope, 4 complete cycles span 9.1 divisions horizontally with the Time-Base set to 1.0 ms/div. Vertically, the wave occupies 4.4 divisions with a Y-sensitivity of 2.0 V/div.</p>
+                    <p>(a) Calculate the period (T) of one sound wave cycle.</p>
+                    <p>(b) Calculate the frequency of the sound tone and identify if it is near the standard musical tuning note Concert A (440 Hz).</p>
+                    <p>(c) Calculate the peak-to-peak voltage (V_pp) and the RMS voltage (V_rms) of the microphone output.</p>
+                </div>
+
+                <!-- Collapsible Verified Solutions -->
+                <details>
+                    <summary>Click to Reveal Solutions and Step-by-Step Proofs</summary>
+                    
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 1:</strong></p>
+                        <p>(a) V_dc = (Vertical Divisions) x (Volts / Div) = 3.2 div x 0.5 V/div = <strong>+1.60 V</strong>.</p>
+                        <p>(b) Because the beam is deflected upward toward the positive upper Y-deflection plate, the active input is connected to the <strong>Positive (+)</strong> terminal.</p>
+                        <p>(c) At 2.0 V/div: Deflection = V_dc / (Volts / Div) = 1.60 V / (2.0 V/div) = <strong>0.8 divisions upward</strong>.</p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 2:</strong></p>
+                        <p>(a) V_pp = (Vertical Divisions) x (Volts / Div) = 5.6 div x 5.0 V/div = <strong>28.0 V</strong>.</p>
+                        <p>(b) V_p = V_pp / 2 = 28.0 V / 2 = <strong>14.0 V</strong>.</p>
+                        <p>(c) V_rms = V_p / √2 = 14.0 V / 1.4142 = <strong>9.90 V</strong> (approximately 10 V RMS).</p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 3:</strong></p>
+                        <p>(a) 2 cycles occupy 8.0 divisions, so 1 cycle occupies: 8.0 div / 2 = <strong>4.0 divisions</strong>.</p>
+                        <p>(b) Periodic time T = 4.0 div x 0.5 ms/div = 2.0 ms = <strong>0.002 s</strong> (or 2.0 x 10^-3 s).</p>
+                        <p>(c) Frequency f = 1 / T = 1 / 0.002 s = <strong>500 Hz</strong>.</p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 4:</strong></p>
+                        <p>(a) Peak-to-peak voltage V_pp = 2 x V_p = 2 x 16.0 V = 32.0 V. At 2.0 V/div, required divisions = 32.0 V / (2.0 V/div) = 16.0 divisions. Because the screen only has 8 total divisions, the trace <strong>clips off-screen by 8 divisions (4 above and 4 below)</strong>.</p>
+                        <p>(b) At 5.0 V/div: 32.0 V / (5.0 V/div) = 6.4 divisions. Since 6.4 divisions is less than the 8.0 available divisions and leaves 0.8 divisions of headroom above and below, <strong>5.0 V/div</strong> is the optimal calibration to maximize measurement resolution without clipping.</p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 5:</strong></p>
+                        <p>(a) Horizontal span per cycle = 9.1 div / 4 = 2.275 divisions. Period T = 2.275 div x 1.0 ms/div = 2.275 ms = <strong>0.002275 s</strong>.</p>
+                        <p>(b) Frequency f = 1 / T = 1 / 0.002275 s = <strong>439.56 Hz</strong> (approximately 440 Hz). Yes, this represents the standard <strong>Concert A (440 Hz)</strong> pitch.</p>
+                        <p>(c) V_pp = 4.4 div x 2.0 V/div = <strong>8.80 V</strong>. Peak V_p = 8.80 / 2 = 4.40 V. V_rms = 4.40 / √2 = <strong>3.11 V</strong>.</p>
+                    </div>
+
+                </details>
+            </section>
+        </article>
+    </main>
+
+    <!-- 5. SYNCHRONIZED COMPLIANCE FOOTER (Zero 404s, Exact Alignment with Home) -->
+    <footer>
+        <nav class="footer-nav">
+            <a href="../index.html">Home</a>
+            <a href="../index.html#about-section">About Us</a>
+            <button type="button" class="footer-modal-trigger" onclick="openSimModal('simPrivacyModal')">Privacy Policy</button>
+            <button type="button" class="footer-modal-trigger" onclick="openSimModal('simTermsModal')">Terms of Service</button>
+            <a href="../index.html#contact-section">Contact Us</a>
+            <a href="https://forms.gle/fYxxaNKAh21dPUoBA" target="_blank" rel="noopener noreferrer">Simulator Suggestions</a>
+        </nav>
+        <p>&copy; 2026 LuyaliSims | Engineered by Click & Draft | Dedicated to Open STEM Education</p>
+    </footer>
+
+    <!-- 6. IDENTICAL PRIVACY POLICY MODAL (Matches Home Exactly) -->
+    <div id="simPrivacyModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="privacyTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeSimModal('simPrivacyModal')">Close [✕]</button>
+            <h2 id="privacyTitle">Privacy Policy</h2>
+            <p class="modal-date">Last Updated: September 2026</p>
+            <p>Welcome to LuyaliSims. We respect your privacy and are committed to protecting your personal data. This privacy policy explains how we treat information when you interact with our educational simulators.</p>
+            
+            <h3>1. Educational Purpose & Information Collection</h3>
+            <p>LuyaliSims is a free educational portal. We do not require account registration, passwords, or personal login information to run any simulation. All simulation calculations occur locally within your browser using client-side JavaScript.</p>
+
+            <h3>2. Google AdSense & Third-Party Cookies</h3>
+            <p>We may display advertisements served by Google AdSense to fund our free educational tools. Google, as a third-party vendor, uses cookies to serve ads on our site based on users' visits to this and other sites on the Internet.</p>
+            <ul>
+                <li>Google's use of advertising cookies enables it and its partners to serve ads based on your visit to LuyaliSims and other sites.</li>
+                <li>Users may opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" style="color: var(--neon-cyan);">Google Ads Settings</a>.</li>
+            </ul>
+
+            <h3>3. Log Files & Analytics</h3>
+            <p>Like standard websites, our hosting servers collect anonymous log records (including IP addresses, browser types, and timestamp references) to monitor server uptime, fix script errors, and optimize simulator performance.</p>
+
+            <h3>4. Children's Online Privacy (COPPA Compliance)</h3>
+            <p>Our educational simulators are built for students and educators of all ages. We do not knowingly solicit or collect personally identifiable information from children under 13.</p>
+
+            <h3>5. Contact Regarding Privacy</h3>
+            <p>If you have any questions regarding this policy, contact us at: <a href="mailto:luyashliz@gmail.com" style="color: var(--neon-cyan);">luyashliz@gmail.com</a>.</p>
+        </div>
     </div>
 
-    <!-- Simulator Logic -->
+    <!-- 7. IDENTICAL TERMS OF SERVICE MODAL (Matches Home Exactly) -->
+    <div id="simTermsModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="termsTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeSimModal('simTermsModal')">Close [✕]</button>
+            <h2 id="termsTitle">Terms of Service</h2>
+            <p class="modal-date">Effective Date: September 2026</p>
+
+            <h3>1. Permitted Educational Use</h3>
+            <p>All interactive models, simulations, practice problems, and laboratory worksheets on LuyaliSims are made freely available for classroom demonstrations, academic study, tutoring, and self-paced individual learning.</p>
+
+            <h3>2. Intellectual Property</h3>
+            <p>The code architecture, layout designs, and custom interactive engines are the intellectual property of Ian Luyali and Click & Draft. You may use our simulators online in academic settings, but mirroring or re-hosting our code for commercial resale without permission is prohibited.</p>
+
+            <h3>3. Disclaimer of Scientific Warranty</h3>
+            <p>While simulations are engineered to accurately replicate classical mechanics, thermodynamics, and electronics, they are provided as conceptual learning aids. LuyaliSims is not liable for outcomes in real-world high-voltage or hazardous laboratory environments constructed without professional teacher supervision.</p>
+
+            <h3>4. Updates to Terms</h3>
+            <p>We reserve the right to refine these terms as new laboratory modules and features are introduced.</p>
+        </div>
+    </div>
+
+    <!-- 8. SIMULATOR CORE SCRIPT & MODAL LOGIC -->
     <script>
+        // Modal Controls (Identical functionality to index.html)
+        function openSimModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeSimModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('policy-modal')) {
+                closeSimModal(e.target.id);
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' || e.key === 'Esc') {
+                document.querySelectorAll('.policy-modal').forEach(m => {
+                    m.style.display = 'none';
+                });
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // Fullscreen Implementation
+        const simContainer = document.getElementById('simulator-container');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                if (simContainer.requestFullscreen) simContainer.requestFullscreen();
+                else if (simContainer.webkitRequestFullscreen) simContainer.webkitRequestFullscreen();
+                fullscreenBtn.innerHTML = 'Exit Screen';
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+                fullscreenBtn.innerHTML = 'Fullscreen';
+            }
+        });
+
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                fullscreenBtn.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                    </svg> Fullscreen`;
+            }
+        });
+
+        // Canvas & Simulation Setup
         const canvas = document.getElementById('croCanvas');
         const ctx = canvas.getContext('2d');
 
-        // Controls
+        // Mode Selectors
+        const btnModeAc = document.getElementById('btn-mode-ac');
+        const btnModeDc = document.getElementById('btn-mode-dc');
+        const acControlsGroup = document.getElementById('ac-controls-group');
+        const dcControlsGroup = document.getElementById('dc-controls-group');
+
+        // AC Inputs
         const inputVp = document.getElementById('input-vp');
         const valVp = document.getElementById('val-vp');
         const inputFreq = document.getElementById('input-freq');
         const valFreq = document.getElementById('val-freq');
-        const voltsDivSelect = document.getElementById('volts-div');
-        const timeDivSelect = document.getElementById('time-div');
-        
+        const waveType = document.getElementById('waveType');
+
+        // DC Inputs
+        const inputVdc = document.getElementById('input-vdc');
+        const valVdc = document.getElementById('val-vdc');
+        const btnDcPos = document.getElementById('btn-dc-pos');
+        const btnDcZero = document.getElementById('btn-dc-zero');
+        const btnDcNeg = document.getElementById('btn-dc-neg');
+
+        // Calibration Inputs
+        const voltsDiv = document.getElementById('volts-div');
+        const timeDiv = document.getElementById('time-div');
+        const yShift = document.getElementById('y-shift');
+        const valYShift = document.getElementById('val-yshift');
+
+        // Action Buttons
+        const freezeBtn = document.getElementById('freezeBtn');
+
+        // Telemetry Readouts
+        const teleStatus = document.getElementById('tele-status');
+        const teleMode = document.getElementById('tele-mode');
+        const labelPrimaryV = document.getElementById('label-primary-v');
+        const labelSecondaryV = document.getElementById('label-secondary-v');
         const readoutVpp = document.getElementById('readout-vpp');
         const readoutVp = document.getElementById('readout-vp');
+        const readoutT = document.getElementById('readout-t');
+        const readoutF = document.getElementById('readout-f');
 
-        function resizeCanvas() {
-            // High-DPI Canvas scaling for crisp lines
-            const rect = canvas.parentElement.getBoundingClientRect();
-            canvas.width = rect.width;
-            canvas.height = rect.height;
-        }
-        
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
+        // State Machine
+        let currentMode = 'ac';
+        let isFrozen = false;
+        let animPhase = 0;
+        let lastTimestamp = 0;
 
-        function drawGrid(width, height, divisionsX = 10, divisionsY = 8) {
-            ctx.clearRect(0, 0, width, height);
-            
-            const dx = width / divisionsX;
-            const dy = height / divisionsY;
+        // AC / DC Mode Switching
+        btnModeAc.addEventListener('click', () => {
+            currentMode = 'ac';
+            btnModeAc.classList.add('active');
+            btnModeDc.classList.remove('active');
+            acControlsGroup.style.display = 'flex';
+            dcControlsGroup.style.display = 'none';
 
-            // Draw major grid lines (dim)
-            ctx.strokeStyle = 'rgba(45, 74, 55, 0.4)'; // Subdued green-slate
+            labelPrimaryV.textContent = 'Measured V_pp:';
+            labelSecondaryV.textContent = 'Peak V_p:';
+            teleMode.textContent = 'AC COUPLED';
+            teleMode.className = 'tele-val green';
+            teleStatus.textContent = isFrozen ? 'HOLD / FROZEN' : 'RUNNING (AC)';
+        });
+
+        btnModeDc.addEventListener('click', () => {
+            currentMode = 'dc';
+            btnModeDc.classList.add('active');
+            btnModeAc.classList.remove('active');
+            acControlsGroup.style.display = 'none';
+            dcControlsGroup.style.display = 'flex';
+
+            labelPrimaryV.textContent = 'DC Voltage (V_dc):';
+            labelSecondaryV.textContent = 'Deflection (d):';
+            teleMode.textContent = 'DC DIRECT';
+            teleMode.className = 'tele-val pink';
+            teleStatus.textContent = isFrozen ? 'HOLD / FROZEN' : 'RUNNING (DC)';
+        });
+
+        // DC Preset Buttons
+        btnDcPos.addEventListener('click', () => { inputVdc.value = 6.0; });
+        btnDcZero.addEventListener('click', () => { inputVdc.value = 0.0; });
+        btnDcNeg.addEventListener('click', () => { inputVdc.value = -6.0; });
+
+        // Freeze Button Toggle
+        freezeBtn.addEventListener('click', () => {
+            isFrozen = !isFrozen;
+            if (isFrozen) {
+                freezeBtn.classList.add('active-state');
+                freezeBtn.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                    Resume Trace`;
+                teleStatus.textContent = 'HOLD / FROZEN';
+                teleStatus.style.color = '#ffbb00';
+            } else {
+                freezeBtn.classList.remove('active-state');
+                freezeBtn.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                        <rect x="6" y="4" width="4" height="16"></rect>
+                        <rect x="14" y="4" width="4" height="16"></rect>
+                    </svg>
+                    Freeze Trace`;
+                teleStatus.textContent = currentMode === 'ac' ? 'RUNNING (AC)' : 'RUNNING (DC)';
+                teleStatus.style.color = 'var(--neon-cyan)';
+            }
+        });
+
+        // Unified Pointer Event Handler
+        canvas.addEventListener('pointerdown', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const touchX = (e.clientX - rect.left) * scaleX;
+            const touchY = (e.clientY - rect.top) * scaleY;
+        });
+
+        // Draw Holographic Graticule Grid
+        function drawHolographicGraticule(w, h, divX = 10, divY = 8) {
+            ctx.fillStyle = '#020b10';
+            ctx.fillRect(0, 0, w, h);
+
+            // CRT Spherical Phosphor Backlight Glow
+            const radialGlow = ctx.createRadialGradient(w / 2, h / 2, 20, w / 2, h / 2, w * 0.65);
+            radialGlow.addColorStop(0, 'rgba(0, 243, 255, 0.08)');
+            radialGlow.addColorStop(0.5, 'rgba(0, 255, 136, 0.03)');
+            radialGlow.addColorStop(1, 'rgba(0, 0, 0, 0.45)');
+            ctx.fillStyle = radialGlow;
+            ctx.fillRect(0, 0, w, h);
+
+            const dx = w / divX;
+            const dy = h / divY;
+
+            // Subdued Grid Lines
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.18)';
             ctx.lineWidth = 1;
 
-            for (let i = 0; i <= divisionsX; i++) {
-                ctx.beginPath();
+            ctx.beginPath();
+            for (let i = 1; i < divX; i++) {
                 ctx.moveTo(i * dx, 0);
-                ctx.lineTo(i * dx, height);
-                ctx.stroke();
+                ctx.lineTo(i * dx, h);
             }
-
-            for (let j = 0; j <= divisionsY; j++) {
-                ctx.beginPath();
+            for (let j = 1; j < divY; j++) {
                 ctx.moveTo(0, j * dy);
-                ctx.lineTo(width, j * dy);
-                ctx.stroke();
+                ctx.lineTo(w, j * dy);
             }
+            ctx.stroke();
 
-            // Draw center axes (brighter)
-            ctx.strokeStyle = 'rgba(52, 211, 153, 0.3)';
+            // Center Major Axes
+            ctx.strokeStyle = 'rgba(0, 255, 136, 0.55)';
             ctx.lineWidth = 1.5;
 
             // Center X axis
             ctx.beginPath();
-            ctx.moveTo(0, height / 2);
-            ctx.lineTo(width, height / 2);
+            ctx.moveTo(0, h / 2);
+            ctx.lineTo(w, h / 2);
             ctx.stroke();
 
             // Center Y axis
             ctx.beginPath();
-            ctx.moveTo(width / 2, 0);
-            ctx.lineTo(width / 2, height);
+            ctx.moveTo(w / 2, 0);
+            ctx.lineTo(w / 2, h);
             ctx.stroke();
 
-            // Draw tick marks on center axes
-            ctx.strokeStyle = 'rgba(52, 211, 153, 0.5)';
+            // Precision Sub-Division Tick Marks on Center Axes (5 ticks per division)
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.8)';
             ctx.lineWidth = 1;
-            
-            // X-axis sub-divisions
-            for (let i = 0; i <= divisionsX * 5; i++) {
-                let tickHeight = (i % 5 === 0) ? 0 : 3;
-                if (tickHeight > 0) {
-                    ctx.beginPath();
-                    ctx.moveTo(i * (dx / 5), (height / 2) - tickHeight);
-                    ctx.lineTo(i * (dx / 5), (height / 2) + tickHeight);
-                    ctx.stroke();
-                }
+
+            // Horizontal Axis Ticks
+            const subTicksX = divX * 5;
+            const subDx = dx / 5;
+            for (let i = 0; i <= subTicksX; i++) {
+                const tickLen = (i % 5 === 0) ? 6 : 3;
+                ctx.beginPath();
+                ctx.moveTo(i * subDx, (h / 2) - tickLen);
+                ctx.lineTo(i * subDx, (h / 2) + tickLen);
+                ctx.stroke();
             }
 
-            // Y-axis sub-divisions
-            for (let j = 0; j <= divisionsY * 5; j++) {
-                let tickWidth = (j % 5 === 0) ? 0 : 3;
-                if (tickWidth > 0) {
-                    ctx.beginPath();
-                    ctx.moveTo((width / 2) - tickWidth, j * (dy / 5));
-                    ctx.lineTo((width / 2) + tickWidth, j * (dy / 5));
-                    ctx.stroke();
-                }
+            // Vertical Axis Ticks
+            const subTicksY = divY * 5;
+            const subDy = dy / 5;
+            for (let j = 0; j <= subTicksY; j++) {
+                const tickLen = (j % 5 === 0) ? 6 : 3;
+                ctx.beginPath();
+                ctx.moveTo((w / 2) - tickLen, j * subDy);
+                ctx.lineTo((w / 2) + tickLen, j * subDy);
+                ctx.stroke();
             }
+
+            // Holographic Corner Brackets [ ]
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.6)';
+            ctx.lineWidth = 2;
+            const cLen = 16;
+            
+            ctx.beginPath();
+            ctx.moveTo(8, 8 + cLen); ctx.lineTo(8, 8); ctx.lineTo(8 + cLen, 8);
+            ctx.moveTo(w - 8 - cLen, 8); ctx.lineTo(w - 8, 8); ctx.lineTo(w - 8, 8 + cLen);
+            ctx.moveTo(8, h - 8 - cLen); ctx.lineTo(8, h - 8); ctx.lineTo(8 + cLen, h - 8);
+            ctx.moveTo(w - 8 - cLen, h - 8); ctx.lineTo(w - 8, h - 8); ctx.lineTo(w - 8, h - 8 - cLen);
+            ctx.stroke();
         }
 
-        function render() {
-            const width = canvas.width;
-            const height = canvas.height;
+        // AC Wave Calculation
+        function getInstantaneousVoltage(type, vp, freq, timeSec) {
+            const period = 1 / freq;
+            const normalizedTime = (timeSec % period + period) % period;
+            const phaseRatio = normalizedTime / period;
 
-            const vp = parseFloat(inputVp.value);
-            const freq = parseFloat(inputFreq.value);
-            const voltsPerDiv = parseFloat(voltsDivSelect.value);
-            const timePerDiv = parseFloat(timeDivSelect.value); // ms per div
-
-            valVp.textContent = `${vp.toFixed(1)} V`;
-            valFreq.textContent = `${freq} Hz`;
-
-            drawGrid(width, height);
-
-            // Calculations for waveform
-            const centerY = height / 2;
-            const centerX = width / 2;
-            
-            // Pixels per division
-            const divHeight = height / 8;
-            const divWidth = width / 10;
-
-            // Voltage to pixel scale: 1 div = voltsPerDiv. 
-            // Therefore, pixels per volt = divHeight / voltsPerDiv
-            const pixelsPerVolt = divHeight / voltsPerDiv;
-
-            // Time scaling: timePerDiv is in milliseconds. Total screen time = timePerDiv * 10 ms.
-            const totalScreenTime = timePerDiv * 10; // ms
-            const pixelsPerMs = width / totalScreenTime;
-
-            // Draw Waveform Trace
-            ctx.beginPath();
-            ctx.strokeStyle = '#34d399'; // Emerald phosphor glow
-            ctx.lineWidth = 2.5;
-            ctx.shadowColor = '#10b981';
-            ctx.shadowBlur = 12; // Neon glow effect
-
-            for (let x = 0; x <= width; x++) {
-                // Map pixel x to time (ms) relative to left side (so phase stays consistent visually if desired, or center)
-                const timeMs = (x - centerX) / pixelsPerMs;
-                const timeSec = timeMs / 1000;
-
-                // Sine wave equation: V = Vp * sin(2 * PI * f * t)
-                const voltage = vp * Math.sin(2 * Math.PI * freq * timeSec);
-                
-                // Map voltage to Y pixel (inverted because canvas Y goes down)
-                const y = centerY - (voltage * pixelsPerVolt);
-
-                if (x === 0) {
-                    ctx.moveTo(x, y);
-                } else {
-                    ctx.lineTo(x, y);
-                }
+            if (type === 'sine') {
+                return vp * Math.sin(2 * Math.PI * freq * timeSec);
+            } else if (type === 'square') {
+                return phaseRatio < 0.5 ? vp : -vp;
+            } else if (type === 'triangle') {
+                if (phaseRatio < 0.25) return vp * (phaseRatio / 0.25);
+                else if (phaseRatio < 0.75) return vp * (1 - 2 * ((phaseRatio - 0.25) / 0.5));
+                else return vp * (-1 + (phaseRatio - 0.75) / 0.25);
             }
-            ctx.stroke();
-            ctx.shadowBlur = 0; // Reset shadow
+            return 0;
+        }
 
-            // Update readouts
-            readoutVpp.textContent = `${(vp * 2).toFixed(2)} V`;
-            readoutVp.textContent = `${vp.toFixed(2)} V`;
+        // Render Loop
+        function render(timestamp) {
+            if (!lastTimestamp) lastTimestamp = timestamp;
+            const dt = (timestamp - lastTimestamp) / 1000;
+            lastTimestamp = timestamp;
+
+            const w = canvas.width;
+            const h = canvas.height;
+
+            const vDiv = parseFloat(voltsDiv.value);
+            const tDiv = parseFloat(timeDiv.value);
+            const shiftDiv = parseFloat(yShift.value);
+
+            // Scale calculations
+            const divHeight = h / 8;
+            const divWidth = w / 10;
+            const pixelsPerVolt = divHeight / vDiv;
+            const totalScreenTimeMs = tDiv * 10;
+            const pixelsPerMs = w / totalScreenTimeMs;
+            const centerY = (h / 2) - (shiftDiv * divHeight);
+
+            valYShift.textContent = (shiftDiv >= 0 ? '+' : '') + shiftDiv.toFixed(1) + ' div';
+
+            drawHolographicGraticule(w, h, 10, 8);
+
+            if (currentMode === 'ac') {
+                // AC MODE
+                const vp = parseFloat(inputVp.value);
+                const freq = parseFloat(inputFreq.value);
+                const type = waveType.value;
+
+                valVp.textContent = vp.toFixed(1) + ' V';
+                valFreq.textContent = freq + ' Hz';
+
+                readoutVpp.textContent = (vp * 2).toFixed(2) + ' V';
+                readoutVp.textContent = vp.toFixed(2) + ' V';
+                const periodMs = (1 / freq) * 1000;
+                readoutT.textContent = periodMs.toFixed(2) + ' ms';
+                readoutF.textContent = freq + ' Hz';
+
+                if (!isFrozen) {
+                    animPhase += dt * (freq * 0.12);
+                }
+
+                // Phosphor Trace Aura
+                ctx.save();
+                ctx.beginPath();
+                ctx.strokeStyle = 'rgba(0, 255, 136, 0.4)';
+                ctx.lineWidth = 6;
+                ctx.shadowColor = '#00f3ff';
+                ctx.shadowBlur = 18;
+
+                for (let x = 0; x <= w; x += 2) {
+                    const timeMs = (x / pixelsPerMs);
+                    const timeSec = (timeMs / 1000) + animPhase;
+                    const v = getInstantaneousVoltage(type, vp, freq, timeSec);
+                    const y = centerY - (v * pixelsPerVolt);
+
+                    if (x === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+                ctx.restore();
+
+                // Phosphor Sharp Core
+                ctx.save();
+                ctx.beginPath();
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2.2;
+                ctx.shadowColor = '#34d399';
+                ctx.shadowBlur = 6;
+
+                for (let x = 0; x <= w; x += 2) {
+                    const timeMs = (x / pixelsPerMs);
+                    const timeSec = (timeMs / 1000) + animPhase;
+                    const v = getInstantaneousVoltage(type, vp, freq, timeSec);
+                    const y = centerY - (v * pixelsPerVolt);
+
+                    if (x === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+                ctx.restore();
+
+            } else {
+                // DC MODE
+                const vdc = parseFloat(inputVdc.value);
+                const deflectionDiv = vdc / vDiv;
+
+                valVdc.textContent = (vdc >= 0 ? '+' : '') + vdc.toFixed(1) + ' V';
+                readoutVpp.textContent = (vdc >= 0 ? '+' : '') + vdc.toFixed(2) + ' V';
+                readoutVp.textContent = (deflectionDiv >= 0 ? '+' : '') + deflectionDiv.toFixed(2) + ' div';
+                readoutT.textContent = 'Infinite (DC)';
+                readoutF.textContent = '0 Hz (Steady)';
+
+                const targetY = centerY - (vdc * pixelsPerVolt);
+
+                // Phosphor Aura
+                ctx.save();
+                ctx.beginPath();
+                ctx.strokeStyle = 'rgba(0, 243, 255, 0.45)';
+                ctx.lineWidth = 6;
+                ctx.shadowColor = '#00ff88';
+                ctx.shadowBlur = 18;
+                ctx.moveTo(0, targetY);
+                ctx.lineTo(w, targetY);
+                ctx.stroke();
+                ctx.restore();
+
+                // Phosphor Core
+                ctx.save();
+                ctx.beginPath();
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2.5;
+                ctx.shadowColor = '#00f3ff';
+                ctx.shadowBlur = 8;
+                ctx.moveTo(0, targetY);
+                ctx.lineTo(w, targetY);
+                ctx.stroke();
+                ctx.restore();
+            }
 
             requestAnimationFrame(render);
         }
 
-        // Attach listeners to trigger visual updates efficiently if we weren't using requestAnimationFrame
-        // But since we are looping, it automatically picks up the slider changes.
-        [inputVp, inputFreq, voltsDivSelect, timeDivSelect].forEach(element => {
-            element.addEventListener('input', () => {});
-        });
-
-        // Start render loop
+        // Initialize Render Loop
         requestAnimationFrame(render);
     </script>
 </body>
