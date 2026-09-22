@@ -3,192 +3,216 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Advanced X-Ray Tube Physics Simulator - LuyaliSims</title>
+    <meta name="description" content="Interactive 3D laboratory simulator for X-ray tube physics, thermionic emission, high-voltage electron acceleration, and the line-focus principle - LuyaliSims STEM Labs.">
+    <title>Advanced X-Ray Tube Physics Simulator & Laboratory - LuyaliSims</title>
     
     <!-- Import Futuristic Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     
     <style>
-        /* Base Theme & Resets */
+        /* Base Reset & Theme Variables */
         *, *::before, *::after {
             box-sizing: border-box;
             user-select: none;
         }
 
         :root {
-            --bg-color: #030712;
-            --panel-bg: rgba(10, 15, 30, 0.75);
-            --panel-border: rgba(0, 243, 255, 0.25);
-            --accent-cyan: #00f3ff;
-            --accent-purple: #bc13fe;
-            --accent-red: #ef4444;
-            --accent-yellow: #fbbf24;
-            --accent-green: #4ade80;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
+            --neon-cyan: #00f3ff;
+            --neon-magenta: #bc13fe;
+            --neon-green: #00ff88;
+            --neon-red: #ef4444;
+            --neon-amber: #fbbf24;
+            --bg-dark: #070a12;
+            --panel-bg: rgba(16, 24, 43, 0.85);
+            --border-glow: rgba(0, 243, 255, 0.35);
         }
 
         body {
             font-family: 'Rajdhani', sans-serif;
-            background-color: var(--bg-color);
+            background-color: var(--bg-dark);
             background-image: 
-                radial-gradient(circle at 75% 15%, rgba(188, 19, 254, 0.12), transparent 45%),
-                radial-gradient(circle at 20% 85%, rgba(0, 243, 255, 0.1), transparent 50%),
-                radial-gradient(circle at 50% 50%, #060b18 0%, #02040a 100%);
+                radial-gradient(circle at 85% 15%, rgba(0, 243, 255, 0.08), transparent 45%),
+                radial-gradient(circle at 15% 85%, rgba(188, 19, 254, 0.08), transparent 45%),
+                linear-gradient(180deg, #05070e 0%, #0a0e1a 100%);
             color: #e2e8f0;
             margin: 0;
-            padding: 20px;
+            padding: 16px 20px;
             min-height: 100vh;
             overflow-x: hidden;
         }
 
-        /* 1. NAVIGATION: Back Button */
+        /* 1. HEADER & TOP NAVIGATION */
+        header {
+            max-width: 1280px;
+            margin: 0 auto 15px auto;
+        }
+
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
         .back-btn {
             display: inline-flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-            padding: 10px 18px;
-            background: rgba(16, 24, 43, 0.6);
+            gap: 8px;
+            padding: 9px 18px;
+            background: rgba(16, 24, 43, 0.7);
             backdrop-filter: blur(8px);
             border: 1px solid rgba(188, 19, 254, 0.5);
             color: #e580ff;
             text-decoration: none;
             border-radius: 8px;
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 0.95rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             transition: all 0.3s ease;
         }
 
         .back-btn:hover {
-            background: rgba(188, 19, 254, 0.15);
-            border-color: var(--accent-purple);
+            background: rgba(188, 19, 254, 0.2);
+            border-color: var(--neon-magenta);
             color: #fff;
             box-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
-            transform: translateX(-4px);
+            transform: translateX(-3px);
         }
 
         h1 {
             font-family: 'Orbitron', sans-serif;
-            color: var(--accent-cyan);
-            text-shadow: 0px 0px 18px rgba(0, 243, 255, 0.4);
-            margin-top: 0;
-            font-size: clamp(1.4rem, 4vw, 2.2rem);
-            word-break: break-word;
-        }
-        
-        h2, h3 {
-            font-family: 'Orbitron', sans-serif;
-            color: var(--accent-purple);
+            color: var(--neon-cyan);
+            text-shadow: 0 0 18px rgba(0, 243, 255, 0.45);
+            margin: 6px 0 10px 0;
+            font-size: clamp(1.4rem, 3.8vw, 2.3rem);
+            letter-spacing: 1.5px;
+            text-align: center;
         }
 
-        /* 2. RESPONSIVE SIMULATOR WORKSPACE */
+        .lead-summary {
+            max-width: 960px;
+            margin: 0 auto 20px auto;
+            text-align: center;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: #cbd5e1;
+        }
+
+        main {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        /* 2. SIMULATOR WORKSPACE */
         #simulator-container {
-            background: var(--panel-bg);
+            background: linear-gradient(135deg, rgba(16, 24, 43, 0.88) 0%, rgba(8, 12, 22, 0.94) 100%);
             backdrop-filter: blur(12px);
-            border: 1px solid var(--panel-border);
+            border: 1px solid var(--border-glow);
             border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), inset 0 0 30px rgba(0, 243, 255, 0.05);
-            margin-bottom: 35px;
-            max-width: 1400px;
-            width: 100%;
+            padding: 22px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75), 0 0 25px rgba(0, 243, 255, 0.12);
+            margin-bottom: 25px;
+            position: relative;
         }
 
-        .sim-header {
+        .hud-telemetry {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            background: rgba(4, 8, 16, 0.85);
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            border-radius: 10px;
+            padding: 10px 16px;
+            margin-bottom: 18px;
+            font-family: 'Share Tech Mono', monospace;
             flex-wrap: wrap;
             gap: 12px;
-            padding-bottom: 15px;
-            margin-bottom: 15px;
-            border-bottom: 1px solid rgba(0, 243, 255, 0.15);
         }
 
-        .sim-header h2 {
-            font-size: clamp(1.1rem, 2.5vw, 1.4rem);
-            margin: 0;
-            color: var(--accent-cyan);
+        .telemetry-item {
             display: flex;
             align-items: center;
-            gap: 10px;
-            text-shadow: 0 0 10px rgba(0, 243, 255, 0.4);
+            gap: 6px;
+            font-size: 0.92rem;
         }
 
-        .header-actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
+        .tele-label {
+            color: #8da4be;
+            font-size: 0.8rem;
+            text-transform: uppercase;
         }
 
-        .btn-header {
-            background: rgba(15, 23, 42, 0.85);
-            color: var(--text-main);
-            border: 1px solid var(--accent-cyan);
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 600;
-            font-family: 'Rajdhani', sans-serif;
-            transition: all 0.25s ease;
-            box-shadow: 0 0 10px rgba(0, 243, 255, 0.1);
+        .tele-val {
+            color: var(--neon-cyan);
+            font-weight: 700;
         }
 
-        .btn-header:hover {
-            background: var(--accent-cyan);
-            color: #030712;
-            box-shadow: 0 0 18px rgba(0, 243, 255, 0.6);
-        }
+        .tele-val.pink { color: #ff55bb; }
+        .tele-val.amber { color: var(--neon-amber); }
+        .tele-val.green { color: var(--neon-green); }
+        .tele-val.red { color: var(--neon-red); }
 
-        /* Dual-pane layout */
         .sim-layout {
             display: grid;
-            grid-template-columns: 1fr 390px;
+            grid-template-columns: 1.65fr 1fr;
             gap: 20px;
-            align-items: start;
+            align-items: stretch;
         }
 
-        /* 3D Holographic Canvas Wrapper */
         .canvas-wrapper {
             position: relative;
             width: 100%;
-            background: radial-gradient(circle at 50% 40%, #0d152a 0%, #030712 90%);
-            border: 1px solid rgba(0, 243, 255, 0.35);
+            background: radial-gradient(circle at 50% 45%, #081726 0%, #02070f 90%);
             border-radius: 12px;
             overflow: hidden;
             touch-action: none;
-            box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.9), 0 0 25px rgba(0, 243, 255, 0.15);
+            border: 4px solid #1e293b;
+            box-shadow: 
+                0 0 0 2px rgba(0, 243, 255, 0.35),
+                0 15px 35px rgba(0, 0, 0, 0.85),
+                inset 0 0 40px rgba(0, 0, 0, 0.95);
+        }
+
+        .canvas-wrapper::before {
+            content: " ";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: 
+                linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, transparent 50%),
+                repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.22) 0px, rgba(0, 0, 0, 0.22) 1px, transparent 1px, transparent 3px);
+            pointer-events: none;
+            z-index: 5;
         }
 
         canvas {
             display: block;
             width: 100%;
             height: auto;
+            aspect-ratio: 16 / 10;
             cursor: crosshair;
         }
 
-        /* Floating Inspector */
+        /* Canvas Floating Overlays */
         .inspector-card {
             position: absolute;
             top: 15px;
             left: 15px;
             background: rgba(8, 14, 28, 0.95);
             backdrop-filter: blur(12px);
-            border: 1px solid var(--accent-cyan);
-            border-left: 4px solid var(--accent-cyan);
+            border: 1px solid var(--neon-cyan);
+            border-left: 4px solid var(--neon-cyan);
             border-radius: 8px;
-            padding: 14px 16px;
-            width: min(360px, calc(100% - 30px));
+            padding: 12px 14px;
+            width: min(340px, calc(100% - 30px));
             pointer-events: none;
             transition: opacity 0.2s, transform 0.2s;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(0, 243, 255, 0.2);
             opacity: 0;
-            transform: translateY(-8px);
-            z-index: 20;
+            transform: translateY(-6px);
+            z-index: 15;
         }
 
         .inspector-card.active {
@@ -197,30 +221,30 @@
         }
 
         .inspector-card h3 {
-            color: var(--accent-cyan);
-            font-size: 1.15rem;
-            margin: 0 0 3px 0;
+            color: var(--neon-cyan);
+            font-size: 1.05rem;
+            margin: 0 0 2px 0;
             font-family: 'Orbitron', sans-serif;
             font-weight: 700;
         }
 
         .inspector-card .subtitle {
-            font-size: 0.8rem;
-            color: var(--accent-yellow);
+            font-size: 0.78rem;
+            color: var(--neon-amber);
             text-transform: uppercase;
             letter-spacing: 0.08em;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             font-weight: bold;
         }
 
         .inspector-card p {
-            font-size: 0.9rem;
-            line-height: 1.5;
+            font-size: 0.88rem;
+            line-height: 1.45;
             color: #cbd5e1;
             margin: 0;
+            user-select: text;
         }
 
-        /* Failure Overlay */
         .fail-overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -235,7 +259,7 @@
             z-index: 30;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.4s ease;
+            transition: opacity 0.35s ease;
         }
 
         .fail-overlay.active {
@@ -244,80 +268,58 @@
         }
 
         .fail-overlay h3 {
-            color: var(--accent-red);
-            font-size: clamp(1.5rem, 3.5vw, 2.5rem);
-            margin: 0 0 14px 0;
+            color: var(--neon-red);
+            font-size: clamp(1.4rem, 3.2vw, 2.2rem);
+            margin: 0 0 12px 0;
             letter-spacing: 0.1em;
-            text-shadow: 0 0 25px rgba(239, 68, 68, 0.7);
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 25px rgba(239, 68, 68, 0.8);
         }
 
         .fail-overlay p {
             color: #e2e8f0;
-            font-size: clamp(0.95rem, 2vw, 1.15rem);
-            margin-bottom: 25px;
-            max-width: 620px;
+            font-size: clamp(0.9rem, 1.8vw, 1.08rem);
+            margin-bottom: 22px;
+            max-width: 600px;
             line-height: 1.6;
         }
 
-        /* Canvas Badges */
-        .hud {
+        .hud-badge {
             position: absolute;
-            bottom: 15px;
-            left: 15px;
-            color: var(--text-muted);
-            font-size: 0.8rem;
+            bottom: 12px;
+            left: 12px;
+            color: #8da4be;
+            font-size: 0.76rem;
             pointer-events: none;
             background: rgba(10, 15, 30, 0.85);
-            padding: 8px 14px;
+            padding: 6px 12px;
             border-radius: 20px;
-            border: 1px solid rgba(0, 243, 255, 0.2);
+            border: 1px solid rgba(0, 243, 255, 0.25);
             backdrop-filter: blur(6px);
-        }
-
-        .author-badge {
-            position: absolute;
-            bottom: 15px;
-            right: 15px;
-            background: rgba(10, 15, 30, 0.88);
-            border: 1px solid var(--accent-yellow);
-            padding: 8px 14px;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            color: var(--text-main);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.6);
-            z-index: 15;
-            user-select: text;
-            text-align: right;
-            line-height: 1.4;
-            backdrop-filter: blur(8px);
-        }
-
-        .author-badge span {
-            color: var(--accent-yellow);
-            font-weight: bold;
+            z-index: 10;
         }
 
         /* Controls Panel */
         .controls-panel {
             display: flex;
             flex-direction: column;
-            gap: 14px;
-            background: rgba(8, 14, 28, 0.75);
+            gap: 12px;
+            background: linear-gradient(145deg, rgba(11, 17, 30, 0.9) 0%, rgba(6, 9, 16, 0.95) 100%);
             padding: 18px;
             border-radius: 12px;
-            border: 1px solid rgba(0, 243, 255, 0.15);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
         }
 
-        /* PROMINENT TOP EXPOSE BUTTON */
         .btn-expose {
             background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%);
             border: 1px solid #f87171;
             color: #ffffff;
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.2rem;
+            font-size: 1.15rem;
             font-weight: 900;
-            padding: 16px;
-            min-height: 56px;
+            padding: 14px;
+            min-height: 52px;
             border-radius: 10px;
             cursor: pointer;
             text-transform: uppercase;
@@ -328,7 +330,7 @@
         }
 
         .btn-expose:hover {
-            box-shadow: 0 6px 28px rgba(239, 68, 68, 0.8), inset 0 1px 1px rgba(255, 255, 255, 0.6);
+            box-shadow: 0 6px 26px rgba(239, 68, 68, 0.8), inset 0 1px 1px rgba(255, 255, 255, 0.6);
             transform: translateY(-1px);
         }
 
@@ -348,53 +350,71 @@
         }
 
         .control-group {
-            background-color: rgba(12, 19, 38, 0.75);
-            border: 1px solid rgba(0, 243, 255, 0.12);
+            background: rgba(12, 19, 38, 0.7);
+            border: 1px solid rgba(0, 243, 255, 0.14);
             border-radius: 8px;
-            padding: 12px 14px;
+            padding: 10px 12px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
         }
 
-        .control-group h3 {
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: var(--accent-cyan);
-            margin: 0;
+        .panel-heading {
             font-family: 'Orbitron', sans-serif;
-            font-weight: 700;
+            font-size: 0.82rem;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            margin: 0;
         }
 
-        .slider-header {
+        .control-group label {
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: #cbd5e1;
             display: flex;
             justify-content: space-between;
-            font-size: 0.95rem;
-            font-weight: 600;
         }
 
-        .slider-header span.val {
+        .control-group label span {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--neon-amber);
             font-weight: 700;
-            color: var(--accent-yellow);
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.9rem;
         }
 
         input[type="range"] {
-            accent-color: var(--accent-cyan);
-            height: 28px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: #0c1527;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            height: 8px;
+            border-radius: 4px;
             cursor: pointer;
+            margin: 6px 0;
+            min-height: 44px;
             width: 100%;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #00f3ff 30%, #0088aa 100%);
+            border: 2px solid #fff;
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.8);
+            cursor: pointer;
         }
 
         .toggle-control {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            font-size: 0.95rem;
+            font-size: 0.92rem;
             font-weight: 600;
             gap: 12px;
+            min-height: 44px;
         }
 
         .switch {
@@ -429,22 +449,67 @@
 
         input:checked + .slider-toggle {
             background-color: rgba(0, 243, 255, 0.3);
-            border-color: var(--accent-cyan);
+            border-color: var(--neon-cyan);
         }
 
         input:checked + .slider-toggle:before {
             transform: translateX(22px);
-            background-color: var(--accent-cyan);
-            box-shadow: 0 0 10px var(--accent-cyan);
+            background-color: var(--neon-cyan);
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 4px;
+        }
+
+        .sim-btn {
+            background: linear-gradient(180deg, rgba(16, 28, 54, 0.9) 0%, rgba(8, 14, 28, 0.95) 100%);
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            color: var(--neon-cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 10px;
+            min-height: 46px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .sim-btn:hover {
+            border-color: var(--neon-cyan);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .sim-btn.secondary {
+            border-color: rgba(188, 19, 254, 0.5);
+            color: #e580ff;
+        }
+
+        .sim-btn.secondary:hover {
+            border-color: var(--neon-magenta);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
         }
 
         .btn-reset {
-            background: var(--accent-cyan);
+            background: var(--neon-cyan);
             color: #030712;
             border: none;
-            padding: 14px 28px;
+            padding: 12px 24px;
             font-weight: 800;
-            font-size: 1rem;
+            font-size: 0.95rem;
             border-radius: 8px;
             cursor: pointer;
             font-family: 'Orbitron', sans-serif;
@@ -452,6 +517,7 @@
             letter-spacing: 1.5px;
             box-shadow: 0 0 20px rgba(0, 243, 255, 0.6);
             transition: all 0.2s ease;
+            min-height: 46px;
         }
 
         .btn-reset:hover {
@@ -459,64 +525,67 @@
             box-shadow: 0 0 30px rgba(0, 243, 255, 0.9);
         }
 
-        /* Metrics */
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-top: 4px;
+        /* 3. POLICY-COMPLIANT AD CONTAINER */
+        .ad-slot-wrapper {
+            margin: 30px auto;
+            text-align: center;
+            clear: both;
         }
 
-        .metric-card {
-            background: rgba(10, 16, 32, 0.85);
-            border: 1px solid rgba(0, 243, 255, 0.15);
-            border-radius: 6px;
-            padding: 10px 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .metric-card .label {
-            font-size: 0.7rem;
-            color: var(--text-muted);
+        .ad-disclaimer {
+            font-size: 0.72rem;
             text-transform: uppercase;
-            font-weight: 600;
+            letter-spacing: 1px;
+            color: #64748b;
+            margin-bottom: 6px;
         }
 
-        .metric-card .value {
-            font-size: 1.05rem;
-            font-weight: 700;
-            font-family: 'Orbitron', sans-serif;
-            color: var(--text-main);
+        .ad-box-placeholder {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            min-height: 90px;
+            max-width: 970px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #475569;
+            font-size: 0.85rem;
+            border-radius: 8px;
         }
 
-        .bar-container {
-            height: 7px;
-            width: 100%;
-            background: #1e293b;
-            border-radius: 4px;
-            overflow: hidden;
-            margin-top: 4px;
-        }
-
-        .bar-fill {
-            height: 100%;
-            width: 0%;
-            transition: width 0.1s, background-color 0.2s;
-        }
-
-        /* Educational Section */
+        /* 4. EDUCATIONAL CONTENT SECTION */
         .educational-content {
-            max-width: 1400px;
-            line-height: 1.7;
+            line-height: 1.75;
             font-size: 1.05rem;
             color: #94a3b8;
-            background: rgba(10, 15, 30, 0.8);
+            background: rgba(10, 14, 23, 0.85);
             padding: 30px;
             border-radius: 16px;
-            border-left: 4px solid var(--accent-cyan);
-            border-top: 1px solid rgba(0, 243, 255, 0.15);
+            border-left: 4px solid var(--neon-cyan);
+            border-top: 1px solid rgba(0, 243, 255, 0.2);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin-bottom: 35px;
+        }
+
+        .educational-content h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-magenta);
+            border-bottom: 1px solid rgba(188, 19, 254, 0.3);
+            padding-bottom: 8px;
+            margin-top: 1.8em;
+            margin-bottom: 0.6em;
+            font-size: 1.45rem;
+        }
+
+        .educational-content h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: #38bdf8;
+            margin-top: 1.4em;
+            margin-bottom: 0.4em;
+            font-size: 1.15rem;
         }
 
         .educational-content strong {
@@ -526,82 +595,167 @@
             border-radius: 4px;
         }
 
-        .educational-content p { margin-bottom: 15px; }
-        .educational-content ul, .educational-content ol { margin-left: 20px; margin-bottom: 20px; }
-        .educational-content li { margin-bottom: 8px; }
+        .formula-box {
+            background: rgba(4, 9, 20, 0.7);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-left: 3px solid var(--neon-green);
+            padding: 14px 18px;
+            margin: 14px 0;
+            border-radius: 6px;
+            font-family: 'Share Tech Mono', monospace;
+            color: #a7f3d0;
+            font-size: 1.02rem;
+            line-height: 1.6;
+        }
 
-        .qa-box {
-            background: rgba(14, 22, 42, 0.5);
-            border: 1px solid rgba(0, 243, 255, 0.2);
-            padding: 22px;
+        .task-card {
+            background: rgba(15, 23, 42, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 10px;
-            margin-bottom: 22px;
+            padding: 16px 20px;
+            margin-bottom: 18px;
         }
 
-        .qa-box h4 {
-            margin-top: 18px;
-            margin-bottom: 6px;
-            color: var(--accent-cyan);
+        .task-title {
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.05rem;
+            font-size: 1rem;
+            color: var(--neon-cyan);
+            margin-bottom: 8px;
         }
 
-        .qa-box h4:first-child { margin-top: 0; }
-
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 100;
-            left: 0; top: 0;
-            width: 100%; height: 100%;
-            background-color: rgba(3, 7, 18, 0.88);
-            backdrop-filter: blur(8px);
-            padding: 15px;
+        details {
+            margin-top: 25px;
+            background: rgba(5, 10, 20, 0.8);
+            border: 1px solid rgba(188, 19, 254, 0.4);
+            border-radius: 10px;
+            padding: 15px 20px;
         }
 
-        .modal-content {
-            background-color: #0b1329;
-            margin: 5vh auto;
-            padding: 26px;
-            border: 1px solid var(--accent-cyan);
-            box-shadow: 0 0 35px rgba(0, 243, 255, 0.3);
-            border-radius: 12px;
+        summary {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            color: #e580ff;
+            cursor: pointer;
+            padding: 6px 0;
+            user-select: none;
+        }
+
+        .solution-step {
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+            padding: 12px 0;
+        }
+
+        .solution-step:last-child {
+            border-bottom: none;
+        }
+
+        /* 5. FOOTER */
+        footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px 20px 20px 20px;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .footer-nav {
+            display: flex;
+            justify-content: center;
+            gap: 22px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .footer-nav a, .footer-modal-trigger {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.2s, text-shadow 0.2s;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .footer-nav a:hover, .footer-modal-trigger:hover {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
+        }
+
+        /* 6. POLICY MODALS */
+        .policy-modal {
+            position: fixed !important;
+            top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
+            width: 100vw !important; height: 100vh !important;
+            background: rgba(4, 7, 15, 0.92) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 99999 !important;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-body {
+            background: linear-gradient(145deg, #0b111e 0%, #060913 100%);
+            border: 2px solid var(--neon-cyan);
+            border-radius: 16px;
+            max-width: 820px;
             width: 100%;
-            max-width: 800px;
             max-height: 85vh;
             overflow-y: auto;
-            color: var(--text-main);
-            font-family: 'Rajdhani', sans-serif;
+            padding: 35px 30px;
+            color: #cbd5e1;
+            box-shadow: 0 0 40px rgba(0, 243, 255, 0.25);
+            line-height: 1.75;
+            position: relative;
+            text-align: left;
         }
 
-        .close-btn {
-            color: var(--text-muted);
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            line-height: 1;
-        }
-        .close-btn:hover { color: var(--accent-red); }
-
-        .modal-content h3 {
-            color: var(--accent-cyan);
-            border-bottom: 1px solid rgba(0, 243, 255, 0.2);
-            padding-bottom: 12px;
+        .modal-body h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-cyan);
             margin-top: 0;
-            margin-bottom: 15px;
-            font-size: 1.4rem;
+            font-size: 1.6rem;
         }
 
-        .task-box {
-            background: rgba(14, 22, 42, 0.7);
-            border-left: 4px solid var(--accent-purple);
-            padding: 14px 18px;
+        .modal-body h3 {
+            color: var(--neon-magenta);
+            font-family: 'Orbitron', sans-serif;
+            margin-top: 24px;
+            margin-bottom: 8px;
+            font-size: 1.15rem;
+        }
+
+        .modal-date {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--neon-green);
+            font-size: 0.9rem;
+            margin-top: -6px;
             margin-bottom: 16px;
-            border-radius: 0 8px 8px 0;
-            user-select: text;
-            line-height: 1.55;
+        }
+
+        .modal-close-btn {
+            background: linear-gradient(180deg, rgba(188, 19, 254, 0.4), rgba(188, 19, 254, 0.15));
+            border: 1px solid var(--neon-magenta);
+            color: #fff;
+            padding: 8px 18px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            float: right;
+            margin-bottom: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close-btn:hover {
+            background: var(--neon-magenta);
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.8);
         }
 
         @media (max-width: 992px) {
@@ -609,971 +763,1081 @@
         }
 
         @media (max-width: 768px) {
-            body { padding: 12px; }
-            #simulator-container, .educational-content { padding: 16px; }
-            .hud, .author-badge {
-                position: static;
-                margin-top: 8px;
-                border-radius: 6px;
-                text-align: left;
-            }
-            .canvas-wrapper {
-                display: flex;
-                flex-direction: column;
-            }
+            body { padding: 10px; }
+            #simulator-container, .educational-content { padding: 14px; }
+            .btn-grid { grid-template-columns: 1fr; }
+            .hud-telemetry { flex-direction: column; align-items: flex-start; }
+            .modal-body { padding: 22px 18px; }
+            .hud-badge { position: static; margin-top: 8px; border-radius: 6px; }
         }
     </style>
 </head>
 <body>
-    
-    <!-- NAVIGATION -->
-    <a href="../index.html" class="back-btn">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
-        </svg>
-        Back to LuyaliSims
-    </a>
-    
-    <h1>Advanced X-Ray Tube Physics Simulator</h1>
 
-    <!-- SIMULATOR CONTAINER -->
-    <div id="simulator-container">
+    <!-- 1. HEADER & TOP NAVIGATION -->
+    <header>
+        <nav class="top-nav">
+            <a href="../index.html" class="back-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Back to LuyaliSims
+            </a>
+            <span style="font-family: 'Share Tech Mono', monospace; font-size: 0.85rem; color: #64748b;">
+                MODULE ID: SIM-XR-004
+            </span>
+        </nav>
         
-        <div class="sim-header">
-            <h2>⚡ X-Ray Tube Functional Workspace</h2>
-            <div class="header-actions">
-                <button class="btn-header" onclick="toggleModal()">📚 Tasks & Notes</button>
-                <button class="btn-header" onclick="toggleFullScreen()">🖵 Full Screen</button>
+        <h1>ADVANCED X-RAY TUBE PHYSICS SIMULATOR</h1>
+        
+        <!-- Contextual Summary: 60-80 words above the fold -->
+        <p class="lead-summary">
+            Explore the fundamental physics of diagnostic X-ray generation inside an evacuated high-vacuum tube. This interactive laboratory models thermionic emission at the coiled cathode filament, electrostatic space-charge focusing, mega-electronvolt kinetic acceleration, and high-velocity collisions against an angled tungsten rotating anode. Investigate the 99% thermal conversion problem, observe real-time continuous Bremsstrahlung and characteristic radiation, evaluate the Line-Focus Principle, and analyze catastrophic thermal failure dynamics when anode rotation ceases.
+        </p>
+    </header>
+
+    <main>
+        <!-- 2. SIMULATOR APP WORKSPACE -->
+        <section id="simulator-container" aria-label="Interactive Simulator Workspace">
+            
+            <!-- Telemetry Status Bar -->
+            <div class="hud-telemetry">
+                <div class="telemetry-item">
+                    <span class="tele-label">Tube State:</span>
+                    <span id="tele-status" class="tele-val">STANDBY</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Tube Current (mA):</span>
+                    <span id="tele-mA" class="tele-val">300 mA</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Acceleration (kVp):</span>
+                    <span id="tele-kVp" class="tele-val pink">70 kVp</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Target Temp:</span>
+                    <span id="tele-temp" class="tele-val amber">25 °C</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">X-Ray Efficiency:</span>
+                    <span id="tele-eff" class="tele-val green">0.57%</span>
+                </div>
+            </div>
+
+            <div class="sim-layout">
+                <!-- 3D Holographic Canvas Display -->
+                <div class="canvas-wrapper" id="canvasFrame">
+                    <canvas id="simCanvas" width="800" height="500"></canvas>
+
+                    <!-- Interactive Inspector Floating Card -->
+                    <div id="inspector" class="inspector-card">
+                        <h3 id="inspect-title">Component</h3>
+                        <div id="inspect-sub" class="subtitle">Material & Engineering Role</div>
+                        <p id="inspect-body">Component description and physical function.</p>
+                    </div>
+
+                    <!-- Thermal Catastrophic Failure Overlay -->
+                    <div class="fail-overlay" id="fail-overlay">
+                        <h3>CATASTROPHIC TUBE MELTDOWN</h3>
+                        <p>The Tungsten target exceeded its critical melting threshold of 3,422°C. Disabling the rotating anode motor concentrated severe thermal energy on a static focal spot, melting the focal track and fracturing the deep vacuum envelope.</p>
+                        <button class="btn-reset" onclick="resetSimulator()">Install New Vacuum Tube</button>
+                    </div>
+
+                    <div class="hud-badge">💡 Hover or tap tube components to inspect. Hold EXPOSE to project high-energy X-rays downward.</div>
+                </div>
+
+                <!-- 3D Controls Console -->
+                <div class="controls-panel">
+                    <!-- Prominent EXPOSE Action Button -->
+                    <button id="btn-expose" class="btn-expose">HOLD TO EXPOSE</button>
+
+                    <div class="control-group">
+                        <h3 class="panel-heading">1. Filament Circuit (Step-Down)</h3>
+                        <label for="mA-slider">Filament Current (Quantity): <span id="mA-val">300 mA</span></label>
+                        <input type="range" id="mA-slider" min="50" max="1000" value="300" step="10">
+                        <div style="font-size: 0.74rem; color: #8da4be; line-height: 1.35;">Controls 10-12V heater circuit to determine thermionic emission rate and space-charge density.</div>
+                    </div>
+
+                    <div class="control-group">
+                        <h3 class="panel-heading">2. High-Voltage Circuit (Step-Up)</h3>
+                        <label for="kVp-slider">Accelerating Voltage (Quality): <span id="kVp-val">70 kVp</span></label>
+                        <input type="range" id="kVp-slider" min="20" max="150" value="70" step="1">
+                        <div style="font-size: 0.74rem; color: #8da4be; line-height: 1.35;">Creates massive cathode-to-anode potential difference, dictating electron velocity and penetrability.</div>
+                    </div>
+
+                    <div class="control-group">
+                        <h3 class="panel-heading">3. Tube Geometry & Mechanics</h3>
+                        <div class="toggle-control">
+                            <span>Rotating Anode (Stator/Rotor)</span>
+                            <label class="switch"><input type="checkbox" id="anode-spin-toggle" checked><span class="slider-toggle"></span></label>
+                        </div>
+                        <div class="toggle-control">
+                            <span>Show Line-Focus Principle</span>
+                            <label class="switch"><input type="checkbox" id="line-focus-toggle"><span class="slider-toggle"></span></label>
+                        </div>
+                    </div>
+
+                    <!-- Action Controls -->
+                    <div class="btn-grid">
+                        <button id="resetBtn" class="sim-btn" onclick="resetSimulator()">Cool / Reset</button>
+                        <button id="fullscreenBtn" class="sim-btn secondary">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                            </svg>
+                            Fullscreen
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. SAFE AD PLACEMENT SLOT -->
+        <div class="ad-slot-wrapper">
+            <div class="ad-disclaimer">Advertisement</div>
+            <div class="ad-box-placeholder">
+                <!-- Google AdSense Responsive Display Unit -->
+                <span>[AdSense Responsive Display Unit]</span>
             </div>
         </div>
 
-        <div class="sim-layout">
+        <!-- 4. EDUCATIONAL REFERENCE ARTICLE -->
+        <article class="educational-content">
+            <section>
+                <h2>How to Operate the Simulator</h2>
+                <p>This virtual laboratory models the electrodynamics and thermal thermodynamics of a modern diagnostic rotating-anode X-ray tube:</p>
+                <ul>
+                    <li><strong>HOLD TO EXPOSE Button:</strong> Press and hold to energize the high-voltage step-up circuit. Electrons immediately break away from the cathode space-charge cloud, accelerating across the vacuum envelope toward the beveled tungsten anode disc.</li>
+                    <li><strong>Tube Current (mA Slider):</strong> Modulates the current delivered by the low-voltage step-down transformer (10 to 12 V) through the coiled tungsten cathode filament. Notice the filament glowing with intense incandescence and the blue electron space-charge cloud expanding within the nickel focusing cup.</li>
+                    <li><strong>Accelerating Potential (kVp Slider):</strong> Modulates the kilovoltage peak across the tube. Higher kVp increases electron kinetic velocity and causes emitted downward X-ray photons to shift in hue, representing harder, more penetrating photon wavelengths.</li>
+                    <li><strong>Rotating Anode Switch:</strong> Toggles the electromagnetic induction motor. When enabled, the anode rotates rapidly, distributing electron bombardment heat along a broad circular focal track. Turning this off concentrates 99% of energy into a static pinhole spot, triggering rapid heating toward tungsten's melting point of 3,422°C.</li>
+                    <li><strong>Line-Focus Principle Switch:</strong> Overlays geometrical projection lines showing how the wide actual focal spot along the beveled disc translates into a compact, sharp effective focal spot projected vertically downward through the beryllium window.</li>
+                    <li><strong>Interactive Inspection:</strong> Move your cursor or tap components (filament, focusing cup, tungsten target, copper rotor stem, beryllium exit window) to view real-time metallurgical composition and operational roles.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Scientific Theory & Working Principles</h2>
+                <p>Diagnostic X-ray production is an inefficient energy conversion process requiring extreme conditions: deep vacuum isolation, high-temperature thermionic emission, high accelerating voltages, and resilient refractory metals.</p>
+
+                <h3>1. Thermionic Emission & Space Charge Limitation</h3>
+                <p>When the cathode filament is heated past 2,200°C by the step-down circuit, thermal energy overcomes the metallic work function of tungsten (4.5 eV). Outer-shell conduction electrons boil out of the crystal lattice into the vacuum gap. Because electrons carry identical negative charges, they exert mutually repulsive electrostatic forces, forming a self-limiting <strong>space-charge cloud</strong> inside the negatively biased nickel focusing cup.</p>
+
+                <h3>2. Vacuum Acceleration & Conversion Mechanisms</h3>
+                <p>The tube housing is maintained under ultra-high vacuum (10⁻⁶ to 10⁻⁷ torr). Without atmospheric gas molecules to scatter incoming charges or cause electrical arcing, the high-voltage electric field propels the electron cloud from cathode to anode at velocities exceeding half the speed of light (v ≈ 0.3c to 0.6c). Upon impact with the high-density tungsten target (atomic number Z = 74), electrons undergo two primary interactions:</p>
+                <ul>
+                    <li><strong>Bremsstrahlung ("Braking") Radiation:</strong> Incoming projectile electrons penetrate electron orbital shells and curve around heavy tungsten nuclei. Electrostatic attraction causes rapid deceleration, radiating the lost kinetic energy as continuous-spectrum X-ray photons. The maximum photon energy corresponds directly to the peak accelerating voltage (E_max = kVp).</li>
+                    <li><strong>Characteristic Radiation:</strong> A high-speed electron collides directly with an inner K-shell electron of tungsten (binding energy = 69.5 keV), knocking it completely out of orbit. An outer-shell electron (L-shell at 12.1 keV or M-shell at 2.8 keV) instantly falls into the vacancy, releasing a monoenergetic characteristic photon equal to the binding energy difference (K_alpha ≈ 57.4 keV, K_beta ≈ 66.7 keV).</li>
+                </ul>
+
+                <h3>3. The Thermal Dissipation Problem & The Line-Focus Principle</h3>
+                <p>Over 99% of projectile electron kinetic energy is dissipated as useless thermal vibration (heat) in the crystal lattice; less than 1% yields diagnostic X-rays. To prevent target melting, C.H.F. Müller introduced the rotating anode, where an external induction stator spins the beveled disc at 3,400 to 10,000 RPM. This spreads heat along an annular focal track hundreds of times larger than the physical impact spot.</p>
+                <p>The <strong>Line-Focus Principle</strong> uses an angled target face (typically 7° to 17°). By projecting the broad electron impact track vertically downward through the exit port, the apparent or <strong>effective focal spot</strong> becomes dramatically smaller than the actual focal spot, achieving both high heat capacity and exceptional spatial resolution.</p>
+            </section>
+
+            <section>
+                <h2>Mathematical Foundations & Formulas</h2>
+                <p>Quantitative design and exposure calculations in medical and industrial radiography rely on standard physics relationships:</p>
+                
+                <div class="formula-box">
+                    1. X-Ray Production Efficiency: Efficiency = 1.1 x 10⁻⁹ x Z x V<br>
+                    2. Maximum Photon Energy (Duane-Hunt Law): E_max = e x kVp, &nbsp; λ_min = 1.24 / kVp (in nanometers)<br>
+                    3. Line-Focus Geometric Relation: Effective Focal Spot = Actual Focal Spot x sin(θ)<br>
+                    4. Instantaneous Tube Electrical Power: Power = kVp x mA = Volts x Amperes (in Watts)<br>
+                    5. Single-Phase Anode Heat Units: HU = kVp x mA x time (seconds)<br>
+                    6. High-Frequency Generator Heat Units: HU = 1.41 x kVp x mA x time (seconds)
+                </div>
+                <p>Where Z represents the target atomic number (Z = 74 for Tungsten, Z = 42 for Molybdenum), V is the accelerating potential in Volts, and θ is the anode bevel angle relative to the central beam axis.</p>
+            </section>
+
+            <section>
+                <h2>Real-World Industrial & Engineering Applications</h2>
+                <p>Evacuated X-ray tubes are applied across critical high-precision industries:</p>
+                <ul>
+                    <li><strong>Hospital Diagnostic Radiography & Computed Tomography (CT):</strong> Helical multi-slice CT systems rotate high-output X-ray tubes continuously at multi-G accelerations, utilizing liquid-metal bearing anodes and oil heat exchangers to dissipate megajoules of heat during whole-body trauma scans.</li>
+                    <li><strong>Non-Destructive Testing (NDT) in Aerospace:</strong> Industrial micro-focus X-ray tubes inspect jet turbine blades, rocket motor casings, and composite airframe wings for sub-millimeter internal voids, stress fractures, and micro-porosities without disassembling safety-critical flight hardware.</li>
+                    <li><strong>Airport Cargo & Baggage Dual-Energy Scanners:</strong> Security portals utilize dual-kVp switching tubes to measure material attenuation differences across low and high photon energies, enabling automatic algorithmic discrimination between harmless organic goods and dense metallic weapons or explosives.</li>
+                    <li><strong>Semiconductor Wafer BGA Inspection:</strong> Open-tube nanofocus systems (focal spots &lt; 1 micrometer) inspect solder ball grid arrays (BGA) inside stacked 3D integrated microchips to identify bridging defects and voiding before commercial packaging.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Practice Problems & Diagnostic Tasks</h2>
+                <p>Test your quantitative comprehension of tube physics and engineering limits using the five problems below:</p>
+
+                <div class="task-card">
+                    <div class="task-title">Task 1: Duane-Hunt Limit & Electron Kinetic Energy</div>
+                    <p>An exposure is conducted at 80 kVp with 200 mA. Calculate the maximum kinetic energy of the accelerated electrons in kiloelectron-volts (keV) and compute the shortest wavelength (cutoff wavelength λ_min) present in the resulting Bremsstrahlung photon spectrum.</p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 2: Total Power & Heat Unit Loading</div>
+                    <p>A high-frequency diagnostic generator operates at 120 kVp and 500 mA for an exposure time of 0.25 seconds. Determine the instantaneous electrical power in kilowatts (kW) and calculate the total Heat Units (HU) accumulated by the anode target (generator constant = 1.41).</p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 3: Line-Focus Effective Spot Projection</div>
+                    <p>An X-ray tube features a tungsten anode target beveled at an angle of 12°. If the focusing cup projects an actual electron impact track of length 3.6 mm onto the target face, calculate the projected effective focal spot size measured along the central downward beam axis.</p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 4: Production Efficiency & Waste Heat Ratio</div>
+                    <p>Calculate the percentage efficiency of X-ray production for a tungsten target (Z = 74) operated at 100 kVp using the empirical formula Efficiency = 1.1 x 10⁻⁹ x Z x V. What percentage of the total electrical energy is converted into waste thermal heat?</p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 5: Anode Rotation Surface Area Advantage</div>
+                    <p>A stationary dental anode spot has dimensions of 1.2 mm by 4.0 mm (area = 4.8 mm²). A rotating anode disc with a mean radius of 45 mm utilizes an identical track width of 4.0 mm during continuous rotation. Calculate the total annular surface area of the focal track and find the multiplication factor by which rotation expands the thermal heat dissipation area.</p>
+                </div>
+
+                <!-- Collapsible Solutions Accordion -->
+                <details>
+                    <summary>Click to Reveal Solutions and Step-by-Step Proofs</summary>
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 1:</strong></p>
+                        <p>1. The maximum kinetic energy is equal to the product of elementary charge and peak voltage: E_max = 80 keV.</p>
+                        <p>2. Applying the Duane-Hunt law: λ_min = 1.24 / kVp = 1.24 / 80 = <strong>0.0155 nanometers</strong> (or 15.5 picometers).</p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 2:</strong></p>
+                        <p>1. Instantaneous Power = Voltage x Current = 120,000 V x 0.500 A = 60,000 W = <strong>60.0 kW</strong>.</p>
+                        <p>2. High-Frequency Heat Units: HU = 1.41 x kVp x mA x time = 1.41 x 120 x 500 x 0.25 = <strong>21,150 Heat Units (HU)</strong> (equivalent to 15,000 Joules).</p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 3:</strong></p>
+                        <p>1. Effective Focal Spot = Actual Focal Spot x sin(θ).</p>
+                        <p>2. For θ = 12°: sin(12°) ≈ 0.2079.</p>
+                        <p>3. Effective Focal Spot = 3.6 mm x 0.2079 = <strong>0.748 mm</strong> (a 79.2% reduction in effective spot dimension for high radiographic image sharpness).</p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 4:</strong></p>
+                        <p>1. Efficiency = 1.1 x 10⁻⁹ x Z x V = 1.1 x 10⁻⁹ x 74 x 100,000 = 0.00814.</p>
+                        <p>2. Expressed as a percentage: Efficiency = <strong>0.814%</strong>.</p>
+                        <p>3. Waste Thermal Heat Ratio = 100% - 0.814% = <strong>99.186%</strong> converted directly into target thermal dissipation.</p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 5:</strong></p>
+                        <p>1. Annular track circumference = 2 x π x Radius = 2 x 3.14159 x 45 mm = 282.74 mm.</p>
+                        <p>2. Total rotating surface area = Circumference x Width = 282.74 mm x 4.0 mm = <strong>1,130.97 mm²</strong>.</p>
+                        <p>3. Area Multiplication Factor = Rotating Area / Stationary Area = 1,130.97 mm² / 4.8 mm² = <strong>235.6x</strong>. Rotation expands the heat distribution area by over 235 times, preventing focal spot melting under heavy diagnostic loads.</p>
+                    </div>
+                </details>
+            </section>
+        </article>
+    </main>
+
+    <!-- 5. SYNCHRONIZED COMPLIANCE FOOTER -->
+    <footer>
+        <nav class="footer-nav">
+            <a href="../index.html">Home</a>
+            <a href="../index.html#about-section">About Us</a>
+            <button type="button" class="footer-modal-trigger" onclick="openSimModal('simPrivacyModal')">Privacy Policy</button>
+            <button type="button" class="footer-modal-trigger" onclick="openSimModal('simTermsModal')">Terms of Service</button>
+            <a href="../index.html#contact-section">Contact Us</a>
+            <a href="https://forms.gle/fYxxaNKAh21dPUoBA" target="_blank" rel="noopener noreferrer">Simulator Suggestions</a>
+        </nav>
+        <p>&copy; 2026 LuyaliSims | Engineered by Click &amp; Draft | Dedicated to Open STEM Education</p>
+    </footer>
+
+    <!-- 6. IDENTICAL PRIVACY POLICY MODAL -->
+    <div id="simPrivacyModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="privacyTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeSimModal('simPrivacyModal')">Close [✕]</button>
+            <h2 id="privacyTitle">Privacy Policy</h2>
+            <p class="modal-date">Last Updated: September 2026</p>
+            <p>Welcome to LuyaliSims. We respect your privacy and are committed to protecting your personal data. This privacy policy explains how we treat information when you interact with our educational simulators.</p>
             
-            <!-- Canvas Box -->
-            <div class="canvas-wrapper" id="canvas-wrapper">
-                <canvas id="simCanvas" width="1000" height="600"></canvas>
-                
-                <div id="inspector" class="inspector-card">
-                    <h3 id="inspect-title">Component</h3>
-                    <div id="inspect-sub" class="subtitle">Material & Role</div>
-                    <p id="inspect-body">Description</p>
-                </div>
+            <h3>1. Educational Purpose & Information Collection</h3>
+            <p>LuyaliSims is a free educational portal. We do not require account registration, passwords, or personal login information to run any simulation. All simulation calculations occur locally within your browser using client-side JavaScript.</p>
 
-                <div class="fail-overlay" id="fail-overlay">
-                    <h3>CATASTROPHIC TUBE FAILURE</h3>
-                    <p>The Tungsten target exceeded its melting point of 3,422°C. Disabling the rotating anode during high exposure concentrated intense thermal heat onto a static focal track point, melting the actual focal spot and destroying the vacuum envelope.</p>
-                    <button class="btn-reset" onclick="resetSimulator()">Install New X-Ray Tube</button>
-                </div>
+            <h3>2. Google AdSense & Third-Party Cookies</h3>
+            <p>We may display advertisements served by Google AdSense to fund our free educational tools. Google, as a third-party vendor, uses cookies to serve ads on our site based on users' visits to this and other sites on the Internet.</p>
+            <ul>
+                <li>Google's use of advertising cookies enables it and its partners to serve ads based on your visit to LuyaliSims and other sites.</li>
+                <li>Users may opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" style="color: var(--neon-cyan);">Google Ads Settings</a>.</li>
+            </ul>
 
-                <div class="hud">💡 Hover or tap components to inspect. Hold EXPOSE to generate high-energy X-rays.</div>
-                
-                <div class="author-badge">
-                    Designed by <span>Ian Luyali</span><br>
-                    📞 0727987669 | ✉️ luyashliz@gmail.com<br>
-                    <i style="font-size: 0.7rem; color: var(--text-muted);">Contact to order or request any educational simulator.</i>
-                </div>
-            </div>
+            <h3>3. Log Files & Analytics</h3>
+            <p>Like standard websites, our hosting servers collect anonymous log records (including IP addresses, browser types, and timestamp references) to monitor server uptime, fix script errors, and optimize simulator performance.</p>
 
-            <!-- Controls Panel: EXPOSE IS NOW THE FIRST COMPONENT -->
-            <div class="controls-panel">
-                
-                <!-- 1. EXPOSE BUTTON AT THE TOP -->
-                <button id="btn-expose" class="btn-expose">HOLD TO EXPOSE</button>
+            <h3>4. Children's Online Privacy (COPPA Compliance)</h3>
+            <p>Our educational simulators are built for students and educators of all ages. We do not knowingly solicit or collect personally identifiable information from children under 13.</p>
 
-                <div class="control-group">
-                    <h3>1. Filament Circuit (Step-Down)</h3>
-                    <div class="slider-header">
-                        <span>Tube Current (mA)</span>
-                        <span id="mA-val" class="val">300 mA</span>
-                    </div>
-                    <input type="range" id="mA-slider" min="50" max="1000" value="300" step="10">
-                    <div style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.4;">Adjusts 10-12V transformer. Heats the filament coil to control the <strong>Quantity</strong> of boiled-off electrons in the vacuum space-charge.</div>
-                </div>
-
-                <div class="control-group">
-                    <h3>2. High-Voltage Circuit (Step-Up)</h3>
-                    <div class="slider-header">
-                        <span>Accelerating Potential (kVp)</span>
-                        <span id="kVp-val" class="val">70 kVp</span>
-                    </div>
-                    <input type="range" id="kVp-slider" min="20" max="150" value="70" step="1">
-                    <div style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.4;">Massive voltage across cathode (-) and anode (+). Controls electron kinetic speed and X-ray <strong>Quality (Penetration)</strong>.</div>
-                </div>
-
-                <div class="control-group">
-                    <h3>3. Tube Modifications</h3>
-                    <div class="toggle-control">
-                        <span>Rotating Anode (Stator/Rotor)</span>
-                        <label class="switch"><input type="checkbox" id="anode-spin-toggle" checked><span class="slider-toggle"></span></label>
-                    </div>
-                    <div class="toggle-control">
-                        <span>Show Line-Focus Principle</span>
-                        <label class="switch"><input type="checkbox" id="line-focus-toggle"><span class="slider-toggle"></span></label>
-                    </div>
-                </div>
-
-                <div class="control-group">
-                    <h3>Energy Conversion Diagnostics</h3>
-                    <div class="metrics-grid">
-                        <div class="metric-card">
-                            <span class="label">Thermal Heat Yield</span>
-                            <span id="heat-yield-val" class="value" style="color:var(--accent-red)">99.4%</span>
-                            <div class="bar-container"><div class="bar-fill" id="heat-bar" style="width: 99.4%; background: var(--accent-red);"></div></div>
-                        </div>
-                        <div class="metric-card">
-                            <span class="label">X-Ray Photon Yield</span>
-                            <span id="xray-yield-val" class="value" style="color:var(--accent-purple)">0.57%</span>
-                            <div class="bar-container"><div class="bar-fill" id="xray-bar" style="width: 10%; background: var(--accent-purple);"></div></div>
-                        </div>
-                    </div>
-                    <div style="margin-top: 8px;">
-                        <div class="slider-header" style="font-size:0.75rem; color:var(--text-muted);">
-                            <span>Tungsten Target Temperature</span>
-                            <span id="temp-val" style="color:var(--text-main); font-weight:bold;">25 °C</span>
-                        </div>
-                        <div class="bar-container" style="height: 10px;">
-                            <div class="bar-fill" id="temp-bar" style="width: 0%; background: var(--accent-cyan);"></div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
+            <h3>5. Contact Regarding Privacy</h3>
+            <p>If you have any questions regarding this policy, contact us at: <a href="mailto:luyashliz@gmail.com" style="color: var(--neon-cyan);">luyashliz@gmail.com</a>.</p>
         </div>
     </div>
 
-    <!-- EDUCATIONAL CONTENT -->
-    <div class="educational-content">
-        
-        <h2>How to Use This Simulator</h2>
-        <p>This interactive laboratory allows you to safely experiment with the internal physics of an evacuated X-ray tube:</p>
-        <ul>
-            <li><strong>HOLD TO EXPOSE (Top Button):</strong> Hold this button to apply the high-voltage potential. Electrons immediately accelerate across the high vacuum and slam into the angled tungsten target.</li>
-            <li><strong>Tube Current (mA):</strong> Drag the slider to heat the cathode. Notice the filament coil glowing hotter and the localized blue <strong>space-charge electron cloud</strong> growing denser inside the focusing cup.</li>
-            <li><strong>Accelerating Potential (kVp):</strong> Controls pulling force. Higher kVp accelerates electrons to immense velocities, projecting higher frequency, deeply penetrating X-ray photons downwards through the port.</li>
-            <li><strong>Rotating Anode:</strong> Disabling the motor halts target rotation. Watch the temperature bar surge! Without rotation spreading the 99% thermal yield along the circular track, the spot melts and destroys the tube.</li>
-            <li><strong>Hover / Touch Inspection:</strong> Hover over any part (coils, target face, rotor, bottom port) to reveal its composition and engineering function.</li>
-        </ul>
+    <!-- 7. IDENTICAL TERMS OF SERVICE MODAL -->
+    <div id="simTermsModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="termsTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeSimModal('simTermsModal')">Close [✕]</button>
+            <h2 id="termsTitle">Terms of Service</h2>
+            <p class="modal-date">Effective Date: September 2026</p>
 
-        <h2>The Theory Behind X-Ray Production</h2>
-        <p>X-rays are produced when fast-moving electrons collide with high-density matter inside an evacuated glass envelope.</p>
-        
-        <h3>1. Thermionic Emission & Space Charge</h3>
-        <p>At the cathode, a step-down circuit heats a coiled Tungsten filament wire beyond 2,200°C. Outer-shell electrons boil off into the vacuum, forming an electrostatic <strong>space charge</strong> held in a concentrated bundle by the negatively charged nickel focusing cup.</p>
-        
-        <h3>2. Vacuum Acceleration & Anode Impact</h3>
-        <p>Because the tube is deeply evacuated (free of air molecules that would cause collisions and electrical arcing), the high-voltage potential difference propels electrons cleanly toward the positive anode at roughly half the speed of light.</p>
-        <ul>
-            <li><strong>Bremsstrahlung (Braking):</strong> High-speed electrons decelerate around heavy tungsten nuclei (Z=74), emitting lost kinetic energy as continuous-spectrum X-ray photons.</li>
-            <li><strong>Characteristic Radiation:</strong> Incoming electrons eject inner-shell tungsten electrons; outer electrons cascade downward, releasing discrete characteristic photon spikes.</li>
-        </ul>
+            <h3>1. Permitted Educational Use</h3>
+            <p>All interactive models, simulations, practice problems, and laboratory worksheets on LuyaliSims are made freely available for classroom demonstrations, academic study, tutoring, and self-paced individual learning.</p>
 
-        <h3>3. The Line-Focus Principle</h3>
-        <p>By angling the target face (typically 7° to 20°), the <strong>actual focal spot</strong> struck by electrons remains large for maximum heat dissipation, while the projected <strong>effective focal spot</strong> directed downwards through the window port is small, delivering maximum radiographic sharpness.</p>
+            <h3>2. Intellectual Property</h3>
+            <p>The code architecture, layout designs, and custom interactive engines are the intellectual property of Ian Luyali and Click &amp; Draft. You may use our simulators online in academic settings, but mirroring or re-hosting our code for commercial resale without permission is prohibited.</p>
 
-        <h2>Practice Questions & Tasks</h2>
-        <div class="qa-box">
-            <h4>Question 1</h4>
-            <p>Why must an X-ray tube envelope be completely evacuated to a deep vacuum rather than filled with air or gas?</p>
-            
-            <h4>Question 2</h4>
-            <p>If kVp is increased from 70 to 120 while keeping mA constant, what happens to the velocity of electrons and the penetration ability of the downward X-ray beam?</p>
-            
-            <h4>Question 3</h4>
-            <p>Why is the anode target disc angled, and where does the useful primary beam exit the housing?</p>
-            
-            <h4>Question 4</h4>
-            <p>Calculate the total electrical power in Watts produced during an exposure of 100 kVp (100,000 V) at 300 mA (0.3 A).</p>
-            
-            <h4>Question 5</h4>
-            <p>What catastrophic failure occurs if the anode rotor is turned off during an extended high-current exposure?</p>
-        </div>
+            <h3>3. Disclaimer of Scientific Warranty</h3>
+            <p>While simulations are engineered to accurately replicate classical mechanics, thermodynamics, and electronics, they are provided as conceptual learning aids. LuyaliSims is not liable for outcomes in real-world high-voltage or hazardous laboratory environments constructed without professional teacher supervision.</p>
 
-        <h3 style="margin-top: 40px; border-bottom: 1px solid #334155; padding-bottom: 10px;">Answer Key</h3>
-        <ol style="color: #cbd5e1; padding-left: 20px;">
-            <li style="margin-bottom: 15px;">A vacuum ensures electrons travel unobstructed from cathode to anode without colliding with gas atoms, which would slow them down, destroy beam focus, and ignite destructive electrical arcs.</li>
-            <li style="margin-bottom: 15px;">Electrons achieve significantly higher kinetic speed. Upon impact, they produce higher-frequency, shorter-wavelength (harder) X-rays with substantially greater penetrating power through dense materials.</li>
-            <li style="margin-bottom: 15px;">The target is angled according to the Line-Focus Principle so that a broad, heat-resistant electron impact track translates into a narrow, high-resolution effective focal spot projected straight downwards through the Beryllium window.</li>
-            <li style="margin-bottom: 15px;">Power = Voltage × Current = 100,000 V × 0.3 A = <strong>30,000 Watts</strong> (30 kW) of instant electrical energy.</li>
-            <li style="margin-bottom: 15px;">Without rotation, the 99% thermal heat cannot be distributed along a circular track. Heat concentrates on a single point, exceeding Tungsten's melting point of 3,422°C, causing focal track pitting, cracking, and vacuum envelope destruction.</li>
-        </ol>
-
-    </div>
-
-    <!-- MODAL -->
-    <div id="tasksModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="toggleModal()">&times;</span>
-            <h3>📚 Guided Simulator Laboratory Tasks</h3>
-            
-            <div class="task-box">
-                <strong>Task A: The Space Charge Effect</strong><br>
-                <em>Instructions:</em> Keep kVp at 20. Move the mA slider from 50 to 1000 without holding EXPOSE. Observe the cathode cup on the left.<br>
-                <em>Observation:</em> Notice how the filament coil increases in incandescence and the blue electron cloud expands within the focusing cup.
-            </div>
-
-            <div class="task-box">
-                <strong>Task B: Downward Line-Focus Verification</strong><br>
-                <em>Instructions:</em> Toggle ON "Show Line-Focus Principle". Press and hold EXPOSE. Observe the beam direction.<br>
-                <em>Observation:</em> Electrons strike the angled actual focal spot horizontally, while the primary diagnostic beam projects downwards through the beryllium window port.
-            </div>
-
-            <div class="task-box">
-                <strong>Task C: Target Thermal Overload</strong><br>
-                <em>Instructions:</em> Toggle OFF the "Rotating Anode". Set mA and kVp to maximum. Hold EXPOSE and monitor the temperature meter.<br>
-                <em>Observation:</em> Notice the rapid thermal accumulation on the stationary target spot, triggering catastrophic tube failure once 3,422°C is breached.
-            </div>
+            <h3>4. Updates to Terms</h3>
+            <p>We reserve the right to refine these terms as new laboratory modules and features are introduced.</p>
         </div>
     </div>
 
-<script>
-    // --- SIMULATOR ENGINE ---
-    const canvas = document.getElementById('simCanvas');
-    const ctx = canvas.getContext('2d');
-    
-    // UI Elements
-    const mASlider = document.getElementById('mA-slider');
-    const mAVal = document.getElementById('mA-val');
-    const kVpSlider = document.getElementById('kVp-slider');
-    const kVpVal = document.getElementById('kVp-val');
-    const anodeSpinToggle = document.getElementById('anode-spin-toggle');
-    const lineFocusToggle = document.getElementById('line-focus-toggle');
-    const btnExpose = document.getElementById('btn-expose');
-    const inspector = document.getElementById('inspector');
-    const failOverlay = document.getElementById('fail-overlay');
-
-    // Simulation State
-    let mA = parseInt(mASlider.value);
-    let kVp = parseInt(kVpSlider.value);
-    let isExposing = false;
-    let isAnodeSpinning = anodeSpinToggle.checked;
-    let showLineFocus = lineFocusToggle.checked;
-    let tubeBroken = false;
-    let targetTemp = 25;
-    let anodeAngle = 0;
-    let hoveredId = null;
-    
-    // Particles
-    let electrons = [];
-    let xrays = [];
-    let heatWaves = [];
-
-    // Interactive Inspection Database
-    const components = [
-        { id: 'focusing_cup', name: 'Focusing Cup', sub: 'Nickel / Molybdenum Shield', desc: 'A negatively charged concave cup. Electrostatic repulsion confines the boiling electrons into a tight, focused beam aimed at the anode target.', bounds: { x: 220, y: 220, w: 90, h: 140 } },
-        { id: 'filament', name: 'Cathode Filament Coil', sub: 'Tungsten-Thorium 3D Spiral', desc: 'Step-down heated wire (2,200°C+). Emits free electrons via Thermionic Emission into the evacuated space.', bounds: { x: 250, y: 240, w: 70, h: 100 } },
-        { id: 'target', name: 'Rotating Anode Target Disc', sub: 'Tungsten-Rhenium Beveled Disc (Z=74)', desc: 'Struck by high-speed electrons. The beveled angled face rotates continuously so the 99% thermal conversion is distributed over a wide circular track.', bounds: { x: 440, y: 180, w: 60, h: 190 } },
-        { id: 'stem', name: 'Anode Cooling Fins & Copper Stem', sub: 'Heat Dissipator & Conductor', desc: 'Conducts heat from the tungsten target back into the rotor shaft and cooling medium.', bounds: { x: 490, y: 190, w: 60, h: 180 } },
-        { id: 'rotor_stator', name: 'Induction Rotor & Stator', sub: 'Electromagnetic Drive', desc: 'Spins the target disc at 3,400 to 10,000 RPM using external stator magnetic fields through the glass.', bounds: { x: 540, y: 220, w: 70, h: 120 } },
-        { id: 'window', name: 'Beryllium Window Port (Bottom)', sub: 'Low-Attenuation Exit Port', desc: 'Located at the bottom of the tube directly beneath the target angle. Allows the downward primary X-ray beam to exit with minimal filtration.', bounds: { x: 415, y: 395, w: 85, h: 35 } },
-        { id: 'envelope', name: 'Evacuated Glass Envelope', sub: 'Deep Vacuum Chamber', desc: 'Maintains an empty vacuum (10⁻⁶ torr). Without air molecules, electrons accelerate cleanly without collisions or electrical arcing.', bounds: { x: 180, y: 160, w: 480, h: 260 } },
-        { id: 'fil_circuit', name: 'Filament Circuit', sub: 'Step-Down Transformer (10-12V)', desc: 'Controls heating current (mA) to dictate the exact QUANTITY of electrons boiled into the vacuum.', bounds: { x: 25, y: 300, w: 100, h: 40 } },
-        { id: 'hv_circuit', name: 'High-Voltage Circuit', sub: 'Step-Up Transformer (kVp)', desc: 'Supplies massive potential difference between cathode and anode to dictate electron velocity and X-ray penetration QUALITY.', bounds: { x: 310, y: 70, w: 140, h: 40 } }
-    ];
-
-    // Controls
-    mASlider.oninput = (e) => { mA = parseInt(e.target.value); mAVal.innerText = `${mA} mA`; };
-    kVpSlider.oninput = (e) => { kVp = parseInt(e.target.value); kVpVal.innerText = `${kVp} kVp`; };
-    anodeSpinToggle.onchange = (e) => isAnodeSpinning = e.target.checked;
-    lineFocusToggle.onchange = (e) => showLineFocus = e.target.checked;
-    
-    // Pointer Events for Expose Button
-    const triggerStart = (e) => { 
-        if(!tubeBroken) { 
-            isExposing = true; 
-            btnExpose.classList.add('active'); 
-        } 
-    };
-    const triggerEnd = (e) => { 
-        isExposing = false; 
-        btnExpose.classList.remove('active'); 
-    };
-    
-    btnExpose.addEventListener('pointerdown', triggerStart);
-    window.addEventListener('pointerup', triggerEnd);
-    btnExpose.addEventListener('pointercancel', triggerEnd);
-
-    // Responsive Canvas Interaction
-    function handlePointerInspection(e) {
-        if (tubeBroken) return;
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
-        const mx = (e.clientX - rect.left) * scaleX; 
-        const my = (e.clientY - rect.top) * scaleY;
-        
-        let found = null;
-        for (let c of components) {
-            if (mx >= c.bounds.x && mx <= c.bounds.x + c.bounds.w && my >= c.bounds.y && my <= c.bounds.y + c.bounds.h) {
-                found = c; 
-                break;
+    <!-- 8. SIMULATOR CORE ENGINE & SCRIPT -->
+    <script>
+        // Modal Controls
+        function openSimModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
             }
         }
-        if (found) {
-            document.getElementById('inspect-title').innerText = found.name;
-            document.getElementById('inspect-sub').innerText = found.sub;
-            document.getElementById('inspect-body').innerText = found.desc;
-            inspector.classList.add('active');
-            hoveredId = found.id;
-        } else {
+
+        function closeSimModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('policy-modal')) {
+                closeSimModal(e.target.id);
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' || e.key === 'Esc') {
+                document.querySelectorAll('.policy-modal').forEach(m => {
+                    m.style.display = 'none';
+                });
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // Fullscreen Implementation
+        const simContainer = document.getElementById('simulator-container');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                if (simContainer.requestFullscreen) simContainer.requestFullscreen();
+                else if (simContainer.webkitRequestFullscreen) simContainer.webkitRequestFullscreen();
+                fullscreenBtn.innerHTML = 'Exit Screen';
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+                fullscreenBtn.innerHTML = 'Fullscreen';
+            }
+        });
+
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                fullscreenBtn.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                    </svg> Fullscreen`;
+            }
+        });
+
+        // Canvas & Physics Engine
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Telemetry & UI references
+        const teleStatus = document.getElementById('tele-status');
+        const teleMA = document.getElementById('tele-mA');
+        const teleKVp = document.getElementById('tele-kVp');
+        const teleTemp = document.getElementById('tele-temp');
+        const teleEff = document.getElementById('tele-eff');
+
+        const mASlider = document.getElementById('mA-slider');
+        const mAVal = document.getElementById('mA-val');
+        const kVpSlider = document.getElementById('kVp-slider');
+        const kVpVal = document.getElementById('kVp-val');
+        const anodeSpinToggle = document.getElementById('anode-spin-toggle');
+        const lineFocusToggle = document.getElementById('line-focus-toggle');
+        const btnExpose = document.getElementById('btn-expose');
+        const inspector = document.getElementById('inspector');
+        const failOverlay = document.getElementById('fail-overlay');
+
+        // Simulation State
+        let mA = parseInt(mASlider.value);
+        let kVp = parseInt(kVpSlider.value);
+        let isExposing = false;
+        let isAnodeSpinning = anodeSpinToggle.checked;
+        let showLineFocus = lineFocusToggle.checked;
+        let tubeBroken = false;
+        let targetTemp = 25;
+        let anodeAngle = 0;
+        let hoveredId = null;
+
+        // Particle Pools
+        let electrons = [];
+        let xrays = [];
+        let heatWaves = [];
+
+        // Interactive Inspection Database (Coordinate scaled for 800x500 canvas)
+        const components = [
+            { id: 'focusing_cup', name: 'Focusing Cup', sub: 'Nickel / Molybdenum Concave Shield', desc: 'Negatively charged cavity holding the coiled filament. Electrostatic repulsion confines boiled electrons into a narrow beam focused directly at the anode focal track.', bounds: { x: 190, y: 195, w: 75, h: 105 } },
+            { id: 'filament', name: 'Cathode Filament Coil', sub: 'Tungsten-Thorium Wire Spiral (W-Th)', desc: 'Step-down heated wire (>2,200°C). Emits free electrons via Thermionic Emission into the deep vacuum space-charge cloud.', bounds: { x: 215, y: 215, w: 55, h: 65 } },
+            { id: 'target', name: 'Rotating Anode Target Disc', sub: 'Tungsten-Rhenium Alloy (Z=74)', desc: 'Struck by high-speed electrons. Its beveled face rotates continuously to distribute the 99% thermal conversion across a wide circular track.', bounds: { x: 445, y: 160, w: 45, h: 180 } },
+            { id: 'stem', name: 'Molybdenum Stem & Heat Dissipator', sub: 'Low Thermal Conduction Neck', desc: 'Isolates the intense target heat from reaching and damaging the delicate induction rotor bearings.', bounds: { x: 485, y: 235, w: 55, h: 30 } },
+            { id: 'rotor_stator', name: 'Copper Induction Rotor', sub: 'Electromagnetic Drive Core', desc: 'Spins the target disc at 3,400 to 10,000 RPM driven by rotating magnetic fields from external stator coils through the glass wall.', bounds: { x: 535, y: 200, w: 50, h: 100 } },
+            { id: 'window', name: 'Beryllium Window Port (Bottom)', sub: 'Low-Attenuation X-Ray Port (Z=4)', desc: 'Positioned at the bottom of the tube envelope directly beneath the target bevel. Allows primary diagnostic X-rays to exit downward with minimal filtration.', bounds: { x: 430, y: 335, w: 60, h: 30 } },
+            { id: 'envelope', name: 'Borosilicate Vacuum Envelope', sub: 'Deep Vacuum Chamber (10⁻⁶ torr)', desc: 'Maintains an empty vacuum so electrons accelerate without colliding with gas atoms or causing electrical flashover arcs.', bounds: { x: 160, y: 140, w: 450, h: 220 } },
+            { id: 'fil_circuit', name: 'Filament Circuit (Step-Down)', sub: '10 - 12 V Heating Circuit', desc: 'Step-down transformer circuit that heats the filament wire, governing the exact QUANTITY (mA) of boiled-off electrons.', bounds: { x: 20, y: 260, w: 110, h: 38 } },
+            { id: 'hv_circuit', name: 'High-Voltage Circuit (Step-Up)', sub: 'Step-Up Transformer (kVp)', desc: 'Provides massive electrostatic potential between cathode (-) and anode (+) to govern electron impact velocity and X-ray QUALITY.', bounds: { x: 280, y: 40, w: 150, h: 38 } }
+        ];
+
+        // Controls Bindings
+        mASlider.oninput = (e) => { 
+            mA = parseInt(e.target.value); 
+            mAVal.innerText = `${mA} mA`; 
+            teleMA.innerText = `${mA} mA`;
+        };
+        kVpSlider.oninput = (e) => { 
+            kVp = parseInt(e.target.value); 
+            kVpVal.innerText = `${kVp} kVp`; 
+            teleKVp.innerText = `${kVp} kVp`;
+        };
+        anodeSpinToggle.onchange = (e) => isAnodeSpinning = e.target.checked;
+        lineFocusToggle.onchange = (e) => showLineFocus = e.target.checked;
+
+        // Pointer Events for Expose Button
+        const triggerExposeStart = (e) => {
+            if (e) e.preventDefault();
+            if (!tubeBroken) {
+                isExposing = true;
+                btnExpose.classList.add('active');
+                teleStatus.innerText = 'EXPOSING';
+                teleStatus.className = 'tele-val red';
+            }
+        };
+
+        const triggerExposeEnd = (e) => {
+            if (e) e.preventDefault();
+            isExposing = false;
+            btnExpose.classList.remove('active');
+            if (!tubeBroken) {
+                teleStatus.innerText = 'STANDBY';
+                teleStatus.className = 'tele-val';
+            }
+        };
+
+        btnExpose.addEventListener('pointerdown', triggerExposeStart);
+        window.addEventListener('pointerup', triggerExposeEnd);
+        btnExpose.addEventListener('pointercancel', triggerExposeEnd);
+
+        // Responsive Canvas Hover & Touch Inspection
+        function handlePointerInspection(e) {
+            if (tubeBroken) return;
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const mx = (e.clientX - rect.left) * scaleX; 
+            const my = (e.clientY - rect.top) * scaleY;
+            
+            let found = null;
+            for (let c of components) {
+                if (mx >= c.bounds.x && mx <= c.bounds.x + c.bounds.w && 
+                    my >= c.bounds.y && my <= c.bounds.y + c.bounds.h) {
+                    found = c; 
+                    break;
+                }
+            }
+
+            if (found) {
+                document.getElementById('inspect-title').innerText = found.name;
+                document.getElementById('inspect-sub').innerText = found.sub;
+                document.getElementById('inspect-body').innerText = found.desc;
+                inspector.classList.add('active');
+                hoveredId = found.id;
+            } else {
+                inspector.classList.remove('active');
+                hoveredId = null;
+            }
+        }
+
+        canvas.addEventListener('pointermove', handlePointerInspection);
+        canvas.addEventListener('pointerdown', handlePointerInspection);
+        canvas.addEventListener('pointerleave', () => {
             inspector.classList.remove('active');
             hoveredId = null;
-        }
-    }
+        });
 
-    canvas.addEventListener('pointermove', handlePointerInspection);
-    canvas.addEventListener('pointerdown', handlePointerInspection);
-    canvas.addEventListener('pointerleave', () => {
-        inspector.classList.remove('active');
-        hoveredId = null;
-    });
+        window.resetSimulator = () => {
+            tubeBroken = false;
+            targetTemp = 25;
+            electrons = []; 
+            xrays = []; 
+            heatWaves = [];
+            failOverlay.classList.remove('active');
+            btnExpose.disabled = false;
+            btnExpose.innerText = "HOLD TO EXPOSE";
+            teleStatus.innerText = 'STANDBY';
+            teleStatus.className = 'tele-val';
+        };
 
-    window.resetSimulator = () => {
-        tubeBroken = false;
-        targetTemp = 25;
-        electrons = []; 
-        xrays = []; 
-        heatWaves = [];
-        failOverlay.classList.remove('active');
-        btnExpose.disabled = false;
-        btnExpose.innerText = "HOLD TO EXPOSE";
-    };
+        // Physics Update Step
+        function updatePhysics() {
+            if (tubeBroken) return;
 
-    window.toggleModal = () => {
-        const modal = document.getElementById('tasksModal');
-        modal.style.display = (modal.style.display === "block") ? "none" : "block";
-    };
+            // Diagnostic Efficiency Calculation
+            let efficiencyFraction = 1.1e-9 * 74 * (kVp * 1000);
+            let xrayPercent = Math.min(efficiencyFraction * 100, 2.0); 
+            teleEff.innerText = `${xrayPercent.toFixed(2)}%`;
 
-    window.toggleFullScreen = () => {
-        const container = document.getElementById('simulator-container');
-        if (!document.fullscreenElement) {
-            container.requestFullscreen().catch((err) => {
-                alert(`Error enabling fullscreen: ${err.message}`);
-            });
-        } else {
-            document.exitFullscreen();
-        }
-    };
+            // Anode Rotation Speed
+            if (isAnodeSpinning) {
+                anodeAngle += 0.32;
+            }
 
-    // Physics Engine Update
-    function updatePhysics() {
-        if (tubeBroken) return;
-
-        let efficiencyFraction = 1.1e-9 * 74 * (kVp * 1000);
-        let xrayPercent = Math.min(efficiencyFraction * 100, 2.0); 
-        let heatPercent = 100 - xrayPercent;
-
-        document.getElementById('heat-yield-val').innerText = `${heatPercent.toFixed(1)}%`;
-        document.getElementById('xray-yield-val').innerText = `${xrayPercent.toFixed(2)}%`;
-        document.getElementById('heat-bar').style.width = `${heatPercent}%`;
-        document.getElementById('xray-bar').style.width = `${xrayPercent * 40}%`;
-
-        // VISIBLE ANODE ROTATION: Speed of angular rotation
-        if (isAnodeSpinning) {
-            anodeAngle += 0.28;
-        }
-
-        // Thermionic Space Charge (Cloud in Focusing Cup)
-        let spaceChargeProbability = (mA / 1000) * 2.0;
-        if (Math.random() < spaceChargeProbability) {
-            electrons.push({
-                x: 285 + Math.random() * 20,
-                y: 285 + (Math.random() - 0.5) * 35,
-                vx: (Math.random() - 0.5) * 0.4, 
-                vy: (Math.random() - 0.5) * 0.4,
-                state: 'cloud'
-            });
-        }
-
-        // High Voltage Accelerated Electrons Across Vacuum
-        if (isExposing) {
-            let spawnCount = Math.floor(mA / 80) + 2;
-            for (let i = 0; i < spawnCount; i++) {
+            // Thermionic Space Charge Emission at Cathode
+            let spaceChargeProbability = (mA / 1000) * 1.8;
+            if (Math.random() < spaceChargeProbability) {
                 electrons.push({
-                    x: 300, 
-                    y: 275 + Math.random() * 20,
-                    vx: 8 + (kVp / 10), 
-                    vy: (Math.random() - 0.5) * 0.4,
-                    state: 'accelerated'
+                    x: 235 + Math.random() * 18,
+                    y: 248 + (Math.random() - 0.5) * 28,
+                    vx: (Math.random() - 0.5) * 0.35, 
+                    vy: (Math.random() - 0.5) * 0.35,
+                    state: 'cloud'
                 });
             }
-            
-            // Heat Accumulation
-            let heatSpike = (mA * kVp) / 10500;
-            if (!isAnodeSpinning) heatSpike *= 4.8; // Concentration on static focal spot
-            targetTemp += heatSpike;
 
-            if (targetTemp >= 3422) {
-                tubeBroken = true;
-                isExposing = false;
-                failOverlay.classList.add('active');
-                btnExpose.disabled = true;
-                btnExpose.innerText = "TUBE DESTROYED";
-            }
-        } else {
-            targetTemp = Math.max(25, targetTemp - (isAnodeSpinning ? 2.5 : 0.6));
-        }
-
-        // Temperature Bar
-        let tempPct = Math.min(100, (targetTemp / 3422) * 100);
-        document.getElementById('temp-val').innerText = `${Math.round(targetTemp)} °C`;
-        document.getElementById('temp-bar').style.width = `${tempPct}%`;
-        document.getElementById('temp-bar').style.background = targetTemp > 2500 ? '#ef4444' : (targetTemp > 1000 ? '#fbbf24' : '#00f3ff');
-
-        // Update Electrons
-        for (let i = electrons.length - 1; i >= 0; i--) {
-            let p = electrons[i];
-            p.x += p.vx; 
-            p.y += p.vy;
-
-            if (p.state === 'cloud') {
-                if (Math.abs(p.x - 295) > 22 || Math.abs(p.y - 285) > 30) {
-                    electrons.splice(i, 1);
-                }
-            } else if (p.state === 'accelerated') {
-                // Focusing cup convergence
-                if (p.x < 445) { 
-                    p.y += (285 - p.y) * 0.05; 
+            // High-Voltage Accelerated Electrons Across Vacuum
+            if (isExposing) {
+                let spawnCount = Math.floor(mA / 100) + 2;
+                for (let i = 0; i < spawnCount; i++) {
+                    electrons.push({
+                        x: 245, 
+                        y: 242 + Math.random() * 14,
+                        vx: 7 + (kVp / 12), 
+                        vy: (Math.random() - 0.5) * 0.4,
+                        state: 'accelerated'
+                    });
                 }
                 
-                // Strike Angled Anode Target
-                if (p.x >= 452) { 
-                    if (Math.random() < 0.95) {
-                        heatWaves.push({ x: 452, y: p.y, radius: 2, max: 20 + Math.random()*20, alpha: 1.0 });
+                // Heat Accumulation Dynamics
+                let heatSpike = (mA * kVp) / 11500;
+                if (!isAnodeSpinning) heatSpike *= 5.2; // Catastrophic concentration on static focal spot
+                targetTemp += heatSpike;
+
+                if (targetTemp >= 3422) {
+                    tubeBroken = true;
+                    isExposing = false;
+                    failOverlay.classList.add('active');
+                    btnExpose.disabled = true;
+                    btnExpose.innerText = "TUBE DESTROYED";
+                    teleStatus.innerText = 'OVERHEAT FAULT';
+                    teleStatus.className = 'tele-val red';
+                }
+            } else {
+                targetTemp = Math.max(25, targetTemp - (isAnodeSpinning ? 2.8 : 0.65));
+            }
+
+            teleTemp.innerText = `${Math.round(targetTemp)} °C`;
+            teleTemp.className = targetTemp > 2500 ? 'tele-val red' : (targetTemp > 1000 ? 'tele-val amber' : 'tele-val');
+
+            // Update Electrons
+            for (let i = electrons.length - 1; i >= 0; i--) {
+                let p = electrons[i];
+                p.x += p.vx; 
+                p.y += p.vy;
+
+                if (p.state === 'cloud') {
+                    if (Math.abs(p.x - 245) > 18 || Math.abs(p.y - 248) > 25) {
+                        electrons.splice(i, 1);
+                    }
+                } else if (p.state === 'accelerated') {
+                    // Electrostatic focusing convergence
+                    if (p.x < 450) { 
+                        p.y += (248 - p.y) * 0.045; 
                     }
                     
-                    // DOWNWARD X-RAY GENERATION
-                    if (Math.random() < (xrayPercent / 100 * 18) + 0.12) {
-                        let downAngle = (Math.PI / 2) + (Math.random() - 0.5) * 0.35; // Directed DOWNWARDS
-                        xrays.push({ 
-                            x: 452, 
-                            y: p.y, 
-                            vx: Math.cos(downAngle) * (10 + (kVp/14)), 
-                            vy: Math.sin(downAngle) * (10 + (kVp/14)), 
-                            life: 1.0 
-                        });
+                    // Strike Angled Tungsten Target Disc
+                    if (p.x >= 458) { 
+                        if (Math.random() < 0.95) {
+                            heatWaves.push({ x: 458, y: p.y, radius: 2, alpha: 1.0 });
+                        }
+                        
+                        // Downward Primary X-Ray Photon Generation
+                        if (Math.random() < (xrayPercent / 100 * 18) + 0.12) {
+                            let downAngle = (Math.PI / 2) + (Math.random() - 0.5) * 0.32;
+                            xrays.push({ 
+                                x: 458, 
+                                y: p.y, 
+                                vx: Math.cos(downAngle) * (8 + (kVp / 16)), 
+                                vy: Math.sin(downAngle) * (8 + (kVp / 16)), 
+                                life: 1.0 
+                            });
+                        }
+                        electrons.splice(i, 1);
                     }
-                    electrons.splice(i, 1);
                 }
             }
-        }
 
-        // Update Downward X-Ray Photons
-        for (let i = xrays.length - 1; i >= 0; i--) {
-            xrays[i].x += xrays[i].vx; 
-            xrays[i].y += xrays[i].vy; 
-            xrays[i].life -= 0.025;
-            if (xrays[i].life <= 0 || xrays[i].y > 600) xrays.splice(i, 1);
-        }
-
-        // Update Heat Waves
-        for (let i = heatWaves.length - 1; i >= 0; i--) {
-            heatWaves[i].radius += 1.4; 
-            heatWaves[i].alpha -= 0.04; 
-            heatWaves[i].x += 0.5;
-            if (heatWaves[i].alpha <= 0) heatWaves.splice(i, 1);
-        }
-    }
-
-    // --- DRAWING PIPELINE ---
-    function draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        // 1. Perspective 3D Grid Floor
-        draw3DGridFloor();
-
-        // 2. High-Voltage and Filament Circuits
-        drawCircuitBuses();
-
-        // 3. 3D Evacuated Vacuum Envelope (Crystal Clear, Empty Interior)
-        draw3DGlassEnvelope();
-
-        // 4. Cathode Assembly & 3D Filament Coil
-        draw3DCathodeAssembly();
-
-        // 5. 3D Rotating Anode Target Disc (With Visible Face Rotation)
-        draw3DAnodeAssembly();
-
-        // 6. Space Charge Cloud & Accelerated Electrons in Vacuum
-        drawVacuumElectrons();
-
-        // 7. Clean Downward Primary X-Ray Beam
-        drawDownwardXRayBeam();
-
-        // 8. Line Focus Overlay
-        if (showLineFocus) {
-            drawLineFocusOverlay();
-        }
-
-        // 9. Tube Failure Graphics
-        if (tubeBroken) {
-            drawFailureShatter();
-        }
-    }
-
-    // Perspective Floor
-    function draw3DGridFloor() {
-        ctx.save();
-        ctx.strokeStyle = 'rgba(0, 243, 255, 0.12)';
-        ctx.lineWidth = 1;
-
-        ctx.beginPath();
-        ctx.moveTo(65, 0); ctx.lineTo(65, 600);
-        ctx.moveTo(245, 0); ctx.lineTo(245, 600);
-        ctx.moveTo(425, 0); ctx.lineTo(425, 600);
-        ctx.moveTo(580, 0); ctx.lineTo(580, 600);
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.moveTo(0, 110); ctx.lineTo(1000, 110);
-        ctx.moveTo(0, 240); ctx.lineTo(1000, 240);
-        ctx.stroke();
-
-        const horizonY = 410;
-        const vpX = 500;
-
-        // Magenta angled floor guide
-        ctx.strokeStyle = 'rgba(188, 19, 254, 0.45)';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(0, 530);
-        ctx.lineTo(1000, 370);
-        ctx.stroke();
-
-        // Grid Lines
-        ctx.strokeStyle = 'rgba(0, 243, 255, 0.2)';
-        ctx.lineWidth = 1.5;
-        for (let x = -200; x <= 1200; x += 120) {
-            ctx.beginPath();
-            ctx.moveTo(x, 600);
-            ctx.lineTo(vpX + (x - vpX) * 0.35, horizonY);
-            ctx.stroke();
-        }
-
-        for (let y = 600; y >= horizonY; y -= (y - horizonY + 30) * 0.28) {
-            ctx.beginPath();
-            ctx.moveTo(0, y);
-            ctx.lineTo(1000, y);
-            ctx.stroke();
-        }
-
-        // Floor HUD cards
-        drawFloorPodium(75, 525, 330, 48, "CATHODE CURRENT DENSITY", `${mA} mA`);
-        drawFloorPodium(425, 500, 320, 48, "ANODE ACCELERATION POTENTIAL", `${kVp} kVp`);
-
-        ctx.font = "bold 14px 'Orbitron'";
-        ctx.fillStyle = "rgba(0, 243, 255, 0.6)";
-        ctx.fillText("Y-AXIS", 110, 460);
-        ctx.fillText("X-AXIS", 360, 490);
-
-        ctx.restore();
-    }
-
-    function drawFloorPodium(x, y, w, h, title, val) {
-        ctx.save();
-        ctx.fillStyle = 'rgba(6, 15, 32, 0.8)';
-        ctx.strokeStyle = 'rgba(0, 243, 255, 0.5)';
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.roundRect(x, y, w, h, 6);
-        ctx.fill();
-        ctx.stroke();
-
-        ctx.font = "bold 13px 'Orbitron'";
-        ctx.fillStyle = "#00f3ff";
-        ctx.fillText(title, x + 16, y + 28);
-        ctx.fillStyle = "#fbbf24";
-        ctx.fillText(val, x + w - 75, y + 28);
-        ctx.restore();
-    }
-
-    function drawCircuitBuses() {
-        ctx.save();
-        // High Voltage Circuit Box (Top)
-        ctx.strokeStyle = hoveredId === 'hv_circuit' ? '#f87171' : 'rgba(248, 113, 113, 0.4)';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(380, 90); ctx.lineTo(185, 90); ctx.lineTo(185, 270);
-        ctx.moveTo(380, 90); ctx.lineTo(540, 90); ctx.lineTo(540, 240);
-        ctx.stroke();
-
-        ctx.fillStyle = 'rgba(10, 16, 32, 0.85)';
-        ctx.fillRect(310, 70, 140, 36);
-        ctx.strokeRect(310, 70, 140, 36);
-        ctx.font = "13px 'Orbitron'";
-        ctx.fillStyle = '#f87171';
-        ctx.fillText(`HV Step-Up (${kVp} kVp)`, 318, 93);
-
-        // Filament Step-Down Circuit (Left)
-        ctx.strokeStyle = hoveredId === 'fil_circuit' ? '#00f3ff' : 'rgba(0, 243, 255, 0.4)';
-        ctx.beginPath();
-        ctx.moveTo(125, 320); ctx.lineTo(170, 320);
-        ctx.stroke();
-
-        ctx.fillStyle = 'rgba(10, 16, 32, 0.85)';
-        ctx.fillRect(25, 302, 100, 34);
-        ctx.strokeRect(25, 302, 100, 34);
-        ctx.font = "12px 'Orbitron'";
-        ctx.fillStyle = '#00f3ff';
-        ctx.fillText(`Filament 10-12V`, 32, 323);
-        ctx.restore();
-    }
-
-    // Evacuated Glass Tube & Bottom Window Port
-    function draw3DGlassEnvelope() {
-        ctx.save();
-        const gx = 200, gy = 180, gw = 450, gh = 210;
-
-        // Outer Protective Shield
-        ctx.strokeStyle = hoveredId === 'envelope' ? '#00f3ff' : 'rgba(0, 243, 255, 0.35)';
-        ctx.lineWidth = 2;
-        ctx.fillStyle = 'rgba(8, 20, 42, 0.3)';
-        ctx.beginPath();
-        ctx.roundRect(110, 140, 560, 290, 16);
-        ctx.stroke();
-        ctx.fill();
-
-        // Crystal-Clear Vacuum Capsule
-        let glassGrad = ctx.createLinearGradient(gx, gy, gx, gy + gh);
-        glassGrad.addColorStop(0, 'rgba(0, 243, 255, 0.2)');
-        glassGrad.addColorStop(0.12, 'rgba(255, 255, 255, 0.12)');
-        glassGrad.addColorStop(0.5, 'rgba(2, 6, 18, 0.45)'); // Empty, clear deep vacuum
-        glassGrad.addColorStop(0.9, 'rgba(0, 243, 255, 0.1)');
-        glassGrad.addColorStop(1, 'rgba(0, 243, 255, 0.25)');
-
-        ctx.fillStyle = glassGrad;
-        ctx.strokeStyle = 'rgba(0, 243, 255, 0.7)';
-        ctx.lineWidth = 3;
-
-        ctx.beginPath();
-        ctx.moveTo(gx, gy + 45);
-        ctx.lineTo(gx + 40, gy + 45);
-        ctx.bezierCurveTo(gx + 80, gy, gx + 100, gy, gx + 150, gy);
-        ctx.lineTo(gx + gw - 80, gy);
-        ctx.bezierCurveTo(gx + gw, gy, gx + gw, gy + gh, gx + gw - 80, gy + gh);
-        ctx.lineTo(gx + 150, gy + gh);
-        ctx.bezierCurveTo(gx + 100, gy + gh, gx + 80, gy + gh - 45, gx + 40, gy + gh - 45);
-        ctx.lineTo(gx, gy + gh - 45);
-        ctx.closePath();
-        ctx.fill();
-        ctx.stroke();
-
-        // Top Glass Specular Reflection Highlight
-        ctx.beginPath();
-        ctx.moveTo(gx + 120, gy + 10);
-        ctx.lineTo(gx + gw - 100, gy + 10);
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
-        ctx.lineWidth = 3.5;
-        ctx.stroke();
-
-        // Left Cathode Electrical Lead Pins
-        ctx.strokeStyle = '#94a3b8';
-        ctx.lineWidth = 4;
-        ctx.beginPath();
-        ctx.moveTo(140, gy + 70); ctx.lineTo(gx + 25, gy + 70);
-        ctx.moveTo(140, gy + 105); ctx.lineTo(gx + 25, gy + 105);
-        ctx.moveTo(140, gy + 140); ctx.lineTo(gx + 25, gy + 140);
-        ctx.stroke();
-
-        // BERYLLIUM WINDOW PORT AT THE BOTTOM
-        ctx.fillStyle = hoveredId === 'window' ? '#00f3ff' : '#0284c7';
-        ctx.fillRect(425, gy + gh - 4, 60, 10);
-        ctx.strokeStyle = '#00f3ff';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(420, gy + gh + 6, 70, 14);
-
-        ctx.font = "bold 12px 'Orbitron'";
-        ctx.fillStyle = hoveredId === 'window' ? '#00f3ff' : '#38bdf8';
-        ctx.fillText("Window Port (Bottom)", 385, gy + gh + 34);
-
-        ctx.restore();
-    }
-
-    // Cathode & Coiled Filament
-    function draw3DCathodeAssembly() {
-        ctx.save();
-        ctx.fillStyle = hoveredId === 'focusing_cup' ? '#cbd5e1' : '#334155';
-        ctx.strokeStyle = '#64748b';
-        ctx.lineWidth = 2;
-        
-        ctx.beginPath();
-        ctx.roundRect(230, 240, 35, 90, 8);
-        ctx.fill();
-        ctx.stroke();
-
-        // Focusing Cup Cavity
-        ctx.fillStyle = '#0f172a';
-        ctx.beginPath();
-        ctx.ellipse(265, 285, 12, 36, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
-
-        // Coiled Filament
-        let filIntensity = mA / 1000;
-        let rColor = Math.min(255, 200 + filIntensity * 55);
-        let gColor = Math.min(255, 160 + filIntensity * 95);
-        let bColor = Math.min(255, 80 + filIntensity * 175);
-
-        ctx.lineWidth = 3.5;
-        ctx.lineCap = 'round';
-
-        const startX = 260;
-        const coilCount = 7;
-        const loopRadiusX = 5;
-        const loopRadiusY = 18;
-        const spacing = 8.5;
-
-        for (let i = 0; i < coilCount; i++) {
-            let cx = startX + i * spacing;
-            let cy = 285;
-
-            // Back half of coil
-            ctx.strokeStyle = `rgb(${rColor * 0.45}, ${gColor * 0.35}, ${bColor * 0.25})`;
-            ctx.beginPath();
-            ctx.ellipse(cx, cy, loopRadiusX, loopRadiusY, 0, Math.PI * 0.5, Math.PI * 1.5);
-            ctx.stroke();
-
-            // Front incandescent half
-            ctx.strokeStyle = `rgb(${rColor}, ${gColor}, ${bColor})`;
-            ctx.shadowColor = `rgb(255, ${150 + filIntensity * 105}, 50)`;
-            ctx.shadowBlur = 10 + filIntensity * 25;
-            
-            ctx.beginPath();
-            ctx.ellipse(cx, cy, loopRadiusX, loopRadiusY, 0, Math.PI * 1.5, Math.PI * 0.5);
-            ctx.stroke();
-            ctx.shadowBlur = 0;
-        }
-
-        ctx.restore();
-    }
-
-    // ANODE ASSEMBLY WITH CLEAR ROTATION VISUALIZATION
-    function draw3DAnodeAssembly() {
-        ctx.save();
-        const ax = 455;
-        const ay = 285;
-
-        // Copper Stem
-        ctx.fillStyle = hoveredId === 'stem' ? '#d97706' : '#92400e';
-        ctx.fillRect(510, 275, 75, 20);
-
-        // Induction Rotor
-        ctx.fillStyle = hoveredId === 'rotor_stator' ? '#94a3b8' : '#475569';
-        ctx.beginPath();
-        ctx.roundRect(540, 245, 45, 80, 6);
-        ctx.fill();
-
-        // Cooling Fins
-        const finCount = 10;
-        for (let i = 0; i < finCount; i++) {
-            let fx = 475 + i * 5;
-            let isHovered = hoveredId === 'stem';
-            ctx.fillStyle = isHovered ? '#f59e0b' : '#334155';
-            ctx.strokeStyle = isHovered ? '#fbbf24' : '#1e293b';
-            ctx.lineWidth = 1.5;
-
-            ctx.beginPath();
-            ctx.ellipse(fx, ay, 6, 48, 0, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.stroke();
-        }
-
-        // TUNGSTEN ANODE DISC TARGET
-        ctx.save();
-        let heatRatio = Math.min(1, targetTemp / 3422);
-        let rTung = Math.min(255, 130 + heatRatio * 125);
-        let gTung = Math.max(20, 150 - heatRatio * 130);
-        let bTung = Math.max(30, 170 - heatRatio * 140);
-
-        ctx.fillStyle = hoveredId === 'target' ? '#00f3ff' : `rgb(${rTung}, ${gTung}, ${bTung})`;
-        ctx.strokeStyle = '#e2e8f0';
-        ctx.lineWidth = 2.5;
-
-        // Beveled Angled Target Disc Face
-        ctx.beginPath();
-        ctx.ellipse(ax, ay, 15, 56, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
-
-        // Machined Circular Focal Track Ring
-        ctx.strokeStyle = 'rgba(0, 0, 0, 0.4)';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.ellipse(ax, ay, 10, 40, 0, 0, Math.PI * 2);
-        ctx.stroke();
-
-        // VISIBLE ANODE ROTATION MARKINGS ON THE TARGET FACE
-        // Radial calibration lines rotating around the disc's face
-        const markCount = 8;
-        for (let k = 0; k < markCount; k++) {
-            let markAngle = anodeAngle + (k * (Math.PI * 2 / markCount));
-            let cosA = Math.cos(markAngle);
-            let sinA = Math.sin(markAngle);
-
-            // Project onto the perspective ellipse (radiusX = 14, radiusY = 52)
-            let innerX = ax + cosA * 5;
-            let innerY = ay + sinA * 18;
-            let outerX = ax + cosA * 13;
-            let outerY = ay + sinA * 50;
-
-            // Highlight contrasting lines
-            ctx.strokeStyle = (k % 2 === 0) ? 'rgba(255, 255, 255, 0.75)' : 'rgba(15, 23, 42, 0.85)';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.moveTo(innerX, innerY);
-            ctx.lineTo(outerX, outerY);
-            ctx.stroke();
-        }
-
-        // Focal Spot Impact Point (Horizontally hit by electrons)
-        let focalGlow = ctx.createRadialGradient(ax - 2, ay, 2, ax - 2, ay, 20);
-        focalGlow.addColorStop(0, '#ffffff');
-        focalGlow.addColorStop(0.3, isExposing ? '#00f3ff' : 'rgba(255,255,255,0.4)');
-        focalGlow.addColorStop(1, 'transparent');
-
-        ctx.fillStyle = focalGlow;
-        ctx.beginPath();
-        ctx.arc(ax - 2, ay, 20, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.restore();
-        ctx.restore();
-    }
-
-    // Vacuum Space Charge & Electron Trajectories
-    function drawVacuumElectrons() {
-        ctx.save();
-
-        // Thermionic Electron Cloud in Focusing Cup
-        for (let p of electrons) {
-            if (p.state === 'cloud') {
-                ctx.fillStyle = 'rgba(0, 243, 255, 0.75)';
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
-                ctx.fill();
-            } else if (p.state === 'accelerated') {
-                // High-speed electron trajectories through empty vacuum
-                ctx.strokeStyle = '#ffffff';
-                ctx.lineWidth = 2.5;
-                ctx.beginPath();
-                ctx.moveTo(p.x, p.y);
-                ctx.lineTo(p.x - p.vx * 1.5, p.y);
-                ctx.stroke();
+            // Update Downward X-Rays
+            for (let i = xrays.length - 1; i >= 0; i--) {
+                xrays[i].x += xrays[i].vx; 
+                xrays[i].y += xrays[i].vy; 
+                xrays[i].life -= 0.028;
+                if (xrays[i].life <= 0 || xrays[i].y > 500) xrays.splice(i, 1);
+            }
+
+            // Update Heat Waves
+            for (let i = heatWaves.length - 1; i >= 0; i--) {
+                heatWaves[i].radius += 1.2; 
+                heatWaves[i].alpha -= 0.045; 
+                heatWaves[i].x += 0.4;
+                if (heatWaves[i].alpha <= 0) heatWaves.splice(i, 1);
             }
         }
 
-        // Thermal Waves on Target
-        for (let h of heatWaves) {
-            ctx.strokeStyle = `rgba(239, 68, 68, ${h.alpha})`;
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.arc(h.x, h.y, h.radius, 0, Math.PI * 2);
-            ctx.stroke();
+        // --- DRAWING PIPELINE (800x500 Internal Canvas Resolution) ---
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            draw3DGridFloor();
+            drawCircuitBuses();
+            drawVacuumGlassEnvelope();
+            drawCathodeAssembly();
+            drawAnodeAssembly();
+            drawVacuumElectrons();
+            drawDownwardXRayBeam();
+
+            if (showLineFocus) {
+                drawLineFocusOverlay();
+            }
+
+            if (tubeBroken) {
+                drawFailureShatter();
+            }
         }
 
-        ctx.restore();
-    }
+        // 3D Perspective Grid Floor
+        function draw3DGridFloor() {
+            ctx.save();
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.08)';
+            ctx.lineWidth = 1;
 
-    // CLEAN DOWNWARD X-RAY BEAM THROUGH BOTTOM WINDOW
-    function drawDownwardXRayBeam() {
-        if (!isExposing && xrays.length === 0) return;
+            const horizonY = 350;
+            const vpX = 400;
 
-        ctx.save();
-        const originX = 452;
-        const originY = 285;
-        const beamBottomY = 560;
+            // Perspective Grid Lines
+            for (let x = -100; x <= 900; x += 90) {
+                ctx.beginPath();
+                ctx.moveTo(x, 500);
+                ctx.lineTo(vpX + (x - vpX) * 0.35, horizonY);
+                ctx.stroke();
+            }
 
-        let hue = 280 - ((kVp - 20) / 130) * 90; // kVp spectral shift
+            for (let y = 500; y >= horizonY; y -= (y - horizonY + 25) * 0.28) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(800, y);
+                ctx.stroke();
+            }
 
-        // Downward Volumetric Fan
-        let beamGrad = ctx.createLinearGradient(originX, originY, originX, beamBottomY);
-        beamGrad.addColorStop(0, `hsla(${hue}, 100%, 85%, 0.75)`);
-        beamGrad.addColorStop(0.3, `hsla(${hue}, 100%, 65%, 0.35)`);
-        beamGrad.addColorStop(1, 'transparent');
-
-        ctx.fillStyle = beamGrad;
-        ctx.beginPath();
-        ctx.moveTo(originX, originY);
-        ctx.lineTo(originX - 70, beamBottomY);
-        ctx.lineTo(originX + 70, beamBottomY);
-        ctx.closePath();
-        ctx.fill();
-
-        // Downward High-Energy Photons
-        for (let x of xrays) {
-            ctx.strokeStyle = `hsla(${hue}, 100%, 85%, ${x.life})`;
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.moveTo(x.x, x.y);
-            ctx.lineTo(x.x - x.vx * 1.4, x.y - x.vy * 1.4);
-            ctx.stroke();
+            ctx.restore();
         }
 
-        ctx.restore();
-    }
+        // Circuit Buses & Indicators
+        function drawCircuitBuses() {
+            ctx.save();
+            // High-Voltage Circuit Bus (Top)
+            ctx.strokeStyle = hoveredId === 'hv_circuit' ? '#f87171' : 'rgba(248, 113, 113, 0.45)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(350, 58); ctx.lineTo(170, 58); ctx.lineTo(170, 235);
+            ctx.moveTo(350, 58); ctx.lineTo(540, 58); ctx.lineTo(540, 210);
+            ctx.stroke();
 
-    // Line Focus Principle Overlay
-    function drawLineFocusOverlay() {
-        ctx.save();
-        ctx.setLineDash([6, 6]);
+            ctx.fillStyle = 'rgba(8, 14, 28, 0.9)';
+            ctx.fillRect(280, 40, 150, 36);
+            ctx.strokeRect(280, 40, 150, 36);
+            ctx.font = "bold 11px 'Orbitron'";
+            ctx.fillStyle = '#f87171';
+            ctx.fillText(`HV Step-Up (${kVp} kVp)`, 292, 62);
 
-        // Actual Focal Spot (Struck on angled face)
-        ctx.strokeStyle = '#fbbf24';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(310, 265); ctx.lineTo(452, 265);
-        ctx.moveTo(310, 305); ctx.lineTo(452, 305);
-        ctx.stroke();
+            // Filament Circuit (Left)
+            ctx.strokeStyle = hoveredId === 'fil_circuit' ? '#00f3ff' : 'rgba(0, 243, 255, 0.45)';
+            ctx.beginPath();
+            ctx.moveTo(130, 278); ctx.lineTo(165, 278);
+            ctx.stroke();
 
-        ctx.strokeRect(442, 265, 16, 40);
-        ctx.font = "bold 13px 'Orbitron'";
-        ctx.fillStyle = '#fbbf24';
-        ctx.fillText("Actual Focal Spot (Wide Heat Area)", 465, 220);
+            ctx.fillStyle = 'rgba(8, 14, 28, 0.9)';
+            ctx.fillRect(20, 260, 110, 36);
+            ctx.strokeRect(20, 260, 110, 36);
+            ctx.font = "bold 10px 'Orbitron'";
+            ctx.fillStyle = '#00f3ff';
+            ctx.fillText("Filament 10-12V", 28, 282);
+            ctx.restore();
+        }
 
-        // Effective Focal Spot (Downwards toward patient/detector)
-        ctx.strokeStyle = '#4ade80';
-        ctx.beginPath();
-        ctx.moveTo(446, 285); ctx.lineTo(435, 480);
-        ctx.moveTo(458, 285); ctx.lineTo(469, 480);
-        ctx.stroke();
-        ctx.setLineDash([]);
+        // Evacuated Glass Tube & Beryllium Bottom Window Port
+        function drawVacuumGlassEnvelope() {
+            ctx.save();
+            const gx = 180, gy = 150, gw = 410, gh = 195;
 
-        ctx.fillStyle = '#4ade80';
-        ctx.fillText("Effective Focal Spot (Narrow = Sharp Image)", 480, 460);
+            // Outer Steel Protective Housing Contour
+            ctx.strokeStyle = hoveredId === 'envelope' ? '#00f3ff' : 'rgba(0, 243, 255, 0.35)';
+            ctx.lineWidth = 2;
+            ctx.fillStyle = 'rgba(6, 16, 32, 0.35)';
+            ctx.beginPath();
+            ctx.roundRect(110, 120, 530, 255, 14);
+            ctx.stroke();
+            ctx.fill();
 
-        ctx.restore();
-    }
+            // Glass Vacuum Chamber
+            let glassGrad = ctx.createLinearGradient(gx, gy, gx, gy + gh);
+            glassGrad.addColorStop(0, 'rgba(0, 243, 255, 0.18)');
+            glassGrad.addColorStop(0.15, 'rgba(255, 255, 255, 0.10)');
+            glassGrad.addColorStop(0.5, 'rgba(2, 6, 18, 0.45)');
+            glassGrad.addColorStop(0.85, 'rgba(0, 243, 255, 0.10)');
+            glassGrad.addColorStop(1, 'rgba(0, 243, 255, 0.22)');
 
-    // Tube Melt / Rupture
-    function drawFailureShatter() {
-        ctx.save();
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 3;
-        ctx.shadowColor = '#ef4444';
-        ctx.shadowBlur = 20;
+            ctx.fillStyle = glassGrad;
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.75)';
+            ctx.lineWidth = 2.5;
 
-        ctx.beginPath();
-        ctx.moveTo(455, 285); ctx.lineTo(390, 210); ctx.lineTo(320, 230);
-        ctx.moveTo(455, 285); ctx.lineTo(520, 220); ctx.lineTo(580, 180);
-        ctx.moveTo(455, 285); ctx.lineTo(410, 370); ctx.lineTo(340, 385);
-        ctx.moveTo(455, 285); ctx.lineTo(510, 360); ctx.lineTo(590, 390);
-        ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(gx, gy + 40);
+            ctx.lineTo(gx + 35, gy + 40);
+            ctx.bezierCurveTo(gx + 70, gy, gx + 90, gy, gx + 135, gy);
+            ctx.lineTo(gx + gw - 70, gy);
+            ctx.bezierCurveTo(gx + gw, gy, gx + gw, gy + gh, gx + gw - 70, gy + gh);
+            ctx.lineTo(gx + 135, gy + gh);
+            ctx.bezierCurveTo(gx + 90, gy + gh, gx + 70, gy + gh - 40, gx + 35, gy + gh - 40);
+            ctx.lineTo(gx, gy + gh - 40);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
 
-        ctx.fillStyle = '#ef4444';
-        ctx.beginPath();
-        ctx.arc(455, 285, 24, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-    }
+            // Glass Reflection Highlight
+            ctx.beginPath();
+            ctx.moveTo(gx + 105, gy + 8);
+            ctx.lineTo(gx + gw - 85, gy + 8);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
+            ctx.lineWidth = 3;
+            ctx.stroke();
 
-    function loop() {
-        updatePhysics();
-        draw();
-        requestAnimationFrame(loop);
-    }
-    
-    loop();
-</script>
+            // Electrical Lead Pins
+            ctx.strokeStyle = '#94a3b8';
+            ctx.lineWidth = 3.5;
+            ctx.beginPath();
+            ctx.moveTo(135, gy + 65); ctx.lineTo(gx + 22, gy + 65);
+            ctx.moveTo(135, gy + 98); ctx.lineTo(gx + 22, gy + 98);
+            ctx.moveTo(135, gy + 130); ctx.lineTo(gx + 22, gy + 130);
+            ctx.stroke();
+
+            // BERYLLIUM WINDOW PORT AT BOTTOM
+            ctx.fillStyle = hoveredId === 'window' ? '#00f3ff' : '#0284c7';
+            ctx.fillRect(435, gy + gh - 4, 50, 8);
+            ctx.strokeStyle = '#00f3ff';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(430, gy + gh + 4, 60, 12);
+
+            ctx.font = "bold 10px 'Orbitron'";
+            ctx.fillStyle = hoveredId === 'window' ? '#00f3ff' : '#38bdf8';
+            ctx.fillText("Beryllium Window (Port)", 398, gy + gh + 28);
+
+            ctx.restore();
+        }
+
+        // Cathode Assembly & Helical Tungsten Filament
+        function drawCathodeAssembly() {
+            ctx.save();
+            ctx.fillStyle = hoveredId === 'focusing_cup' ? '#cbd5e1' : '#334155';
+            ctx.strokeStyle = '#64748b';
+            ctx.lineWidth = 2;
+            
+            // Focusing Cup Base
+            ctx.beginPath();
+            ctx.roundRect(205, 210, 30, 78, 6);
+            ctx.fill();
+            ctx.stroke();
+
+            // Concave Focusing Cavity
+            ctx.fillStyle = '#0b1324';
+            ctx.beginPath();
+            ctx.ellipse(235, 248, 10, 32, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            // 3D Spiral Filament Wire
+            let filIntensity = mA / 1000;
+            let rColor = Math.min(255, 200 + filIntensity * 55);
+            let gColor = Math.min(255, 150 + filIntensity * 105);
+            let bColor = Math.min(255, 70 + filIntensity * 185);
+
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+
+            const startX = 228;
+            const coilCount = 6;
+            const loopRadiusX = 4.5;
+            const loopRadiusY = 15;
+            const spacing = 7.5;
+
+            for (let i = 0; i < coilCount; i++) {
+                let cx = startX + i * spacing;
+                let cy = 248;
+
+                // Back half of loop
+                ctx.strokeStyle = `rgb(${rColor * 0.4}, ${gColor * 0.3}, ${bColor * 0.2})`;
+                ctx.beginPath();
+                ctx.ellipse(cx, cy, loopRadiusX, loopRadiusY, 0, Math.PI * 0.5, Math.PI * 1.5);
+                ctx.stroke();
+
+                // Front glowing loop
+                ctx.strokeStyle = `rgb(${rColor}, ${gColor}, ${bColor})`;
+                ctx.shadowColor = `rgb(255, ${140 + filIntensity * 115}, 40)`;
+                ctx.shadowBlur = 8 + filIntensity * 20;
+                
+                ctx.beginPath();
+                ctx.ellipse(cx, cy, loopRadiusX, loopRadiusY, 0, Math.PI * 1.5, Math.PI * 0.5);
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+            }
+
+            ctx.restore();
+        }
+
+        // Rotating Anode Assembly & Tungsten Disc
+        function drawAnodeAssembly() {
+            ctx.save();
+            const ax = 460;
+            const ay = 248;
+
+            // Copper Stem / Molybdenum Neck
+            ctx.fillStyle = hoveredId === 'stem' ? '#d97706' : '#92400e';
+            ctx.fillRect(495, 240, 55, 16);
+
+            // Induction Rotor Core
+            ctx.fillStyle = hoveredId === 'rotor_stator' ? '#94a3b8' : '#475569';
+            ctx.beginPath();
+            ctx.roundRect(535, 212, 38, 72, 6);
+            ctx.fill();
+
+            // Copper Cooling Fins
+            const finCount = 8;
+            for (let i = 0; i < finCount; i++) {
+                let fx = 475 + i * 4.5;
+                let isHovered = hoveredId === 'stem';
+                ctx.fillStyle = isHovered ? '#f59e0b' : '#334155';
+                ctx.strokeStyle = isHovered ? '#fbbf24' : '#1e293b';
+                ctx.lineWidth = 1.2;
+
+                ctx.beginPath();
+                ctx.ellipse(fx, ay, 5, 40, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+            }
+
+            // TUNGSTEN ANODE DISC TARGET
+            ctx.save();
+            let heatRatio = Math.min(1, targetTemp / 3422);
+            let rTung = Math.min(255, 125 + heatRatio * 130);
+            let gTung = Math.max(20, 145 - heatRatio * 125);
+            let bTung = Math.max(30, 165 - heatRatio * 135);
+
+            ctx.fillStyle = hoveredId === 'target' ? '#00f3ff' : `rgb(${rTung}, ${gTung}, ${bTung})`;
+            ctx.strokeStyle = '#e2e8f0';
+            ctx.lineWidth = 2.2;
+
+            // Beveled Angled Target Disc Face
+            ctx.beginPath();
+            ctx.ellipse(ax, ay, 13, 50, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            // Circular Focal Track Grooves
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.4)';
+            ctx.lineWidth = 1.8;
+            ctx.beginPath();
+            ctx.ellipse(ax, ay, 9, 36, 0, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // ROTATION STROBE MARKINGS ON THE TARGET FACE
+            const markCount = 8;
+            for (let k = 0; k < markCount; k++) {
+                let markAngle = anodeAngle + (k * (Math.PI * 2 / markCount));
+                let cosA = Math.cos(markAngle);
+                let sinA = Math.sin(markAngle);
+
+                let innerX = ax + cosA * 4;
+                let innerY = ay + sinA * 15;
+                let outerX = ax + cosA * 11;
+                let outerY = ay + sinA * 44;
+
+                ctx.strokeStyle = (k % 2 === 0) ? 'rgba(255, 255, 255, 0.8)' : 'rgba(15, 23, 42, 0.85)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(innerX, innerY);
+                ctx.lineTo(outerX, outerY);
+                ctx.stroke();
+            }
+
+            // Electron Impact Glow Spot
+            let focalGlow = ctx.createRadialGradient(ax - 2, ay, 2, ax - 2, ay, 18);
+            focalGlow.addColorStop(0, '#ffffff');
+            focalGlow.addColorStop(0.35, isExposing ? '#00f3ff' : 'rgba(255,255,255,0.3)');
+            focalGlow.addColorStop(1, 'transparent');
+
+            ctx.fillStyle = focalGlow;
+            ctx.beginPath();
+            ctx.arc(ax - 2, ay, 18, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+            ctx.restore();
+        }
+
+        // Vacuum Electrons & Thermal Pulses
+        function drawVacuumElectrons() {
+            ctx.save();
+
+            // Thermionic Space Charge Cloud
+            for (let p of electrons) {
+                if (p.state === 'cloud') {
+                    ctx.fillStyle = 'rgba(0, 243, 255, 0.75)';
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 1.8, 0, Math.PI * 2);
+                    ctx.fill();
+                } else if (p.state === 'accelerated') {
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 2.2;
+                    ctx.beginPath();
+                    ctx.moveTo(p.x, p.y);
+                    ctx.lineTo(p.x - p.vx * 1.4, p.y);
+                    ctx.stroke();
+                }
+            }
+
+            // Target Thermal Wave Rings
+            for (let h of heatWaves) {
+                ctx.strokeStyle = `rgba(239, 68, 68, ${h.alpha})`;
+                ctx.lineWidth = 1.8;
+                ctx.beginPath();
+                ctx.arc(h.x, h.y, h.radius, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+
+            ctx.restore();
+        }
+
+        // Clean Downward Primary X-Ray Beam
+        function drawDownwardXRayBeam() {
+            if (!isExposing && xrays.length === 0) return;
+
+            ctx.save();
+            const originX = 458;
+            const originY = 248;
+            const beamBottomY = 490;
+
+            let hue = 280 - ((kVp - 20) / 130) * 85;
+
+            // Volumetric Cone Projected Downward
+            let beamGrad = ctx.createLinearGradient(originX, originY, originX, beamBottomY);
+            beamGrad.addColorStop(0, `hsla(${hue}, 100%, 85%, 0.75)`);
+            beamGrad.addColorStop(0.3, `hsla(${hue}, 100%, 65%, 0.35)`);
+            beamGrad.addColorStop(1, 'transparent');
+
+            ctx.fillStyle = beamGrad;
+            ctx.beginPath();
+            ctx.moveTo(originX, originY);
+            ctx.lineTo(originX - 60, beamBottomY);
+            ctx.lineTo(originX + 60, beamBottomY);
+            ctx.closePath();
+            ctx.fill();
+
+            // Downward Photons
+            for (let x of xrays) {
+                ctx.strokeStyle = `hsla(${hue}, 100%, 85%, ${x.life})`;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(x.x, x.y);
+                ctx.lineTo(x.x - x.vx * 1.3, x.y - x.vy * 1.3);
+                ctx.stroke();
+            }
+
+            ctx.restore();
+        }
+
+        // Line-Focus Principle Overlay
+        function drawLineFocusOverlay() {
+            ctx.save();
+            ctx.setLineDash([5, 5]);
+
+            // Actual Focal Spot (Struck on angled face)
+            ctx.strokeStyle = '#fbbf24';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(270, 232); ctx.lineTo(458, 232);
+            ctx.moveTo(270, 264); ctx.lineTo(458, 264);
+            ctx.stroke();
+
+            ctx.strokeRect(450, 232, 14, 32);
+            ctx.font = "bold 11px 'Orbitron'";
+            ctx.fillStyle = '#fbbf24';
+            ctx.fillText("Actual Focal Spot (Wide)", 470, 192);
+
+            // Effective Focal Spot (Downwards)
+            ctx.strokeStyle = '#4ade80';
+            ctx.beginPath();
+            ctx.moveTo(453, 248); ctx.lineTo(442, 420);
+            ctx.moveTo(463, 248); ctx.lineTo(474, 420);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            ctx.fillStyle = '#4ade80';
+            ctx.fillText("Effective Focal Spot (Narrow = Sharp)", 480, 410);
+
+            ctx.restore();
+        }
+
+        // Catastrophic Shatter Graphic
+        function drawFailureShatter() {
+            ctx.save();
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 3;
+            ctx.shadowColor = '#ef4444';
+            ctx.shadowBlur = 18;
+
+            ctx.beginPath();
+            ctx.moveTo(460, 248); ctx.lineTo(395, 185); ctx.lineTo(330, 200);
+            ctx.moveTo(460, 248); ctx.lineTo(515, 190); ctx.lineTo(565, 160);
+            ctx.moveTo(460, 248); ctx.lineTo(420, 320); ctx.lineTo(360, 335);
+            ctx.moveTo(460, 248); ctx.lineTo(505, 310); ctx.lineTo(575, 340);
+            ctx.stroke();
+
+            ctx.fillStyle = '#ef4444';
+            ctx.beginPath();
+            ctx.arc(460, 248, 22, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
+
+        // Render Loop
+        function renderLoop() {
+            updatePhysics();
+            draw();
+            requestAnimationFrame(renderLoop);
+        }
+
+        requestAnimationFrame(renderLoop);
+    </script>
 </body>
 </html>
