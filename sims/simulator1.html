@@ -3,69 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>3D Holographic Oil Drop Monolayer Simulator - LuyaliSims</title>
+    <meta name="description" content="Interactive 3D laboratory simulator for the classic Rayleigh oleic acid oil drop monolayer experiment - LuyaliSims STEM Labs.">
+    <title>3D Oil Drop Monolayer Simulator & Laboratory - LuyaliSims</title>
     
-    <!-- Three.js & OrbitControls -->
+    <!-- Import Three.js & OrbitControls -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     
-    <!-- Futuristic Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Import Futuristic Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     
     <style>
-        /* Base Reset & Theme */
+        /* Base Reset & Theme Variables */
         *, *::before, *::after {
             box-sizing: border-box;
         }
 
         :root {
-            --holo-cyan: #00f3ff;
-            --holo-magenta: #bc13fe;
-            --holo-emerald: #10b981;
-            --holo-bg-dark: #060a12;
-            --holo-panel: rgba(10, 16, 30, 0.72);
-            --holo-border: rgba(0, 243, 255, 0.35);
+            --neon-cyan: #00f3ff;
+            --neon-magenta: #bc13fe;
+            --neon-green: #00ff88;
+            --bg-dark: #070a12;
+            --panel-bg: rgba(16, 24, 43, 0.85);
+            --border-glow: rgba(0, 243, 255, 0.35);
         }
 
         body {
             font-family: 'Rajdhani', sans-serif;
-            background-color: var(--holo-bg-dark);
+            background-color: var(--bg-dark);
             background-image: 
-                radial-gradient(circle at 80% 10%, rgba(0, 243, 255, 0.08), transparent 45%),
+                radial-gradient(circle at 85% 15%, rgba(0, 243, 255, 0.08), transparent 45%),
                 radial-gradient(circle at 15% 85%, rgba(188, 19, 254, 0.08), transparent 45%),
-                linear-gradient(rgba(0, 243, 255, 0.02) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 243, 255, 0.02) 1px, transparent 1px);
-            background-size: 100% 100%, 100% 100%, 35px 35px, 35px 35px;
+                linear-gradient(180deg, #05070e 0%, #0a0e1a 100%);
             color: #e2e8f0;
             margin: 0;
-            padding: 20px;
+            padding: 16px 20px;
             min-height: 100vh;
             overflow-x: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
         }
 
-        .font-mono { font-family: 'Fira Code', monospace; }
+        /* 1. HEADER & TOP NAVIGATION */
+        header {
+            max-width: 1200px;
+            margin: 0 auto 15px auto;
+        }
 
-        /* 1. NAVIGATION */
-        .header-wrapper {
-            width: 100%;
-            max-width: 1180px;
-            margin-bottom: 12px;
+        .top-nav {
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
             gap: 12px;
+            margin-bottom: 12px;
         }
 
         .back-btn {
-            align-self: flex-start;
             display: inline-flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             padding: 9px 18px;
             background: rgba(16, 24, 43, 0.7);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(8px);
             border: 1px solid rgba(188, 19, 254, 0.5);
             color: #e580ff;
             text-decoration: none;
@@ -74,748 +72,1016 @@
             font-size: 0.95rem;
             text-transform: uppercase;
             letter-spacing: 1px;
-            box-shadow: 0 0 15px rgba(188, 19, 254, 0.2);
             transition: all 0.3s ease;
         }
 
         .back-btn:hover {
             background: rgba(188, 19, 254, 0.2);
-            border-color: #bc13fe;
+            border-color: var(--neon-magenta);
             color: #fff;
-            box-shadow: 0 0 20px rgba(188, 19, 254, 0.6);
-            transform: translateX(-4px);
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
+            transform: translateX(-3px);
         }
 
         h1 {
             font-family: 'Orbitron', sans-serif;
-            color: #00f3ff;
-            text-shadow: 0 0 15px rgba(0, 243, 255, 0.5), 0 0 35px rgba(0, 243, 255, 0.2);
-            margin: 0;
-            font-size: clamp(1.4rem, 3.6vw, 2.3rem);
+            color: var(--neon-cyan);
+            text-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+            margin: 6px 0 10px 0;
+            font-size: clamp(1.4rem, 3.8vw, 2.3rem);
             letter-spacing: 1.5px;
-            text-transform: uppercase;
+            text-align: center;
         }
 
-        /* 2. MAIN SIMULATOR CONTAINER */
+        .lead-summary {
+            max-width: 920px;
+            margin: 0 auto 20px auto;
+            text-align: center;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: #cbd5e1;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* 2. SIMULATOR WORKSPACE */
         #simulator-container {
-            background: var(--holo-panel);
-            backdrop-filter: blur(14px);
-            border: 1px solid var(--holo-border);
+            background: linear-gradient(135deg, rgba(16, 24, 43, 0.85) 0%, rgba(8, 12, 22, 0.9) 100%);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-glow);
             border-radius: 16px;
             padding: 22px;
-            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.6), inset 0 0 30px rgba(0, 243, 255, 0.05);
-            margin-bottom: 35px;
-            max-width: 1180px;
-            width: 100%;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 25px rgba(0, 243, 255, 0.12);
+            margin-bottom: 25px;
             position: relative;
         }
 
-        .sim-toolbar {
+        .hud-telemetry {
             display: flex;
-            flex-wrap: wrap;
             justify-content: space-between;
             align-items: center;
-            gap: 12px;
+            background: rgba(4, 8, 16, 0.8);
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            border-radius: 10px;
+            padding: 10px 16px;
             margin-bottom: 18px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid rgba(0, 243, 255, 0.15);
+            font-family: 'Share Tech Mono', monospace;
+            flex-wrap: wrap;
+            gap: 12px;
         }
 
-        .sim-subtitle {
-            font-size: 0.95rem;
-            color: #94a3b8;
-            font-weight: 500;
-        }
-
-        .tool-actions {
+        .telemetry-item {
             display: flex;
-            gap: 10px;
-        }
-
-        .btn-aux {
-            background: rgba(15, 23, 42, 0.8);
-            border: 1px solid rgba(148, 163, 184, 0.3);
-            color: #cbd5e1;
-            padding: 8px 14px;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            font-family: 'Rajdhani', sans-serif;
-            font-weight: 600;
-            cursor: pointer;
-            display: inline-flex;
             align-items: center;
             gap: 6px;
-            transition: all 0.25s ease;
+            font-size: 0.92rem;
         }
 
-        .btn-aux:hover {
-            border-color: #00f3ff;
-            color: #fff;
-            box-shadow: 0 0 12px rgba(0, 243, 255, 0.35);
+        .tele-label {
+            color: #8da4be;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .tele-val {
+            color: var(--neon-cyan);
+            font-weight: 700;
+        }
+
+        .tele-val.pink {
+            color: #ff55bb;
+        }
+
+        .tele-val.green {
+            color: var(--neon-green);
         }
 
         .sim-layout {
             display: grid;
-            grid-template-columns: 1.55fr 1fr;
-            gap: 22px;
-            align-items: start;
+            grid-template-columns: 1.65fr 1fr;
+            gap: 20px;
+            align-items: stretch;
         }
 
-        /* 3D Holographic Canvas Wrapper */
         .canvas-wrapper {
             position: relative;
             width: 100%;
-            aspect-ratio: 16 / 10;
-            background: radial-gradient(circle at center, #0c1527 0%, #050811 85%);
-            border: 1px solid rgba(0, 243, 255, 0.4);
+            background: radial-gradient(circle at 50% 50%, #08171a 0%, #02070a 100%);
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: inset 0 0 40px rgba(0, 243, 255, 0.12), 0 0 25px rgba(0, 0, 0, 0.8);
             touch-action: none;
+            border: 4px solid #1e293b;
+            box-shadow: 
+                0 0 0 2px rgba(0, 243, 255, 0.4),
+                0 15px 35px rgba(0, 0, 0, 0.8),
+                inset 0 0 35px rgba(0, 0, 0, 0.95);
         }
 
-        #canvas-container {
-            width: 100%;
-            height: 100%;
-            cursor: grab;
-        }
-
-        #canvas-container:active {
-            cursor: grabbing;
-        }
-
-        .holo-overlay {
+        .canvas-wrapper::before {
+            content: " ";
             position: absolute;
-            inset: 0;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: 
+                linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+                repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.18) 0px, rgba(0, 0, 0, 0.18) 1px, transparent 1px, transparent 3px);
             pointer-events: none;
-            background: repeating-linear-gradient(
-                0deg,
-                rgba(0, 243, 255, 0.015) 0px,
-                rgba(0, 243, 255, 0.015) 2px,
-                transparent 2px,
-                transparent 4px
-            );
             z-index: 5;
         }
 
-        .canvas-hud {
+        #webgl-viewport {
+            width: 100%;
+            aspect-ratio: 16 / 10;
+            cursor: grab;
+            display: block;
+        }
+
+        #webgl-viewport:active {
+            cursor: grabbing;
+        }
+
+        .canvas-overlay-guide {
             position: absolute;
-            z-index: 10;
+            top: 12px;
+            left: 12px;
+            z-index: 6;
             pointer-events: none;
-            background: rgba(6, 10, 18, 0.78);
+            background: rgba(6, 10, 18, 0.8);
             border: 1px solid rgba(0, 243, 255, 0.3);
             border-radius: 8px;
             padding: 8px 12px;
             font-size: 0.75rem;
             color: #94a3b8;
-            backdrop-filter: blur(8px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            font-family: 'Share Tech Mono', monospace;
+            backdrop-filter: blur(6px);
         }
 
-        .canvas-hud.top-left { top: 12px; left: 12px; }
-        .canvas-hud.top-right { top: 12px; right: 12px; }
-        .canvas-hud.bottom-bar {
-            bottom: 12px;
+        #canvas-prompt-badge {
+            position: absolute;
+            bottom: 15px;
             left: 50%;
             transform: translateX(-50%);
-            display: flex;
-            gap: 16px;
+            background: rgba(0, 243, 255, 0.12);
+            border: 1px solid rgba(0, 243, 255, 0.45);
+            color: var(--neon-cyan);
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 8px 18px;
+            border-radius: 20px;
+            backdrop-filter: blur(8px);
+            text-align: center;
+            pointer-events: none;
+            z-index: 6;
+            transition: opacity 0.4s ease;
             white-space: nowrap;
         }
 
-        .hud-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .hud-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-        }
-
-        #canvas-prompt {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 243, 255, 0.1);
-            border: 1px solid rgba(0, 243, 255, 0.4);
-            color: #00f3ff;
-            font-size: 0.85rem;
-            font-weight: 600;
-            padding: 10px 18px;
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            text-align: center;
-            pointer-events: none;
-            transition: opacity 0.4s ease;
-            box-shadow: 0 0 25px rgba(0, 243, 255, 0.25);
-            z-index: 10;
-        }
-
-        /* Controls Panel */
         .controls-panel {
             display: flex;
             flex-direction: column;
-            gap: 16px;
-        }
-
-        .control-card {
-            background: rgba(10, 14, 25, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            gap: 14px;
+            background: linear-gradient(145deg, rgba(11, 17, 30, 0.9) 0%, rgba(6, 9, 16, 0.95) 100%);
+            padding: 18px;
             border-radius: 12px;
-            padding: 16px;
-            box-shadow: inset 0 0 15px rgba(0, 243, 255, 0.02);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
         }
 
-        .control-card-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-            padding-bottom: 8px;
-        }
-
-        .badge-step {
-            width: 22px;
-            height: 22px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            font-weight: 700;
-        }
-
-        .badge-cyan {
-            background: rgba(0, 243, 255, 0.15);
-            color: #00f3ff;
-            border: 1px solid rgba(0, 243, 255, 0.4);
-        }
-
-        .badge-magenta {
-            background: rgba(188, 19, 254, 0.15);
-            color: #bc13fe;
-            border: 1px solid rgba(188, 19, 254, 0.4);
+        .panel-heading {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border-bottom: 1px solid rgba(0, 243, 255, 0.25);
+            padding-bottom: 6px;
+            margin: 0;
         }
 
         .control-group {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 5px;
         }
 
-        .control-label-row {
+        .control-group label {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #cbd5e1;
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            font-size: 0.95rem;
         }
 
-        .val-pill {
-            padding: 3px 9px;
-            border-radius: 6px;
-            background: #020617;
-            font-weight: 600;
-            font-size: 0.9rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        .control-group label span {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--neon-green);
+        }
+
+        .control-group label span.magenta {
+            color: #ff55bb;
         }
 
         input[type="range"] {
             -webkit-appearance: none;
-            width: 100%;
-            height: 6px;
-            border-radius: 3px;
-            background: #1e293b;
-            outline: none;
+            appearance: none;
+            background: #0c1527;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            height: 8px;
+            border-radius: 4px;
             cursor: pointer;
-            margin: 6px 0;
+            margin: 8px 0;
+            min-height: 44px;
         }
 
-        .slider-cyan::-webkit-slider-thumb {
+        input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 20px;
-            height: 20px;
+            appearance: none;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
-            background: #00f3ff;
-            box-shadow: 0 0 12px #00f3ff, inset 0 0 4px #ffffff;
-            border: 2px solid #ffffff;
+            background: radial-gradient(circle, #00f3ff 30%, #0088aa 100%);
+            border: 2px solid #fff;
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.8);
             cursor: pointer;
-            transition: transform 0.1s;
         }
 
-        .slider-cyan::-webkit-slider-thumb:hover { transform: scale(1.15); }
-
-        .slider-magenta::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #bc13fe;
-            box-shadow: 0 0 12px #bc13fe, inset 0 0 4px #ffffff;
-            border: 2px solid #ffffff;
-            cursor: pointer;
-            transition: transform 0.1s;
+        #input-patch::-webkit-slider-thumb {
+            background: radial-gradient(circle, #bc13fe 30%, #7908a8 100%);
+            box-shadow: 0 0 10px rgba(188, 19, 254, 0.8);
         }
 
-        .slider-magenta::-webkit-slider-thumb:hover { transform: scale(1.15); }
-
-        .sim-btn-holo {
-            width: 100%;
-            min-height: 48px;
-            padding: 12px;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.92rem;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            color: #030712;
-            background: linear-gradient(135deg, #00f3ff, #38bdf8);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            border-radius: 10px;
-            cursor: pointer;
-            box-shadow: 0 0 20px rgba(0, 243, 255, 0.45);
-            transition: all 0.25s ease;
+        .hud-summary-card {
+            background: rgba(4, 8, 16, 0.7);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.85rem;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            flex-direction: column;
+            gap: 6px;
         }
 
-        .sim-btn-holo:hover {
-            box-shadow: 0 0 30px rgba(0, 243, 255, 0.7);
+        .hud-summary-row {
+            display: flex;
+            justify-content: space-between;
+            color: #94a3b8;
+        }
+
+        .hud-summary-row strong {
+            color: #fff;
+        }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1.3fr 1fr;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .sim-btn {
+            background: linear-gradient(180deg, rgba(16, 28, 54, 0.9) 0%, rgba(8, 14, 28, 0.95) 100%);
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            color: var(--neon-cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 700;
+            padding: 10px;
+            min-height: 48px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .sim-btn:hover {
+            border-color: var(--neon-cyan);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
             transform: translateY(-2px);
         }
 
-        .sim-btn-holo:active {
-            transform: scale(0.98);
+        .sim-btn.secondary {
+            border-color: rgba(188, 19, 254, 0.5);
+            color: #e580ff;
         }
 
-        .hud-analysis-box {
-            background: rgba(3, 7, 18, 0.85);
-            border: 1px solid rgba(0, 243, 255, 0.25);
-            border-radius: 12px;
-            padding: 16px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: inset 0 0 20px rgba(0, 243, 255, 0.04);
+        .sim-btn.secondary:hover {
+            border-color: var(--neon-magenta);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
         }
 
-        .hud-header {
-            font-size: 0.75rem;
-            color: #64748b;
-            font-weight: 700;
-            letter-spacing: 2px;
+        .sim-btn.reset-style {
+            border-color: rgba(255, 255, 255, 0.2);
+            color: #94a3b8;
+            grid-column: span 2;
+        }
+
+        .sim-btn.reset-style:hover {
+            border-color: #cbd5e1;
+            color: #fff;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        /* 3. POLICY-COMPLIANT AD CONTAINER */
+        .ad-slot-wrapper {
+            margin: 30px auto;
+            text-align: center;
+            clear: both;
+        }
+
+        .ad-disclaimer {
+            font-size: 0.72rem;
             text-transform: uppercase;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 12px;
+            letter-spacing: 1px;
+            color: #64748b;
+            margin-bottom: 6px;
         }
 
-        .hud-data-row {
+        .ad-box-placeholder {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            min-height: 90px;
+            max-width: 970px;
+            margin: 0 auto;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: 8px 10px;
+            justify-content: center;
+            color: #475569;
+            font-size: 0.85rem;
             border-radius: 8px;
-            background: rgba(15, 23, 42, 0.45);
-            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        /* 4. EDUCATIONAL CONTENT SECTION */
+        .educational-content {
+            line-height: 1.75;
+            font-size: 1.05rem;
+            color: #94a3b8;
+            background: rgba(10, 14, 23, 0.85);
+            padding: 30px;
+            border-radius: 16px;
+            border-left: 4px solid var(--neon-cyan);
+            border-top: 1px solid rgba(0, 243, 255, 0.2);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin-bottom: 35px;
+        }
+
+        .educational-content h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-magenta);
+            border-bottom: 1px solid rgba(188, 19, 254, 0.3);
+            padding-bottom: 8px;
+            margin-top: 1.8em;
+            margin-bottom: 0.6em;
+            font-size: 1.45rem;
+        }
+
+        .educational-content h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: #38bdf8;
+            margin-top: 1.4em;
+            margin-bottom: 0.4em;
+            font-size: 1.15rem;
+        }
+
+        .formula-box {
+            background: rgba(4, 9, 20, 0.7);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-left: 3px solid var(--neon-green);
+            padding: 14px 18px;
+            margin: 14px 0;
+            border-radius: 6px;
+            font-family: 'Share Tech Mono', monospace;
+            color: #a7f3d0;
+            font-size: 1.02rem;
+            line-height: 1.65;
+        }
+
+        .task-card {
+            background: rgba(15, 23, 42, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 18px;
+        }
+
+        .task-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            color: var(--neon-cyan);
             margin-bottom: 8px;
         }
 
-        .hud-formula {
-            font-size: 0.68rem;
-            color: #64748b;
+        details {
+            margin-top: 25px;
+            background: rgba(5, 10, 20, 0.8);
+            border: 1px solid rgba(188, 19, 254, 0.4);
+            border-radius: 10px;
+            padding: 15px 20px;
         }
 
-        .hud-final-metric {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 10px;
-            margin-top: 6px;
-            border-top: 1px dashed rgba(255, 255, 255, 0.12);
-        }
-
-        /* 3. EDUCATIONAL CONTENT SECTION */
-        .educational-content {
-            max-width: 1180px;
-            width: 100%;
-            line-height: 1.7;
-            font-size: 1.05rem;
-            color: #94a3b8;
-            background: rgba(10, 14, 23, 0.82);
-            padding: 30px;
-            border-radius: 14px;
-            border-left: 4px solid #00f3ff;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-            margin-bottom: 30px;
-        }
-
-        .educational-content h2, .educational-content h3 {
+        summary {
             font-family: 'Orbitron', sans-serif;
-            color: #bc13fe;
-            margin-top: 1.4em;
-            margin-bottom: 0.4em;
+            font-weight: 700;
+            color: #e580ff;
+            cursor: pointer;
+            padding: 6px 0;
+            user-select: none;
         }
 
-        .educational-content strong {
-            color: #fff;
-            background: rgba(0, 243, 255, 0.1);
-            padding: 2px 6px;
-            border-radius: 4px;
+        .solution-step {
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+            padding: 12px 0;
         }
 
-        .task-box { 
-            background: rgba(20, 30, 48, 0.6); 
-            border-left: 4px solid #06b6d4; 
-            padding: 18px; 
-            margin: 18px 0; 
-            border-radius: 0 8px 8px 0; 
+        .solution-step:last-child {
+            border-bottom: none;
         }
 
-        .task-box h4 { 
-            color: #38bdf8; 
-            margin: 0 0 8px 0; 
-            font-size: 1.15rem; 
-            font-family: 'Rajdhani', sans-serif; 
+        /* 5. FOOTER & ACCURATE ALIGNED LINKS */
+        footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px 20px 20px 20px;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9rem;
         }
 
-        .task-formula-callout {
-            display: block;
-            margin: 10px 0;
-            padding: 8px 14px;
-            background: rgba(0, 243, 255, 0.05);
-            border: 1px solid rgba(0, 243, 255, 0.2);
-            border-radius: 6px;
-            font-family: 'Fira Code', monospace;
-            color: #00f3ff;
-            font-size: 0.95rem;
-        }
-
-        footer.author-footer {
-            max-width: 1180px;
-            width: 100%;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 16px 0;
+        .footer-nav {
             display: flex;
+            justify-content: center;
+            gap: 22px;
             flex-wrap: wrap;
-            justify-content: space-between;
+            margin-bottom: 12px;
             align-items: center;
-            gap: 12px;
-            font-size: 0.95rem;
+        }
+
+        .footer-nav a, .footer-modal-trigger {
             color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.2s, text-shadow 0.2s;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .footer-nav a:hover, .footer-modal-trigger:hover {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
+        }
+
+        /* 6. SELF-CONTAINED POLICY MODALS (Zero 404s, Exact Match with Home) */
+        .policy-modal {
+            position: fixed !important;
+            top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
+            width: 100vw !important; height: 100vh !important;
+            background: rgba(4, 7, 15, 0.92) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 99999 !important;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-body {
+            background: linear-gradient(145deg, #0b111e 0%, #060913 100%);
+            border: 2px solid var(--neon-cyan);
+            border-radius: 16px;
+            max-width: 820px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 35px 30px;
+            color: #cbd5e1;
+            box-shadow: 0 0 40px rgba(0, 243, 255, 0.25);
+            line-height: 1.75;
+            position: relative;
+            text-align: left;
+        }
+
+        .modal-body h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-cyan);
+            margin-top: 0;
+            font-size: 1.6rem;
+        }
+
+        .modal-body h3 {
+            color: var(--neon-magenta);
+            font-family: 'Orbitron', sans-serif;
+            margin-top: 24px;
+            margin-bottom: 8px;
+            font-size: 1.15rem;
+        }
+
+        .modal-date {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--neon-green);
+            font-size: 0.9rem;
+            margin-top: -6px;
+            margin-bottom: 16px;
+        }
+
+        .modal-close-btn {
+            background: linear-gradient(180deg, rgba(188, 19, 254, 0.4), rgba(188, 19, 254, 0.15));
+            border: 1px solid var(--neon-magenta);
+            color: #fff;
+            padding: 8px 18px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            float: right;
+            margin-bottom: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close-btn:hover {
+            background: var(--neon-magenta);
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.8);
         }
 
         @media (max-width: 768px) {
-            body {
-                padding: 12px;
-            }
-
-            #simulator-container, .educational-content {
-                padding: 16px;
-            }
-
-            .sim-layout {
-                grid-template-columns: 1fr;
-            }
-
-            .canvas-wrapper {
-                aspect-ratio: 4 / 3;
-            }
-
-            .sim-btn-holo, .btn-aux {
-                width: 100%;
-            }
-
-            .canvas-hud.top-left, .canvas-hud.top-right {
-                padding: 6px 8px;
-                font-size: 0.68rem;
-            }
-
-            .canvas-hud.bottom-bar {
-                gap: 8px;
-                font-size: 0.68rem;
-            }
-
-            footer.author-footer {
-                flex-direction: column;
-                text-align: center;
-            }
+            body { padding: 10px; }
+            #simulator-container, .educational-content { padding: 14px; }
+            .sim-layout { grid-template-columns: 1fr; }
+            .btn-grid { grid-template-columns: 1fr; }
+            .sim-btn.reset-style { grid-column: span 1; }
+            .hud-telemetry { flex-direction: column; align-items: flex-start; }
+            .modal-body { padding: 22px 18px; }
         }
     </style>
 </head>
 <body>
-    
-    <!-- 1. NAVIGATION -->
-    <div class="header-wrapper">
-        <a href="../index.html" class="back-btn">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="19" y1="12" x2="5" y2="12"></line>
-                <polyline points="12 19 5 12 12 5"></polyline>
-            </svg>
-            Back to LuyaliSims
-        </a>
+
+    <!-- 1. HEADER & TOP NAVIGATION -->
+    <header>
+        <nav class="top-nav">
+            <a href="../index.html" class="back-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Back to LuyaliSims
+            </a>
+            <span style="font-family: 'Share Tech Mono', monospace; font-size: 0.85rem; color: #64748b;">
+                MODULE ID: SIM-PHYS-01-MONO
+            </span>
+        </nav>
+        
         <h1>3D Oil Drop Monolayer Simulator</h1>
-    </div>
-
-    <!-- 2. SIMULATOR WORKSPACE -->
-    <div id="simulator-container">
         
-        <div class="sim-toolbar">
-            <span class="sim-subtitle">Holographic Nanoscale Surface Film Visualization</span>
-            <div class="tool-actions">
-                <button onclick="toggleFullScreen()" class="btn-aux">🖵 Full Screen</button>
-                <button id="btn-reset-default" class="btn-aux">
-                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                    Reset Scene
-                </button>
-            </div>
-        </div>
+        <!-- Contextual Summary: 60-80 words guaranteed above the fold -->
+        <p class="lead-summary">
+            Investigate how Lord Rayleigh and Agnes Pockels estimated the microscopic size of a single molecule using macroscopic apparatus. This interactive 3D laboratory simulates a micro-droplet of oleic acid falling onto water dusted with lycopodium powder, dispersing into a film one molecule thick. Adjust droplet volume or circular patch diameter to observe volumetric conservation, molecular alignment, and nanoscale dimension derivations in real-time.
+        </p>
+    </header>
 
-        <div class="sim-layout">
+    <main>
+        <!-- 2. SIMULATOR APP WORKSPACE -->
+        <section id="simulator-container" aria-label="Interactive Simulator Workspace">
             
-            <!-- 3D Canvas Box -->
-            <div class="canvas-wrapper">
-                <div class="holo-overlay"></div>
-                <div id="canvas-container"></div>
-                
-                <!-- HUD Controls Overlay -->
-                <div class="canvas-hud top-left">
-                    <div>🖱️ <strong>Left-Drag:</strong> Orbit</div>
-                    <div>📜 <strong>Scroll:</strong> Zoom</div>
-                    <div>✋ <strong>Right-Drag:</strong> Pan</div>
+            <!-- Telemetry Status Bar -->
+            <div class="hud-telemetry">
+                <div class="telemetry-item">
+                    <span class="tele-label">Status:</span>
+                    <span id="tele-status" class="tele-val">READY</span>
                 </div>
-
-                <div class="canvas-hud top-right">
-                    <div style="color:#00f3ff; font-weight:700; border-bottom:1px solid rgba(0,243,255,0.3); padding-bottom:3px; margin-bottom:4px;">HOLO-SENSOR</div>
-                    <div class="hud-item">
-                        <div class="hud-dot" style="background:#00f3ff; box-shadow:0 0 8px #00f3ff;"></div>
-                        <span>Oleic Acid Monomer</span>
-                    </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Drop Volume (V):</span>
+                    <span id="tele-volume" class="tele-val">0.065 mm³</span>
                 </div>
-
-                <div class="canvas-hud bottom-bar">
-                    <div class="hud-item">
-                        <div class="hud-dot" style="background:#00f3ff; box-shadow:0 0 6px #00f3ff;"></div>
-                        <span>3D Spherical Drop</span>
-                    </div>
-                    <div class="hud-item">
-                        <div class="hud-dot" style="background:#bc13fe; box-shadow:0 0 6px #bc13fe;"></div>
-                        <span>1-Molecule Monolayer</span>
-                    </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Patch Area (A):</span>
+                    <span id="tele-area" class="tele-val pink">260.16 cm²</span>
                 </div>
-
-                <div id="canvas-prompt">
-                    Adjust variables, then tap "Execute Experiment"
+                <div class="telemetry-item">
+                    <span class="tele-label">Molecule Thickness (t):</span>
+                    <span id="tele-thickness" class="tele-val green">2.50 nm</span>
                 </div>
             </div>
 
-            <!-- Controls & Live Calculations -->
-            <div class="controls-panel">
-                
-                <!-- Variable Coupling Note -->
-                <div style="background:rgba(0,243,255,0.06); border:1px solid rgba(0,243,255,0.25); border-radius:8px; padding:10px 12px; font-size:0.8rem; color:#38bdf8; display:flex; gap:8px;">
-                    <span style="font-size:1.1rem;">🔗</span>
-                    <span><strong>Coupled Dimensions:</strong> Volume is conserved based on a constant single-molecule height (~2.5 nm).</span>
+            <div class="sim-layout">
+                <!-- 3D Holographic Canvas Display -->
+                <div class="canvas-wrapper" id="canvasFrame">
+                    <div class="canvas-overlay-guide">
+                        <span>🖱️ Left-Drag: Orbit | 📜 Wheel: Zoom | ✋ Right-Drag: Pan</span>
+                    </div>
+                    <div id="canvas-prompt-badge">Adjust sliders or tap "Execute Experiment"</div>
+                    <div id="webgl-viewport"></div>
                 </div>
 
-                <!-- Step 1: Droplet -->
-                <div class="control-card">
-                    <div class="control-card-header">
-                        <div class="badge-step badge-cyan">1</div>
-                        <strong style="color:#fff; font-size:0.95rem;">Spherical Drop Diameter (d)</strong>
-                    </div>
+                <!-- 3D Controls Console -->
+                <div class="controls-panel">
+                    <h3 class="panel-heading">Kinetic & Geometric Controls</h3>
+
                     <div class="control-group">
-                        <div class="control-label-row">
-                            <span style="color:#94a3b8; font-size:0.85rem;">Micro-droplet</span>
-                            <span id="val-diameter" class="font-mono val-pill" style="color:#00f3ff; border-color:rgba(0,243,255,0.3);">0.50 mm</span>
-                        </div>
-                        <input type="range" id="input-diameter" min="0.2" max="1.0" step="0.01" value="0.5" class="slider-cyan">
+                        <label for="input-diameter">
+                            Droplet Diameter (d):
+                            <span id="val-diameter">0.50 mm</span>
+                        </label>
+                        <input type="range" id="input-diameter" min="0.20" max="1.00" step="0.01" value="0.50">
                     </div>
-                </div>
 
-                <!-- Step 2: Monolayer Patch -->
-                <div class="control-card">
-                    <div class="control-card-header">
-                        <div class="badge-step badge-magenta">2</div>
-                        <strong style="color:#fff; font-size:0.95rem;">Spread Patch Diameter (D)</strong>
-                    </div>
                     <div class="control-group">
-                        <div class="control-label-row">
-                            <span style="color:#94a3b8; font-size:0.85rem;">Basin Film</span>
-                            <span id="val-patch" class="font-mono val-pill" style="color:#e580ff; border-color:rgba(188,19,254,0.3);">18.2 cm</span>
+                        <label for="input-patch">
+                            Spread Patch Diameter (D):
+                            <span id="val-patch" class="magenta">18.2 cm</span>
+                        </label>
+                        <input type="range" id="input-patch" min="5.0" max="40.0" step="0.1" value="18.2">
+                    </div>
+
+                    <!-- Live Real-Time Conversion Card -->
+                    <div class="hud-summary-card">
+                        <div class="hud-summary-row">
+                            <span>Volumetric Form:</span>
+                            <strong id="card-vol-metric">6.545 x 10⁻⁵ cm³</strong>
                         </div>
-                        <input type="range" id="input-patch" min="5.0" max="40.0" step="0.1" value="18.2" class="slider-magenta">
+                        <div class="hud-summary-row">
+                            <span>Patch Geometry:</span>
+                            <strong id="card-area-metric">260.16 cm²</strong>
+                        </div>
+                        <div class="hud-summary-row">
+                            <span>Computed Thickness (t):</span>
+                            <strong style="color: var(--neon-green);" id="card-t-metric">2.50 x 10⁻⁷ cm (2.50 nm)</strong>
+                        </div>
+                    </div>
+
+                    <!-- Action Controls -->
+                    <div class="btn-grid">
+                        <button id="runBtn" class="sim-btn">
+                            <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                            </svg>
+                            Execute Experiment
+                        </button>
+
+                        <button id="fullscreenBtn" class="sim-btn secondary">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                            </svg>
+                            Fullscreen
+                        </button>
+
+                        <button id="resetBtn" class="sim-btn reset-style">
+                            Reset Parameters to Default
+                        </button>
                     </div>
                 </div>
-
-                <!-- Run Simulation Button -->
-                <button id="btn-drop" class="sim-btn-holo">
-                    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
-                    Execute Experiment
-                </button>
-
-                <!-- Calculations HUD -->
-                <div class="hud-analysis-box">
-                    <div class="hud-header">
-                        <span style="width:7px; height:7px; border-radius:50%; background:#00f3ff; display:inline-block; box-shadow:0 0 8px #00f3ff;"></span>
-                        Real-Time Analysis
-                    </div>
-
-                    <div class="hud-data-row">
-                        <div>
-                            <div style="font-size:0.8rem; color:#cbd5e1;">Drop Volume <span class="font-mono" style="color:#00f3ff;">(V)</span></div>
-                            <div class="hud-formula font-mono">V = 4/3 &pi; (d/2)³</div>
-                        </div>
-                        <div style="text-align:right;">
-                            <div id="calc-volume" class="font-mono" style="color:#00f3ff; font-weight:600; font-size:1rem;">0.065</div>
-                            <div style="font-size:0.65rem; color:#64748b;">mm³</div>
-                        </div>
-                    </div>
-
-                    <div class="hud-data-row">
-                        <div>
-                            <div style="font-size:0.8rem; color:#cbd5e1;">Patch Area <span class="font-mono" style="color:#bc13fe;">(A)</span></div>
-                            <div class="hud-formula font-mono">A = &pi; (D/2)²</div>
-                        </div>
-                        <div style="text-align:right;">
-                            <div id="calc-area" class="font-mono" style="color:#e580ff; font-weight:600; font-size:1rem;">260.16</div>
-                            <div style="font-size:0.65rem; color:#64748b;">cm²</div>
-                        </div>
-                    </div>
-
-                    <div class="hud-final-metric">
-                        <div>
-                            <div style="font-size:0.9rem; color:#fff; font-weight:700;">Molecule Length <span class="font-mono" style="color:#10b981;">(t)</span></div>
-                            <div class="hud-formula font-mono">t = V / A (Conserved)</div>
-                        </div>
-                        <div style="text-align:right;">
-                            <div id="calc-thickness" class="font-mono" style="color:#10b981; font-weight:700; font-size:1.45rem; text-shadow:0 0 12px rgba(16,185,129,0.45);">2.50</div>
-                            <div style="font-size:0.7rem; color:#059669; font-weight:600;">nanometers (nm)</div>
-                        </div>
-                    </div>
-                </div>
-
             </div>
+        </section>
 
+        <!-- 3. SAFE AD PLACEMENT SLOT -->
+        <div class="ad-slot-wrapper">
+            <div class="ad-disclaimer">Advertisement</div>
+            <div class="ad-box-placeholder">
+                <!-- Google AdSense Responsive Unit Goes Here -->
+                <span>[AdSense Responsive Display Unit - Fixed Safe Zone]</span>
+            </div>
         </div>
 
-    </div>
+        <!-- 4. EDUCATIONAL REFERENCE ARTICLE -->
+        <article class="educational-content">
+            <section>
+                <h2>How to Operate the Simulator</h2>
+                <p>
+                    This virtual laboratory provides a complete 3D interactive model of an oleic acid monolayer film on a water surface. Use the following steps to explore the experiment:
+                </p>
+                <ul>
+                    <li><strong>Droplet Diameter Slider:</strong> Adjust the diameter (d) of the initial spherical drop in millimetres. Notice how increasing the drop volume automatically recalculates the conjugate patch diameter needed to maintain a constant single-molecule height.</li>
+                    <li><strong>Spread Patch Diameter Slider:</strong> Alternately modify the spread monolayer diameter (D) in centimetres. The simulator will back-calculate the required spherical droplet diameter.</li>
+                    <li><strong>Execute Experiment Button:</strong> Triggers the dynamic delivery of the micro-droplet. Watch the 3D droplet drop onto the water, generating a surface tension shockwave, pushing aside lycopodium particles, and dispersing into a flat monomolecular disc.</li>
+                    <li><strong>Camera Control:</strong> Left-click and drag across the viewport to orbit the camera, scroll to zoom in close to see individual oleic acid molecular chains, and right-click drag to pan the camera target.</li>
+                    <li><strong>Reset Button:</strong> Restores all physical parameters to the baseline calibrated state (d = 0.50 mm, D = 18.2 cm).</li>
+                </ul>
+            </section>
 
-    <!-- 3. EDUCATIONAL CONTENT SECTION -->
-    <div class="educational-content">
-        <h2>How to Use This Simulator</h2>
-        <p>Use the sliders to adjust either the <strong>Droplet Diameter (d)</strong> or the <strong>Patch Diameter (D)</strong>. Because the molecular length of oleic acid is an unvarying physical constant, modifying one dimension computes the conjugate value instantly.</p>
-        <p>Click <strong>Execute Experiment</strong> to launch the 3D falling drop. Upon hitting the water, it spreads outwards into a thin monolayer disc. Left-click/drag on the scene to orbit, scroll to zoom in close to see the individual molecular instances, and right-drag to pan.</p>
+            <section>
+                <h2>Scientific Theory & Working Principles</h2>
+                <p>
+                    Long before the invention of transmission electron microscopy (TEM) or atomic force microscopy (AFM), nineteenth-century physicists sought accessible empirical methods to determine the physical size of molecules. In 1890, Lord Rayleigh, building on observations made by German independent scientist Agnes Pockels, devised the oil-on-water monolayer technique.
+                </p>
+                <p>
+                    The experiment exploits the amphiphilic nature of <strong>oleic acid (C17H33COOH)</strong>. Each oleic acid molecule possesses two chemically distinct regions:
+                </p>
+                <ul>
+                    <li>A <strong>hydrophilic carboxyl head group (-COOH)</strong> that forms strong hydrogen bonds with underlying water molecules.</li>
+                    <li>A <strong>hydrophobic hydrocarbon tail (C17H33-)</strong> that repels polar water and extends vertically into the air.</li>
+                </ul>
+                <p>
+                    When a diluted drop of oleic acid dissolved in a volatile solvent (such as ethanol or petroleum ether) is placed onto a surface lightly dusted with lycopodium powder, the solvent rapidly evaporates. The oleic acid molecules disperse across the surface, repelling the lycopodium powder radially outward. Because the hydrophobic tails repel water while heads cling to it, molecules cannot easily form multi-layered stacks; instead, they stand shoulder-to-shoulder, creating a film exactly <strong>one molecule thick</strong> (a monomolecular layer or monolayer).
+                </p>
+            </section>
 
-        <h2>The Theory Behind the Oil Drop Experiment</h2>
-        <p>Devised by Lord Rayleigh and refined by Agnes Pockels, this classical experiment allows one to estimate the dimension of a single molecule using basic laboratory apparatus (pipettes and shallow basins).</p>
-        <p>Oleic acid molecules possess a hydrophilic (water-attracting) carboxyl head and a hydrophobic (water-repelling) hydrocarbon tail. When placed onto water dusted with lycopodium powder, the molecules stand vertically side-by-side, forming a layer exactly <strong>one molecule thick</strong>.</p>
-        
-        <h3>The Formula Used</h3>
-        <p>The calculation is rooted in the <em>Principle of Conservation of Volume</em>:</p>
-        <ul>
-            <li><strong>Volume of the Drop (V):</strong> V = <sup>4</sup>/<sub>3</sub> &pi; (d/2)<sup>3</sup></li>
-            <li><strong>Area of the Patch (A):</strong> A = &pi; (D/2)<sup>2</sup></li>
-            <li><strong>Thickness of one molecule (t):</strong> Modeling the monolayer as a flat cylinder of height <em>t</em>, V = A &times; t &rArr; <strong>t = V / A</strong>.</li>
-        </ul>
-        <p>Typical experimental results yield approximately <strong>2.5 &times; 10<sup>-7</sup> cm (2.5 nm)</strong>, establishing nanoscale measurements without electron microscopy.</p>
-        
-        <h2>Guided Exercises for Students</h2>
+            <section>
+                <h2>Mathematical Foundations & Formulas</h2>
+                <p>
+                    The quantitative foundation of this experiment relies directly on the <strong>Law of Conservation of Volume</strong>. The volume of the initial macroscopic sphere must equal the volume of the resulting macroscopic cylindrical disc:
+                </p>
+                <div class="formula-box">
+                    Formula 1: Volume of Spherical Droplet (V)<br>
+                    V = (4 / 3) x π x r³ = (4 / 3) x π x (d / 2)³ = (π / 6) x d³<br><br>
+                    
+                    Formula 2: Area of Circular Monolayer Patch (A)<br>
+                    A = π x R² = π x (D / 2)² = (π / 4) x D²<br><br>
+                    
+                    Formula 3: Thickness of One Molecule (t)<br>
+                    V_drop = V_patch = A x t  ==>  t = V / A<br><br>
+                    
+                    Formula 4: Solution Dilution Correction (Laboratory Practice)<br>
+                    If an oleic acid solution is diluted in two stages by ratio 1:N each time:<br>
+                    Concentration (C) = (1 / N) x (1 / N) = 1 / N²<br>
+                    Actual Volume of Pure Oleic Acid = V_drop x C
+                </div>
+                <p>
+                    Because the monolayer is one molecule thick, the calculated cylindrical thickness <em>t</em> represents the longitudinal length of an oleic acid molecule (approximately 2.5 x 10⁻⁷ cm or 2.5 nm).
+                </p>
+            </section>
 
-        <!-- Task 1 -->
-        <div class="task-box">
-            <h4>Task 1: Conservation of Volume Across Geometries</h4>
-            <p><strong>Objective:</strong> Prove that the volumetric displacement of oil remains identical regardless of geometric transformation.<br>
-            <strong>Action:</strong> Set a droplet diameter of <strong>d = 0.50 mm</strong> and click <strong>"Execute Experiment"</strong>. Orbit the camera to view both the reference droplet and the spread basin.<br>
-            <strong>Observation & Analysis:</strong> The oil transforms from a compact 3D sphere into a broad 2D disc. Despite this radical change in shape, the total molecular volume is completely conserved: 
-            <span class="task-formula-callout">V<sub>drop</sub> = V<sub>patch</sub> = A &times; t</span></p>
-        </div>
+            <section>
+                <h2>Real-World Engineering & Industrial Applications</h2>
+                <p>
+                    The principles underlying monomolecular spreading and self-assembly extend far beyond classical classroom demonstrations:
+                </p>
+                <ul>
+                    <li><strong>Langmuir-Blodgett Thin Films in Electronics:</strong> In modern semiconductor manufacturing, molecular monolayers are transferred onto solid substrates to construct ultrathin dielectric gates, organic light-emitting diodes (OLEDs), and molecular switches.</li>
+                    <li><strong>Evaporation Suppression in Water Reservoirs:</strong> Spreading biodegradable monomolecular films (such as cetyl alcohol) over arid-region open-air reservoirs reduces water evaporation by up to 35% without blocking dissolved oxygen transfer necessary for aquatic ecosystems.</li>
+                    <li><strong>Biological Membranes & Targeted Drug Delivery:</strong> Cellular life depends on lipid bilayers—two opposing monolayers functioning as selectively permeable membranes. Synthetic liposomes engineered from lipid monolayers are used to encapsulate pharmaceutical drugs, targeting specific cell receptors.</li>
+                    <li><strong>Lubrication and Tribology:</strong> High-performance boundary lubricants depend on single-molecule surfactant layers chemically bonded to metal gears, preventing catastrophic metal-on-metal wear during cold starts.</li>
+                </ul>
+            </section>
 
-        <!-- Task 2 -->
-        <div class="task-box">
-            <h4>Task 2: Invariance of Single-Molecule Height (t)</h4>
-            <p><strong>Objective:</strong> Demonstrate why molecular thickness does not depend on the macroscopic volume used.<br>
-            <strong>Action:</strong> Sweep the <em>Droplet Diameter (d)</em> slider across multiple values (e.g., <strong>0.30 mm</strong>, <strong>0.60 mm</strong>, and <strong>0.90 mm</strong>). Observe the <em>Molecule Length (t)</em> readout in the Real-Time Analysis HUD.<br>
-            <strong>Observation & Analysis:</strong> Notice that the calculated thickness remains fixed at <strong>2.50 nm</strong>. Because molecular length is a physical constant determined by chemical bonds (the 18-carbon chain of oleic acid), adding more oil merely enlarges the surface area (A) rather than stacking molecules into thicker layers.</p>
-        </div>
+            <section>
+                <h2>Practice Problems & Diagnostic Tasks</h2>
+                <p>Test your quantitative comprehension using the five laboratory exercises below:</p>
 
-        <!-- Task 3 -->
-        <div class="task-box">
-            <h4>Task 3: Non-Linear Scaling Law (D &prop; d<sup>1.5</sup>)</h4>
-            <p><strong>Objective:</strong> Investigate the geometric relationship between the drop diameter (d) and patch diameter (D).<br>
-            <strong>Action:</strong> Double the droplet diameter from <strong>0.40 mm</strong> to <strong>0.80 mm</strong>, and record the corresponding patch diameter (D) in both states.<br>
-            <strong>Observation & Analysis:</strong> When d doubles (2&times;), the patch diameter does <em>not</em> simply double; it increases by a factor of approximately 2<sup>1.5</sup> &approx; 2.83 times!
-            <span class="task-formula-callout">Since V &prop; d<sup>3</sup> and A = (&pi;/4) D<sup>2</sup> = V / t &prop; d<sup>3</sup> &rArr; D &prop; d<sup>3/2</sup> (or d<sup>1.5</sup>)</span>
-            This non-linear scaling demonstrates how three-dimensional cubic volume expansion drives two-dimensional surface dispersion.</p>
-        </div>
+                <div class="task-card">
+                    <div class="task-title">Task 1: Basic Parameter Calculation</div>
+                    <p>
+                        A micro-pipette produces an oleic acid droplet with a diameter of <strong>d = 0.48 mm</strong>. When placed on water, it spreads into a circular film with diameter <strong>D = 17.5 cm</strong>. Calculate the volume of the droplet in cm³, the area of the patch in cm², and the resulting molecular thickness in nanometres (nm).
+                    </p>
+                </div>
 
-        <!-- Task 4 -->
-        <div class="task-box">
-            <h4>Task 4: Manual Unit Conversion & Thickness Calculation</h4>
-            <p><strong>Objective:</strong> Master laboratory unit conversions from millimetres and centimetres to nanometres.<br>
-            <strong>Action:</strong> Set <strong>d = 0.60 mm</strong> and note the resulting patch diameter <strong>D = 23.9 cm</strong>. Calculate the thickness by hand using standard scientific notation without looking at the final metric box:<br>
-            1. Find volume: V = <sup>4</sup>/<sub>3</sub> &pi; (0.06 cm / 2)<sup>3</sup> cm<sup>3</sup><br>
-            2. Find area: A = &pi; (23.9 cm / 2)<sup>2</sup> cm<sup>2</sup><br>
-            3. Find thickness: t = (V / A) cm, then multiply by 10<sup>7</sup> to convert into nanometres (nm).<br>
-            <strong>Observation & Analysis:</strong> Compare your manual step-by-step result with the HUD readout to verify how microscopic dimensions are deduced purely from macro-scale ruler measurements.</p>
-        </div>
+                <div class="task-card">
+                    <div class="task-title">Task 2: Proportional Scaling Law</div>
+                    <p>
+                        Assuming the physical length of an oleic acid molecule (t) remains constant at 2.50 nm, demonstrate algebraically how the patch diameter (D) scales with droplet diameter (d). If a student doubles the droplet diameter from 0.40 mm to 0.80 mm, by what numerical factor will the patch diameter increase?
+                    </p>
+                </div>
 
-        <!-- Task 5 -->
-        <div class="task-box">
-            <h4>Task 5: Evaluating Experimental Assumptions & Error Sources</h4>
-            <p><strong>Objective:</strong> Identify critical assumptions made during the physical laboratory experiment.<br>
-            <strong>Action:</strong> Zoom closely into the holographic patch molecules in the 3D scene and compare the ideal simulation with a real water trough.<br>
-            <strong>Observation & Analysis:</strong> The calculation assumes three major physical conditions:
-            <ul style="margin: 8px 0 0 20px; padding: 0; list-style-type: disc;">
-                <li><strong>Strict Monolayer:</strong> Assumes oil spreads until it is exactly 1 molecule thick with no overlapping bilayers or unspread lenses.</li>
-                <li><strong>Geometric Packing:</strong> Assumes molecules are tightly packed, upright cylinders with zero voids or inter-molecular gaps.</li>
-                <li><strong>Circular Symmetry:</strong> Assumes surface tension and lycopodium dust resistance produce a perfect circle rather than an irregular polygon.</li>
-            </ul>
-            <p style="margin-top: 10px;"><em>Critical Thinking:</em> If surface contamination on the water prevents the oil from spreading fully, would your experimental estimate for molecular thickness (t) be <strong>larger</strong> or <strong>smaller</strong> than the true value? (Answer: <strong>Larger</strong>, because a smaller measured area A in t = V / A artificially inflates the computed thickness).</p>
-        </div>
+                <div class="task-card">
+                    <div class="task-title">Task 3: Dilution Series Correction</div>
+                    <p>
+                        In a school lab, 1.0 cm³ of pure oleic acid is dissolved in alcohol to make 500 cm³ of solution. Then, 1.0 cm³ of this solution is diluted again to 500 cm³ with alcohol. A burette delivers 40 drops of this second mixture per cm³. One drop is dispensed onto lycopodium powder, forming a patch of diameter 14.0 cm. Calculate the estimated length of an oleic acid molecule.
+                    </p>
+                </div>
 
-        <h2>Real World Applications</h2>
-        <ul>
-            <li><strong>Reservoir Water Conservation:</strong> Monomolecular films spread over large open reservoirs significantly suppress evaporation losses in dry climates without cutting off aquatic aeration.</li>
-            <li><strong>Biological Bilayers:</strong> Cell membranes are lipid bilayers consisting of two opposing monolayers, functioning as selective barriers in every living organism.</li>
-            <li><strong>Anti-Reflective Optics:</strong> Langmuir-Blodgett monolayers applied to lenses create destructive interference for incoming glare.</li>
-        </ul>
-    </div>
+                <div class="task-card">
+                    <div class="task-title">Task 4: Reverse Engineering Required Volume</div>
+                    <p>
+                        A researcher wishes to coat an optical wafer of diameter <strong>D = 30.0 cm</strong> with a monolayer of a specialized surfactant whose molecular length is known to be <strong>t = 1.80 nm</strong>. Assuming 100% coverage with zero voids, what volume of surfactant (in mm³) must be dispensed?
+                    </p>
+                </div>
 
-    <!-- Inline Footer -->
-    <footer class="author-footer">
-        <div>Designed by <strong style="color: #00f3ff; background:transparent; padding:0;">Ian Luyali</strong></div>
-        <div style="display:flex; gap:14px; flex-wrap:wrap;">
-            <span>📞 0727987669</span>
-            <span>✉️ luyashliz@gmail.com</span>
-        </div>
-        <div style="font-size:0.8rem; color:#64748b; font-style:italic;">
-            Custom educational simulations & mechanics interactive modules.
-        </div>
+                <div class="task-card">
+                    <div class="task-title">Task 5: Systematic Error Analysis</div>
+                    <p>
+                        A student performs the experiment and calculates a molecular thickness of <strong>t = 5.60 nm</strong>, which is more than double the accepted literature value (~2.5 nm). Name two plausible experimental systematic errors that could cause the calculated thickness to be significantly greater than the actual value, and explain the physical mechanism for each.
+                    </p>
+                </div>
+
+                <!-- Collapsible Solutions -->
+                <details>
+                    <summary>Click to Reveal Solutions and Step-by-Step Proofs</summary>
+                    
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 1:</strong></p>
+                        <p>
+                            1. Convert droplet diameter to cm: d = 0.48 mm = 0.048 cm.<br>
+                            Radius r = 0.048 / 2 = 0.024 cm.<br>
+                            Volume V = (4 / 3) x π x (0.024)³ ≈ <strong>5.79 x 10⁻⁵ cm³</strong> (or 0.0579 mm³).<br>
+                            2. Area of circular patch: Radius R = 17.5 / 2 = 8.75 cm.<br>
+                            Area A = π x (8.75)² ≈ <strong>240.53 cm²</strong>.<br>
+                            3. Thickness t = V / A = (5.79 x 10⁻⁵ cm³) / (240.53 cm²) ≈ 2.407 x 10⁻⁷ cm.<br>
+                            Convert to nanometres: (2.407 x 10⁻⁷ cm) x (10⁷ nm / cm) = <strong>2.41 nm</strong>.
+                        </p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 2:</strong></p>
+                        <p>
+                            1. Droplet volume: V = (π / 6) x d³.<br>
+                            2. Patch area: A = (π / 4) x D².<br>
+                            3. Since t = V / A, we have: (π / 6) x d³ = [(π / 4) x D²] x t.<br>
+                            Rearranging for D:<br>
+                            D² = [4 x (π / 6) x d³] / (π x t) = (2 / 3t) x d³  ==>  <strong>D ∝ d^(1.5) (or d^(3/2))</strong>.<br>
+                            4. If d is doubled (factor of 2):<br>
+                            New diameter D_new = D_old x 2^(1.5) = D_old x 2.828.<br>
+                            The patch diameter increases by a factor of <strong>2.83</strong> (or 2√2).
+                        </p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 3:</strong></p>
+                        <p>
+                            1. First dilution ratio = 1 / 500.<br>
+                            Second dilution ratio = 1 / 500.<br>
+                            Overall concentration C = (1 / 500) x (1 / 500) = 1 / 250,000.<br>
+                            2. Volume of one solution drop = 1 cm³ / 40 = 0.025 cm³.<br>
+                            3. Actual volume of pure oleic acid in one drop:<br>
+                            V_acid = 0.025 cm³ / 250,000 = 1.00 x 10⁻⁷ cm³.<br>
+                            4. Patch Area: Radius R = 14.0 / 2 = 7.0 cm.<br>
+                            A = π x (7.0)² = 49π ≈ 153.94 cm².<br>
+                            5. Molecular thickness t = V_acid / A = (1.00 x 10⁻⁷ cm³) / 153.94 cm² ≈ 6.50 x 10⁻¹⁰ cm.<br>
+                            Convert to nanometres: 6.50 x 10⁻¹⁰ cm x 10⁷ nm/cm = <strong>0.0065 nm (or 6.5 x 10⁻³ nm)</strong>.<br>
+                            <em>Note:</em> In practical laboratory settings, if the patch area is smaller than expected due to excessive lycopodium dust resistance or premature evaporation, calculated values deviate, highlighting the need for carefully calibrated dilutions.
+                        </p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 4:</strong></p>
+                        <p>
+                            1. Wafer radius R = 30.0 / 2 = 15.0 cm.<br>
+                            Wafer Area A = π x (15.0)² = 225π ≈ 706.86 cm².<br>
+                            2. Convert thickness to cm: t = 1.80 nm = 1.80 x 10⁻⁷ cm.<br>
+                            3. Required volume V = A x t = 706.86 cm² x (1.80 x 10⁻⁷ cm) ≈ 1.272 x 10⁻⁴ cm³.<br>
+                            4. Convert cm³ to mm³ (1 cm³ = 1000 mm³):<br>
+                            V = 1.272 x 10⁻⁴ x 1000 = <strong>0.127 mm³</strong>.
+                        </p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 5:</strong></p>
+                        <p>
+                            Since t = V / A, any error that causes the measured area A to be smaller than the true spread, or the volume V to be overestimated, results in an inflated thickness t:<br>
+                            1. <strong>Incomplete Spreading (Bi-layer / Lens Formation):</strong> If the water surface is contaminated with trace oils or if excess lycopodium powder resists surface expansion, the oleic acid cannot spread completely into a single-molecule layer. Pockets remain 2 or more molecules thick, shrinking the measured area A and causing t to be calculated as significantly larger than normal.<br>
+                            2. <strong>Premature Solvent Evaporation in Pipette:</strong> If the volatile carrier solvent evaporates while inside the burette tip prior to dispensing, the delivered drop contains a higher concentration of pure oleic acid than calculated in V_drop x C. Using the nominal smaller concentration underestimates pure volume, leading to an erroneously high calculated value for t.
+                        </p>
+                    </div>
+                </details>
+            </section>
+        </article>
+    </main>
+
+    <!-- 5. SYNCHRONIZED COMPLIANCE FOOTER (Zero 404s, Exact Alignment with Home) -->
+    <footer>
+        <nav class="footer-nav">
+            <a href="../index.html">Home</a>
+            <a href="../index.html#about-section">About Us</a>
+            <button type="button" class="footer-modal-trigger" onclick="openSimModal('simPrivacyModal')">Privacy Policy</button>
+            <button type="button" class="footer-modal-trigger" onclick="openSimModal('simTermsModal')">Terms of Service</button>
+            <a href="../index.html#contact-section">Contact Us</a>
+            <a href="https://forms.gle/fYxxaNKAh21dPUoBA" target="_blank" rel="noopener noreferrer">Simulator Suggestions</a>
+        </nav>
+        <p>&copy; 2026 LuyaliSims | Engineered by Click & Draft | Dedicated to Open STEM Education</p>
     </footer>
 
-    <!-- 4. THREE.JS & INTERACTIVE ENGINE -->
+    <!-- 6. IDENTICAL PRIVACY POLICY MODAL (Matches Home Exactly) -->
+    <div id="simPrivacyModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="privacyTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeSimModal('simPrivacyModal')">Close [✕]</button>
+            <h2 id="privacyTitle">Privacy Policy</h2>
+            <p class="modal-date">Last Updated: September 2026</p>
+            <p>Welcome to LuyaliSims. We respect your privacy and are committed to protecting your personal data. This privacy policy explains how we treat information when you interact with our educational simulators.</p>
+            
+            <h3>1. Educational Purpose & Information Collection</h3>
+            <p>LuyaliSims is a free educational portal. We do not require account registration, passwords, or personal login information to run any simulation. All simulation calculations occur locally within your browser using client-side JavaScript.</p>
+
+            <h3>2. Google AdSense & Third-Party Cookies</h3>
+            <p>We may display advertisements served by Google AdSense to fund our free educational tools. Google, as a third-party vendor, uses cookies to serve ads on our site based on users' visits to this and other sites on the Internet.</p>
+            <ul>
+                <li>Google's use of advertising cookies enables it and its partners to serve ads based on your visit to LuyaliSims and other sites.</li>
+                <li>Users may opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" style="color: var(--neon-cyan);">Google Ads Settings</a>.</li>
+            </ul>
+
+            <h3>3. Log Files & Analytics</h3>
+            <p>Like standard websites, our hosting servers collect anonymous log records (including IP addresses, browser types, and timestamp references) to monitor server uptime, fix script errors, and optimize simulator performance.</p>
+
+            <h3>4. Children's Online Privacy (COPPA Compliance)</h3>
+            <p>Our educational simulators are built for students and educators of all ages. We do not knowingly solicit or collect personally identifiable information from children under 13.</p>
+
+            <h3>5. Contact Regarding Privacy</h3>
+            <p>If you have any questions regarding this policy, contact us at: <a href="mailto:luyashliz@gmail.com" style="color: var(--neon-cyan);">luyashliz@gmail.com</a>.</p>
+        </div>
+    </div>
+
+    <!-- 7. IDENTICAL TERMS OF SERVICE MODAL (Matches Home Exactly) -->
+    <div id="simTermsModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="termsTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeSimModal('simTermsModal')">Close [✕]</button>
+            <h2 id="termsTitle">Terms of Service</h2>
+            <p class="modal-date">Effective Date: September 2026</p>
+
+            <h3>1. Permitted Educational Use</h3>
+            <p>All interactive models, simulations, practice problems, and laboratory worksheets on LuyaliSims are made freely available for classroom demonstrations, academic study, tutoring, and self-paced individual learning.</p>
+
+            <h3>2. Intellectual Property</h3>
+            <p>The code architecture, layout designs, and custom interactive engines are the intellectual property of Ian Luyali and Click & Draft. You may use our simulators online in academic settings, but mirroring or re-hosting our code for commercial resale without permission is prohibited.</p>
+
+            <h3>3. Disclaimer of Scientific Warranty</h3>
+            <p>While simulations are engineered to accurately replicate classical mechanics, thermodynamics, and electronics, they are provided as conceptual learning aids. LuyaliSims is not liable for outcomes in real-world high-voltage or hazardous laboratory environments constructed without professional teacher supervision.</p>
+
+            <h3>4. Updates to Terms</h3>
+            <p>We reserve the right to refine these terms as new laboratory modules and features are introduced.</p>
+        </div>
+    </div>
+
+    <!-- 8. SIMULATOR CORE SCRIPT & INTERACTIVE 3D ENGINE -->
     <script>
-        const OLEIC_ACID_THICKNESS_CM = 2.5e-7; 
-        
-        const container = document.getElementById('canvas-container');
+        // Modal Handlers (100% homepage parity)
+        function openSimModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeSimModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('policy-modal')) {
+                closeSimModal(e.target.id);
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' || e.key === 'Esc') {
+                document.querySelectorAll('.policy-modal').forEach(m => {
+                    m.style.display = 'none';
+                });
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // Fullscreen Implementation
+        const simContainer = document.getElementById('simulator-container');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                if (simContainer.requestFullscreen) simContainer.requestFullscreen();
+                else if (simContainer.webkitRequestFullscreen) simContainer.webkitRequestFullscreen();
+                fullscreenBtn.innerHTML = 'Exit Screen';
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+                fullscreenBtn.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                    </svg> Fullscreen`;
+            }
+        });
+
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                fullscreenBtn.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                    </svg> Fullscreen`;
+            }
+        });
+
+        /* --- 3D MONOLAYER INTERACTIVE ENGINE (Three.js) --- */
+        const OLEIC_ACID_THICKNESS_CM = 2.50e-7; // 2.5 nm
+        const viewport = document.getElementById('webgl-viewport');
         const inputDiameter = document.getElementById('input-diameter');
         const valDiameter = document.getElementById('val-diameter');
         const inputPatch = document.getElementById('input-patch');
         const valPatch = document.getElementById('val-patch');
-        const btnDrop = document.getElementById('btn-drop');
-        const btnResetDefault = document.getElementById('btn-reset-default');
-        const canvasPrompt = document.getElementById('canvas-prompt');
+        const runBtn = document.getElementById('runBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const badgePrompt = document.getElementById('canvas-prompt-badge');
 
-        const calcVolume = document.getElementById('calc-volume');
-        const calcArea = document.getElementById('calc-area');
-        const calcThickness = document.getElementById('calc-thickness');
+        const teleStatus = document.getElementById('tele-status');
+        const teleVolume = document.getElementById('tele-volume');
+        const teleArea = document.getElementById('tele-area');
+        const teleThickness = document.getElementById('tele-thickness');
+
+        const cardVolMetric = document.getElementById('card-vol-metric');
+        const cardAreaMetric = document.getElementById('card-area-metric');
+        const cardTMetric = document.getElementById('card-t-metric');
 
         let dropState = 'idle'; // 'idle', 'falling', 'spreading', 'done'
         let fallProgress = 0;
@@ -823,68 +1089,57 @@
         let rippleActive = false;
         let rippleProgress = 0;
 
-        window.toggleFullScreen = () => {
-            const simContainer = document.getElementById('simulator-container');
-            if (!document.fullscreenElement) {
-                simContainer.requestFullscreen().catch((err) => {
-                    alert(`Fullscreen request error: ${err.message}`);
-                });
-            } else {
-                document.exitFullscreen();
-            }
-        };
-
-        // Molecular instancing geometry distribution
-        const MOL_COUNT = 850;
+        // Molecular instanced distribution data
+        const MOL_COUNT = 900;
         const molData = [];
-        const golden_ratio = (1 + Math.sqrt(5)) / 2;
+        const goldenRatio = (1 + Math.sqrt(5)) / 2;
         
         for (let i = 0; i < MOL_COUNT; i++) {
             molData.push({
                 u: Math.random(),
                 v: Math.random(),
-                rFactor: Math.cbrt(Math.random()), 
-                t: (i + 0.5) / MOL_COUNT, 
-                angle: i * Math.PI * 2 * golden_ratio
+                rFactor: Math.cbrt(Math.random()),
+                t: (i + 0.5) / MOL_COUNT,
+                angle: i * Math.PI * 2 * goldenRatio
             });
         }
 
-        // Scene setup
+        // Scene Setup
         const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0x060a12, 0.015);
+        scene.fog = new THREE.FogExp2(0x070a12, 0.018);
 
-        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-        camera.position.set(0, 9, 15);
+        const camera = new THREE.PerspectiveCamera(45, viewport.clientWidth / viewport.clientHeight, 0.1, 1000);
+        camera.position.set(0, 8.5, 14.5);
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
-        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setSize(viewport.clientWidth, viewport.clientHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        renderer.setClearColor(0x000000, 0); 
-        container.appendChild(renderer.domElement);
+        renderer.setClearColor(0x000000, 0);
+        viewport.appendChild(renderer.domElement);
 
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
         controls.dampingFactor = 0.05;
-        controls.maxPolarAngle = Math.PI / 2 - 0.03;
+        controls.maxPolarAngle = Math.PI / 2 - 0.04;
         controls.minDistance = 3.5;
-        controls.maxDistance = 28;
+        controls.maxDistance = 26;
 
         // Holographic Lighting Setup
-        const ambientLight = new THREE.AmbientLight(0x38bdf8, 0.85);
+        const ambientLight = new THREE.AmbientLight(0x38bdf8, 0.9);
         scene.add(ambientLight);
-        
+
         const dirLight = new THREE.DirectionalLight(0x00f3ff, 1.2);
         dirLight.position.set(10, 20, 10);
         scene.add(dirLight);
 
-        const rimLight = new THREE.DirectionalLight(0xbc13fe, 1.5);
+        const rimLight = new THREE.DirectionalLight(0xbc13fe, 1.6);
         rimLight.position.set(-10, -5, -10);
         scene.add(rimLight);
 
-        // Holographic Water Grid Surface
-        const waterGeo = new THREE.PlaneGeometry(40, 40, 40, 40);
+        // Water Basin Grid Surface
+        const waterGeo = new THREE.PlaneGeometry(36, 36, 32, 32);
         const waterMat = new THREE.MeshPhysicalMaterial({
-            color: 0x051626,
+            color: 0x061426,
             roughness: 0.1,
             metalness: 0.8,
             transmission: 0.7,
@@ -896,8 +1151,8 @@
         waterMesh.rotation.x = -Math.PI / 2;
         scene.add(waterMesh);
 
-        // Cyber Grid Lines on Surface
-        const holoGrid = new THREE.GridHelper(40, 40, 0x00f3ff, 0x1e293b);
+        // Holographic Grid lines
+        const holoGrid = new THREE.GridHelper(36, 36, 0x00f3ff, 0x1e293b);
         holoGrid.position.y = 0.01;
         scene.add(holoGrid);
 
@@ -927,7 +1182,7 @@
         const dropReticle = createHoloReticle(-4.5, 0, 0x00f3ff);
         const patchReticle = createHoloReticle(4.5, 0, 0xbc13fe);
 
-        // Holographic materials
+        // Holographic Meshes & Geometries
         const holoGlassOil = new THREE.MeshPhysicalMaterial({
             color: 0x00f3ff,
             emissive: 0x003b46,
@@ -939,48 +1194,48 @@
             opacity: 0.45,
             clearcoat: 1.0
         });
-        
+
         const dropSphereGeo = new THREE.SphereGeometry(1, 32, 32);
         const molGeo = new THREE.SphereGeometry(0.065, 14, 14);
-        
-        const molMat = new THREE.MeshStandardMaterial({ 
+
+        const molMat = new THREE.MeshStandardMaterial({
             color: 0x00f3ff,
-            emissive: 0x0099aa,
+            emissive: 0x008899,
             emissiveIntensity: 0.6,
             roughness: 0.2,
             metalness: 0.8
         });
 
-        // 1. Reference Droplet Group
+        // Reference Droplet Pedestal
         const dropGroup = new THREE.Group();
         dropGroup.position.set(-4.5, 0, 0);
         scene.add(dropGroup);
-        
+
         const refDropMesh = new THREE.Mesh(dropSphereGeo, holoGlassOil);
         dropGroup.add(refDropMesh);
-        
+
         const refMols = new THREE.InstancedMesh(molGeo, molMat, MOL_COUNT);
         dropGroup.add(refMols);
 
         const pedestal = new THREE.Mesh(
-            new THREE.CylinderGeometry(1.2, 1.4, 0.08, 32), 
+            new THREE.CylinderGeometry(1.2, 1.4, 0.08, 32),
             new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.7, roughness: 0.3 })
         );
         pedestal.position.y = 0.04;
         dropGroup.add(pedestal);
 
-        // 2. Falling Droplet Group
+        // Falling Droplet
         const fallingDropGroup = new THREE.Group();
         fallingDropGroup.visible = false;
         scene.add(fallingDropGroup);
-        
+
         const fallDropMesh = new THREE.Mesh(dropSphereGeo, holoGlassOil);
         fallingDropGroup.add(fallDropMesh);
-        
+
         const fallMols = new THREE.InstancedMesh(molGeo, molMat, MOL_COUNT);
         fallingDropGroup.add(fallMols);
 
-        // 3. Monolayer Patch Group
+        // Monolayer Spread Patch
         const patchGroup = new THREE.Group();
         patchGroup.position.set(4.5, 0, 0);
         scene.add(patchGroup);
@@ -1004,7 +1259,7 @@
 
         const ringGeo = new THREE.RingGeometry(0.97, 1.03, 64);
         const patchRing = new THREE.Mesh(
-            ringGeo, 
+            ringGeo,
             new THREE.MeshBasicMaterial({ color: 0xbc13fe, side: THREE.DoubleSide, transparent: true, opacity: 0.85 })
         );
         patchRing.rotation.x = -Math.PI / 2;
@@ -1014,7 +1269,7 @@
 
         // Shockwave Ripple
         const ripple = new THREE.Mesh(
-            new THREE.RingGeometry(0.1, 0.25, 48), 
+            new THREE.RingGeometry(0.1, 0.25, 48),
             new THREE.MeshBasicMaterial({ color: 0x00f3ff, transparent: true, opacity: 0.8, side: THREE.DoubleSide })
         );
         ripple.rotation.x = -Math.PI / 2;
@@ -1025,11 +1280,10 @@
         const dummy = new THREE.Object3D();
 
         function updateMolecules(dropRadius, patchRadiusUnits, spreadFactor) {
-            const usableDropRadius = Math.max(0, dropRadius - 0.07); 
-            
+            const usableDropRadius = Math.max(0, dropRadius - 0.07);
+
             for (let i = 0; i < MOL_COUNT; i++) {
                 const data = molData[i];
-                
                 const phi = Math.acos(2 * data.v - 1);
                 const theta = 2 * Math.PI * data.u;
                 const r = data.rFactor * usableDropRadius;
@@ -1068,7 +1322,7 @@
             const aCm2 = vCm3 / OLEIC_ACID_THICKNESS_CM;
             const rCm = Math.sqrt(aCm2 / Math.PI);
             const DCm = rCm * 2;
-            
+
             inputPatch.value = DCm.toFixed(1);
             updateCalculations();
         }
@@ -1079,7 +1333,7 @@
             const aCm2 = Math.PI * Math.pow(rCm, 2);
             const vCm3 = aCm2 * OLEIC_ACID_THICKNESS_CM;
             const vMm3 = vCm3 * 1000;
-            const rMm = Math.pow(vMm3 / ((4/3)*Math.PI), 1/3);
+            const rMm = Math.pow(vMm3 / ((4/3) * Math.PI), 1/3);
             const dMm = rMm * 2;
 
             inputDiameter.value = dMm.toFixed(2);
@@ -1088,25 +1342,29 @@
 
         function updateCalculations() {
             const dMm = parseFloat(inputDiameter.value);
-            const Dcm = parseFloat(inputPatch.value);
+            const DCm = parseFloat(inputPatch.value);
 
             valDiameter.textContent = `${dMm.toFixed(2)} mm`;
-            valPatch.textContent = `${Dcm.toFixed(1)} cm`;
+            valPatch.textContent = `${DCm.toFixed(1)} cm`;
 
             const rMm = dMm / 2;
             const volumeMm3 = (4 / 3) * Math.PI * Math.pow(rMm, 3);
-            const Rcm = Dcm / 2;
+            const Rcm = DCm / 2;
             const areaCm2 = Math.PI * Math.pow(Rcm, 2);
-            
+
             const volumeCm3 = volumeMm3 / 1000;
             const thicknessCm = volumeCm3 / areaCm2;
             const thicknessNm = thicknessCm * 1e7;
 
-            calcVolume.textContent = volumeMm3.toFixed(3);
-            calcArea.textContent = areaCm2.toFixed(2);
-            calcThickness.textContent = thicknessNm.toFixed(2);
+            teleVolume.textContent = `${volumeMm3.toFixed(3)} mm³`;
+            teleArea.textContent = `${areaCm2.toFixed(2)} cm²`;
+            teleThickness.textContent = `${thicknessNm.toFixed(2)} nm`;
 
-            const dropScale = (dMm / 0.5) * 0.85; 
+            cardVolMetric.textContent = `${volumeCm3.toExponential(3)} cm³`;
+            cardAreaMetric.textContent = `${areaCm2.toFixed(2)} cm²`;
+            cardTMetric.textContent = `${thicknessCm.toExponential(2)} cm (${thicknessNm.toFixed(2)} nm)`;
+
+            const dropScale = (dMm / 0.5) * 0.85;
             refDropMesh.scale.set(dropScale, dropScale, dropScale);
             refDropMesh.position.y = dropScale + 0.12;
             refMols.position.y = dropScale + 0.12;
@@ -1115,10 +1373,10 @@
                 fallDropMesh.scale.set(dropScale, dropScale, dropScale);
             }
 
-            const patchRadiusUnits = (Dcm / 2) * 0.22; 
+            const patchRadiusUnits = (DCm / 2) * 0.22;
             const visualHeight = Math.max(0.02, thicknessNm * 0.006);
             let currentSpread = (dropState === 'done') ? 1 : ((dropState === 'spreading') ? spreadProgress : 0.0001);
-            
+
             patchMesh.scale.set(patchRadiusUnits * currentSpread, visualHeight, patchRadiusUnits * currentSpread);
             patchMesh.position.y = visualHeight / 2;
             patchRing.scale.set(patchRadiusUnits * currentSpread, patchRadiusUnits * currentSpread, 1);
@@ -1138,18 +1396,20 @@
             patchReticle.rotation.y -= 0.004;
 
             if (dropState === 'falling') {
-                fallProgress += 0.038; 
+                fallProgress += 0.038;
                 fallingDropGroup.position.y = 5 - (5 * fallProgress);
-                
+
                 if (fallProgress >= 1) {
                     fallingDropGroup.visible = false;
                     dropState = 'spreading';
                     spreadProgress = 0;
-                    
+                    teleStatus.textContent = "SPREADING FILM";
+                    teleStatus.className = "tele-val pink";
+
                     patchMesh.visible = true;
                     patchRing.visible = true;
                     patchMols.visible = true;
-                    
+
                     rippleActive = true;
                     rippleProgress = 0;
                     ripple.visible = true;
@@ -1159,13 +1419,16 @@
                 if (spreadProgress >= 0.999) {
                     spreadProgress = 1;
                     dropState = 'done';
-                    
-                    btnDrop.disabled = false;
-                    btnDrop.innerHTML = '<svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> Repeat Experiment';
-                    btnDrop.style.background = 'linear-gradient(135deg, #bc13fe, #ec4899)';
-                    btnDrop.style.boxShadow = '0 0 20px rgba(188, 19, 254, 0.5)';
+                    teleStatus.textContent = "MONOLAYER STABLE";
+                    teleStatus.className = "tele-val green";
+
+                    runBtn.disabled = false;
+                    runBtn.innerHTML = `
+                        <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg> Repeat Run`;
                 }
-                updateCalculations(); 
+                updateCalculations();
             }
 
             if (rippleActive) {
@@ -1186,60 +1449,64 @@
         inputDiameter.addEventListener('input', syncFromDrop);
         inputPatch.addEventListener('input', syncFromPatch);
 
-        btnDrop.addEventListener('click', () => {
+        runBtn.addEventListener('click', () => {
             if (dropState === 'idle' || dropState === 'done') {
                 dropState = 'falling';
                 fallProgress = 0;
                 spreadProgress = 0;
-                
+                teleStatus.textContent = "DROPPING";
+                teleStatus.className = "tele-val";
+
                 fallingDropGroup.position.set(4.5, 5, 0);
                 fallingDropGroup.visible = true;
-                
+
                 patchMesh.visible = false;
                 patchRing.visible = false;
                 patchMols.visible = false;
-                
-                if (canvasPrompt) canvasPrompt.style.opacity = '0';
-                
-                btnDrop.disabled = true;
-                btnDrop.innerHTML = '<span>Simulating Surface Kinetics...</span>';
-                btnDrop.style.background = 'linear-gradient(135deg, #0284c7, #00f3ff)';
-                
+
+                badgePrompt.style.opacity = '0';
+
+                runBtn.disabled = true;
+                runBtn.innerHTML = 'Dispensing...';
+
                 updateCalculations();
             }
         });
 
-        btnResetDefault.addEventListener('click', () => {
+        resetBtn.addEventListener('click', () => {
             dropState = 'idle';
             fallProgress = 0;
             spreadProgress = 0;
-            
-            inputDiameter.value = 0.5;
-            syncFromDrop(); 
-            
+            teleStatus.textContent = "ACTIVE";
+            teleStatus.className = "tele-val";
+
+            inputDiameter.value = 0.50;
+            syncFromDrop();
+
             patchMesh.visible = false;
             patchRing.visible = false;
             patchMols.visible = false;
             fallingDropGroup.visible = false;
-            
-            if (canvasPrompt) canvasPrompt.style.opacity = '1';
-            
-            btnDrop.disabled = false;
-            btnDrop.innerHTML = '<svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg> Execute Experiment';
-            btnDrop.style.background = 'linear-gradient(135deg, #00f3ff, #38bdf8)';
-            btnDrop.style.boxShadow = '0 0 20px rgba(0, 243, 255, 0.45)';
 
-            camera.position.set(0, 9, 15);
+            badgePrompt.style.opacity = '1';
+
+            runBtn.disabled = false;
+            runBtn.innerHTML = `
+                <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                </svg> Execute Experiment`;
+
+            camera.position.set(0, 8.5, 14.5);
             controls.target.set(0, 0, 0);
         });
 
-        function onWindowResize() {
-            camera.aspect = container.clientWidth / container.clientHeight;
+        function handleResize() {
+            camera.aspect = viewport.clientWidth / viewport.clientHeight;
             camera.updateProjectionMatrix();
-            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setSize(viewport.clientWidth, viewport.clientHeight);
         }
 
-        window.addEventListener('resize', onWindowResize);
+        window.addEventListener('resize', handleResize);
 
         // Initial launch
         syncFromDrop();
