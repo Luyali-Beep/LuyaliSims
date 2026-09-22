@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stationary Waves Simulator Pro - LuyaliSims</title>
+    
+    <!-- Tailwind CSS for layout utility -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Futuristic Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Rajdhani:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Base Theme from Template */
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: #0a0e17;
+            background-image: radial-gradient(circle at top right, rgba(0, 243, 255, 0.05), transparent 40%),
+                              radial-gradient(circle at bottom left, rgba(188, 19, 254, 0.05), transparent 40%);
+            color: #e2e8f0;
+            margin: 0;
+            padding: 30px;
+            min-height: 100vh;
+        }
+
+        /* NAVIGATION: Futuristic Back Button */
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: rgba(16, 24, 43, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(188, 19, 254, 0.5);
+            color: #e580ff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(188, 19, 254, 0.15);
+            border-color: #bc13fe;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
+            transform: translateX(-5px);
+        }
+
+        .back-btn svg { transition: transform 0.3s ease; }
+        .back-btn:hover svg { transform: translateX(-3px); }
+
+        /* Headings */
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: #00f3ff;
+            text-shadow: 0px 0px 15px rgba(0, 243, 255, 0.3);
+            margin-top: 0;
+            font-size: 2.5rem;
+            text-align: center;
+        }
+        
+        h2, h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: #bc13fe;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        /* THE SIMULATOR APP CONTAINER */
+        #simulator-container {
+            background: rgba(16, 24, 43, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin: 0 auto 40px auto;
+            max-width: 1280px;
+            transition: all 0.3s duration;
+        }
+
+        /* Fullscreen Layout Overrides */
+        #simulator-container:fullscreen {
+            background-color: #0a0e17;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            grid-template-rows: auto 1fr auto;
+            gap: 1.5rem;
+            height: 100vh;
+            max-width: 100vw;
+            overflow-y: auto;
+            border: none;
+        }
+        
+        .fs-header { grid-column: 1 / -1; }
+        #simulator-container:fullscreen .fs-canvas-area { grid-column: 1 / 2; grid-row: 2 / 3; display: flex; flex-direction: column; height: 100%; }
+        #simulator-container:fullscreen .fs-canvas-area canvas { flex-grow: 1; height: auto !important; }
+        #simulator-container:fullscreen .fs-controls-area { grid-column: 2 / 3; grid-row: 2 / 3; display: flex; flex-direction: column; gap: 1rem; overflow-y: auto;}
+
+        /* Canvas optimizations */
+        #waveCanvas { touch-action: none; }
+
+        /* EDUCATIONAL CONTENT */
+        .educational-content {
+            max-width: 1280px;
+            margin: 0 auto;
+            line-height: 1.7;
+            font-size: 1.1rem;
+            color: #94a3b8;
+            background: rgba(10, 14, 23, 0.8);
+            padding: 30px;
+            border-radius: 15px;
+            border-left: 4px solid #00f3ff;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .educational-content strong {
+            color: #fff;
+            background: rgba(0, 243, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .educational-content p {
+            margin-bottom: 1rem;
+        }
+
+        .educational-content ul {
+            list-style-type: disc;
+            margin-left: 20px;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- 1. NAVIGATION -->
+    <a href="../index.html" class="back-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Back to LuyaliSims
+    </a>
+    
+    <h1>Stationary Waves Simulator Pro</h1>
+    <div class="flex justify-center mb-8">
+        <div class="bg-indigo-950/80 border border-indigo-500/30 rounded-full px-5 py-1.5 text-sm text-indigo-200 shadow-lg tracking-wide">
+            Designed by <span class="font-bold text-white">Ian Luyali</span> | Contact: <span class="font-mono text-emerald-400">0727987669</span>
+        </div>
+    </div>
+
+    <!-- 2. THE SIMULATOR APP -->
+    <div id="simulator-container">
+        
+        <!-- Header: Tabs & Instruments -->
+        <div class="fs-header mb-6">
+            <div class="flex justify-between items-end mb-4">
+                <span class="block text-sm font-bold uppercase tracking-wider text-slate-400">1. Select Wave System or Instrument</span>
+                <button onclick="toggleFullscreen()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded text-xs font-semibold shadow flex items-center gap-2 transition uppercase tracking-wider">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
+                    <span id="fs-btn-text">Fullscreen Mode</span>
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-7 gap-3">
+                <button id="tab-string" onclick="setSystemType('string')" class="col-span-1 py-2 px-3 rounded text-sm font-medium bg-slate-800/80 text-slate-300 border border-slate-600 hover:bg-slate-700 transition">Vibrating String</button>
+                <button id="tab-closed" onclick="setSystemType('closed')" class="col-span-1 py-2 px-3 rounded text-sm font-medium bg-slate-800/80 text-slate-300 border border-slate-600 hover:bg-slate-700 transition">Closed Air Column</button>
+                <button id="tab-open" onclick="setSystemType('open')" class="col-span-1 py-2 px-3 rounded text-sm font-medium bg-slate-800/80 text-slate-300 border border-slate-600 hover:bg-slate-700 transition">Open Air Column</button>
+                
+                <div class="col-span-1 md:col-span-3 lg:col-span-4 flex gap-2 border-l-2 border-slate-700 pl-3">
+                    <button onclick="loadInstrument('guitar')" class="flex-1 py-2 px-2 bg-indigo-900/40 text-indigo-300 hover:bg-indigo-800/60 rounded text-sm font-medium border border-indigo-500/30 transition">🎸 Guitar</button>
+                    <button onclick="loadInstrument('violin')" class="flex-1 py-2 px-2 bg-indigo-900/40 text-indigo-300 hover:bg-indigo-800/60 rounded text-sm font-medium border border-indigo-500/30 transition">🎻 Violin</button>
+                    <button onclick="loadInstrument('flute')" class="flex-1 py-2 px-2 bg-indigo-900/40 text-indigo-300 hover:bg-indigo-800/60 rounded text-sm font-medium border border-indigo-500/30 transition">💨 Flute</button>
+                    <button onclick="loadInstrument('clarinet')" class="flex-1 py-2 px-2 bg-indigo-900/40 text-indigo-300 hover:bg-indigo-800/60 rounded text-sm font-medium border border-indigo-500/30 transition">📯 Clarinet</button>
+                </div>
+            </div>
+            <div id="instrument-desc" class="hidden mt-4 p-3 bg-indigo-950/60 border-l-4 border-cyan-400 rounded text-sm text-slate-300 italic"></div>
+        </div>
+
+        <!-- Simulator Split Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6" id="fs-grid-container">
+            
+            <!-- Canvas Area (Left side) -->
+            <div class="fs-canvas-area lg:col-span-8 flex flex-col">
+                <div class="bg-[#050b14] rounded-xl p-4 shadow-inner relative flex flex-col flex-grow border border-slate-800">
+                    
+                    <div class="flex justify-between items-center mb-3 z-10">
+                        <span id="canvas-label" class="text-sm font-bold text-cyan-400 uppercase tracking-wider font-['Orbitron']">Visualizer</span>
+                        
+                        <div class="flex items-center gap-1 bg-slate-800/80 rounded p-1 border border-slate-700">
+                            <button onclick="setTool('select')" id="tool-select" class="p-1.5 rounded bg-slate-700 text-cyan-400 hover:bg-slate-600 transition" title="Select Tool">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path></svg>
+                            </button>
+                            <button onclick="setTool('pan')" id="tool-pan" class="p-1.5 rounded text-slate-400 hover:bg-slate-600 hover:text-white transition" title="Pan Tool (Click & Drag)">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11"></path></svg>
+                            </button>
+                            <div class="w-px h-4 bg-slate-600 mx-1"></div>
+                            <button onclick="zoomCanvas(1.2)" class="p-1.5 rounded text-slate-300 hover:bg-slate-600 transition" title="Zoom In">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
+                            </button>
+                            <button onclick="zoomCanvas(0.8)" class="p-1.5 rounded text-slate-300 hover:bg-slate-600 transition" title="Zoom Out">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"></path></svg>
+                            </button>
+                            <button onclick="resetView()" class="p-1.5 rounded text-slate-300 hover:bg-slate-600 text-xs font-bold font-mono transition" title="Reset View">1:1</button>
+                        </div>
+                    </div>
+                    
+                    <div class="flex-grow relative overflow-hidden rounded border border-slate-700/50 cursor-crosshair h-64 lg:h-auto">
+                        <canvas id="waveCanvas" class="w-full h-full absolute inset-0"></canvas>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-4 mt-4 text-xs justify-center text-slate-400 font-medium">
+                        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-cyan-400 shadow-[0_0_8px_#22d3ee]"></span> Instantaneous Displacement</span>
+                        <span class="flex items-center gap-1.5"><span class="w-3 h-0.5 border-t-2 border-dashed border-yellow-400"></span> Envelope</span>
+                        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-red-500"></span> Node (N)</span>
+                        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-green-500"></span> Antinode (A)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controls & Math Area (Right side) -->
+            <div class="fs-controls-area lg:col-span-4 flex flex-col gap-5">
+                
+                <!-- Sliders -->
+                <div class="bg-slate-800/50 p-5 rounded-lg border border-slate-700">
+                    <span class="block text-sm font-bold uppercase tracking-wider text-slate-400 mb-4">2. Tuning Variables</span>
+                    
+                    <div class="space-y-5">
+                        <div>
+                            <div class="flex justify-between mb-1.5 text-slate-200">
+                                <label class="text-sm font-semibold">Harmonic (<i>n</i>)</label>
+                                <span id="harmonic-val" class="text-sm font-mono text-cyan-300">1</span>
+                            </div>
+                            <input type="range" id="harmonic-slider" min="1" max="5" step="1" value="1" oninput="updateHarmonic(this.value)" class="w-full h-1.5 bg-slate-600 rounded appearance-none accent-cyan-400 cursor-pointer">
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-1.5 text-slate-200">
+                                <label class="text-sm font-semibold">Length (<i>L</i>)</label>
+                                <span id="length-val" class="text-sm font-mono text-cyan-300">1.00 m</span>
+                            </div>
+                            <input type="range" id="length-slider" min="0.3" max="2.0" step="0.05" value="1.0" oninput="updateLength(this.value)" class="w-full h-1.5 bg-slate-600 rounded appearance-none accent-cyan-400 cursor-pointer">
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-1.5 text-slate-200">
+                                <label id="speed-label" class="text-sm font-semibold">Wave Speed (<i>v</i>)</label>
+                                <span id="speed-val" class="text-sm font-mono text-cyan-300">340 m/s</span>
+                            </div>
+                            <input type="range" id="speed-slider" min="100" max="600" step="5" value="340" oninput="updateSpeed(this.value)" class="w-full h-1.5 bg-slate-600 rounded appearance-none accent-cyan-400 cursor-pointer">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Audio Output -->
+                <div class="bg-slate-800/50 p-4 rounded-lg border border-slate-700 flex justify-between items-center">
+                    <div class="text-sm font-semibold text-slate-300">Audio Output:</div>
+                    <button id="mute-btn" onclick="toggleMute()" class="px-4 py-2 bg-emerald-600/80 hover:bg-emerald-500 text-white rounded text-sm font-bold shadow-lg transition flex items-center gap-2 border border-emerald-500/50">
+                        🔊 Play Tone
+                    </button>
+                </div>
+
+                <!-- Mathematical Sub Box -->
+                <div class="bg-slate-900/80 p-5 rounded-lg border border-slate-700 flex-grow shadow-inner">
+                    <span class="block text-sm font-bold uppercase tracking-wider text-slate-400 mb-4">3. Live Mathematics</span>
+                    
+                    <div class="grid grid-cols-2 gap-3 font-mono text-center mb-4">
+                        <div class="bg-[#050b14] p-3 rounded border border-slate-800">
+                            <span class="text-xs text-slate-500 block mb-1 uppercase tracking-widest">Wavelength (&lambda;)</span>
+                            <span id="calc-wavelength" class="text-lg font-bold text-cyan-400 drop-shadow-[0_0_5px_rgba(34,211,238,0.5)]">2.00 m</span>
+                        </div>
+                        <div class="bg-[#050b14] p-3 rounded border border-slate-800">
+                            <span class="text-xs text-slate-500 block mb-1 uppercase tracking-widest">Frequency (<i>f</i>)</span>
+                            <span id="calc-frequency" class="text-lg font-bold text-purple-400 drop-shadow-[0_0_5px_rgba(188,19,254,0.5)]">170.0 Hz</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-[#050b14] p-3.5 rounded border border-slate-800">
+                        <span class="block text-xs text-slate-500 uppercase tracking-widest mb-2 border-b border-slate-800 pb-2">Derivation Path</span>
+                        <div id="dynamic-formula-sub" class="font-mono text-sm text-slate-300 leading-relaxed space-y-1 mt-2">
+                            <!-- Dynamic JS Math Inserted here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Context-Aware Guided Questions Section -->
+        <div class="mt-6 bg-slate-900/60 p-6 rounded-xl border border-slate-700 relative overflow-hidden">
+            <h2 class="text-xl font-bold text-slate-100 mb-4 border-b border-slate-700 pb-2 mt-0 font-['Orbitron']">Contextual Guided Derivations</h2>
+            <p class="text-sm text-slate-400 mb-6">Read the instructions specific to the currently selected mode and observe the physical wave boundaries.</p>
+
+            <!-- Only visible when String Mode is active -->
+            <div id="q-string" class="question-block hidden">
+                <div class="border border-slate-700 rounded-lg p-5 bg-slate-800/40">
+                    <div class="flex justify-between items-start gap-4">
+                        <div>
+                            <span class="inline-block px-2.5 py-1 bg-indigo-900/50 text-indigo-300 font-mono text-xs rounded mb-3 border border-indigo-700/50">Question: Vibrating Strings / Guitars / Violins</span>
+                            <h3 class="font-semibold text-slate-200 text-lg mt-0">How is the fundamental relationship between string length (<i>L</i>) and wavelength (&lambda;) derived?</h3>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-sm text-slate-300 space-y-4">
+                        <p class="bg-cyan-900/20 p-3 rounded italic text-cyan-200 border-l-4 border-cyan-500">
+                            <strong class="text-cyan-100">Observation Task:</strong> Set the harmonic slider to <span class="font-semibold">n = 1</span>. Note the distance between the two fixed ends (Nodes) on the instrument.
+                        </p>
+                        <p>Because a single full wavelength (&lambda;) is formed by TWO complete loops (one up, one down), the single loop you see vibrating is exactly half a wavelength (&lambda; / 2).</p>
+                        <div class="p-4 bg-[#050b14] border border-slate-800 rounded-lg space-y-2 font-mono text-sm">
+                            <p>1. Length = half wavelength: <strong class="text-indigo-400"><i>L</i> = &lambda;<sub>1</sub> / 2</strong></p>
+                            <p>2. Therefore Wavelength is: <strong class="text-indigo-400">&lambda;<sub>1</sub> = 2<i>L</i></strong></p>
+                            <p>3. Frequency (<i>v = f &lambda;</i>): <strong class="text-indigo-400"><i>f</i><sub>1</sub> = <i>v</i> / 2<i>L</i></strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Only visible when Closed Mode is active -->
+            <div id="q-closed" class="question-block hidden">
+                <div class="border border-slate-700 rounded-lg p-5 bg-slate-800/40">
+                    <div class="flex justify-between items-start gap-4">
+                        <div>
+                            <span class="inline-block px-2.5 py-1 bg-indigo-900/50 text-indigo-300 font-mono text-xs rounded mb-3 border border-indigo-700/50">Question: Closed Air Columns / Clarinet</span>
+                            <h3 class="font-semibold text-slate-200 text-lg mt-0">Why do closed pipes physically skip even harmonics (n=2,4...)?</h3>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-sm text-slate-300 space-y-4">
+                        <p class="bg-cyan-900/20 p-3 rounded italic text-cyan-200 border-l-4 border-cyan-500">
+                            <strong class="text-cyan-100">Observation Task:</strong> Slide the harmonic to <span class="font-semibold">n = 3</span>. Notice how the left end is blocked (Node) and the right end is open (Antinode).
+                        </p>
+                        <p>To keep these physical boundary conditions true (a Node must exist at the closed end, an Antinode at the open end), you can only add "half-wavelength loops" one at a time. This results in quarter-wavelength steps: 1/4, 3/4, 5/4. You can never fit exactly 2/4 (which would incorrectly require a node at both ends).</p>
+                        <div class="p-4 bg-[#050b14] border border-slate-800 rounded-lg space-y-2 font-mono text-sm">
+                            <p>1. Fundamental (Node to Antinode): <strong class="text-indigo-400"><i>L</i> = &lambda; / 4 &rArr; &lambda; = 4<i>L</i></strong></p>
+                            <p>2. Next mode requires adding &lambda;/2: <strong class="text-indigo-400"><i>L</i> = 3&lambda; / 4 &rArr; &lambda; = 4<i>L</i> / 3</strong></p>
+                            <p>3. Frequency: <strong class="text-indigo-400"><i>f</i><sub>n</sub> = <i>n v</i> / 4<i>L</i> (where n=1,3,5...)</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Only visible when Open Mode is active -->
+            <div id="q-open" class="question-block hidden">
+                <div class="border border-slate-700 rounded-lg p-5 bg-slate-800/40">
+                    <div class="flex justify-between items-start gap-4">
+                        <div>
+                            <span class="inline-block px-2.5 py-1 bg-indigo-900/50 text-indigo-300 font-mono text-xs rounded mb-3 border border-indigo-700/50">Question: Open Air Columns / Flute</span>
+                            <h3 class="font-semibold text-slate-200 text-lg mt-0">How does opening both ends change the harmonic series compared to a closed pipe?</h3>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-sm text-slate-300 space-y-4">
+                        <p class="bg-cyan-900/20 p-3 rounded italic text-cyan-200 border-l-4 border-cyan-500">
+                            <strong class="text-cyan-100">Observation Task:</strong> View <span class="font-semibold">n = 1</span>. Note that Antinodes (max amplitude) appear at BOTH ends because air is free to move.
+                        </p>
+                        <p>Because there is an antinode at each open end and one node in the middle, the distance is exactly half a wavelength (Antinode &rarr; Node = &lambda;/4, Node &rarr; Antinode = &lambda;/4). Thus, it mimics the mathematics of the vibrating string, allowing all integer harmonics.</p>
+                        <div class="p-4 bg-[#050b14] border border-slate-800 rounded-lg space-y-2 font-mono text-sm">
+                            <p>1. Total Length: <strong class="text-indigo-400"><i>L</i> = 2 &times; (&lambda; / 4) = &lambda; / 2</strong></p>
+                            <p>2. Wavelength: <strong class="text-indigo-400">&lambda; = 2<i>L</i></strong></p>
+                            <p>3. Frequency: <strong class="text-indigo-400"><i>f</i><sub>n</sub> = <i>n v</i> / 2<i>L</i> (where n=1,2,3...)</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> <!-- END SIMULATOR APP -->
+
+    <!-- 3. THE EDUCATIONAL CONTENT -->
+    <div class="educational-content">
+        <h2>How to Use This Simulator</h2>
+        <p>This professional-grade physics interactive tool visualizes mechanical stationary (standing) waves. You can interact with it using the following steps:</p>
+        <ul>
+            <li><strong>Select a System:</strong> Choose between a "Vibrating String", "Closed Air Column", or "Open Air Column" using the top tabs. Alternatively, choose a real-world instrument preset (like the Guitar or Clarinet) to load scientifically accurate boundary conditions and tuning constants.</li>
+            <li><strong>Tune Variables:</strong> Use the sliders on the right to manually alter the Harmonic Number (<i>n</i>), the Length of the medium (<i>L</i> in meters), and the Speed of the wave (<i>v</i> in meters per second).</li>
+            <li><strong>Analyze the Mathematics:</strong> Watch the "Live Mathematics" pane calculate real-time Wavelength (&lambda;) and Frequency (<i>f</i>) data. The derivation path updates dynamically based on your chosen physical boundary conditions.</li>
+            <li><strong>Audio and Visuals:</strong> Enable the "Play Tone" feature to hear the exact frequency being generated. Use the Canvas tools (Pan and Zoom) to closely inspect Nodes (red) and Antinodes (green).</li>
+        </ul>
+
+        <h2>The Theory Behind Stationary Waves</h2>
+        <p>A stationary wave, also known as a standing wave, is a wave that remains in a constant position over time. In physics, this phenomenon occurs when two waves of the exact same frequency and amplitude travel in opposite directions across the same medium and interfere with one another.</p>
+        <p>According to the principle of <strong>Superposition</strong>, when these waves cross, their individual displacements are added together. At certain points, the waves always cancel each other out (destructive interference), creating points of zero amplitude known as <strong>Nodes</strong>. At other points, they reinforce one another (constructive interference), creating regions of maximum amplitude known as <strong>Antinodes</strong>.</p>
+        
+        <h3>The Formulas Used</h3>
+        <p>The mathematical boundaries dictate which frequencies can naturally resonate within the system. These natural resonance states are called harmonics.</p>
+        <ul>
+            <li><strong>Strings & Open Pipes:</strong> Since the boundaries require identical states at both ends (either two Nodes for a string, or two Antinodes for an open pipe), the wavelength fits into the length of the system in half-wavelength intervals. 
+            <br><br>
+            Wavelength: <strong>&lambda;<sub>n</sub> = 2<i>L</i> / <i>n</i></strong><br>
+            Frequency: <strong><i>f</i><sub>n</sub> = (<i>n</i> &middot; <i>v</i>) / 2<i>L</i></strong><br>
+            Where <i>n</i> is any integer (1, 2, 3, 4...).</li>
+            
+            <br>
+            
+            <li><strong>Closed Pipes:</strong> One end must be a Node (blocked) and the other an Antinode (open). The wave fits in quarter-wavelength intervals, physically preventing the formation of even-numbered harmonics. 
+            <br><br>
+            Wavelength: <strong>&lambda;<sub>n</sub> = 4<i>L</i> / <i>n</i></strong><br>
+            Frequency: <strong><i>f</i><sub>n</sub> = (<i>n</i> &middot; <i>v</i>) / 4<i>L</i></strong><br>
+            Where <i>n</i> is an odd integer (1, 3, 5, 7...).</li>
+        </ul>
+        
+        <h2>Real World Applications</h2>
+        <p>Standing waves aren't just limited to the music of guitars and flutes; they are fundamental principles applied across all domains of engineering and physics:</p>
+        <ul>
+            <li><strong>Acoustical Engineering:</strong> When designing concert halls or recording studios, architects must calculate the room's dimensions to prevent "room modes" (standing sound waves) from creating dead spots where specific bass notes disappear due to nodal interference.</li>
+            <li><strong>Microwave Ovens:</strong> A microwave cooks food by creating three-dimensional standing electromagnetic waves inside the metal box. The turntable rotates your food specifically to ensure it moves through both nodes and antinodes, preventing cold spots.</li>
+            <li><strong>Quantum Mechanics:</strong> At the subatomic level, electrons orbiting a nucleus do not move like planets. Instead, their probability distributions behave precisely like three-dimensional standing waves wrapped around the atom.</li>
+        </ul>
+    </div>
+
+    <!-- JavaScript Engine -->
+    <script>
+        // Data & State
+        let systemType = 'string'; // string, closed, open
+        let activeInstrument = null; // 'guitar', 'violin', 'flute', 'clarinet', null
+        let harmonic = 1;          
+        let length = 1.0;          
+        let speed = 340;           
+        
+        // Canvas & Tool States
+        const canvas = document.getElementById('waveCanvas');
+        const ctx = canvas.getContext('2d');
+        let t = 0; 
+        
+        let zoom = 1.0;
+        let offsetX = 0;
+        let offsetY = 0;
+        let currentTool = 'select'; // 'select' or 'pan'
+        let isDragging = false;
+        let dragStartX = 0;
+        let dragStartY = 0;
+
+        // Audio
+        let audioCtx = null;
+        let oscillator = null;
+        let gainNode = null;
+        let isMuted = true;
+
+        // Instrument Presets
+        const instruments = {
+            guitar: { type: 'string', n: 1, L: 0.65, v: 107.25, desc: "🎸 <strong>Acoustic Guitar (E2):</strong> Plucking excites the string fixed at the bridge and nut." },
+            violin: { type: 'string', n: 1, L: 0.33, v: 290.4, desc: "🎻 <strong>Violin (A4):</strong> Drawing a bow creates stick-slip standing waves between the bridge and fingerboard nut." },
+            flute: { type: 'open', n: 1, L: 0.65, v: 340, desc: "💨 <strong>Flute (C4 Key):</strong> Blowing across the embouchure hole creates pressure waves open at both ends." },
+            clarinet: { type: 'closed', n: 1, L: 0.58, v: 340, desc: "📯 <strong>Clarinet (D3 Key):</strong> The reed acts as a closed node boundary; the bell acts as an open antinode boundary." }
+        };
+
+        window.onload = function() {
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            setupCanvasEvents();
+            setSystemType('string');
+            animate();
+        };
+
+        // --- FULLSCREEN & LAYOUT LOGIC ---
+        function toggleFullscreen() {
+            const elem = document.getElementById("simulator-container");
+            const btnText = document.getElementById("fs-btn-text");
+
+            if (!document.fullscreenElement) {
+                if (elem.requestFullscreen) { elem.requestFullscreen(); }
+                else if (elem.webkitRequestFullscreen) { elem.webkitRequestFullscreen(); }
+                else if (elem.msRequestFullscreen) { elem.msRequestFullscreen(); }
+                btnText.innerText = "Exit Fullscreen";
+            } else {
+                if (document.exitFullscreen) { document.exitFullscreen(); }
+                btnText.innerText = "Fullscreen Mode";
+            }
+        }
+
+        function resizeCanvas() {
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+        }
+
+        document.addEventListener('fullscreenchange', () => {
+            setTimeout(resizeCanvas, 50); 
+            const btnText = document.getElementById("fs-btn-text");
+            if (!document.fullscreenElement) btnText.innerText = "Fullscreen Mode";
+        });
+
+        // --- TOOLBAR & PAN/ZOOM LOGIC ---
+        function setTool(tool) {
+            currentTool = tool;
+            document.getElementById('tool-select').className = tool === 'select' 
+                ? "p-1.5 rounded bg-slate-700 text-cyan-400 transition" 
+                : "p-1.5 rounded text-slate-400 hover:bg-slate-600 transition";
+            document.getElementById('tool-pan').className = tool === 'pan' 
+                ? "p-1.5 rounded bg-slate-700 text-cyan-400 transition" 
+                : "p-1.5 rounded text-slate-400 hover:bg-slate-600 transition";
+            canvas.style.cursor = tool === 'pan' ? 'grab' : 'crosshair';
+        }
+
+        function zoomCanvas(factor) {
+            const newZoom = Math.min(Math.max(zoom * factor, 0.5), 4.0);
+            const scaleChange = newZoom / zoom;
+            
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            
+            offsetX = centerX - (centerX - offsetX) * scaleChange;
+            offsetY = centerY - (centerY - offsetY) * scaleChange;
+            zoom = newZoom;
+        }
+
+        function resetView() {
+            zoom = 1.0;
+            offsetX = 0;
+            offsetY = 0;
+            setTool('select');
+        }
+
+        function setupCanvasEvents() {
+            canvas.addEventListener('mousedown', (e) => {
+                if (currentTool === 'pan') {
+                    isDragging = true;
+                    dragStartX = e.clientX - offsetX;
+                    dragStartY = e.clientY - offsetY;
+                    canvas.style.cursor = 'grabbing';
+                }
+            });
+            window.addEventListener('mouseup', () => {
+                isDragging = false;
+                if(currentTool === 'pan') canvas.style.cursor = 'grab';
+            });
+            window.addEventListener('mousemove', (e) => {
+                if (isDragging && currentTool === 'pan') {
+                    offsetX = e.clientX - dragStartX;
+                    offsetY = e.clientY - dragStartY;
+                }
+            });
+            canvas.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
+                
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+                
+                const newZoom = Math.min(Math.max(zoom * zoomFactor, 0.5), 4.0);
+                const scaleChange = newZoom / zoom;
+                
+                offsetX = mouseX - (mouseX - offsetX) * scaleChange;
+                offsetY = mouseY - (mouseY - offsetY) * scaleChange;
+                zoom = newZoom;
+            }, { passive: false });
+        }
+
+        // --- AUDIO LOGIC ---
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        function playSound(freq) {
+            initAudio();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            if (!oscillator) {
+                oscillator = audioCtx.createOscillator();
+                gainNode = audioCtx.createGain();
+                oscillator.type = 'sine';
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                oscillator.start();
+            }
+            if (isMuted) gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+            else gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime); 
+            
+            oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        }
+        function toggleMute() {
+            isMuted = !isMuted;
+            const muteBtn = document.getElementById('mute-btn');
+            if (isMuted) {
+                muteBtn.innerHTML = "🔊 Play Tone";
+                muteBtn.className = "px-4 py-2 bg-emerald-600/80 hover:bg-emerald-500 text-white rounded text-sm font-bold shadow-lg transition flex items-center gap-2 border border-emerald-500/50";
+                if (gainNode) gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+            } else {
+                muteBtn.innerHTML = "🔇 Mute Tone";
+                muteBtn.className = "px-4 py-2 bg-red-600/80 hover:bg-red-500 text-white rounded text-sm font-bold shadow-lg transition flex items-center gap-2 border border-red-500/50";
+                updateUI();
+            }
+        }
+
+        // --- SYSTEM & INSTRUMENT CONTROL ---
+        function loadInstrument(key) {
+            activeInstrument = key;
+            const inst = instruments[key];
+            
+            systemType = inst.type;
+            harmonic = inst.n;
+            length = inst.L;
+            speed = inst.v;
+
+            document.getElementById('harmonic-slider').value = harmonic;
+            document.getElementById('length-slider').value = length;
+            document.getElementById('speed-slider').value = speed;
+
+            setSystemType(inst.type, true);
+
+            const descBox = document.getElementById('instrument-desc');
+            descBox.innerHTML = inst.desc;
+            descBox.classList.remove('hidden');
+            
+            resetView();
+        }
+
+        function setSystemType(type, isFromPreset = false) {
+            if (!isFromPreset) {
+                activeInstrument = null;
+                document.getElementById('instrument-desc').classList.add('hidden');
+            }
+            systemType = type;
+            
+            const hSlider = document.getElementById('harmonic-slider');
+            const speedSlider = document.getElementById('speed-slider');
+            const speedLabel = document.getElementById('speed-label');
+            
+            if (type === 'closed') {
+                hSlider.min = 1; hSlider.max = 7; hSlider.step = 2;
+                if (harmonic % 2 === 0) harmonic = Math.max(1, harmonic - 1);
+                hSlider.value = harmonic;
+                
+                speedLabel.innerHTML = "Speed of Sound (<i>v</i>)";
+                if (!isFromPreset && (speed < 300 || speed > 360)) speed = 340;
+                speedSlider.value = speed;
+            } else if (type === 'open') {
+                hSlider.min = 1; hSlider.max = 5; hSlider.step = 1;
+                hSlider.value = harmonic;
+                
+                speedLabel.innerHTML = "Speed of Sound (<i>v</i>)";
+                if (!isFromPreset && (speed < 300 || speed > 360)) speed = 340;
+                speedSlider.value = speed;
+            } else { 
+                hSlider.min = 1; hSlider.max = 5; hSlider.step = 1;
+                hSlider.value = harmonic;
+                
+                speedLabel.innerHTML = "Wave Speed (<i>v</i>)";
+                if (!isFromPreset && (speed < 100 || speed > 600)) speed = 200;
+                speedSlider.value = speed;
+            }
+            
+            // Tab styling update for dark mode
+            const tabs = ['string', 'closed', 'open'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`tab-${t}`);
+                if (t === type) {
+                    btn.className = "col-span-1 py-2 px-3 rounded text-sm font-bold bg-cyan-600 text-white shadow-[0_0_10px_rgba(34,211,238,0.4)] border border-cyan-400 transition";
+                } else {
+                    btn.className = "col-span-1 py-2 px-3 rounded text-sm font-medium bg-slate-800/80 text-slate-300 border border-slate-600 hover:bg-slate-700 transition";
+                }
+            });
+
+            // Context Questions Logic
+            document.querySelectorAll('.question-block').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`q-${type}`).classList.remove('hidden');
+
+            updateUI();
+        }
+
+        function updateHarmonic(val) { harmonic = parseInt(val); updateUI(); }
+        function updateLength(val) { length = parseFloat(val); updateUI(); }
+        function updateSpeed(val) { speed = parseFloat(val); updateUI(); }
+
+        function updateUI() {
+            document.getElementById('harmonic-val').innerText = harmonic;
+            document.getElementById('length-val').innerText = `${length.toFixed(2)} m`;
+            document.getElementById('speed-val').innerText = `${Math.round(speed)} m/s`;
+            
+            let classText = "Fundamental Harmonic";
+            if (harmonic > 1) {
+                const overtone = systemType === 'closed' ? (harmonic - 1) / 2 : harmonic - 1;
+                classText = `${overtone}${getOrdinal(overtone)} Overtone (${harmonic}${getOrdinal(harmonic)} Harmonic)`;
+            }
+            document.getElementById('canvas-label').innerText = activeInstrument ? `Visualizer: ${activeInstrument.toUpperCase()} - ${classText}` : `Visualizer: ${classText}`;
+
+            let wl = (systemType === 'closed' ? 4 : 2) * length / harmonic;
+            const freq = speed / wl;
+            
+            document.getElementById('calc-wavelength').innerText = `${wl.toFixed(2)} m`;
+            document.getElementById('calc-frequency').innerText = `${freq.toFixed(1)} Hz`;
+
+            // Derivation Maths Update
+            const formBox = document.getElementById('dynamic-formula-sub');
+            const formulaDiv = (systemType === 'closed') ? 4 : 2;
+            formBox.innerHTML = `
+                <div class="text-indigo-300 font-bold mb-1">${classText}</div>
+                <div><i>f<sub>n</sub></i> = <i>n &middot; v</i> / ${formulaDiv}<i>L</i></div>
+                <div class="mt-2 text-slate-400"><i>f</i> = (${harmonic} &middot; ${Math.round(speed)}) / (${formulaDiv} &middot; ${length.toFixed(2)})</div>
+                <div class="text-cyan-400 font-bold mt-2 text-base">&rarr; ${freq.toFixed(1)} Hz</div>
+            `;
+
+            if (!isMuted) playSound(freq);
+        }
+
+        function getOrdinal(n) {
+            if(n===1) return "st"; if(n===2) return "nd"; if(n===3) return "rd"; return "th";
+        }
+
+        // --- CANVAS RENDERING LOGIC ---
+        function animate() {
+            let wl = (systemType === 'closed' ? 4 : 2) * length / harmonic;
+            const freq = speed / wl;
+            const frameInc = Math.min(0.2, Math.max(0.02, freq * 0.0002));
+            t += frameInc; 
+
+            drawCanvas();
+            requestAnimationFrame(animate);
+        }
+
+        function drawCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Transparent to blend with CSS background
+            
+            const paddingX = canvas.width * 0.15;
+            const maxL = 2.0; 
+            const activeWidth = (canvas.width - 2 * paddingX) * (length / maxL);
+            const startX = paddingX;
+            const endX = startX + activeWidth;
+            const centerY = canvas.height / 2;
+            
+            ctx.save();
+            ctx.translate(offsetX, offsetY);
+            ctx.scale(zoom, zoom);
+
+            drawSystemBackground(startX, endX, centerY, activeWidth);
+            drawWaves(startX, endX, centerY, activeWidth);
+
+            ctx.restore();
+        }
+
+        function drawSystemBackground(sx, ex, cy, w) {
+            ctx.lineWidth = 2;
+            
+            if (activeInstrument === 'guitar') {
+                ctx.fillStyle = '#5c4033'; 
+                ctx.fillRect(sx - 20, cy - 10, w + 40, 20);
+                
+                ctx.strokeStyle = '#a8a29e';
+                for(let i=1; i<10; i++){
+                    ctx.beginPath(); ctx.moveTo(sx + i*20, cy-10); ctx.lineTo(sx + i*20, cy+10); ctx.stroke();
+                }
+                
+                ctx.fillStyle = '#8b5a2b';
+                ctx.beginPath(); ctx.arc(ex + 40, cy, 50, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = '#050b14'; 
+                ctx.beginPath(); ctx.arc(ex + 40, cy, 25, 0, Math.PI*2); ctx.fill();
+
+                ctx.fillStyle = '#e5e7eb'; 
+                ctx.fillRect(sx - 5, cy - 12, 5, 24); 
+                ctx.fillRect(ex, cy - 12, 8, 24);     
+            } else if (activeInstrument === 'violin') {
+                ctx.fillStyle = '#1c1917'; 
+                ctx.fillRect(sx - 30, cy - 8, w * 0.7, 16);
+                
+                ctx.fillStyle = '#a0522d'; 
+                ctx.beginPath();
+                ctx.ellipse(ex + 10, cy, 70, 45, 0, 0, Math.PI*2);
+                ctx.fill();
+
+                ctx.fillStyle = '#f5deb3'; 
+                ctx.fillRect(ex, cy - 15, 6, 30);
+                ctx.fillStyle = '#d6d3d1';
+                ctx.fillRect(sx, cy - 10, 4, 20); 
+
+            } else if (activeInstrument === 'flute') {
+                const h = 24;
+                const grad = ctx.createLinearGradient(0, cy - h/2, 0, cy + h/2);
+                grad.addColorStop(0, '#94a3b8'); grad.addColorStop(0.5, '#f1f5f9'); grad.addColorStop(1, '#64748b');
+                ctx.fillStyle = grad;
+                ctx.fillRect(sx - 30, cy - h/2, w + 60, h);
+                
+                ctx.fillStyle = '#0f172a';
+                ctx.beginPath(); ctx.ellipse(sx, cy, 10, 6, 0, 0, Math.PI*2); ctx.fill();
+                
+                ctx.fillStyle = '#cbd5e1';
+                ctx.strokeStyle = '#475569';
+                for(let i=1; i<=5; i++){
+                    ctx.beginPath(); ctx.arc(sx + w * 0.2 * i, cy, 8, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+                }
+
+            } else if (activeInstrument === 'clarinet') {
+                const h = 22;
+                ctx.fillStyle = '#111827'; 
+                ctx.fillRect(sx, cy - h/2, w, h);
+                
+                ctx.fillStyle = '#1f2937';
+                ctx.beginPath(); ctx.moveTo(sx, cy-h/2); ctx.lineTo(sx-30, cy - 5); ctx.lineTo(sx-30, cy + h/2); ctx.lineTo(sx, cy+h/2); ctx.fill();
+                
+                ctx.beginPath(); ctx.moveTo(ex, cy-h/2); ctx.lineTo(ex+40, cy-h); ctx.lineTo(ex+40, cy+h); ctx.lineTo(ex, cy+h/2); ctx.fill();
+
+                ctx.fillStyle = '#e2e8f0';
+                for(let i=1; i<=4; i++){
+                    ctx.fillRect(sx + w * 0.2 * i, cy - h/2 - 4, 6, h+8);
+                }
+
+            } else {
+                ctx.lineWidth = 4;
+                if (systemType === 'string') {
+                    ctx.fillStyle = '#64748b';
+                    ctx.fillRect(sx - 8, cy - 30, 8, 60); ctx.fillRect(ex, cy - 30, 8, 60);
+                    ctx.strokeStyle = '#475569'; ctx.beginPath(); ctx.moveTo(sx, cy); ctx.lineTo(ex, cy); ctx.stroke();
+                } else if (systemType === 'closed') {
+                    ctx.strokeStyle = '#475569';
+                    ctx.beginPath(); ctx.moveTo(sx, cy-40); ctx.lineTo(sx, cy+40); 
+                    ctx.moveTo(sx, cy-40); ctx.lineTo(ex, cy-40); 
+                    ctx.moveTo(sx, cy+40); ctx.lineTo(ex, cy+40); ctx.stroke();
+                } else if (systemType === 'open') {
+                    ctx.strokeStyle = '#475569';
+                    ctx.beginPath(); ctx.moveTo(sx, cy-40); ctx.lineTo(ex, cy-40); 
+                    ctx.moveTo(sx, cy+40); ctx.lineTo(ex, cy+40); ctx.stroke();
+                }
+            }
+        }
+
+        function drawWaves(sx, ex, cy, w) {
+            const maxAmp = (systemType === 'string') ? 35 : 45; 
+            const osc = Math.sin(t);
+
+            // Envelope
+            ctx.strokeStyle = 'rgba(234, 179, 8, 0.4)';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath(); plotCurve(sx, ex, cy, w, maxAmp, 1); ctx.stroke();
+            ctx.beginPath(); plotCurve(sx, ex, cy, w, maxAmp, -1); ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Instant Wave (Cyan Neon)
+            ctx.strokeStyle = '#00f3ff';
+            ctx.shadowColor = '#00f3ff';
+            ctx.shadowBlur = 10;
+            ctx.lineWidth = 3;
+            ctx.beginPath(); plotCurve(sx, ex, cy, w, maxAmp, osc); ctx.stroke();
+            ctx.shadowBlur = 0; 
+
+            // Calc Dots
+            let nodes = [], antinodes = [];
+            if (systemType === 'string') {
+                for (let i = 0; i <= harmonic; i++) nodes.push(sx + (i/harmonic)*w);
+                for (let i = 0; i < harmonic; i++) antinodes.push(sx + ((i+0.5)/harmonic)*w);
+            } else if (systemType === 'closed') {
+                for (let i = 0; i <= harmonic; i++) {
+                    let px = sx + (i/harmonic)*w;
+                    (i % 2 === 0) ? nodes.push(px) : antinodes.push(px);
+                }
+            } else if (systemType === 'open') {
+                for (let i = 0; i <= harmonic*2; i++) {
+                    let px = sx + (i/(harmonic*2))*w;
+                    (i % 2 === 1) ? nodes.push(px) : antinodes.push(px);
+                }
+            }
+
+            ctx.font = `bold ${10 / zoom}px sans-serif`; 
+
+            nodes.forEach(pos => {
+                ctx.fillStyle = '#ef4444';
+                ctx.beginPath(); ctx.arc(pos, cy, 4/zoom, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = '#fca5a5';
+                ctx.fillText('N', pos - (4/zoom), cy - (12/zoom));
+            });
+
+            antinodes.forEach(pos => {
+                let localY = cy;
+                const relX = (pos - sx) / w;
+                if (systemType === 'string') localY += maxAmp * Math.sin(harmonic * Math.PI * relX) * osc;
+                else if (systemType === 'closed') localY += maxAmp * Math.sin((harmonic * Math.PI * relX)/2) * osc;
+                else localY += maxAmp * Math.cos(harmonic * Math.PI * relX) * osc;
+
+                ctx.fillStyle = '#22c55e';
+                ctx.beginPath(); ctx.arc(pos, localY, 4/zoom, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = '#86efac';
+                ctx.fillText('A', pos - (4/zoom), localY - (12/zoom));
+            });
+        }
+
+        function plotCurve(sx, ex, cy, w, amp, scale) {
+            for (let x = sx; x <= ex; x++) {
+                const rel = (x - sx) / w;
+                let y = 0;
+                if (systemType === 'string') y = amp * Math.sin(harmonic * Math.PI * rel) * scale;
+                else if (systemType === 'closed') y = amp * Math.sin((harmonic * Math.PI * rel)/2) * scale;
+                else if (systemType === 'open') y = amp * Math.cos(harmonic * Math.PI * rel) * scale;
+                
+                (x === sx) ? ctx.moveTo(x, cy + y) : ctx.lineTo(x, cy + y);
+            }
+        }
+    </script>
+</body>
+</html>

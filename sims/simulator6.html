@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Magic Block Builder - LuyaliSims</title>
+    
+    <!-- Import Futuristic Fonts for Template & Playful Fonts for Game -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Rajdhani:wght@400;500;600&family=Fredoka+One&family=Nunito:wght@700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ========================================================= */
+        /* 1. BASE TEMPLATE STYLES (Futuristic Theme)                */
+        /* ========================================================= */
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: #0a0e17;
+            background-image: radial-gradient(circle at top right, rgba(0, 243, 255, 0.05), transparent 40%),
+                              radial-gradient(circle at bottom left, rgba(188, 19, 254, 0.05), transparent 40%);
+            color: #e2e8f0;
+            margin: 0;
+            padding: 20px 30px;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: rgba(16, 24, 43, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(188, 19, 254, 0.5);
+            color: #e580ff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(188, 19, 254, 0.15);
+            border-color: #bc13fe;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
+            transform: translateX(-5px);
+        }
+
+        .back-btn svg { transition: transform 0.3s ease; }
+        .back-btn:hover svg { transform: translateX(-3px); }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: #00f3ff;
+            text-shadow: 0px 0px 15px rgba(0, 243, 255, 0.3);
+            margin-top: 0;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        h2, h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: #bc13fe;
+        }
+
+        /* 3. EDUCATIONAL CONTENT (Upgraded for Readability & Theme) */
+        .educational-content {
+            max-width: 1000px;
+            margin: 0 auto 40px auto;
+            line-height: 1.7;
+            font-size: 1.1rem;
+            color: #94a3b8;
+            background: rgba(10, 14, 23, 0.8);
+            padding: 30px;
+            border-radius: 15px;
+            border-left: 4px solid #00f3ff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .educational-content strong {
+            color: #fff;
+            background: rgba(0, 243, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .task-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .task-list li {
+            background: rgba(188, 19, 254, 0.05);
+            border: 1px solid rgba(188, 19, 254, 0.2);
+            margin-bottom: 15px;
+            padding: 15px 20px;
+            border-radius: 10px;
+        }
+
+        .task-list li strong {
+            color: #e580ff;
+            background: none;
+            padding: 0;
+        }
+
+        /* ========================================================= */
+        /* 2. THE SIMULATOR APP CONTAINER & GAME STYLES              */
+        /* ========================================================= */
+        
+        :root {
+            --primary: #FF5E7E;
+            --secondary: #38B6FF;
+            --accent: #FFDE59;
+            --text: #2D3436;
+        }
+
+        /* Container acts as the interactive "Window" */
+        #simulator-container {
+            background: rgba(16, 24, 43, 0.6);
+            backdrop-filter: blur(8px);
+            border: 2px solid rgba(0, 243, 255, 0.5);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 243, 255, 0.2);
+            margin: 0 auto 40px auto;
+            max-width: 1000px;
+            height: 70vh; /* Responsive height */
+            min-height: 500px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        /* Prevent text selection ONLY inside the game so parents can read the guide below */
+        #simulator-container * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none; 
+            -webkit-tap-highlight-color: transparent; 
+        }
+
+        /* Collapsible Top Ribbon */
+        #top-header {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 12px 20px;
+            display: flex; align-items: center; justify-content: space-between;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-bottom: 4px solid white;
+            z-index: 50;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border-top-left-radius: 13px;
+            border-top-right-radius: 13px;
+        }
+
+        #top-header.collapsed {
+            transform: translateY(-100%);
+        }
+
+        .header-toggle {
+            position: absolute;
+            bottom: -34px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70px; height: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 4px solid white;
+            border-top: none;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            display: flex; justify-content: center; align-items: center;
+            color: var(--secondary); font-size: 18px; font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 6px 10px rgba(0,0,0,0.1);
+            touch-action: none;
+        }
+        .header-toggle:active { background: #F8F9FA; color: var(--primary); }
+
+        .logo {
+            font-family: 'Fredoka One', cursive;
+            font-size: 24px; color: var(--primary);
+            text-shadow: 2px 2px 0px white, 3px 3px 0px rgba(0,0,0,0.1);
+            display: flex; align-items: center; gap: 10px;
+        }
+
+        .toolbar-group { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center; }
+
+        /* Scope buttons to simulator to not affect template */
+        #simulator-container button, #simulator-container select {
+            padding: 10px 14px; font-size: 16px;
+            border: none; border-radius: 20px;
+            background-color: white; color: var(--text);
+            cursor: pointer; font-weight: bold; font-family: 'Nunito', sans-serif;
+            box-shadow: 0 4px 0 #D1D9E6, 0 5px 10px rgba(0,0,0,0.1);
+            transition: all 0.1s cubic-bezier(0.4, 2, 0.2, 1);
+        }
+
+        #simulator-container button:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0 0 #D1D9E6; }
+        #simulator-container button:hover:not(:disabled) { background-color: #F8F9FA; transform: translateY(-2px); }
+        #simulator-container button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .btn-magic { background-color: var(--primary) !important; color: white !important; box-shadow: 0 4px 0 #D63056 !important; }
+        .btn-magic:hover:not(:disabled) { background-color: #FF708D !important; }
+        .btn-blueprint { background-color: var(--secondary) !important; color: white !important; box-shadow: 0 4px 0 #0f8de0 !important; display: none; }
+        .btn-blueprint:hover:not(:disabled) { background-color: #5AC2FF !important; }
+
+        #simulator-container select { box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); border: 2px solid #E2E8F0; max-width: 150px; }
+
+        .game-main { flex: 1; position: relative; width: 100%; height: 100%; border-radius: 13px; overflow: hidden; }
+
+        #workspace { width: 100%; height: 100%; cursor: grab; position: absolute; touch-action: none; border-radius: 13px;}
+        #workspace:active { cursor: grabbing; }
+        canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+
+        /* Scrollable Palette */
+        #palette {
+            position: absolute; 
+            top: 50%; left: 15px; 
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 12px; border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15), inset 0 -4px 0 rgba(0,0,0,0.05);
+            display: flex; flex-direction: column; gap: 12px;
+            align-items: center; border: 4px solid white; z-index: 15;
+            max-height: 70%; 
+            overflow-y: auto; overflow-x: hidden;
+            touch-action: pan-y; 
+            scrollbar-width: none; -ms-overflow-style: none; 
+        }
+        #palette::-webkit-scrollbar { display: none; }
+
+        .color-swatch {
+            width: 48px; height: 48px; border-radius: 12px; flex-shrink: 0;
+            cursor: grab; box-shadow: 0 6px 0 rgba(0,0,0,0.15), inset 0 5px 10px rgba(255,255,255,0.4);
+            transition: transform 0.2s cubic-bezier(0.4, 2, 0.2, 1);
+            position: relative; 
+            touch-action: pan-y; 
+        }
+        .color-swatch::after {
+            content: ''; position: absolute; top: 5px; left: 12px; width: 24px; height: 8px;
+            background: rgba(255,255,255,0.5); border-radius: 4px;
+        }
+
+        /* Blueprint Modal */
+        @keyframes rainbowGlow {
+            0% { border-color: #FF5E7E; box-shadow: 0 8px 30px rgba(255, 94, 126, 0.6); }
+            25% { border-color: #FFDE59; box-shadow: 0 8px 30px rgba(255, 222, 89, 0.6); }
+            50% { border-color: #38B6FF; box-shadow: 0 8px 30px rgba(56, 182, 255, 0.6); }
+            75% { border-color: #2ED573; box-shadow: 0 8px 30px rgba(46, 213, 115, 0.6); }
+            100% { border-color: #FF5E7E; box-shadow: 0 8px 30px rgba(255, 94, 126, 0.6); }
+        }
+
+        #blueprint-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 100;
+            display: none; justify-content: center; align-items: center; backdrop-filter: blur(4px);
+            border-radius: 13px;
+        }
+        .blueprint-modal {
+            background: white; padding: 20px; border-radius: 25px;
+            border: 6px solid var(--secondary); width: 80%; height: 80%; max-width: 500px; max-height: 500px;
+            display: flex; flex-direction: column; animation: rainbowGlow 4s infinite linear;
+        }
+        .blueprint-modal h3 { margin: 0 0 10px 0; text-align: center; color: var(--text); font-size: 22px; font-family: 'Nunito', sans-serif;}
+        #ref-canvas { flex: 1; width: 100%; background: #f8fbff; border-radius: 12px; display: block;}
+        #btn-close-blueprint { 
+            margin-top: 15px; background: var(--primary) !important; width: 100%; color: white !important; 
+            padding: 12px !important; border-radius: 15px; font-size: 18px !important; box-shadow: 0 4px 0 #D63056 !important;
+        }
+
+        /* Helper Toast */
+        #helper {
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: white; padding: 12px 18px; border-radius: 20px;
+            font-size: 16px; color: var(--text); border: 3px solid var(--accent);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); pointer-events: none;
+            display: flex; align-items: center; gap: 10px; z-index: 5;
+            animation: floatHelper 3s infinite ease-in-out; white-space: nowrap;
+        }
+        @keyframes floatHelper { 0%, 100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, -10px); } }
+
+        /* D-Pad Navigation Controls */
+        #nav-controls {
+            position: absolute; bottom: 20px; right: 20px;
+            display: flex; flex-direction: column; align-items: center; gap: 6px; z-index: 15;
+            opacity: 0.5; transition: opacity 0.3s;
+        }
+        #nav-controls:hover, #nav-controls:active, #nav-controls:focus-within { opacity: 1.0; }
+        .nav-row { display: flex; gap: 6px; }
+        .nav-btn {
+            width: 48px; height: 48px; border-radius: 12px;
+            background: rgba(255, 255, 255, 0.95) !important;
+            border: 3px solid var(--secondary) !important; color: var(--secondary) !important;
+            font-size: 20px !important; font-weight: bold; display: flex; justify-content: center; align-items: center;
+            cursor: pointer; box-shadow: 0 6px 0 rgba(0,0,0,0.1) !important; touch-action: none; padding: 0 !important;
+            transition: all 0.1s;
+        }
+        .nav-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 rgba(0,0,0,0.1) !important; background: var(--secondary) !important; color: white !important; }
+
+        /* Responsive Tweaks */
+        @media (max-width: 768px) {
+            #top-header { flex-wrap: wrap; justify-content: space-evenly; gap: 8px; padding: 8px; }
+            .logo { width: 100%; justify-content: center; font-size: 20px; margin-bottom: 4px; }
+            #simulator-container button, #simulator-container select { padding: 8px 10px; font-size: 14px; }
+            #palette { left: 8px; padding: 12px 8px; gap: 10px;}
+            .color-swatch { width: 42px; height: 42px; }
+            #helper { font-size: 14px; padding: 8px 12px; bottom: 20px; }
+            #nav-controls { bottom: 15px; right: 10px; transform: scale(0.9); transform-origin: bottom right; }
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- 1. NAVIGATION -->
+    <a href="../index.html" class="back-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Back to LuyaliSims
+    </a>
+    
+    <h1>Magic Block Builder</h1>
+
+    <!-- 2. THE SIMULATOR APP -->
+    <div id="simulator-container">
+        
+        <header id="top-header">
+            <div class="logo">🧸 Magic Block Builder</div>
+            
+            <div class="toolbar-group">
+                <select id="template-select">
+                    <option value="none">✨ Free Build</option>
+                    <option value="castle">🏰 Castle</option>
+                    <option value="rocket">🚀 Rocket</option>
+                    <option value="dino">🦕 Dinosaur</option>
+                    <option value="flower">🌸 Flower</option>
+                    <option value="tree">🌳 Tree</option>
+                    <option value="car">🚗 Car</option>
+                    <option value="robot">🤖 Robot</option>
+                    <option value="house">🏠 House</option>
+                    <option value="star">⭐ Star</option>
+                    <option value="face">😀 Face</option>
+                </select>
+                <button id="btn-blueprint" class="btn-blueprint">💡 Blueprint</button>
+                <button id="btn-zoom-out" title="Zoom Out">🔍-</button>
+                <button id="btn-zoom-in" title="Zoom In">🔍+</button>
+                <button id="btn-fullscreen" title="Full Screen">📺</button>
+            </div>
+            
+            <div class="toolbar-group">
+                <button id="btn-undo" disabled title="Undo">↩️</button>
+                <button id="btn-redo" disabled title="Redo">↪️</button>
+                <button id="btn-reset" class="btn-magic" title="Clear All">🗑️ Clear</button>
+            </div>
+
+            <!-- Pull Tab for hiding/showing the menu -->
+            <div id="header-toggle" class="header-toggle">▲</div>
+        </header>
+
+        <div class="game-main">
+            <div id="workspace">
+                <canvas id="main-canvas"></canvas>
+                
+                <div id="helper"><span>👋</span> <strong>Grab a block, double-tap to delete!</strong></div>
+
+                <!-- Single Container Scrollable Palette -->
+                <div id="palette"></div>
+                
+                <!-- D-Pad Navigation Controls -->
+                <div id="nav-controls">
+                    <button class="nav-btn" id="nav-up">▲</button>
+                    <div class="nav-row">
+                        <button class="nav-btn" id="nav-left">◀</button>
+                        <button class="nav-btn" id="nav-center" title="Center Camera">🎯</button>
+                        <button class="nav-btn" id="nav-right">▶</button>
+                    </div>
+                    <button class="nav-btn" id="nav-down">▼</button>
+                </div>
+            </div>
+
+            <!-- Center Blueprint Modal -->
+            <div id="blueprint-overlay">
+                <div class="blueprint-modal">
+                    <h3>💡 Blueprint Guide</h3>
+                    <canvas id="ref-canvas"></canvas>
+                    <button id="btn-close-blueprint">Got it! Close.</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 3. THE EDUCATIONAL CONTENT FOR EARLY CHILDHOOD -->
+    <div class="educational-content">
+        
+        <h2>Welcome to the Magic Block Builder!</h2>
+        <p>The Magic Block Builder is a wonderful digital sandbox specifically designed for toddlers and preschoolers (ages 3 to 5). In this colorful environment, children can safely explore shapes, vibrant colors, and their own creativity without the messy cleanup of physical toys.</p>
+
+        <h2>How to Play (Guide for Parents)</h2>
+        <p>Using the simulator is intuitive and designed for little fingers. <strong>Drag</strong> a colorful block from the palette on the left side of the screen into the nature scene. The blocks will magically snap together! If your child makes a mistake or wants to remove a block, simply <strong>double-tap</strong> or <strong>double-click</strong> the block to make it disappear with a fun sound. Use the menu at the top to load fun outlines (like a Rocket or a Dinosaur) for them to trace!</p>
+
+        <h2>Why Block Building is Great for Growing Brains</h2>
+        <p>While it looks like pure fun, this simulator is gently introducing fundamental concepts of spatial awareness, counting, and fine motor skills. As children interact with the game, they are making decisions about balance, pattern recognition, and color sorting. These are the building blocks of early mathematics and problem-solving skills!</p>
+        
+        <h3>5 Fun Activities to Try Together:</h3>
+        <ul class="task-list">
+            <li><strong>1. Color Sorting Challenge:</strong> Can you build a really tall tower using only the red blocks?</li>
+            <li><strong>2. Shape Matching Explorer:</strong> Let's pick the "Star" from the menu. Can you put blocks exactly where the shadow shows us?</li>
+            <li><strong>3. Counting Constructor:</strong> Build a small house and let's count out loud how many blocks you used. Can you build something using exactly 5 blocks?</li>
+            <li><strong>4. Pattern Maker:</strong> Make a line of blocks in a pattern: Blue, Red, Blue, Red. What color do you think comes next?</li>
+            <li><strong>5. Free Play Storytime:</strong> Build an animal from your imagination. Once you are done, tell me a story about where your animal lives and what sound it makes!</li>
+        </ul>
+
+        <h2>Answers & Guidance for the Activities</h2>
+        <p><strong>Activity 1:</strong> Help your child find the red color swatch on the left. Encourage them to drag and stack the blocks vertically. Celebrate when the tower gets high!</p>
+        <p><strong>Activity 2:</strong> Click the drop-down menu at the top, select "Star", and click the "Blueprint" lightbulb button to show them the guide. Let them match the blocks to the faint image on the play area.</p>
+        <p><strong>Activity 3:</strong> Count out loud together as they place each block. (e.g., "One... Two..."). If they go over 5, remind them they can double-tap to remove extras!</p>
+        <p><strong>Activity 4:</strong> Start the pattern for them, then ask them to pick the next color. Point to the colors as you say the pattern out loud to reinforce auditory and visual learning.</p>
+        <p><strong>Activity 5:</strong> Let their imagination lead! Ask open-ended questions like "What does it like to eat?" or "How does it move?". This builds language and narrative skills alongside their visual creation.</p>
+        
+    </div>
+
+<script>
+    // --- Ribbon Toggle Logic ---
+    const topHeader = document.getElementById('top-header');
+    const headerToggle = document.getElementById('header-toggle');
+    
+    headerToggle.addEventListener('pointerdown', (e) => {
+        e.preventDefault(); 
+        e.stopPropagation();
+        triggerHaptic('light');
+        playSound('pickup');
+        
+        topHeader.classList.toggle('collapsed');
+        headerToggle.innerHTML = topHeader.classList.contains('collapsed') ? '▼' : '▲';
+    });
+
+    // --- Haptic Feedback Engine ---
+    function triggerHaptic(strength) {
+        if (typeof navigator !== 'undefined' && navigator.vibrate) {
+            try {
+                if (strength === 'light') navigator.vibrate(10);
+                else if (strength === 'heavy') navigator.vibrate([20, 10, 20]);
+                else navigator.vibrate(15);
+            } catch (e) {}
+        }
+    }
+
+    // --- Audio System ---
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let actx = null;
+
+    function initAudio() {
+        if (!actx) actx = new AudioCtx();
+        if (actx.state === 'suspended') actx.resume();
+    }
+
+    function playSound(type) {
+        if (!actx) return;
+        const osc = actx.createOscillator();
+        const gain = actx.createGain();
+        osc.connect(gain); gain.connect(actx.destination);
+        const now = actx.currentTime;
+        
+        if (type === 'pop') {
+            triggerHaptic('light');
+            osc.type = 'sine'; osc.frequency.setValueAtTime(400, now); osc.frequency.exponentialRampToValueAtTime(800, now + 0.1);
+            gain.gain.setValueAtTime(0.3, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+            osc.start(now); osc.stop(now + 0.1);
+        } else if (type === 'pickup') {
+            triggerHaptic('medium');
+            osc.type = 'triangle'; osc.frequency.setValueAtTime(600, now); osc.frequency.exponentialRampToValueAtTime(300, now + 0.1);
+            gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+            osc.start(now); osc.stop(now + 0.1);
+        } else if (type === 'trash') {
+            triggerHaptic('heavy');
+            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(200, now); osc.frequency.exponentialRampToValueAtTime(50, now + 0.2);
+            gain.gain.setValueAtTime(0.2, now); gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+            osc.start(now); osc.stop(now + 0.2);
+        } else if (type === 'magic') {
+            triggerHaptic('heavy');
+            osc.type = 'sine'; osc.frequency.setValueAtTime(400, now); osc.frequency.setValueAtTime(600, now + 0.1); osc.frequency.setValueAtTime(800, now + 0.2);
+            gain.gain.setValueAtTime(0.2, now); gain.gain.linearRampToValueAtTime(0.01, now + 0.4);
+            osc.start(now); osc.stop(now + 0.4);
+        }
+    }
+
+    const MAX_BLOCKS = 300;
+    const BLOCK_SIZE = 50;
+    const COLORS = [
+        '#FF4757', '#FFA502', '#F1C40F', '#2ED573', 
+        '#1E90FF', '#3742FA', '#9C88FF', '#FF6B81', 
+        '#FFFFFF', '#2F3542', '#00CED1', '#8B4513'
+    ];
+    
+    const SEASONS = [
+        { name: 'Summer', skyTop: '#87CEEB', skyBot: '#E0F6FF', hill1: '#78E08F', hill2: '#B8E994' },
+        { name: 'Autumn', skyTop: '#FFB870', skyBot: '#FFE4B5', hill1: '#E17055', hill2: '#FAB1A0' },
+        { name: 'Winter', skyTop: '#B0C4DE', skyBot: '#F0F8FF', hill1: '#FFFFFF', hill2: '#E8F3F8' }
+    ];
+    let seasonTimer = 0;
+    const SEASON_DURATION = 20000; 
+    let lastRenderTime = performance.now();
+
+    let blocks = []; 
+    let history = [];
+    let historyIndex = -1;
+
+    let offsetX = 0, offsetY = 0, zoom = 1.0;
+    
+    let isPanning = false, panStartX, panStartY;
+    let panSpeedX = 0, panSpeedY = 0;
+    const PAN_VELOCITY = 15;
+
+    let isDragging = false;
+    let draggedBlock = null; 
+    let mouseScreenX = 0, mouseScreenY = 0;
+    let dragTilt = 0; 
+    
+    let lastTapTime = 0, lastTapX = 0, lastTapY = 0;
+    let hoveredBlockIndex = -1;
+    let activePointerId = null;
+
+    let particles = [];
+    let weatherSystem = [];
+    let clouds = [
+        {x: 100, y: 50, speed: 0.2, scale: 1}, {x: 400, y: 100, speed: 0.1, scale: 1.5},
+        {x: 800, y: 80, speed: 0.3, scale: 0.8}, {x: 1200, y: 150, speed: 0.15, scale: 1.2}
+    ];
+
+    const TEMPLATES = {
+        castle: [{x:-3,y:0,c:8},{x:-2,y:0,c:8},{x:-1,y:0,c:8},{x:0,y:0,c:8},{x:1,y:0,c:8},{x:2,y:0,c:8},{x:3,y:0,c:8},{x:-3,y:1,c:8},{x:-2,y:1,c:8},{x:-1,y:1,c:8},{x:0,y:1,c:9},{x:1,y:1,c:8},{x:2,y:1,c:8},{x:3,y:1,c:8},{x:-3,y:2,c:8},{x:-2,y:2,c:8},{x:-1,y:2,c:8},{x:0,y:2,c:9},{x:1,y:2,c:8},{x:2,y:2,c:8},{x:3,y:2,c:8},{x:-3,y:3,c:8},{x:-1,y:3,c:8},{x:1,y:3,c:8},{x:3,y:3,c:8},{x:-3,y:4,c:0},{x:3,y:4,c:0}],
+        rocket: [{x:-1,y:0,c:1},{x:1,y:0,c:1},{x:-1,y:1,c:8},{x:0,y:1,c:8},{x:1,y:1,c:8},{x:-1,y:2,c:8},{x:0,y:2,c:4},{x:1,y:2,c:8},{x:-2,y:3,c:0},{x:-1,y:3,c:8},{x:0,y:3,c:8},{x:1,y:3,c:8},{x:2,y:3,c:0},{x:-1,y:4,c:8},{x:0,y:4,c:8},{x:1,y:4,c:8},{x:0,y:5,c:0}],
+        dino: [{x:-1,y:0,c:3},{x:1,y:0,c:3},{x:2,y:0,c:3},{x:-1,y:1,c:3},{x:1,y:1,c:3},{x:2,y:1,c:3},{x:-2,y:2,c:3},{x:-1,y:2,c:3},{x:0,y:2,c:3},{x:1,y:2,c:3},{x:2,y:2,c:3},{x:3,y:2,c:3},{x:-3,y:3,c:3},{x:-2,y:3,c:3},{x:-1,y:3,c:3},{x:0,y:3,c:3},{x:1,y:3,c:3},{x:-1,y:4,c:3},{x:0,y:4,c:3},{x:-1,y:5,c:3},{x:0,y:5,c:3},{x:1,y:5,c:3},{x:0,y:6,c:9}],
+        flower: [{x:0,y:0,c:3},{x:0,y:1,c:3},{x:0,y:2,c:3},{x:-1,y:1,c:3},{x:1,y:2,c:3},{x:0,y:3,c:2},{x:0,y:4,c:7},{x:0,y:2,c:7},{x:-1,y:3,c:7},{x:1,y:3,c:7}],
+        tree: [ {x:0,y:0,c:11}, {x:0,y:1,c:11}, {x:-1,y:2,c:3}, {x:0,y:2,c:3}, {x:1,y:2,c:3}, {x:-1,y:3,c:3}, {x:0,y:3,c:3}, {x:1,y:3,c:3}, {x:0,y:4,c:3} ],
+        car: [ {x:-2,y:0,c:9}, {x:1,y:0,c:9}, {x:-3,y:1,c:0}, {x:-2,y:1,c:0}, {x:-1,y:1,c:0}, {x:0,y:1,c:0}, {x:1,y:1,c:0}, {x:2,y:1,c:0}, {x:-1,y:2,c:4}, {x:0,y:2,c:0}, {x:1,y:2,c:4} ],
+        robot: [ {x:-1,y:0,c:9}, {x:1,y:0,c:9}, {x:-1,y:1,c:8}, {x:0,y:1,c:8}, {x:1,y:1,c:8}, {x:-2,y:2,c:5}, {x:-1,y:2,c:8}, {x:0,y:2,c:8}, {x:1,y:2,c:8}, {x:2,y:2,c:5}, {x:-1,y:3,c:8}, {x:0,y:3,c:8}, {x:1,y:3,c:8}, {x:-1,y:4,c:0}, {x:1,y:4,c:0}, {x:0,y:5,c:8} ],
+        house: [ {x:-1,y:0,c:2}, {x:0,y:0,c:11}, {x:1,y:0,c:2}, {x:-1,y:1,c:2}, {x:0,y:1,c:11}, {x:1,y:1,c:2}, {x:-2,y:2,c:0}, {x:-1,y:2,c:0}, {x:0,y:2,c:0}, {x:1,y:2,c:0}, {x:2,y:2,c:0}, {x:-1,y:3,c:0}, {x:0,y:3,c:0}, {x:1,y:3,c:0}, {x:0,y:4,c:0} ],
+        star: [ {x:-1,y:0,c:2}, {x:1,y:0,c:2}, {x:-2,y:1,c:2}, {x:0,y:1,c:2}, {x:2,y:1,c:2}, {x:-3,y:2,c:2}, {x:-1,y:2,c:2}, {x:1,y:2,c:2}, {x:3,y:2,c:2}, {x:-2,y:3,c:2}, {x:0,y:3,c:2}, {x:2,y:3,c:2}, {x:0,y:4,c:2} ],
+        face: [ {x:0,y:0,c:1}, {x:-1,y:1,c:1}, {x:0,y:1,c:0}, {x:1,y:1,c:1}, {x:-2,y:2,c:1}, {x:-1,y:2,c:1}, {x:0,y:2,c:1}, {x:1,y:2,c:1}, {x:2,y:2,c:1}, {x:-1,y:3,c:5}, {x:0,y:3,c:1}, {x:1,y:3,c:5}, {x:0,y:4,c:1} ]
+    };
+    let activeTemplate = 'none';
+
+    // --- DOM Elements ---
+    const canvas = document.getElementById('main-canvas');
+    const ctx = canvas.getContext('2d');
+    const refCanvas = document.getElementById('ref-canvas');
+    const refCtx = refCanvas.getContext('2d');
+    
+    const paletteDiv = document.getElementById('palette');
+    const templateSelect = document.getElementById('template-select');
+    
+    const btnUndo = document.getElementById('btn-undo');
+    const btnRedo = document.getElementById('btn-redo');
+    const btnReset = document.getElementById('btn-reset');
+    const zoomInBtn = document.getElementById('btn-zoom-in');
+    const zoomOutBtn = document.getElementById('btn-zoom-out');
+    const btnFullscreen = document.getElementById('btn-fullscreen');
+    
+    const btnBlueprint = document.getElementById('btn-blueprint');
+    const blueprintOverlay = document.getElementById('blueprint-overlay');
+    const btnCloseBlueprint = document.getElementById('btn-close-blueprint');
+
+    // --- Initialization ---
+    function init() {
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Initial Center Positioning
+        offsetX = canvas.width / 2;
+        offsetY = canvas.height * 0.65; 
+
+        COLORS.forEach(color => {
+            let swatch = document.createElement('div');
+            swatch.className = 'color-swatch';
+            swatch.style.backgroundColor = color;
+            
+            let holdTimer = null;
+            let isScrolling = false;
+            let startX = 0, startY = 0;
+
+            const triggerDrag = (e) => {
+                initAudio(); triggerHaptic('light');
+                if(blocks.length >= MAX_BLOCKS) return;
+                
+                isDragging = true;
+                updateMousePos(e);
+                
+                dragRenderX = mouseScreenX; dragRenderY = mouseScreenY;
+                hoveredBlockIndex = -1;
+                
+                draggedBlock = { 
+                    color: color, sourceIndex: -1, 
+                    offsetX: BLOCK_SIZE / 2, offsetY: BLOCK_SIZE / 2,
+                    scale: 0.5, targetScale: 1.15
+                };
+                
+                playSound('pickup');
+                document.getElementById('helper').style.display = 'none';
+                
+                swatch.setPointerCapture(e.pointerId);
+                activePointerId = e.pointerId;
+            };
+
+            swatch.addEventListener('pointerdown', (e) => {
+                if (e.pointerType === 'mouse') {
+                    e.preventDefault(); 
+                    e.stopPropagation();
+                    isScrolling = false;
+                    triggerDrag(e);
+                    return;
+                }
+                
+                isScrolling = false;
+                startX = e.clientX;
+                startY = e.clientY;
+                
+                holdTimer = setTimeout(() => {
+                    if (!isScrolling) triggerDrag(e);
+                }, 80); 
+            });
+
+            swatch.addEventListener('pointermove', (e) => {
+                if (isDragging) {
+                    onPointerMove(e); 
+                    return;
+                }
+                
+                if (e.pointerType !== 'mouse' && !isScrolling) {
+                    let dx = Math.abs(e.clientX - startX);
+                    let dy = Math.abs(e.clientY - startY);
+                    
+                    if (dx > 5 && dx > dy) {
+                        clearTimeout(holdTimer);
+                        triggerDrag(e);
+                    } else if (dy > 5 && dy > dx) {
+                        isScrolling = true;
+                        clearTimeout(holdTimer);
+                    }
+                }
+            });
+
+            swatch.addEventListener('pointerup', (e) => {
+                clearTimeout(holdTimer);
+                if (isDragging) onPointerUp(e);
+            });
+
+            swatch.addEventListener('pointercancel', (e) => {
+                clearTimeout(holdTimer);
+                if (isDragging) onPointerUp(e);
+            });
+            
+            paletteDiv.appendChild(swatch);
+        });
+
+        // Initialize D-Pad Camera Controls
+        function bindNavBtn(id, dx, dy) {
+            let btn = document.getElementById(id);
+            const start = (e) => { e.preventDefault(); panSpeedX = dx; panSpeedY = dy; triggerHaptic('light'); };
+            const stop = (e) => { e.preventDefault(); panSpeedX = 0; panSpeedY = 0; };
+            
+            btn.addEventListener('pointerdown', start);
+            btn.addEventListener('pointerup', stop);
+            btn.addEventListener('pointerleave', stop);
+            btn.addEventListener('pointercancel', stop);
+            btn.addEventListener('touchstart', start, {passive: false});
+            btn.addEventListener('touchend', stop, {passive: false});
+        }
+        
+        bindNavBtn('nav-up', 0, PAN_VELOCITY);
+        bindNavBtn('nav-down', 0, -PAN_VELOCITY);
+        bindNavBtn('nav-left', PAN_VELOCITY, 0);
+        bindNavBtn('nav-right', -PAN_VELOCITY, 0);
+
+        document.getElementById('nav-center').addEventListener('pointerdown', (e) => {
+            e.preventDefault(); triggerHaptic('medium');
+            offsetX = canvas.width / 2; offsetY = canvas.height * 0.65; zoom = 1.0;
+        });
+
+        saveState(); 
+        requestAnimationFrame(gameLoop);
+    }
+
+    function resizeCanvas() {
+        const workspace = document.getElementById('workspace');
+        canvas.width = workspace.clientWidth;
+        canvas.height = workspace.clientHeight;
+    }
+
+    function hexToRgb(hex) {
+        let bigint = parseInt(hex.replace('#',''), 16);
+        return {r: (bigint >> 16) & 255, g: (bigint >> 8) & 255, b: bigint & 255};
+    }
+
+    function lerpColor(a, b, amount) {
+        let rgbA = hexToRgb(a); let rgbB = hexToRgb(b);
+        let r = Math.round(rgbA.r + (rgbB.r - rgbA.r) * amount);
+        let g = Math.round(rgbA.g + (rgbB.g - rgbA.g) * amount);
+        let bOut = Math.round(rgbA.b + (rgbB.b - rgbA.b) * amount);
+        return `rgb(${r},${g},${bOut})`;
+    }
+
+    function saveState() {
+        history = history.slice(0, historyIndex + 1);
+        history.push(JSON.parse(JSON.stringify(blocks)));
+        historyIndex++;
+        updateUI();
+    }
+
+    function undo() {
+        if (historyIndex > 0) {
+            historyIndex--;
+            blocks = JSON.parse(JSON.stringify(history[historyIndex]));
+            updateUI(); playSound('trash'); spawnParticles(canvas.width/2, canvas.height/2, '#999');
+        }
+    }
+
+    function redo() {
+        if (historyIndex < history.length - 1) {
+            historyIndex++;
+            blocks = JSON.parse(JSON.stringify(history[historyIndex]));
+            updateUI(); playSound('pop');
+        }
+    }
+
+    function reset() {
+        blocks = []; saveState();
+        offsetX = canvas.width / 2; offsetY = canvas.height * 0.65; zoom = 1.0;
+        playSound('magic'); spawnParticles(canvas.width/2, canvas.height/2, '#FFDE59', 30);
+    }
+
+    function updateUI() {
+        btnUndo.disabled = historyIndex <= 0;
+        btnRedo.disabled = historyIndex >= history.length - 1;
+    }
+
+    function screenToWorld(x, y) { return { x: (x - offsetX) / zoom, y: (y - offsetY) / zoom }; }
+    function worldToScreen(x, y) { return { x: (x * zoom) + offsetX, y: (y * zoom) + offsetY }; }
+
+    function spawnParticles(screenX, screenY, color, count=10) {
+        for(let i=0; i<count; i++) {
+            particles.push({
+                x: screenX, y: screenY,
+                vx: (Math.random() - 0.5) * 15, vy: (Math.random() - 1) * 15,
+                life: 1.0, color: color, size: Math.random() * 8 + 4
+            });
+        }
+    }
+
+    function updateAndDrawEffects(ctx, s1, s2, blend) {
+        for(let i = particles.length - 1; i >= 0; i--) {
+            let p = particles[i];
+            p.x += p.vx; p.y += p.vy;
+            p.vy += 0.5; p.life -= 0.02;
+            if(p.life <= 0) { particles.splice(i, 1); continue; }
+            ctx.globalAlpha = p.life; ctx.fillStyle = p.color;
+            ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
+        }
+        ctx.globalAlpha = 1.0;
+
+        if (Math.random() < 0.05) {
+            let currentS = (blend > 0.5) ? s2.name : s1.name;
+            if (currentS === 'Winter') {
+                weatherSystem.push({ x: Math.random() * canvas.width, y: -20, vx: (Math.random() - 0.5)*2, vy: Math.random() * 2 + 1, type: 'snow' });
+            } else if (currentS === 'Autumn') {
+                weatherSystem.push({ x: Math.random() * canvas.width, y: -20, vx: Math.random() * 3 + 1, vy: Math.random() * 1.5 + 1, type: 'leaf' });
+            } else if (currentS === 'Summer' && Math.random() < 0.2) {
+                weatherSystem.push({ x: Math.random() * canvas.width, y: canvas.height + 20, vx: (Math.random() - 0.5), vy: -(Math.random() * 2 + 1), type: 'bubble' });
+            }
+        }
+
+        for(let i = weatherSystem.length - 1; i >= 0; i--) {
+            let w = weatherSystem[i];
+            w.x += w.vx; w.y += w.vy;
+            if (w.type === 'snow') {
+                ctx.fillStyle = 'rgba(255,255,255,0.8)';
+                ctx.beginPath(); ctx.arc(w.x, w.y, 4, 0, Math.PI * 2); ctx.fill();
+            } else if (w.type === 'leaf') {
+                ctx.fillStyle = '#E67E22'; ctx.fillRect(w.x, w.y, 8, 6);
+            } else if (w.type === 'bubble') {
+                ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.lineWidth = 1;
+                ctx.beginPath(); ctx.arc(w.x, w.y, 6, 0, Math.PI * 2); ctx.stroke();
+            }
+            if (w.y > canvas.height + 50 || w.y < -50 || w.x > canvas.width + 50) weatherSystem.splice(i, 1);
+        }
+    }
+
+    function drawScenery(ctx) {
+        let currentSeasonIdx = Math.floor(seasonTimer / SEASON_DURATION) % SEASONS.length;
+        let nextSeasonIdx = (currentSeasonIdx + 1) % SEASONS.length;
+        let transitionProgress = (seasonTimer % SEASON_DURATION) / SEASON_DURATION;
+        
+        let blend = 0; 
+        if (transitionProgress > 0.7) blend = (transitionProgress - 0.7) / 0.3;
+        
+        let s1 = SEASONS[currentSeasonIdx];
+        let s2 = SEASONS[nextSeasonIdx];
+
+        let skyTop = lerpColor(s1.skyTop, s2.skyTop, blend);
+        let skyBot = lerpColor(s1.skyBot, s2.skyBot, blend);
+        let hill1 = lerpColor(s1.hill1, s2.hill1, blend);
+        let hill2 = lerpColor(s1.hill2, s2.hill2, blend);
+
+        let grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        grad.addColorStop(0, skyTop); grad.addColorStop(1, skyBot);
+        ctx.fillStyle = grad; ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = 'rgba(255,255,255,0.8)';
+        clouds.forEach(c => {
+            c.x += c.speed;
+            if (c.x > canvas.width + 100) c.x = -100;
+            ctx.beginPath(); ctx.arc(c.x, c.y, 30*c.scale, 0, Math.PI*2);
+            ctx.arc(c.x + 25*c.scale, c.y - 15*c.scale, 35*c.scale, 0, Math.PI*2);
+            ctx.arc(c.x + 50*c.scale, c.y, 25*c.scale, 0, Math.PI*2); ctx.fill();
+        });
+
+        ctx.fillStyle = hill1;
+        ctx.beginPath(); ctx.moveTo(0, offsetY + BLOCK_SIZE);
+        ctx.quadraticCurveTo(canvas.width*0.25, offsetY - 20, canvas.width*0.5, offsetY + BLOCK_SIZE);
+        ctx.quadraticCurveTo(canvas.width*0.75, offsetY + 60, canvas.width, offsetY + BLOCK_SIZE);
+        ctx.lineTo(canvas.width, canvas.height); ctx.lineTo(0, canvas.height); ctx.fill();
+
+        ctx.fillStyle = hill2; ctx.fillRect(0, offsetY + BLOCK_SIZE, canvas.width, 10);
+        return {s1, s2, blend};
+    }
+
+    // --- Core Rendering Loop ---
+    let dashOffset = 0;
+
+    function gameLoop() {
+        let now = performance.now();
+        let dt = now - lastRenderTime;
+        lastRenderTime = now;
+        seasonTimer += dt;
+        dashOffset -= 0.5;
+        
+        offsetX += panSpeedX; offsetY += panSpeedY;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let seasonData = drawScenery(ctx);
+        
+        ctx.save();
+        ctx.translate(offsetX, offsetY);
+        ctx.scale(zoom, zoom);
+
+        if (activeTemplate !== 'none') {
+            const template = TEMPLATES[activeTemplate];
+            ctx.globalAlpha = 0.3;
+            template.forEach(b => drawRoundedBlock(ctx, b.x * BLOCK_SIZE, -(b.y * BLOCK_SIZE), COLORS[b.c], false));
+            ctx.globalAlpha = 1.0;
+        }
+
+        blocks.forEach((b, i) => {
+            drawRoundedBlock(ctx, b.x, b.y, b.color, true);
+            
+            if (i === hoveredBlockIndex && !isDragging) {
+                ctx.save();
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+                ctx.lineWidth = 4; ctx.lineDashOffset = dashOffset; ctx.setLineDash([8, 6]);
+                ctx.beginPath();
+                if(ctx.roundRect) ctx.roundRect(b.x - 3, b.y - 12, BLOCK_SIZE + 6, BLOCK_SIZE + 14, 10);
+                else ctx.rect(b.x - 3, b.y - 12, BLOCK_SIZE + 6, BLOCK_SIZE + 14);
+                ctx.stroke(); ctx.restore();
+            }
+        });
+
+        if (isDragging && draggedBlock) {
+            let worldPos = screenToWorld(mouseScreenX, mouseScreenY);
+            let snap = calculateSnap(worldPos.x - draggedBlock.offsetX + BLOCK_SIZE/2, worldPos.y - draggedBlock.offsetY + BLOCK_SIZE/2);
+            
+            ctx.globalAlpha = 0.4;
+            drawRoundedBlock(ctx, snap.x, snap.y, draggedBlock.color, true);
+            ctx.globalAlpha = 1.0;
+        }
+
+        ctx.restore();
+
+        // 1:1 DRAGGING
+        if (isDragging && draggedBlock) {
+            draggedBlock.scale += (draggedBlock.targetScale - draggedBlock.scale) * 0.35;
+            
+            dragTilt *= 0.8; 
+            let tilt = Math.max(-0.25, Math.min(0.25, dragTilt)); 
+
+            ctx.save();
+            ctx.translate(
+                mouseScreenX - (draggedBlock.offsetX * zoom), 
+                mouseScreenY - (draggedBlock.offsetY * zoom)
+            );
+            
+            ctx.scale(zoom, zoom); 
+            ctx.translate(BLOCK_SIZE/2, BLOCK_SIZE/2);
+            ctx.rotate(tilt); 
+            ctx.scale(draggedBlock.scale, draggedBlock.scale);
+            ctx.translate(-BLOCK_SIZE/2, -BLOCK_SIZE/2);
+            
+            drawRoundedBlock(ctx, 0, 0, draggedBlock.color, true);
+            ctx.restore();
+        }
+
+        updateAndDrawEffects(ctx, seasonData.s1, seasonData.s2, seasonData.blend);
+        requestAnimationFrame(gameLoop);
+    }
+
+    function drawRoundedBlock(ctx, x, y, color, shiny=true) {
+        const radius = 8; const sz = BLOCK_SIZE;
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        if(ctx.roundRect) ctx.roundRect(x, y, sz, sz, radius); else ctx.rect(x, y, sz, sz);
+        ctx.fill();
+        
+        if (shiny) {
+            ctx.fillStyle = 'rgba(255,255,255,0.4)';
+            ctx.beginPath();
+            if(ctx.roundRect) ctx.roundRect(x, y, sz, 10, [radius, radius, 0, 0]); else ctx.rect(x, y, sz, 10);
+            ctx.fill();
+            
+            ctx.fillStyle = 'rgba(0,0,0,0.15)';
+            ctx.beginPath();
+            if(ctx.roundRect) ctx.roundRect(x, y + sz - 10, sz, 10, [0, 0, radius, radius]); else ctx.rect(x, y + sz - 10, sz, 10);
+            ctx.fill();
+            
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            if(ctx.roundRect) ctx.roundRect(x + 12, y - 8, sz - 24, 12, 4); else ctx.rect(x + 12, y - 8, sz - 24, 12);
+            ctx.fill();
+            
+            ctx.fillStyle = 'rgba(255,255,255,0.4)'; 
+            ctx.fillRect(x + 15, y - 6, sz - 30, 3);
+        }
+    }
+
+    function updateMousePos(e) {
+        const rect = canvas.getBoundingClientRect();
+        mouseScreenX = e.clientX - rect.left; 
+        mouseScreenY = e.clientY - rect.top;
+    }
+
+    function getBlockAt(worldX, worldY) {
+        const PAD = 15; 
+        for (let i = blocks.length - 1; i >= 0; i--) {
+            let b = blocks[i];
+            if (worldX >= b.x - PAD && worldX <= b.x + BLOCK_SIZE + PAD && 
+                worldY >= b.y - 12 - PAD && worldY <= b.y + BLOCK_SIZE + PAD) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    function isOccupied(x, y) { return blocks.some(b => b.x === x && b.y === y); }
+
+    function calculateSnap(worldX, worldY) {
+        let snapX = Math.round((worldX - BLOCK_SIZE/2) / BLOCK_SIZE) * BLOCK_SIZE;
+        let snapY = Math.round((worldY - BLOCK_SIZE/2) / BLOCK_SIZE) * BLOCK_SIZE;
+        if (snapY > 0) snapY = 0; 
+        while (isOccupied(snapX, snapY)) snapY -= BLOCK_SIZE;
+        return { x: snapX, y: snapY };
+    }
+
+    const onPointerMove = (e) => {
+        if (activePointerId !== null && activePointerId !== e.pointerId) return; 
+        
+        let moveX = (e.clientX - canvas.getBoundingClientRect().left) - mouseScreenX;
+        if (isDragging) dragTilt += moveX * 0.02; 
+        
+        updateMousePos(e);
+
+        if (!isDragging && !isPanning) {
+            let worldPos = screenToWorld(mouseScreenX, mouseScreenY);
+            hoveredBlockIndex = getBlockAt(worldPos.x, worldPos.y);
+        } else {
+            hoveredBlockIndex = -1;
+        }
+
+        if (isDragging || isPanning) { e.preventDefault(); e.stopPropagation(); }
+        
+        if (isPanning) {
+            offsetX = mouseScreenX - panStartX;
+            offsetY = mouseScreenY - panStartY;
+        }
+    };
+
+    const onPointerUp = (e) => {
+        if (activePointerId !== e.pointerId) return;
+        e.preventDefault(); e.stopPropagation();
+
+        if (isDragging && draggedBlock) {
+            if (mouseScreenX >= 0 && mouseScreenX <= canvas.width &&
+                mouseScreenY >= 0 && mouseScreenY <= canvas.height) {
+                
+                let worldPos = screenToWorld(mouseScreenX, mouseScreenY);
+                let blockOriginX = worldPos.x - draggedBlock.offsetX;
+                let blockOriginY = worldPos.y - draggedBlock.offsetY;
+                let snap = calculateSnap(blockOriginX + BLOCK_SIZE/2, blockOriginY + BLOCK_SIZE/2);
+                
+                blocks.push({ x: snap.x, y: snap.y, color: draggedBlock.color });
+                blocks.sort((a, b) => b.y !== a.y ? b.y - a.y : a.x - b.x);
+                
+                playSound('pop');
+                let sc = worldToScreen(snap.x + BLOCK_SIZE/2, snap.y + BLOCK_SIZE/2);
+                spawnParticles(sc.x, sc.y, draggedBlock.color, 15);
+                
+                saveState();
+            } else if (draggedBlock.sourceIndex !== -1) {
+                playSound('trash'); triggerHaptic('heavy');
+                spawnParticles(mouseScreenX, mouseScreenY, draggedBlock.color, 25);
+                saveState();
+            }
+            isDragging = false; draggedBlock = null;
+        }
+        
+        isPanning = false;
+        try { e.target.releasePointerCapture(e.pointerId); } catch(err) {}
+        activePointerId = null;
+    };
+
+    const onCanvasPointerDown = (e) => {
+        if (e.pointerType === 'mouse' && e.button !== 0 && e.button !== 1 && e.button !== 2) return;
+        
+        e.preventDefault(); e.stopPropagation();
+        initAudio(); updateMousePos(e);
+        
+        canvas.setPointerCapture(e.pointerId);
+        activePointerId = e.pointerId;
+        
+        if (e.pointerType === 'mouse' && (e.button === 2 || e.button === 1)) {
+            isPanning = true; 
+            panStartX = mouseScreenX - offsetX; panStartY = mouseScreenY - offsetY;
+            return;
+        }
+
+        let worldPos = screenToWorld(mouseScreenX, mouseScreenY);
+        let clickedIndex = getBlockAt(worldPos.x, worldPos.y);
+        
+        let now = Date.now();
+        let dist = Math.hypot(mouseScreenX - lastTapX, mouseScreenY - lastTapY);
+
+        if (now - lastTapTime < 300 && dist < 20 && clickedIndex !== -1) {
+            let b = blocks[clickedIndex];
+            blocks.splice(clickedIndex, 1);
+            playSound('trash'); triggerHaptic('heavy');
+            spawnParticles(mouseScreenX, mouseScreenY, b.color, 20);
+            saveState();
+            
+            lastTapTime = 0; isDragging = false; draggedBlock = null; hoveredBlockIndex = -1;
+            updateUI(); canvas.releasePointerCapture(e.pointerId); activePointerId = null;
+            return;
+        }
+        
+        lastTapTime = now; lastTapX = mouseScreenX; lastTapY = mouseScreenY;
+
+        if (clickedIndex !== -1) {
+            isDragging = true;
+            let b = blocks[clickedIndex];
+            
+            let offX = worldPos.x - b.x;
+            let offY = worldPos.y - b.y;
+            dragTilt = 0;
+            
+            dragRenderX = mouseScreenX; dragRenderY = mouseScreenY;
+            
+            draggedBlock = { 
+                color: b.color, sourceIndex: clickedIndex, 
+                offsetX: offX, offsetY: offY,
+                scale: 0.7, targetScale: 1.15
+            };
+            
+            blocks.splice(clickedIndex, 1);
+            playSound('pickup'); triggerHaptic('light');
+            hoveredBlockIndex = -1;
+            updateUI(); 
+        }
+    };
+
+    canvas.addEventListener('pointerdown', onCanvasPointerDown);
+    canvas.addEventListener('pointermove', onPointerMove);
+    canvas.addEventListener('pointerup', onPointerUp);
+    canvas.addEventListener('pointercancel', onPointerUp);
+    canvas.addEventListener('contextmenu', e => e.preventDefault());
+
+    canvas.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const oldZoom = zoom;
+        zoom += (e.deltaY < 0) ? 0.1 : -0.1;
+        zoom = Math.max(0.4, Math.min(zoom, 2.5));
+        offsetX = mouseScreenX - ((mouseScreenX - offsetX) / oldZoom * zoom);
+        offsetY = mouseScreenY - ((mouseScreenY - offsetY) / oldZoom * zoom);
+    }, {passive: false});
+
+    // --- UI Listeners ---
+    btnUndo.addEventListener('click', undo);
+    btnRedo.addEventListener('click', redo);
+    btnReset.addEventListener('click', reset);
+    
+    btnFullscreen.addEventListener('click', () => {
+        const simulatorNode = document.getElementById('simulator-container');
+        if (!document.fullscreenElement) {
+            if (simulatorNode.requestFullscreen) simulatorNode.requestFullscreen().catch(()=>{});
+            else if (simulatorNode.webkitRequestFullscreen) simulatorNode.webkitRequestFullscreen();
+            btnFullscreen.textContent = '↙️';
+            simulatorNode.style.maxWidth = '100%';
+            simulatorNode.style.height = '100vh';
+            simulatorNode.style.margin = '0';
+            simulatorNode.style.border = 'none';
+            simulatorNode.style.borderRadius = '0';
+        } else {
+            if (document.exitFullscreen) document.exitFullscreen();
+            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+            btnFullscreen.textContent = '📺';
+            simulatorNode.style.maxWidth = '1000px';
+            simulatorNode.style.height = '70vh';
+            simulatorNode.style.margin = '0 auto 40px auto';
+            simulatorNode.style.border = '2px solid rgba(0, 243, 255, 0.5)';
+            simulatorNode.style.borderRadius = '15px';
+        }
+        playSound('pickup');
+    });
+
+    zoomInBtn.addEventListener('click', () => { zoom = Math.min(zoom + 0.2, 2.5); playSound('pickup'); });
+    zoomOutBtn.addEventListener('click', () => { zoom = Math.max(zoom - 0.2, 0.4); playSound('pickup'); });
+
+    templateSelect.addEventListener('change', (e) => {
+        activeTemplate = e.target.value; playSound('magic'); triggerHaptic('medium');
+        spawnParticles(canvas.width/2, canvas.height/4, '#FFDE59', 20);
+        if (activeTemplate === 'none') {
+            btnBlueprint.style.display = 'none';
+        } else {
+            btnBlueprint.style.display = 'inline-block';
+            openBlueprintModal();
+        }
+    });
+
+    btnBlueprint.addEventListener('click', openBlueprintModal);
+    btnCloseBlueprint.addEventListener('click', () => {
+        playSound('pickup');
+        blueprintOverlay.style.display = 'none';
+    });
+
+    function openBlueprintModal() {
+        playSound('pickup');
+        blueprintOverlay.style.display = 'flex';
+        setTimeout(drawBlueprintModal, 50);
+    }
+
+    function drawBlueprintModal() {
+        if (activeTemplate === 'none') return;
+        const modal = document.querySelector('.blueprint-modal');
+        refCanvas.width = modal.clientWidth - 40;
+        refCanvas.height = modal.clientHeight - 100; 
+        refCtx.clearRect(0, 0, refCanvas.width, refCanvas.height);
+        
+        const template = TEMPLATES[activeTemplate];
+        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+        template.forEach(b => {
+            if(b.x < minX) minX = b.x; if(b.x > maxX) maxX = b.x;
+            if(b.y < minY) minY = b.y; if(b.y > maxY) maxY = b.y;
+        });
+
+        let wUnits = (maxX - minX + 1), hUnits = (maxY - minY + 1);
+        let scale = Math.min((refCanvas.width - 20) / (wUnits * BLOCK_SIZE), (refCanvas.height - 20) / (hUnits * BLOCK_SIZE));
+
+        refCtx.save(); refCtx.translate(refCanvas.width / 2, refCanvas.height / 2); refCtx.scale(scale, scale);
+        let cx = ((minX + maxX) / 2) * BLOCK_SIZE + (BLOCK_SIZE/2);
+        let cy = -((minY + maxY) / 2) * BLOCK_SIZE - (BLOCK_SIZE/2);
+        refCtx.translate(-cx, -cy);
+
+        template.forEach(b => drawRoundedBlock(refCtx, b.x * BLOCK_SIZE, -(b.y * BLOCK_SIZE), COLORS[b.c], true));
+        refCtx.restore();
+    }
+
+    init();
+</script>
+</body>
+</html>

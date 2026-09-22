@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRO Voltage Measurement Simulator - LuyaliSims</title>
+    
+    <!-- Tailwind CSS for Simulator UI layout -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Import Futuristic Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Rajdhani:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Base Theme to match the main page */
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: #0a0e17;
+            background-image: radial-gradient(circle at top right, rgba(0, 243, 255, 0.05), transparent 40%),
+                              radial-gradient(circle at bottom left, rgba(188, 19, 254, 0.05), transparent 40%);
+            color: #e2e8f0;
+            margin: 0;
+            padding: 30px;
+            min-height: 100vh;
+        }
+
+        /* 1. NAVIGATION: Futuristic Back Button */
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: rgba(16, 24, 43, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(188, 19, 254, 0.5);
+            color: #e580ff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(188, 19, 254, 0.15);
+            border-color: #bc13fe;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
+            transform: translateX(-5px);
+        }
+
+        .back-btn svg { transition: transform 0.3s ease; }
+        .back-btn:hover svg { transform: translateX(-3px); }
+
+        /* Headings */
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: #00f3ff;
+            text-shadow: 0px 0px 15px rgba(0, 243, 255, 0.3);
+            margin-top: 0;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h2, h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: #bc13fe;
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+        }
+
+        /* 2. THE SIMULATOR APP CONTAINER */
+        #simulator-container {
+            background: rgba(16, 24, 43, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin: 0 auto 40px auto;
+            max-width: 1100px; /* Widened slightly to accommodate the CRO interface nicely */
+        }
+
+        /* 3. EDUCATIONAL CONTENT */
+        .educational-content {
+            max-width: 1100px;
+            margin: 0 auto;
+            line-height: 1.7;
+            font-size: 1.1rem;
+            color: #94a3b8;
+            background: rgba(10, 14, 23, 0.8);
+            padding: 30px;
+            border-radius: 15px;
+            border-left: 4px solid #00f3ff;
+        }
+
+        .educational-content strong {
+            color: #fff;
+            background: rgba(0, 243, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .educational-content p {
+            margin-bottom: 1rem;
+        }
+
+        .educational-content ul {
+            margin-left: 20px;
+            margin-bottom: 1rem;
+            list-style-type: disc;
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- 1. NAVIGATION -->
+    <a href="../index.html" class="back-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Back to LuyaliSims
+    </a>
+    
+    <h1>Cathode Ray Oscilloscope Simulator</h1>
+
+    <!-- 2. THE SIMULATOR APP -->
+    <div id="simulator-container">
+        
+        <div class="flex flex-col gap-6">
+            <!-- Header -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-700/50 pb-4 gap-4">
+                <div>
+                    <h2 class="text-xl font-bold tracking-wide text-emerald-400 !font-['Orbitron'] !mt-0 !mb-1 !text-shadow-none">CRO Interface</h2>
+                    <p class="text-sm text-slate-400 font-['Rajdhani']">Voltage & Frequency Measurement Panel</p>
+                </div>
+                <div class="bg-[#050b14] px-4 py-2 rounded-lg border border-slate-700/50 flex gap-6 text-sm">
+                    <div>Measured V<sub>p-p</sub>: <span id="readout-vpp" class="font-mono text-emerald-400 font-semibold drop-shadow-[0_0_5px_rgba(52,211,153,0.5)]">0.00 V</span></div>
+                    <div>Calculated Peak: <span id="readout-vp" class="font-mono text-cyan-400 font-semibold drop-shadow-[0_0_5px_rgba(34,211,238,0.5)]">0.00 V</span></div>
+                </div>
+            </div>
+
+            <!-- Main Display & Controls Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <!-- CRO Screen (2 columns) -->
+                <div class="lg:col-span-2 flex flex-col items-center font-['Rajdhani']">
+                    <div class="relative bg-[#021008] border-4 border-slate-700 rounded-lg w-full aspect-[4/3] overflow-hidden shadow-inner flex items-center justify-center">
+                        <!-- Canvas -->
+                        <canvas id="croCanvas" class="w-full h-full cursor-crosshair"></canvas>
+                        <!-- CRT Grid Overlay Lines (Simulated via Canvas) -->
+                    </div>
+                    <div class="flex justify-between w-full text-sm font-semibold text-slate-400 mt-3 px-1 tracking-widest uppercase">
+                        <span>Y-Axis: Volts / Div</span>
+                        <span>X-Axis: Time / Div</span>
+                    </div>
+                </div>
+
+                <!-- Control Panel (1 column) -->
+                <div class="bg-[#0a0e17] border border-slate-700/80 rounded-xl p-5 flex flex-col justify-start gap-6 font-['Rajdhani']">
+                    
+                    <!-- Signal Generator Controls -->
+                    <div class="space-y-4">
+                        <h3 class="text-sm font-bold uppercase tracking-widest text-slate-400 border-b border-slate-700 pb-2 !mt-0 !mb-0 !font-['Rajdhani'] !text-slate-400">Input Signal Generator</h3>
+                        
+                        <div>
+                            <div class="flex justify-between text-sm mb-1 text-slate-200">
+                                <span>Peak Voltage (V<sub>p</sub>):</span>
+                                <span id="val-vp" class="font-mono text-emerald-400 font-bold">5.0 V</span>
+                            </div>
+                            <input type="range" id="input-vp" min="1" max="20" step="0.5" value="5" class="w-full h-2 bg-slate-700 rounded appearance-none accent-emerald-500 cursor-pointer">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-sm mb-1 text-slate-200">
+                                <span>Frequency (f):</span>
+                                <span id="val-freq" class="font-mono text-emerald-400 font-bold">100 Hz</span>
+                            </div>
+                            <input type="range" id="input-freq" min="10" max="1000" step="10" value="100" class="w-full h-2 bg-slate-700 rounded appearance-none accent-emerald-500 cursor-pointer">
+                        </div>
+                    </div>
+
+                    <!-- CRO Calibration Controls -->
+                    <div class="space-y-4 mt-2">
+                        <h3 class="text-sm font-bold uppercase tracking-widest text-slate-400 border-b border-slate-700 pb-2 !mt-0 !mb-0 !font-['Rajdhani'] !text-slate-400">CRO Settings</h3>
+                        
+                        <div>
+                            <label class="block text-sm mb-1.5 text-slate-300 font-medium">Y-Sensitivity (Volts/Div):</label>
+                            <select id="volts-div" class="w-full bg-[#050b14] border border-slate-600 rounded px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-emerald-500 cursor-pointer">
+                                <option value="1">1.0 V / div</option>
+                                <option value="2" selected>2.0 V / div</option>
+                                <option value="5">5.0 V / div</option>
+                                <option value="10">10.0 V / div</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm mb-1.5 text-slate-300 font-medium">Time-Base (Time/Div):</label>
+                            <select id="time-div" class="w-full bg-[#050b14] border border-slate-600 rounded px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-emerald-500 cursor-pointer">
+                                <option value="1">1 ms / div</option>
+                                <option value="2" selected>2 ms / div</option>
+                                <option value="5">5 ms / div</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Instructional Hint Box -->
+                    <div class="bg-indigo-900/20 border border-indigo-500/30 p-4 rounded-lg text-sm text-slate-300 leading-relaxed mt-auto">
+                        <strong class="text-indigo-300 block mb-1">Reading Guide:</strong>
+                        Count vertical divisions (h) from peak-to-peak. Multiply h by the <strong>Volts/Div</strong> setting to calculate the peak-to-peak voltage (V<sub>pp</sub>).
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 3. EDUCATIONAL CONTENT -->
+    <div class="educational-content">
+        
+        <h2>How to Use This Simulator</h2>
+        <p>This simulator provides a realistic, interactive interface for understanding how a Cathode Ray Oscilloscope operates. Follow these steps to master reading waveforms:</p>
+        <ul>
+            <li><strong>Input Signal Generator:</strong> Use the top sliders to simulate injecting a voltage signal into the CRO. You can adjust the exact Peak Voltage (V<sub>p</sub>) and the Frequency (f) of the incoming alternating current.</li>
+            <li><strong>CRO Settings (Calibration):</strong> Real oscilloscopes require the user to scale the graph to fit the screen. 
+                <ul>
+                    <li>Adjust the <strong>Y-Sensitivity (Volts/Div)</strong> dial. Notice how increasing this value compresses the waveform vertically, allowing higher voltages to fit on the screen.</li>
+                    <li>Adjust the <strong>Time-Base (Time/Div)</strong> dial. Changing this stretches or compresses the wave horizontally, allowing you to view higher or lower frequencies clearly.</li>
+                </ul>
+            </li>
+            <li><strong>Reading the Screen:</strong> Practice reading the screen visually without looking at the digital readout. Count the squares!</li>
+        </ul>
+
+        <h2>The Theory Behind Oscilloscopes</h2>
+        <p>A Cathode Ray Oscilloscope (CRO) is a fundamental diagnostic instrument used in laboratories to display and analyze the waveform of electronic signals. In a traditional analog CRO, an electron gun fires a beam of electrons at a phosphor-coated screen. When the electrons hit the screen, the phosphor glows, creating a visible dot.</p>
+        <p>The device uses deflecting plates to move this dot. The vertical deflecting plates pull the dot up and down based on the incoming voltage (the signal you are measuring). Simultaneously, a "sweep generator" inside the CRO pulls the dot smoothly from left to right at a known, constant speed (set by the Time/Div knob). This combination plots a perfect graph of <strong>Voltage vs. Time</strong>.</p>
+        
+        <h3>The Formulas Used</h3>
+        <p>To extract mathematical data from a CRO screen, you must count the physical grid squares (divisions) and multiply them by the scale factors set on your control knobs:</p>
+        
+        <p><strong>1. Calculating Voltage:</strong></p>
+        <p>To find the Peak-to-Peak Voltage (V<sub>pp</sub>), count the number of vertical grid squares from the very bottom of the wave trough to the very top of the wave peak. Then apply the formula:</p>
+        <p><strong>V<sub>pp</sub> = Vertical Divisions &times; (Volts / Div)</strong></p>
+        <p>To find the Peak Voltage (Amplitude), simply divide the V<sub>pp</sub> by 2.</p>
+
+        <p><strong>2. Calculating Frequency:</strong></p>
+        <p>To find the Time Period (T) of one complete wave cycle, count the number of horizontal grid squares it takes for the wave to repeat itself.</p>
+        <p><strong>T = Horizontal Divisions &times; (Time / Div)</strong></p>
+        <p>Once you have the Time Period (in seconds), you can calculate the signal's frequency (in Hertz):</p>
+        <p><strong>Frequency (f) = 1 / T</strong></p>
+        
+        <h2>Real World Applications</h2>
+        <p>Understanding how to read an oscilloscope is a critical skill across many technical and scientific fields:</p>
+        <ul>
+            <li><strong>Electronics Engineering:</strong> Engineers use oscilloscopes to troubleshoot circuit boards, measure power noise, and verify that digital logic chips are sending the correct high and low voltage pulses at the exact right nanosecond.</li>
+            <li><strong>Medicine (ECG / EKG):</strong> The electrocardiogram machines you see in hospitals are essentially specialized oscilloscopes that map the tiny electrical voltages generated by a patient's beating heart over time.</li>
+            <li><strong>Automotive Diagnostics:</strong> Modern cars are highly computerized. Mechanics use specialized automotive oscilloscopes to check the timing signals from camshaft sensors and the firing pulses of spark plugs.</li>
+        </ul>
+        
+    </div>
+
+    <!-- Simulator Logic -->
+    <script>
+        const canvas = document.getElementById('croCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Controls
+        const inputVp = document.getElementById('input-vp');
+        const valVp = document.getElementById('val-vp');
+        const inputFreq = document.getElementById('input-freq');
+        const valFreq = document.getElementById('val-freq');
+        const voltsDivSelect = document.getElementById('volts-div');
+        const timeDivSelect = document.getElementById('time-div');
+        
+        const readoutVpp = document.getElementById('readout-vpp');
+        const readoutVp = document.getElementById('readout-vp');
+
+        function resizeCanvas() {
+            // High-DPI Canvas scaling for crisp lines
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+        }
+        
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function drawGrid(width, height, divisionsX = 10, divisionsY = 8) {
+            ctx.clearRect(0, 0, width, height);
+            
+            const dx = width / divisionsX;
+            const dy = height / divisionsY;
+
+            // Draw major grid lines (dim)
+            ctx.strokeStyle = 'rgba(45, 74, 55, 0.4)'; // Subdued green-slate
+            ctx.lineWidth = 1;
+
+            for (let i = 0; i <= divisionsX; i++) {
+                ctx.beginPath();
+                ctx.moveTo(i * dx, 0);
+                ctx.lineTo(i * dx, height);
+                ctx.stroke();
+            }
+
+            for (let j = 0; j <= divisionsY; j++) {
+                ctx.beginPath();
+                ctx.moveTo(0, j * dy);
+                ctx.lineTo(width, j * dy);
+                ctx.stroke();
+            }
+
+            // Draw center axes (brighter)
+            ctx.strokeStyle = 'rgba(52, 211, 153, 0.3)';
+            ctx.lineWidth = 1.5;
+
+            // Center X axis
+            ctx.beginPath();
+            ctx.moveTo(0, height / 2);
+            ctx.lineTo(width, height / 2);
+            ctx.stroke();
+
+            // Center Y axis
+            ctx.beginPath();
+            ctx.moveTo(width / 2, 0);
+            ctx.lineTo(width / 2, height);
+            ctx.stroke();
+
+            // Draw tick marks on center axes
+            ctx.strokeStyle = 'rgba(52, 211, 153, 0.5)';
+            ctx.lineWidth = 1;
+            
+            // X-axis sub-divisions
+            for (let i = 0; i <= divisionsX * 5; i++) {
+                let tickHeight = (i % 5 === 0) ? 0 : 3;
+                if (tickHeight > 0) {
+                    ctx.beginPath();
+                    ctx.moveTo(i * (dx / 5), (height / 2) - tickHeight);
+                    ctx.lineTo(i * (dx / 5), (height / 2) + tickHeight);
+                    ctx.stroke();
+                }
+            }
+
+            // Y-axis sub-divisions
+            for (let j = 0; j <= divisionsY * 5; j++) {
+                let tickWidth = (j % 5 === 0) ? 0 : 3;
+                if (tickWidth > 0) {
+                    ctx.beginPath();
+                    ctx.moveTo((width / 2) - tickWidth, j * (dy / 5));
+                    ctx.lineTo((width / 2) + tickWidth, j * (dy / 5));
+                    ctx.stroke();
+                }
+            }
+        }
+
+        function render() {
+            const width = canvas.width;
+            const height = canvas.height;
+
+            const vp = parseFloat(inputVp.value);
+            const freq = parseFloat(inputFreq.value);
+            const voltsPerDiv = parseFloat(voltsDivSelect.value);
+            const timePerDiv = parseFloat(timeDivSelect.value); // ms per div
+
+            valVp.textContent = `${vp.toFixed(1)} V`;
+            valFreq.textContent = `${freq} Hz`;
+
+            drawGrid(width, height);
+
+            // Calculations for waveform
+            const centerY = height / 2;
+            const centerX = width / 2;
+            
+            // Pixels per division
+            const divHeight = height / 8;
+            const divWidth = width / 10;
+
+            // Voltage to pixel scale: 1 div = voltsPerDiv. 
+            // Therefore, pixels per volt = divHeight / voltsPerDiv
+            const pixelsPerVolt = divHeight / voltsPerDiv;
+
+            // Time scaling: timePerDiv is in milliseconds. Total screen time = timePerDiv * 10 ms.
+            const totalScreenTime = timePerDiv * 10; // ms
+            const pixelsPerMs = width / totalScreenTime;
+
+            // Draw Waveform Trace
+            ctx.beginPath();
+            ctx.strokeStyle = '#34d399'; // Emerald phosphor glow
+            ctx.lineWidth = 2.5;
+            ctx.shadowColor = '#10b981';
+            ctx.shadowBlur = 12; // Neon glow effect
+
+            for (let x = 0; x <= width; x++) {
+                // Map pixel x to time (ms) relative to left side (so phase stays consistent visually if desired, or center)
+                const timeMs = (x - centerX) / pixelsPerMs;
+                const timeSec = timeMs / 1000;
+
+                // Sine wave equation: V = Vp * sin(2 * PI * f * t)
+                const voltage = vp * Math.sin(2 * Math.PI * freq * timeSec);
+                
+                // Map voltage to Y pixel (inverted because canvas Y goes down)
+                const y = centerY - (voltage * pixelsPerVolt);
+
+                if (x === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+            ctx.stroke();
+            ctx.shadowBlur = 0; // Reset shadow
+
+            // Update readouts
+            readoutVpp.textContent = `${(vp * 2).toFixed(2)} V`;
+            readoutVp.textContent = `${vp.toFixed(2)} V`;
+
+            requestAnimationFrame(render);
+        }
+
+        // Attach listeners to trigger visual updates efficiently if we weren't using requestAnimationFrame
+        // But since we are looping, it automatically picks up the slider changes.
+        [inputVp, inputFreq, voltsDivSelect, timeDivSelect].forEach(element => {
+            element.addEventListener('input', () => {});
+        });
+
+        // Start render loop
+        requestAnimationFrame(render);
+    </script>
+</body>
+</html>

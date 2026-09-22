@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LuyaliSims - Interactive Virtual Simulators</title>
+    <!-- Importing futuristic fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Rajdhani:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <!-- Futuristic Atom Icon -->
+            <svg class="logo-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="10" fill="#00f3ff" />
+                <ellipse cx="50" cy="50" rx="40" ry="15" fill="none" stroke="#00f3ff" stroke-width="2" transform="rotate(30 50 50)"/>
+                <ellipse cx="50" cy="50" rx="40" ry="15" fill="none" stroke="#bc13fe" stroke-width="2" transform="rotate(90 50 50)"/>
+                <ellipse cx="50" cy="50" rx="40" ry="15" fill="none" stroke="#00f3ff" stroke-width="2" transform="rotate(150 50 50)"/>
+            </svg>
+            <h1>LuyaliSims</h1>
+        </div>
+        <p class="subtitle">Next-Generation Interactive Educational Simulators</p>
+        
+        <!-- Search and Filter -->
+        <div class="controls">
+            <input type="text" id="searchInput" placeholder="Search simulators...">
+            <select id="categoryFilter">
+                <option value="All">All Categories</option>
+                <option value="Sciences">Sciences</option>
+                <option value="Exploration & Others">Exploration & Others</option>
+            </select>
+        </div>
+    </header>
+
+    <main id="simulatorGrid" class="grid-container">
+        <!-- Cards injected by JS -->
+    </main>
+
+    <!-- Load More Button Container -->
+    <div id="loadMoreContainer" class="load-more-container">
+        <button id="loadMoreBtn" class="load-more-btn">Show More Simulators</button>
+    </div>
+    
+    <footer>
+        <div class="footer-container">
+            <div class="footer-col">
+                <h3>About LuyaliSims</h3>
+                <p>LuyaliSims is a dynamic educational platform designed to empower learners and educators through visual, interactive simulations. By transforming abstract scientific data and complex concepts into manipulable, hands-on experiences, we foster a deeper and more engaging learning environment.</p>
+                <p class="highlight-text">🚀 New content is updated weekly! For any special requests for custom simulators or learning content, please reach out.</p>
+            </div>
+            <div class="footer-col">
+                <h3>About the Author</h3>
+                <p><strong>Ian Luyali</strong> is an educator, EdTech developer, and creative strategist. As the founder of Click & Draft, he crafts custom curriculum solutions and AI workflows for modern educators, alongside building web application prototypes and digital media.</p>
+            </div>
+            <div class="footer-col contact-info">
+                <h3>Contact Info</h3>
+                <ul>
+                    <li><strong>Phone:</strong> +254 727 987 669</li>
+                    <li><strong>Email 1:</strong> <a href="mailto:luyashliz@gmail.com">luyashliz@gmail.com</a></li>
+                    <li><strong>Email 2:</strong> <a href="mailto:ianlinyali@gmail.com">ianlinyali@gmail.com</a></li>
+                    <li><strong>Work Email:</strong> <a href="mailto:ianlinyali78@mwalimu.tsc.go.ke">ianlinyali78@mwalimu.tsc.go.ke</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2026 LuyaliSims | Engineered by Click & Draft
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
