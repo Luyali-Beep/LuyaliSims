@@ -2,32 +2,50 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Advanced X-Ray Tube Physics Simulator - LuyaliSims</title>
     
     <!-- Import Futuristic Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Rajdhani:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- TEMPLATE BASE STYLES --- */
+        /* Base Theme */
+        *, *::before, *::after {
+            box-sizing: border-box; /* Ensures padding never breaks screen width */
+        }
+
+        :root {
+            --bg-color: #0a0e17;
+            --panel-bg: rgba(16, 24, 43, 0.6);
+            --panel-border: rgba(0, 243, 255, 0.3);
+            --accent-blue: #00f3ff;
+            --accent-purple: #bc13fe;
+            --accent-red: #ef4444;
+            --accent-yellow: #fbbf24;
+            --accent-green: #4ade80;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
         body {
             font-family: 'Rajdhani', sans-serif;
-            background-color: #0a0e17;
+            background-color: var(--bg-color);
             background-image: radial-gradient(circle at top right, rgba(0, 243, 255, 0.05), transparent 40%),
                               radial-gradient(circle at bottom left, rgba(188, 19, 254, 0.05), transparent 40%);
             color: #e2e8f0;
             margin: 0;
-            padding: 30px;
+            padding: 20px;
             min-height: 100vh;
+            overflow-x: hidden; /* Prevents awkward horizontal scrollbars on mobile */
         }
 
-        /* NAVIGATION: Futuristic Back Button */
+        /* 1. NAVIGATION: Back Button */
         .back-btn {
             display: inline-flex;
             align-items: center;
             gap: 10px;
             margin-bottom: 20px;
-            padding: 10px 20px;
+            padding: 10px 18px;
             background: rgba(16, 24, 43, 0.6);
             backdrop-filter: blur(8px);
             border: 1px solid rgba(188, 19, 254, 0.5);
@@ -35,7 +53,7 @@
             text-decoration: none;
             border-radius: 8px;
             font-weight: 600;
-            font-size: 1.1rem;
+            font-size: 1rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             transition: all 0.3s ease;
@@ -43,56 +61,457 @@
 
         .back-btn:hover {
             background: rgba(188, 19, 254, 0.15);
-            border-color: #bc13fe;
+            border-color: var(--accent-purple);
             color: #fff;
             box-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
-            transform: translateX(-5px);
+            transform: translateX(-4px);
         }
-
-        .back-btn svg { transition: transform 0.3s ease; }
-        .back-btn:hover svg { transform: translateX(-3px); }
 
         h1 {
             font-family: 'Orbitron', sans-serif;
-            color: #00f3ff;
+            color: var(--accent-blue);
             text-shadow: 0px 0px 15px rgba(0, 243, 255, 0.3);
             margin-top: 0;
+            font-size: clamp(1.4rem, 4vw, 2.2rem); /* Auto-scales title down on mobile */
+            word-break: break-word;
         }
         
         h2, h3 {
             font-family: 'Orbitron', sans-serif;
-            color: #bc13fe;
-            margin-top: 25px;
-            margin-bottom: 10px;
+            color: var(--accent-purple);
         }
 
-        /* THE SIMULATOR APP CONTAINER */
+        /* 2. RESPONSIVE SIMULATOR WORKSPACE */
         #simulator-container {
-            background: rgba(16, 24, 43, 0.6);
+            background: var(--panel-bg);
             backdrop-filter: blur(8px);
-            border: 1px solid rgba(0, 243, 255, 0.3);
+            border: 1px solid var(--panel-border);
             border-radius: 15px;
-            padding: 0; /* Removed padding to let app fill container */
+            padding: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            margin-bottom: 40px;
-            max-width: 1400px; /* Widened to fit the advanced simulator layout */
+            margin-bottom: 30px;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        /* Workspace Header */
+        .sim-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .sim-header h2 {
+            font-size: clamp(1.05rem, 2.5vw, 1.3rem);
+            margin: 0;
+            color: var(--accent-blue);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-header {
+            background: rgba(15, 23, 42, 0.8);
+            color: var(--text-main);
+            border: 1px solid var(--accent-blue);
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            font-family: 'Rajdhani', sans-serif;
+            transition: all 0.2s;
+        }
+
+        .btn-header:hover {
+            background: var(--accent-blue);
+            color: #0a0e17;
+        }
+
+        /* Dual-pane layout: Simulation view on left, Controls on right (stacks on mobile) */
+        .sim-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        /* Responsive Canvas Wrapper */
+        .canvas-wrapper {
+            position: relative;
+            width: 100%;
+            background: #050811;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            border-radius: 10px;
             overflow: hidden;
-            height: 750px; /* Fixed height for the simulator UI */
+            touch-action: none; /* Prevents phone page from scrolling while interacting on canvas */
+            box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.8);
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            cursor: crosshair;
+        }
+
+        /* Floating Inspector Card */
+        .inspector-card {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: rgba(15, 23, 42, 0.94);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--accent-blue);
+            border-radius: 8px;
+            padding: 12px 14px;
+            width: min(340px, calc(100% - 24px));
+            pointer-events: none;
+            transition: opacity 0.2s, transform 0.2s;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
+            opacity: 0;
+            transform: translateY(-8px);
+            z-index: 20;
+        }
+
+        .inspector-card.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .inspector-card h3 {
+            color: var(--accent-blue);
+            font-size: 1.05rem;
+            margin: 0 0 2px 0;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+        }
+
+        .inspector-card .subtitle {
+            font-size: 0.75rem;
+            color: var(--accent-yellow);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        .inspector-card p {
+            font-size: 0.85rem;
+            line-height: 1.45;
+            color: var(--text-main);
+            margin: 0;
+        }
+
+        /* Failure Overlay */
+        .fail-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.92);
             display: flex;
             flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+            z-index: 30;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
         }
 
-        /* EDUCATIONAL CONTENT */
+        .fail-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .fail-overlay h3 {
+            color: var(--accent-red);
+            font-size: clamp(1.4rem, 3.5vw, 2.2rem);
+            margin: 0 0 12px 0;
+            letter-spacing: 0.08em;
+        }
+
+        .fail-overlay p {
+            color: #cbd5e1;
+            font-size: clamp(0.85rem, 2vw, 1rem);
+            margin-bottom: 20px;
+            max-width: 600px;
+            line-height: 1.5;
+        }
+
+        /* Canvas HUD and Author Watermark */
+        .hud {
+            position: absolute;
+            bottom: 12px;
+            left: 12px;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            pointer-events: none;
+            background: rgba(15, 23, 42, 0.85);
+            padding: 6px 10px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .author-badge {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid var(--accent-yellow);
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            color: var(--text-main);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            z-index: 15;
+            user-select: text;
+            text-align: right;
+            line-height: 1.35;
+        }
+
+        .author-badge span {
+            color: var(--accent-yellow);
+            font-weight: bold;
+        }
+
+        /* Responsive Controls Panel */
+        .controls-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            background: rgba(10, 14, 23, 0.6);
+            padding: 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .control-group {
+            background-color: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .control-group h3 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--accent-blue);
+            margin: 0;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            margin-bottom: 2px;
+        }
+
+        .slider-header span.val {
+            font-weight: bold;
+            color: var(--accent-yellow);
+        }
+
+        /* Touch-friendly inputs: Min 44px touch area */
+        input[type="range"] {
+            accent-color: var(--accent-blue);
+            height: 32px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .toggle-control {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            gap: 10px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider-toggle {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #334155;
+            transition: .3s;
+            border-radius: 24px;
+        }
+
+        .slider-toggle:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider-toggle {
+            background-color: var(--accent-blue);
+        }
+
+        input:checked + .slider-toggle:before {
+            transform: translateX(20px);
+        }
+
+        /* Buttons */
+        .sim-btn {
+            background: transparent;
+            border: 1px solid var(--accent-blue);
+            color: var(--accent-blue);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.95rem;
+            padding: 12px;
+            min-height: 48px; /* Safe thumb tap zone */
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s ease;
+            width: 100%;
+        }
+
+        .sim-btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-expose {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-expose:hover {
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.6);
+        }
+
+        .btn-expose:active, .btn-expose.active {
+            background: linear-gradient(135deg, #b91c1c, #991b1b);
+            box-shadow: none;
+        }
+
+        .btn-expose:disabled {
+            background: #475569;
+            box-shadow: none;
+            cursor: not-allowed;
+            color: #94a3b8;
+        }
+
+        .btn-reset {
+            background: var(--accent-blue);
+            color: #0a0e17;
+            border: none;
+            padding: 12px 24px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Rajdhani', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-reset:hover {
+            box-shadow: 0 0 15px var(--accent-blue);
+        }
+
+        /* Metrics grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 4px;
+        }
+
+        .metric-card {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 6px;
+            padding: 8px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .metric-card .label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .metric-card .value {
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: var(--text-main);
+        }
+
+        .bar-container {
+            height: 6px;
+            width: 100%;
+            background: #334155;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 3px;
+        }
+
+        .bar-fill {
+            height: 100%;
+            width: 0%;
+            transition: width 0.1s, background-color 0.2s;
+        }
+
+        /* 3. EDUCATIONAL CONTENT SECTION */
         .educational-content {
-            max-width: 1400px;
+            max-width: 1200px;
             line-height: 1.7;
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             color: #94a3b8;
             background: rgba(10, 14, 23, 0.8);
-            padding: 30px;
+            padding: 25px;
             border-radius: 15px;
-            border-left: 4px solid #00f3ff; 
-            margin-bottom: 50px;
+            border-left: 4px solid var(--accent-blue);
         }
 
         .educational-content strong {
@@ -115,130 +534,6 @@
             margin-bottom: 8px;
         }
 
-        /* --- ORIGINAL SIMULATOR STYLES (Scoped & Adapted) --- */
-        :root {
-            --bg-color: #0f172a;
-            --panel-bg: #1e293b;
-            --panel-border: #334155;
-            --accent-blue: #38bdf8;
-            --accent-purple: #c084fc;
-            --accent-red: #f87171;
-            --accent-green: #4ade80;
-            --accent-yellow: #fbbf24;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-        }
-
-        /* Resets for the simulator components */
-        #simulator-container * { box-sizing: border-box; user-select: none; margin: 0; padding: 0; }
-        
-        .sim-header {
-            background-color: rgba(30, 41, 59, 0.9);
-            border-bottom: 1px solid var(--panel-border);
-            padding: 12px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            z-index: 10;
-        }
-
-        .sim-header h2 { font-size: 1.25rem; font-weight: 600; color: var(--accent-blue); display: flex; align-items: center; gap: 10px; margin: 0; font-family: 'Rajdhani', sans-serif; text-shadow: none; }
-        
-        .header-actions { display: flex; gap: 12px; align-items: center; }
-        
-        .btn-header {
-            background: var(--panel-border); color: var(--text-main); border: 1px solid var(--accent-blue);
-            padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: bold;
-            transition: all 0.2s; font-family: 'Rajdhani', sans-serif;
-        }
-        .btn-header:hover { background: var(--accent-blue); color: #0f172a; }
-
-        .sim-layout { display: grid; grid-template-columns: 1fr 360px; flex: 1; height: 100%; overflow: hidden; }
-
-        .main-viewport {
-            position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
-            overflow: hidden; height: 100%;
-        }
-
-        canvas { background: transparent; cursor: crosshair; max-width: 100%; max-height: 100%; object-fit: contain; }
-
-        .inspector-card {
-            position: absolute; top: 20px; left: 20px;
-            background: rgba(15, 23, 42, 0.9);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--accent-blue);
-            border-radius: 8px; padding: 16px;
-            width: 380px; pointer-events: none;
-            transition: opacity 0.2s, transform 0.2s;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6);
-            opacity: 0; transform: translateY(-10px);
-            z-index: 20;
-        }
-        .inspector-card.active { opacity: 1; transform: translateY(0); }
-        .inspector-card h3 { color: var(--accent-blue); font-size: 1.1rem; margin-bottom: 4px; margin-top: 0; font-family: 'Rajdhani', sans-serif; }
-        .inspector-card .subtitle { font-size: 0.75rem; color: var(--accent-yellow); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; font-weight: bold; }
-        .inspector-card p { font-size: 0.85rem; line-height: 1.5; color: var(--text-main); margin-bottom: 0; }
-
-        .sidebar { background-color: rgba(30, 41, 59, 0.9); border-left: 1px solid var(--panel-border); padding: 20px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto; }
-        .control-group { background-color: rgba(15, 23, 42, 0.6); border: 1px solid var(--panel-border); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
-        .control-group h3 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent-blue); margin: 0 0 2px 0; font-family: 'Rajdhani', sans-serif; }
-        
-        .slider-header { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 4px; }
-        .slider-header span.val { font-weight: bold; color: var(--accent-yellow); }
-        input[type="range"] { width: 100%; accent-color: var(--accent-blue); cursor: pointer; }
-        
-        .toggle-control { display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; }
-        .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider-toggle { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #334155; transition: .3s; border-radius: 20px; }
-        .slider-toggle:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
-        input:checked + .slider-toggle { background-color: var(--accent-blue); }
-        input:checked + .slider-toggle:before { transform: translateX(20px); }
-
-        .btn-expose {
-            background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; padding: 16px; border-radius: 8px;
-            font-weight: bold; font-size: 1.1rem; cursor: pointer; box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);
-            transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 5px; font-family: 'Orbitron', sans-serif;
-        }
-        .btn-expose:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(239, 68, 68, 0.6); }
-        .btn-expose:active, .btn-expose.active { transform: translateY(2px); background: linear-gradient(135deg, #b91c1c, #991b1b); box-shadow: none; }
-        .btn-expose:disabled { background: #475569; box-shadow: none; cursor: not-allowed; transform: none; color: #94a3b8; }
-
-        .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px; }
-        .metric-card { background: rgba(15, 23, 42, 0.8); border: 1px solid var(--panel-border); border-radius: 6px; padding: 10px; display: flex; flex-direction: column; gap: 4px; }
-        .metric-card .label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; }
-        .metric-card .value { font-size: 1rem; font-weight: bold; color: var(--text-main); }
-        .bar-container { height: 6px; width: 100%; background: #334155; border-radius: 3px; overflow: hidden; margin-top: 4px; }
-        .bar-fill { height: 100%; width: 0%; transition: width 0.1s, background-color 0.2s; }
-
-        .fail-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.85); display: flex; flex-direction: column; align-items: center; justify-content: center;
-            z-index: 30; opacity: 0; pointer-events: none; transition: opacity 0.5s;
-        }
-        .fail-overlay.active { opacity: 1; pointer-events: auto; }
-        .fail-overlay h3 { color: var(--accent-red); font-size: 2.5rem; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.1em; }
-        .fail-overlay p { color: white; font-size: 1.1rem; margin-bottom: 20px; max-width: 600px; text-align: center; line-height: 1.5; }
-        .btn-reset { background: var(--accent-blue); color: #0f172a; border: none; padding: 10px 24px; font-weight: bold; font-size: 1rem; border-radius: 6px; cursor: pointer; font-family: 'Rajdhani', sans-serif;}
-        
-        .hud { position: absolute; bottom: 20px; left: 20px; color: var(--text-muted); font-size: 0.85rem; pointer-events: none; background: rgba(15, 23, 42, 0.8); padding: 6px 12px; border-radius: 20px; border: 1px solid var(--panel-border); }
-        
-        .author-badge { position: absolute; bottom: 20px; right: 20px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--accent-yellow); padding: 8px 14px; border-radius: 6px; font-size: 0.8rem; color: var(--text-main); box-shadow: 0 4px 10px rgba(0,0,0,0.5); pointer-events: auto; z-index: 15; user-select: text; text-align: right; }
-        .author-badge span { color: var(--accent-yellow); font-weight: bold; }
-
-        /* Modal Styles */
-        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px); }
-        .modal-content { background-color: var(--panel-bg); margin: 5% auto; padding: 25px; border: 1px solid var(--accent-blue); border-radius: 8px; width: 80%; max-width: 800px; max-height: 85vh; overflow-y: auto; color: var(--text-main); font-family: 'Rajdhani', sans-serif;}
-        .close-btn { color: var(--text-muted); float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
-        .close-btn:hover { color: var(--accent-red); }
-        .modal-content h3 { color: var(--accent-blue); border-bottom: 1px solid var(--panel-border); padding-bottom: 10px; margin-bottom: 15px; font-size: 1.5rem; }
-        .modal-content h4 { color: var(--accent-yellow); margin-top: 20px; margin-bottom: 10px; font-size: 1.1rem; }
-        .modal-content p, .modal-content li { font-size: 1rem; line-height: 1.6; margin-bottom: 10px; color: #cbd5e1; user-select: text; }
-        .modal-content ul, .modal-content ol { margin-left: 20px; margin-bottom: 15px; }
-        .task-box { background: rgba(15,23,42,0.5); border-left: 4px solid var(--accent-purple); padding: 10px 15px; margin-bottom: 15px; border-radius: 0 6px 6px 0; user-select: text; }
-        
         .qa-box {
             background: rgba(16, 24, 43, 0.4);
             border: 1px solid #334155;
@@ -246,14 +541,119 @@
             border-radius: 10px;
             margin-bottom: 20px;
         }
-        .qa-box h4 { margin-top: 0; color: #00f3ff; font-family: 'Rajdhani', sans-serif; }
+
+        .qa-box h4 {
+            margin-top: 15px;
+            margin-bottom: 6px;
+            color: var(--accent-blue);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.15rem;
+        }
+
+        .qa-box h4:first-child {
+            margin-top: 0;
+        }
+
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            padding: 15px;
+        }
+
+        .modal-content {
+            background-color: #1e293b;
+            margin: 5vh auto;
+            padding: 24px;
+            border: 1px solid var(--accent-blue);
+            border-radius: 10px;
+            width: 100%;
+            max-width: 760px;
+            max-height: 85vh;
+            overflow-y: auto;
+            color: var(--text-main);
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        .close-btn {
+            color: var(--text-muted);
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .close-btn:hover {
+            color: var(--accent-red);
+        }
+
+        .modal-content h3 {
+            color: var(--accent-blue);
+            border-bottom: 1px solid #334155;
+            padding-bottom: 10px;
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.35rem;
+        }
+
+        .task-box {
+            background: rgba(15, 23, 42, 0.6);
+            border-left: 4px solid var(--accent-purple);
+            padding: 12px 16px;
+            margin-bottom: 14px;
+            border-radius: 0 6px 6px 0;
+            user-select: text;
+            line-height: 1.5;
+        }
+
+        /* ===================================================
+           4. MOBILE-SPECIFIC ADAPTATIONS (Under 768px Width)
+           =================================================== */
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+
+            #simulator-container, .educational-content {
+                padding: 15px;
+            }
+
+            /* Switches dual-pane into vertical stack */
+            .sim-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .sim-btn {
+                width: 100%;
+            }
+
+            .hud, .author-badge {
+                position: static;
+                margin-top: 6px;
+                border-radius: 6px;
+                text-align: left;
+            }
+
+            .canvas-wrapper {
+                display: flex;
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body>
     
-    <!-- NAVIGATION -->
+    <!-- 1. NAVIGATION -->
     <a href="../index.html" class="back-btn">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="19" y1="12" x2="5" y2="12"></line>
             <polyline points="12 19 5 12 12 5"></polyline>
         </svg>
@@ -262,7 +662,7 @@
     
     <h1>Advanced X-Ray Tube Physics Simulator</h1>
 
-    <!-- THE SIMULATOR APP CONTAINER -->
+    <!-- 2. THE SIMULATOR APP WORKSPACE -->
     <div id="simulator-container">
         
         <div class="sim-header">
@@ -274,22 +674,24 @@
         </div>
 
         <div class="sim-layout">
-            <div class="main-viewport" id="viewport">
+            
+            <!-- Dynamic Canvas Box -->
+            <div class="canvas-wrapper" id="canvas-wrapper">
                 <canvas id="simCanvas" width="1000" height="650"></canvas>
                 
                 <div id="inspector" class="inspector-card">
-                    <h3 id="inspect-title">Name</h3>
-                    <div id="inspect-sub" class="subtitle">Sub</div>
-                    <p id="inspect-body">Desc</p>
+                    <h3 id="inspect-title">Component</h3>
+                    <div id="inspect-sub" class="subtitle">Material & Role</div>
+                    <p id="inspect-body">Description</p>
                 </div>
 
                 <div class="fail-overlay" id="fail-overlay">
                     <h3>CATASTROPHIC TUBE FAILURE</h3>
-                    <p>The Tungsten target exceeded its melting point of 3,422°C. By disabling the rotating anode (rotor) during a high exposure, the intense heat generated was concentrated on a single spot, melting the actual focal track and destroying the vacuum envelope.</p>
+                    <p>The Tungsten target exceeded its melting point of 3,422°C. Disabling the rotating anode (rotor) during a high exposure concentrated the intense 99% thermal energy onto a single static focal spot, instantly melting the target and destroying the vacuum envelope.</p>
                     <button class="btn-reset" onclick="resetSimulator()">Install New X-Ray Tube</button>
                 </div>
 
-                <div class="hud">💡 Hover over components to inspect details. Hold EXPOSE to generate X-rays.</div>
+                <div class="hud">💡 Hover or tap components to inspect. Hold EXPOSE to generate X-rays.</div>
                 
                 <div class="author-badge">
                     Designed by <span>Ian Luyali</span><br>
@@ -298,7 +700,8 @@
                 </div>
             </div>
 
-            <div class="sidebar">
+            <!-- Responsive Controls Panel -->
+            <div class="controls-panel">
                 <div class="control-group">
                     <h3>1. Filament Circuit (Step-Down)</h3>
                     <div class="slider-header">
@@ -306,7 +709,7 @@
                         <span id="mA-val" class="val">300 mA</span>
                     </div>
                     <input type="range" id="mA-slider" min="50" max="1000" value="300" step="10">
-                    <div style="font-size: 0.75rem; color: var(--text-muted);">Adjusts step-down transformer (10-12V). Heats the filament coil to control the <strong>Quantity</strong> of electrons boiled off.</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.4;">Adjusts step-down transformer (10-12V). Heats the filament coil to control the <strong>Quantity</strong> of boiled-off electrons.</div>
                 </div>
 
                 <div class="control-group">
@@ -316,7 +719,7 @@
                         <span id="kVp-val" class="val">70 kVp</span>
                     </div>
                     <input type="range" id="kVp-slider" min="20" max="150" value="70" step="1">
-                    <div style="font-size: 0.75rem; color: var(--text-muted);">Massive potential difference applied across the tube. Controls electron kinetic energy and X-ray <strong>Quality (Penetration)</strong>.</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.4;">Massive potential difference applied across the tube. Controls electron kinetic energy and X-ray <strong>Quality (Penetration)</strong>.</div>
                 </div>
 
                 <div class="control-group">
@@ -331,10 +734,10 @@
                     </div>
                 </div>
 
-                <button id="btn-expose" class="btn-expose">Hold To Expose</button>
+                <button id="btn-expose" class="sim-btn btn-expose">Hold To Expose</button>
 
                 <div class="control-group">
-                    <h3>Energy Conversion Diagnostics</h3>
+                    <h3>Energy Diagnostics</h3>
                     <div class="metrics-grid">
                         <div class="metric-card">
                             <span class="label">Thermal Heat Yield</span>
@@ -347,7 +750,7 @@
                             <div class="bar-container"><div class="bar-fill" id="xray-bar" style="width: 10%; background: var(--accent-purple);"></div></div>
                         </div>
                     </div>
-                    <div style="margin-top: 10px;">
+                    <div style="margin-top: 8px;">
                         <div class="slider-header" style="font-size:0.75rem; color:var(--text-muted);">
                             <span>Tungsten Target Temperature</span>
                             <span id="temp-val" style="color:var(--text-main); font-weight:bold;">25 °C</span>
@@ -358,19 +761,20 @@
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 
-    <!-- EDUCATIONAL CONTENT SECTION -->
+    <!-- 3. EDUCATIONAL CONTENT SECTION -->
     <div class="educational-content">
         
         <h2>How to Use This Simulator</h2>
         <p>This interactive laboratory allows you to safely experiment with the internal mechanisms of an X-ray tube. Use the controls on the right panel to dictate the physics taking place within the glass envelope:</p>
         <ul>
-            <li><strong>Tube Current (mA):</strong> Drag the slider to increase the current sent to the cathode. You will visually see the filament coil burn brighter, generating a larger "space charge" of electrons.</li>
-            <li><strong>Accelerating Potential (kVp):</strong> Adjust the kilovoltage peak to control the electrical pulling force. Higher kVp values will propel the electrons across the gap at blistering speeds, resulting in highly penetrating X-rays (shown as purple/blue energetic waves).</li>
-            <li><strong>Anode Rotation:</strong> Toggle the induction motor on or off. Keep a close eye on the <em>Tungsten Target Temperature</em> gauge. If you expose the tube for too long with the rotor off, you will melt the target and destroy the tube!</li>
-            <li><strong>Hover Inspection:</strong> Move your mouse over different components (the glass envelope, the copper stem, the dielectric oil, the window) to reveal their precise functions and material composition.</li>
+            <li><strong>Tube Current (mA):</strong> Drag the slider to increase the current sent to the cathode. You will visually see the filament coil burn brighter, generating a larger "space charge" cloud of electrons.</li>
+            <li><strong>Accelerating Potential (kVp):</strong> Adjust the kilovoltage peak to control the electrical pulling force. Higher kVp values propel electrons across the gap at blistering speeds, resulting in high-frequency, highly penetrating X-rays (rendered as violet and purple energetic waves).</li>
+            <li><strong>Anode Rotation:</strong> Toggle the induction motor on or off. Keep a close eye on the <em>Tungsten Target Temperature</em> gauge. If you expose the tube with the rotor turned off, heat concentrates on a single focal track point, causing catastrophic thermal tube failure!</li>
+            <li><strong>Hover / Touch Inspection:</strong> Move your mouse or tap across components (the glass envelope, copper stem, dielectric oil, beryllium window) to reveal their precise functions and material composition.</li>
         </ul>
 
         <h2>The Theory Behind X-Ray Production</h2>
@@ -429,7 +833,7 @@
 
     </div>
 
-    <!-- Tasks and Notes Modal (Overlayed on top of everything) -->
+    <!-- Tasks and Notes Modal -->
     <div id="tasksModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="toggleModal()">&times;</span>
@@ -458,7 +862,7 @@
     </div>
 
 <script>
-    // --- SIMULATOR JAVASCRIPT ---
+    // --- 4. SIMULATOR LOGIC & RESPONSIVE TOUCH ENGINE ---
     const canvas = document.getElementById('simCanvas');
     const ctx = canvas.getContext('2d');
     
@@ -482,6 +886,7 @@
     let tubeBroken = false;
     let targetTemp = 25;
     let anodeAngle = 0;
+    let hoveredId = null;
     
     // Particle Arrays
     let electrons = [];
@@ -490,7 +895,7 @@
     let oilConvection = [];
 
     // Initialize Oil Particles
-    for(let i=0; i<60; i++) {
+    for(let i = 0; i < 60; i++) {
         oilConvection.push({
             x: 100 + Math.random() * 800,
             y: 100 + Math.random() * 450,
@@ -499,7 +904,7 @@
         });
     }
 
-    // Interactive Bounds Database
+    // Interactive Bounds Database (Coordinate space: 1000 x 650)
     const components = [
         { id: 'focusing_cup', name: 'Focusing Cup', sub: 'Nickel / Molybdenum Shield', desc: 'A negatively charged concave cup. Because like charges repel, it forces the boiling electrons into a tight, narrow beam directed at the anode.', bounds: { x: 280, y: 285, w: 50, h: 80 } },
         { id: 'filament', name: 'Cathode Filament Coil', sub: 'Tungsten-Thorium Wire', desc: 'Receives low-voltage current. Heats above 2,200 degrees C to "boil off" electrons via Thermionic Emission. Shaped like a coil to increase surface area.', bounds: { x: 310, y: 300, w: 25, h: 50 } },
@@ -514,22 +919,32 @@
         { id: 'hv_circuit', name: 'High-Voltage Circuit', sub: 'Step-Up Transformer', desc: 'Boosts voltage to incredibly high levels (kVp). Wiring connects across the entire tube (Negative to Cathode, Positive to Anode) to violently accelerate electrons.', bounds: { x: 450, y: 60, w: 180, h: 40 } }
     ];
 
-    // Listeners
+    // Listeners for Sliders & Toggles
     mASlider.oninput = (e) => { mA = parseInt(e.target.value); mAVal.innerText = `${mA} mA`; };
     kVpSlider.oninput = (e) => { kVp = parseInt(e.target.value); kVpVal.innerText = `${kVp} kVp`; };
     anodeSpinToggle.onchange = (e) => isAnodeSpinning = e.target.checked;
     lineFocusToggle.onchange = (e) => showLineFocus = e.target.checked;
     
-    const triggerStart = (e) => { if(!tubeBroken) { isExposing = true; btnExpose.classList.add('active'); } };
-    const triggerEnd = (e) => { isExposing = false; btnExpose.classList.remove('active'); };
+    // Unified Pointer Handling for Expose Button
+    const triggerStart = (e) => { 
+        if(!tubeBroken) { 
+            isExposing = true; 
+            btnExpose.classList.add('active'); 
+        } 
+    };
+    const triggerEnd = (e) => { 
+        isExposing = false; 
+        btnExpose.classList.remove('active'); 
+    };
     
-    btnExpose.onmousedown = triggerStart; btnExpose.onmouseup = triggerEnd; btnExpose.onmouseleave = triggerEnd;
-    btnExpose.ontouchstart = (e) => { e.preventDefault(); triggerStart(); }; btnExpose.ontouchend = (e) => { e.preventDefault(); triggerEnd(); };
+    btnExpose.addEventListener('pointerdown', triggerStart);
+    window.addEventListener('pointerup', triggerEnd);
+    btnExpose.addEventListener('pointercancel', triggerEnd);
 
-    canvas.onmousemove = (e) => {
-        if(tubeBroken) return;
+    // Responsive Inspector (Works on Pointer, Mouse, and Finger Taps)
+    function handlePointerInspection(e) {
+        if (tubeBroken) return;
         const rect = canvas.getBoundingClientRect();
-        // Adjust coordinate mapping in case canvas scales
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
         const mx = (e.clientX - rect.left) * scaleX; 
@@ -538,7 +953,8 @@
         let found = null;
         for (let c of components) {
             if (mx >= c.bounds.x && mx <= c.bounds.x + c.bounds.w && my >= c.bounds.y && my <= c.bounds.y + c.bounds.h) {
-                found = c; break;
+                found = c; 
+                break;
             }
         }
         if (found) {
@@ -551,14 +967,21 @@
             inspector.classList.remove('active');
             hoveredId = null;
         }
-    };
+    }
 
-    let hoveredId = null;
+    canvas.addEventListener('pointermove', handlePointerInspection);
+    canvas.addEventListener('pointerdown', handlePointerInspection);
+    canvas.addEventListener('pointerleave', () => {
+        inspector.classList.remove('active');
+        hoveredId = null;
+    });
 
     window.resetSimulator = () => {
         tubeBroken = false;
         targetTemp = 25;
-        electrons = []; xrays = []; heatWaves = [];
+        electrons = []; 
+        xrays = []; 
+        heatWaves = [];
         failOverlay.classList.remove('active');
         btnExpose.disabled = false;
         btnExpose.innerText = "Hold To Expose";
@@ -580,7 +1003,7 @@
         }
     };
 
-    // Physics Update
+    // Physics Engine Update
     function updatePhysics() {
         if (tubeBroken) return;
 
@@ -595,7 +1018,7 @@
 
         if (isAnodeSpinning) anodeAngle += 0.3;
 
-        // Thermionic Emission (Space Charge)
+        // Thermionic Emission (Space Charge Cloud)
         if (Math.random() < (mA / 1000) * 1.5) {
             electrons.push({
                 x: 320 + Math.random() * 15,
@@ -617,7 +1040,7 @@
             
             // Heat Generation
             let heatSpike = (mA * kVp) / 10000;
-            if (!isAnodeSpinning) heatSpike *= 4.5; // Massive heat if stationary
+            if (!isAnodeSpinning) heatSpike *= 4.5; // Concentrated heat if stationary
             targetTemp += heatSpike;
 
             if (targetTemp >= 3422) {
@@ -631,13 +1054,13 @@
             targetTemp = Math.max(25, targetTemp - (isAnodeSpinning ? 2.0 : 0.5));
         }
 
-        // Temp UI
+        // Temperature UI
         let tempPct = Math.min(100, (targetTemp / 3422) * 100);
         document.getElementById('temp-val').innerText = `${Math.round(targetTemp)} °C`;
         document.getElementById('temp-bar').style.width = `${tempPct}%`;
-        document.getElementById('temp-bar').style.background = targetTemp > 2500 ? '#ef4444' : (targetTemp > 1000 ? '#f59e0b' : '#38bdf8');
+        document.getElementById('temp-bar').style.background = targetTemp > 2500 ? '#ef4444' : (targetTemp > 1000 ? '#f59e0b' : '#00f3ff');
 
-        // Update Particles
+        // Update Electrons
         for (let i = electrons.length - 1; i >= 0; i--) {
             let p = electrons[i];
             p.x += p.vx; p.y += p.vy;
@@ -660,32 +1083,41 @@
             }
         }
 
+        // Update X-Rays
         for (let i = xrays.length - 1; i >= 0; i--) {
-            xrays[i].x += xrays[i].vx; xrays[i].y += xrays[i].vy; xrays[i].life -= 0.02;
+            xrays[i].x += xrays[i].vx; 
+            xrays[i].y += xrays[i].vy; 
+            xrays[i].life -= 0.02;
             if (xrays[i].life <= 0 || xrays[i].y > 650) xrays.splice(i, 1);
         }
 
+        // Update Heat Waves
         for (let i = heatWaves.length - 1; i >= 0; i--) {
-            heatWaves[i].radius += 1.5; heatWaves[i].alpha -= 0.04; heatWaves[i].x += 0.8;
+            heatWaves[i].radius += 1.5; 
+            heatWaves[i].alpha -= 0.04; 
+            heatWaves[i].x += 0.8;
             if (heatWaves[i].alpha <= 0) heatWaves.splice(i, 1);
         }
 
-        // Oil Convection (Speed increases with tube temp)
+        // Convection Bubbles
         let oilSpeedMult = 1 + (targetTemp / 1000);
         for (let o of oilConvection) {
             o.y -= o.speed * oilSpeedMult;
             o.x += Math.sin(o.y / 20) * 0.5;
-            if (o.y < 130) { o.y = 520; o.x = 180 + Math.random()*640; }
+            if (o.y < 130) { 
+                o.y = 520; 
+                o.x = 180 + Math.random() * 640; 
+            }
         }
     }
 
-    // Drawing Rendering
+    // Canvas Render Function
     function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         // --- EXPLICIT WIRING CIRCUITS ---
         
-        // High Voltage Circuit (Across top)
+        // High Voltage Circuit (Top)
         ctx.lineWidth = 3;
         ctx.strokeStyle = hoveredId === 'hv_circuit' ? '#f87171' : '#475569';
         ctx.beginPath();
@@ -693,8 +1125,12 @@
         ctx.moveTo(630, 80); ctx.lineTo(780, 80); ctx.lineTo(780, 280);
         ctx.stroke();
         
-        ctx.fillStyle = '#1e293b'; ctx.fillRect(450, 60, 180, 40); ctx.strokeRect(450, 60, 180, 40);
-        ctx.fillStyle = '#f87171'; ctx.font = "14px 'Rajdhani'"; ctx.fillText(`HV Step-Up (${kVp} kVp)`, 465, 85);
+        ctx.fillStyle = '#1e293b'; 
+        ctx.fillRect(450, 60, 180, 40); 
+        ctx.strokeRect(450, 60, 180, 40);
+        ctx.fillStyle = '#f87171'; 
+        ctx.font = "15px 'Rajdhani'"; 
+        ctx.fillText(`HV Step-Up (${kVp} kVp)`, 465, 85);
 
         // Filament Circuit (Left side)
         ctx.strokeStyle = hoveredId === 'fil_circuit' ? '#38bdf8' : '#475569';
@@ -703,15 +1139,26 @@
         ctx.moveTo(180, 345); ctx.lineTo(240, 345);
         ctx.stroke();
         
-        ctx.fillStyle = '#1e293b'; ctx.fillRect(40, 315, 140, 40); ctx.strokeRect(40, 315, 140, 40);
-        ctx.fillStyle = '#38bdf8'; ctx.font = "14px 'Rajdhani'"; ctx.fillText(`Filament Step-Down`, 45, 340);
+        ctx.fillStyle = '#1e293b'; 
+        ctx.fillRect(40, 315, 140, 40); 
+        ctx.strokeRect(40, 315, 140, 40);
+        ctx.fillStyle = '#38bdf8'; 
+        ctx.font = "15px 'Rajdhani'"; 
+        ctx.fillText(`Filament Step-Down`, 45, 340);
 
-        // --- HOUSING ---
-        ctx.fillStyle = '#1e293b'; ctx.strokeStyle = hoveredId === 'housing' ? '#94a3b8' : '#334155'; ctx.lineWidth = hoveredId === 'housing' ? 4 : 2;
-        ctx.beginPath(); ctx.roundRect(150, 120, 760, 410, 20); ctx.fill(); ctx.stroke();
-        ctx.strokeStyle = '#64748b'; ctx.lineWidth = 6; ctx.strokeRect(158, 128, 744, 394); 
+        // --- PROTECTIVE HOUSING ---
+        ctx.fillStyle = '#1e293b'; 
+        ctx.strokeStyle = hoveredId === 'housing' ? '#94a3b8' : '#334155'; 
+        ctx.lineWidth = hoveredId === 'housing' ? 4 : 2;
+        ctx.beginPath(); 
+        ctx.roundRect(150, 120, 760, 410, 20); 
+        ctx.fill(); 
+        ctx.stroke();
+        ctx.strokeStyle = '#64748b'; 
+        ctx.lineWidth = 6; 
+        ctx.strokeRect(158, 128, 744, 394); 
 
-        // --- OIL ---
+        // --- DIELECTRIC OIL ---
         ctx.fillStyle = hoveredId === 'oil' ? 'rgba(234, 179, 8, 0.2)' : 'rgba(234, 179, 8, 0.1)';
         ctx.fillRect(164, 134, 732, 382);
         ctx.fillStyle = 'rgba(251, 191, 36, 0.3)';
@@ -721,9 +1168,10 @@
             }
         }
 
-        // --- ENVELOPE (Glass) ---
+        // --- VACUUM ENVELOPE (Glass) ---
         ctx.fillStyle = 'rgba(15, 23, 42, 0.8)';
-        ctx.strokeStyle = hoveredId === 'envelope' ? '#38bdf8' : 'rgba(203, 213, 225, 0.6)'; ctx.lineWidth = 2;
+        ctx.strokeStyle = hoveredId === 'envelope' ? '#38bdf8' : 'rgba(203, 213, 225, 0.6)'; 
+        ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.moveTo(280, 270); 
         ctx.bezierCurveTo(350, 270, 400, 210, 500, 210);
@@ -731,40 +1179,53 @@
         ctx.lineTo(500, 440); 
         ctx.bezierCurveTo(400, 440, 350, 380, 280, 380); 
         ctx.closePath();
-        ctx.fill(); ctx.stroke();
+        ctx.fill(); 
+        ctx.stroke();
 
-        // --- WINDOW ---
+        // --- BERYLLIUM WINDOW ---
         ctx.fillStyle = hoveredId === 'window' ? '#38bdf8' : '#0284c7';
         ctx.fillRect(590, 440, 80, 8);
-        ctx.strokeStyle = '#334155'; ctx.lineWidth = 3; ctx.strokeRect(580, 448, 100, 70); 
+        ctx.strokeStyle = '#334155'; 
+        ctx.lineWidth = 3; 
+        ctx.strokeRect(580, 448, 100, 70); 
 
         // --- CATHODE ---
-        ctx.fillStyle = '#334155'; ctx.fillRect(240, 290, 40, 70);
+        ctx.fillStyle = '#334155'; 
+        ctx.fillRect(240, 290, 40, 70);
         ctx.fillStyle = hoveredId === 'focusing_cup' ? '#94a3b8' : '#475569';
         ctx.beginPath();
         ctx.arc(320, 325, 30, Math.PI/2 - 0.2, -Math.PI/2 + 0.2, true);
         ctx.lineTo(280, 290); ctx.lineTo(280, 360);
-        ctx.closePath(); ctx.fill();
+        ctx.closePath(); 
+        ctx.fill();
 
         let filAlpha = mA / 1000;
         ctx.strokeStyle = hoveredId === 'filament' ? '#fff' : `rgb(255, ${220 - filAlpha*100}, ${150 - filAlpha*100})`;
-        ctx.lineWidth = 3; ctx.shadowColor = '#f59e0b'; ctx.shadowBlur = filAlpha * 20;
+        ctx.lineWidth = 3; 
+        ctx.shadowColor = '#f59e0b'; 
+        ctx.shadowBlur = filAlpha * 20;
         ctx.beginPath();
         for (let y = 305; y <= 345; y += 1) {
             let x = 312 + Math.sin((y - 305) * 1.5) * 6;
             if (y === 305) ctx.moveTo(x, y);
             else ctx.lineTo(x, y);
         }
-        ctx.stroke(); ctx.shadowBlur = 0;
+        ctx.stroke(); 
+        ctx.shadowBlur = 0;
 
-        // --- ANODE ---
-        ctx.fillStyle = '#7c2d12'; ctx.fillRect(720, 160, 120, 45); ctx.fillRect(720, 445, 120, 45);
-        ctx.fillStyle = hoveredId === 'rotor_stator' ? '#cbd5e1' : '#64748b'; ctx.fillRect(730, 280, 110, 90);
+        // --- ANODE ASSEMBLY ---
+        ctx.fillStyle = '#7c2d12'; 
+        ctx.fillRect(720, 160, 120, 45); 
+        ctx.fillRect(720, 445, 120, 45);
+        ctx.fillStyle = hoveredId === 'rotor_stator' ? '#cbd5e1' : '#64748b'; 
+        ctx.fillRect(730, 280, 110, 90);
         
         ctx.fillStyle = hoveredId === 'stem' ? '#d97706' : '#b45309'; 
         ctx.fillRect(640, 305, 90, 40);
         ctx.fillStyle = hoveredId === 'stem' ? '#b45309' : '#78350f';
-        for (let i = 0; i < 4; i++) { ctx.fillRect(655 + i * 18, 298, 6, 54); }
+        for (let i = 0; i < 4; i++) { 
+            ctx.fillRect(655 + i * 18, 298, 6, 54); 
+        }
         
         ctx.save();
         ctx.translate(635, 325);
@@ -773,57 +1234,98 @@
         ctx.beginPath();
         ctx.moveTo(-15, -65); ctx.lineTo(15, -50); 
         ctx.lineTo(15, 50); ctx.lineTo(-15, 65);
-        ctx.closePath(); ctx.fill();
+        ctx.closePath(); 
+        ctx.fill();
         
         if (isAnodeSpinning && !tubeBroken) {
-            ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth = 2;
+            ctx.strokeStyle = 'rgba(255,255,255,0.5)'; 
+            ctx.lineWidth = 2;
             let sy = Math.sin(anodeAngle) * 50;
-            ctx.beginPath(); ctx.moveTo(-5, sy); ctx.lineTo(10, sy + 5); ctx.stroke();
+            ctx.beginPath(); 
+            ctx.moveTo(-5, sy); 
+            ctx.lineTo(10, sy + 5); 
+            ctx.stroke();
         }
         ctx.restore();
 
         // --- LINE FOCUS OVERLAY ---
         if (showLineFocus) {
-            ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 1.5; ctx.setLineDash([5, 5]);
-            ctx.beginPath(); ctx.moveTo(340, 310); ctx.lineTo(625, 310); ctx.moveTo(340, 340); ctx.lineTo(625, 340); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(625, 310); ctx.lineTo(625, 340); ctx.stroke();
+            ctx.strokeStyle = '#fbbf24'; 
+            ctx.lineWidth = 1.5; 
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath(); 
+            ctx.moveTo(340, 310); ctx.lineTo(625, 310); 
+            ctx.moveTo(340, 340); ctx.lineTo(625, 340); 
+            ctx.stroke();
+            ctx.beginPath(); 
+            ctx.moveTo(625, 310); ctx.lineTo(625, 340); 
+            ctx.stroke();
+            
             ctx.strokeStyle = '#4ade80';
-            ctx.beginPath(); ctx.moveTo(635, 335); ctx.lineTo(635, 500); ctx.moveTo(615, 335); ctx.lineTo(615, 500); ctx.stroke();
+            ctx.beginPath(); 
+            ctx.moveTo(635, 335); ctx.lineTo(635, 500); 
+            ctx.moveTo(615, 335); ctx.lineTo(615, 500); 
+            ctx.stroke();
             ctx.setLineDash([]);
             
-            ctx.fillStyle = '#fbbf24'; ctx.font = "14px 'Rajdhani'"; ctx.fillText("Actual Focal Spot (Wide = High Heat Capacity)", 650, 250);
-            ctx.fillStyle = '#4ade80'; ctx.fillText("Effective Focal Spot (Narrow = Sharp Image)", 660, 480);
+            ctx.fillStyle = '#fbbf24'; 
+            ctx.font = "14px 'Rajdhani'"; 
+            ctx.fillText("Actual Focal Spot (Wide = High Heat Capacity)", 650, 250);
+            ctx.fillStyle = '#4ade80'; 
+            ctx.fillText("Effective Focal Spot (Narrow = Sharp Image)", 660, 480);
         }
 
         // --- PARTICLES ---
         for (let p of electrons) {
             ctx.fillStyle = p.state === 'cloud' ? 'rgba(56, 189, 248, 0.7)' : '#38bdf8';
-            ctx.beginPath(); ctx.arc(p.x, p.y, 2.5, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); 
+            ctx.arc(p.x, p.y, 2.5, 0, Math.PI*2); 
+            ctx.fill();
         }
 
         for (let h of heatWaves) {
-            ctx.strokeStyle = `rgba(248, 113, 113, ${h.alpha})`; ctx.lineWidth = 2;
-            ctx.beginPath(); ctx.arc(h.x, h.y, h.radius, 0, Math.PI*2); ctx.stroke();
+            ctx.strokeStyle = `rgba(248, 113, 113, ${h.alpha})`; 
+            ctx.lineWidth = 2;
+            ctx.beginPath(); 
+            ctx.arc(h.x, h.y, h.radius, 0, Math.PI*2); 
+            ctx.stroke();
         }
 
         for (let x of xrays) {
             let hue = 280 - ((150 - kVp) * 1.5); 
             ctx.strokeStyle = `hsla(${hue}, 100%, 70%, ${x.life})`;
-            ctx.lineWidth = 2; ctx.shadowColor = `hsl(${hue}, 100%, 60%)`; ctx.shadowBlur = 5;
-            ctx.beginPath(); ctx.moveTo(x.x, x.y); ctx.lineTo(x.x - x.vx*1.5, x.y - x.vy*1.5); ctx.stroke();
+            ctx.lineWidth = 2; 
+            ctx.shadowColor = `hsl(${hue}, 100%, 60%)`; 
+            ctx.shadowBlur = 5;
+            ctx.beginPath(); 
+            ctx.moveTo(x.x, x.y); 
+            ctx.lineTo(x.x - x.vx*1.5, x.y - x.vy*1.5); 
+            ctx.stroke();
             ctx.shadowBlur = 0;
         }
 
         // --- BROKEN TUBE GRAPHICS ---
         if (tubeBroken) {
-            ctx.strokeStyle = '#fff'; ctx.lineWidth = 2;
-            ctx.beginPath(); ctx.moveTo(620, 325); ctx.lineTo(580, 280); ctx.moveTo(620, 325); ctx.lineTo(650, 240);
-            ctx.moveTo(620, 325); ctx.lineTo(550, 360); ctx.moveTo(620, 325); ctx.lineTo(660, 400); ctx.stroke();
-            ctx.fillStyle = '#fff'; ctx.shadowColor = '#f87171'; ctx.shadowBlur = 20;
-            ctx.beginPath(); ctx.arc(625, 325, 15, 0, Math.PI*2); ctx.fill(); ctx.shadowBlur=0;
+            ctx.strokeStyle = '#fff'; 
+            ctx.lineWidth = 2;
+            ctx.beginPath(); 
+            ctx.moveTo(620, 325); ctx.lineTo(580, 280); 
+            ctx.moveTo(620, 325); ctx.lineTo(650, 240);
+            ctx.moveTo(620, 325); ctx.lineTo(550, 360); 
+            ctx.moveTo(620, 325); ctx.lineTo(660, 400); 
+            ctx.stroke();
+            
+            ctx.fillStyle = '#fff'; 
+            ctx.shadowColor = '#f87171'; 
+            ctx.shadowBlur = 20;
+            ctx.beginPath(); 
+            ctx.arc(625, 325, 15, 0, Math.PI*2); 
+            ctx.fill(); 
+            ctx.shadowBlur = 0;
         }
     }
 
+    // Animation Loop
     function loop() {
         updatePhysics();
         draw();
@@ -832,7 +1334,6 @@
     
     // Start animation loop
     loop();
-
 </script>
 </body>
 </html>
