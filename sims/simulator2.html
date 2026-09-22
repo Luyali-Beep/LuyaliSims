@@ -2,886 +2,2053 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stationary Waves Simulator Pro - LuyaliSims</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Interactive 3D Holographic Stationary Waves Simulator. Explore standing waves in vibrating strings, open and closed air columns, and real musical instruments.">
+    <title>Stationary Waves Simulator Pro - Interactive 3D Physics Lab - LuyaliSims</title>
     
-    <!-- Tailwind CSS for layout utility -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Futuristic Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Rajdhani:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Futuristic Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* Base Theme from Template */
-        body {
-            font-family: 'Rajdhani', sans-serif;
-            background-color: #0a0e17;
-            background-image: radial-gradient(circle at top right, rgba(0, 243, 255, 0.05), transparent 40%),
-                              radial-gradient(circle at bottom left, rgba(188, 19, 254, 0.05), transparent 40%);
-            color: #e2e8f0;
-            margin: 0;
-            padding: 30px;
-            min-height: 100vh;
+        /* Base Reset & Box Sizing */
+        *, *::before, *::after {
+            box-sizing: border-box;
         }
 
-        /* NAVIGATION: Futuristic Back Button */
+        :root {
+            --holo-cyan: #00f3ff;
+            --holo-cyan-glow: rgba(0, 243, 255, 0.4);
+            --holo-purple: #bc13fe;
+            --holo-purple-glow: rgba(188, 19, 254, 0.4);
+            --holo-green: #10b981;
+            --holo-amber: #f59e0b;
+            --holo-red: #ef4444;
+            --holo-dark-bg: #060913;
+            --holo-card-bg: rgba(13, 20, 36, 0.78);
+            --holo-border: rgba(0, 243, 255, 0.3);
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--holo-dark-bg);
+            background-image: 
+                radial-gradient(circle at 85% 10%, rgba(0, 243, 255, 0.08), transparent 40%),
+                radial-gradient(circle at 10% 85%, rgba(188, 19, 254, 0.08), transparent 40%),
+                linear-gradient(180deg, #060913 0%, #090e1c 100%);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* 1. HEADER & NAVIGATION */
+        header.app-header {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .nav-bar {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
         .back-btn {
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 20px;
-            padding: 10px 20px;
-            background: rgba(16, 24, 43, 0.6);
+            padding: 10px 18px;
+            background: rgba(16, 24, 43, 0.75);
             backdrop-filter: blur(8px);
             border: 1px solid rgba(188, 19, 254, 0.5);
             color: #e580ff;
             text-decoration: none;
             border-radius: 8px;
             font-weight: 600;
-            font-size: 1.1rem;
+            font-size: 0.95rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             transition: all 0.3s ease;
         }
 
         .back-btn:hover {
-            background: rgba(188, 19, 254, 0.15);
-            border-color: #bc13fe;
-            color: #fff;
-            box-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
-            transform: translateX(-5px);
+            background: rgba(188, 19, 254, 0.2);
+            border-color: var(--holo-purple);
+            color: #ffffff;
+            box-shadow: 0 0 16px var(--holo-purple-glow);
+            transform: translateX(-4px);
         }
 
-        .back-btn svg { transition: transform 0.3s ease; }
-        .back-btn:hover svg { transform: translateX(-3px); }
-
-        /* Headings */
-        h1 {
-            font-family: 'Orbitron', sans-serif;
-            color: #00f3ff;
-            text-shadow: 0px 0px 15px rgba(0, 243, 255, 0.3);
-            margin-top: 0;
-            font-size: 2.5rem;
-            text-align: center;
-        }
-        
-        h2, h3 {
-            font-family: 'Orbitron', sans-serif;
-            color: #bc13fe;
-            margin-top: 1.5rem;
-            margin-bottom: 0.75rem;
-        }
-
-        /* THE SIMULATOR APP CONTAINER */
-        #simulator-container {
-            background: rgba(16, 24, 43, 0.6);
-            backdrop-filter: blur(8px);
+        .author-badge {
+            background: rgba(16, 24, 48, 0.85);
             border: 1px solid rgba(0, 243, 255, 0.3);
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            margin: 0 auto 40px auto;
-            max-width: 1280px;
-            transition: all 0.3s duration;
+            border-radius: 30px;
+            padding: 8px 18px;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+        }
+
+        .author-badge span.author-name {
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .author-badge span.contact {
+            color: var(--holo-green);
+            font-family: monospace;
+            font-weight: bold;
+        }
+
+        h1.main-title {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--holo-cyan);
+            text-shadow: 0 0 20px var(--holo-cyan-glow);
+            margin: 0 0 6px 0;
+            font-size: clamp(1.5rem, 3.8vw, 2.4rem);
+            text-align: center;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .title-subtext {
+            color: var(--text-muted);
+            font-size: 1rem;
+            text-align: center;
+            margin: 0 0 10px 0;
+        }
+
+        /* ADSENSE CONTAINER STYLES */
+        .ads-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 15px auto;
+            min-height: 90px;
+            background: rgba(10, 15, 28, 0.5);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            overflow: hidden;
+        }
+
+        /* 2. MAIN SIMULATOR WORKSPACE */
+        main#simulator-container {
+            background: var(--holo-card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--holo-border);
+            border-radius: 16px;
+            padding: 22px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), inset 0 0 25px rgba(0, 243, 255, 0.05);
+            margin-bottom: 30px;
+            max-width: 1200px;
+            width: 100%;
+            transition: all 0.3s ease;
         }
 
         /* Fullscreen Layout Overrides */
-        #simulator-container:fullscreen {
-            background-color: #0a0e17;
-            padding: 2rem;
-            display: grid;
-            grid-template-columns: 1fr 350px;
-            grid-template-rows: auto 1fr auto;
-            gap: 1.5rem;
-            height: 100vh;
-            max-width: 100vw;
-            overflow-y: auto;
-            border: none;
+        #simulator-container:fullscreen,
+        #simulator-container:-webkit-full-screen {
+            width: 100vw !important;
+            max-width: 100vw !important;
+            height: 100vh !important;
+            border-radius: 0 !important;
+            margin: 0 !important;
+            padding: 16px 24px !important;
+            overflow-y: auto !important;
+            background: #060913 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 12px;
         }
-        
-        .fs-header { grid-column: 1 / -1; }
-        #simulator-container:fullscreen .fs-canvas-area { grid-column: 1 / 2; grid-row: 2 / 3; display: flex; flex-direction: column; height: 100%; }
-        #simulator-container:fullscreen .fs-canvas-area canvas { flex-grow: 1; height: auto !important; }
-        #simulator-container:fullscreen .fs-controls-area { grid-column: 2 / 3; grid-row: 2 / 3; display: flex; flex-direction: column; gap: 1rem; overflow-y: auto;}
 
-        /* Canvas optimizations */
-        #waveCanvas { touch-action: none; }
+        #simulator-container:fullscreen .sim-layout,
+        #simulator-container:-webkit-full-screen .sim-layout {
+            flex-grow: 1;
+            min-height: 0;
+        }
 
-        /* EDUCATIONAL CONTENT */
-        .educational-content {
-            max-width: 1280px;
-            margin: 0 auto;
-            line-height: 1.7;
+        #simulator-container:fullscreen .canvas-wrapper,
+        #simulator-container:-webkit-full-screen .canvas-wrapper {
+            height: 100%;
+            min-height: 480px;
+        }
+
+        /* Mode & Instrument Selector */
+        .system-presets-bar {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+            background: rgba(8, 13, 25, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 14px;
+            border-radius: 12px;
+        }
+
+        .mode-selection-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 10px;
+        }
+
+        .preset-instruments-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding-top: 10px;
+        }
+
+        .tab-btn {
+            background: rgba(16, 24, 43, 0.85);
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            color: #cbd5e1;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            padding: 10px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            transition: all 0.25s ease;
+            text-align: center;
+        }
+
+        .tab-btn:hover {
+            border-color: var(--holo-cyan);
+            color: #ffffff;
+            box-shadow: 0 0 12px var(--holo-cyan-glow);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, rgba(0, 243, 255, 0.25), rgba(188, 19, 254, 0.25));
+            border-color: var(--holo-cyan);
+            color: #ffffff;
+            font-weight: 700;
+            box-shadow: 0 0 16px rgba(0, 243, 255, 0.45);
+        }
+
+        .inst-btn {
+            background: rgba(22, 17, 43, 0.7);
+            border: 1px solid rgba(188, 19, 254, 0.35);
+            color: #d8b4fe;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .inst-btn:hover {
+            background: rgba(188, 19, 254, 0.25);
+            border-color: var(--holo-purple);
+            color: #ffffff;
+            box-shadow: 0 0 12px var(--holo-purple-glow);
+        }
+
+        .inst-btn.active-inst {
+            border-color: var(--holo-purple);
+            background: rgba(188, 19, 254, 0.35);
+            color: #ffffff;
+            box-shadow: 0 0 14px var(--holo-purple-glow);
+        }
+
+        .instrument-info-callout {
+            font-size: 0.92rem;
+            padding: 10px 14px;
+            background: rgba(0, 243, 255, 0.08);
+            border-left: 3px solid var(--holo-cyan);
+            border-radius: 4px;
+            color: #93c5fd;
+            display: none;
+            margin-top: 4px;
+        }
+
+        /* Dual-Pane Responsive Grid Layout */
+        .sim-layout {
+            display: grid;
+            grid-template-columns: 1.65fr 1fr;
+            gap: 20px;
+            align-items: stretch;
+        }
+
+        /* Holographic 3D Canvas Box */
+        .canvas-wrapper {
+            position: relative;
+            width: 100%;
+            background: #040711;
+            border: 1px solid rgba(0, 243, 255, 0.35);
+            border-radius: 12px;
+            overflow: hidden;
+            touch-action: none;
+            box-shadow: inset 0 0 35px rgba(0, 243, 255, 0.12), 0 8px 25px rgba(0, 0, 0, 0.6);
+            display: flex;
+            flex-direction: column;
+            min-height: 490px;
+        }
+
+        /* Scanline Overlay & Glare */
+        .canvas-wrapper::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+            background-size: 100% 3px, 6px 100%;
+            pointer-events: none;
+            z-index: 4;
+        }
+
+        .canvas-toolbar {
+            position: absolute;
+            top: 12px;
+            left: 14px;
+            right: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .canvas-toolbar > * {
+            pointer-events: auto;
+        }
+
+        .canvas-title-badge {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            color: var(--holo-cyan);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            background: rgba(6, 10, 22, 0.88);
+            padding: 6px 14px;
+            border-radius: 6px;
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
+        }
+
+        .view-controls {
+            display: flex;
+            gap: 6px;
+            background: rgba(6, 10, 22, 0.88);
+            padding: 4px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .icon-btn {
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-muted);
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-family: 'Orbitron', sans-serif;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .icon-btn:hover, .icon-btn.active {
+            color: var(--holo-cyan);
+            border-color: rgba(0, 243, 255, 0.4);
+            background: rgba(0, 243, 255, 0.15);
+            box-shadow: 0 0 8px rgba(0, 243, 255, 0.3);
+        }
+
+        .icon-btn.fs-active {
+            border-color: var(--holo-purple);
+            color: #e580ff;
+            background: rgba(188, 19, 254, 0.2);
+            box-shadow: 0 0 10px var(--holo-purple-glow);
+        }
+
+        canvas#simCanvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            flex-grow: 1;
+        }
+
+        .canvas-legend {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 14px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            background: rgba(6, 10, 22, 0.88);
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .indicator-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        /* Streamlined Controls Panel */
+        .controls-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            background: rgba(10, 15, 28, 0.8);
+            padding: 18px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+        }
+
+        .panel-heading {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.95rem;
+            color: #cbd5e1;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 8px;
+            margin: 0;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .control-group label {
+            font-size: 0.95rem;
+            color: #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            font-weight: 500;
+        }
+
+        .control-group label span.value-display {
+            font-family: monospace;
+            color: var(--holo-cyan);
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        input[type="range"] {
+            accent-color: var(--holo-cyan);
+            height: 28px;
+            cursor: pointer;
+            width: 100%;
+            background: transparent;
+        }
+
+        .action-btns-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 4px;
+        }
+
+        .sim-btn {
+            background: transparent;
+            border: 1px solid var(--holo-cyan);
+            color: var(--holo-cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            padding: 10px 12px;
+            min-height: 44px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .sim-btn:hover {
+            background: rgba(0, 243, 255, 0.15);
+            box-shadow: 0 0 15px var(--holo-cyan-glow);
+            color: #ffffff;
+        }
+
+        .sim-btn:active {
+            transform: scale(0.97);
+        }
+
+        .sim-btn.btn-magenta {
+            border-color: var(--holo-purple);
+            color: #e580ff;
+        }
+
+        .sim-btn.btn-magenta:hover {
+            background: rgba(188, 19, 254, 0.2);
+            box-shadow: 0 0 15px var(--holo-purple-glow);
+            color: #ffffff;
+        }
+
+        .sim-btn.active-audio {
+            background: rgba(16, 185, 129, 0.25);
+            border-color: var(--holo-green);
+            color: #6ee7b7;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
+        }
+
+        /* Real-Time Math Readout */
+        .math-hud-box {
+            background: #040711;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 0.9rem;
+        }
+
+        .hud-metrics-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .metric-cell {
+            background: rgba(13, 20, 36, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 6px;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .metric-title {
+            font-size: 0.75rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        .metric-val {
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
             font-size: 1.1rem;
-            color: #94a3b8;
-            background: rgba(10, 14, 23, 0.8);
+        }
+
+        .derivation-path {
+            background: rgba(13, 20, 36, 0.6);
+            border-radius: 6px;
+            padding: 10px;
+            font-family: 'Rajdhani', monospace;
+            font-size: 0.88rem;
+            color: #cbd5e1;
+            line-height: 1.5;
+            border-left: 3px solid var(--holo-purple);
+        }
+
+        /* 3. EDUCATIONAL CONTENT SECTION */
+        section.educational-content {
+            max-width: 1200px;
+            width: 100%;
+            line-height: 1.75;
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            background: rgba(10, 14, 23, 0.85);
             padding: 30px;
-            border-radius: 15px;
-            border-left: 4px solid #00f3ff;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+            border-radius: 16px;
+            border-left: 4px solid var(--holo-cyan);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin-top: 10px;
+        }
+
+        h2, h3, h4 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--holo-purple);
+            letter-spacing: 0.8px;
+        }
+
+        h2 {
+            font-size: 1.45rem;
+            margin-top: 2rem;
+            border-bottom: 1px solid rgba(188, 19, 254, 0.25);
+            padding-bottom: 6px;
+        }
+
+        h2:first-of-type {
+            margin-top: 0;
+        }
+
+        h3 {
+            font-size: 1.15rem;
+            color: var(--holo-cyan);
+            margin-top: 1.5rem;
         }
 
         .educational-content strong {
-            color: #fff;
+            color: #ffffff;
             background: rgba(0, 243, 255, 0.1);
             padding: 2px 6px;
             border-radius: 4px;
         }
 
-        .educational-content p {
-            margin-bottom: 1rem;
+        .formula-callout {
+            background: #040711;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            padding: 16px 20px;
+            border-radius: 10px;
+            margin: 14px 0;
+            color: #e2e8f0;
+            line-height: 1.7;
         }
 
-        .educational-content ul {
-            list-style-type: disc;
-            margin-left: 20px;
-            margin-bottom: 1rem;
+        .formula-highlight {
+            font-family: 'Orbitron', monospace;
+            color: var(--holo-cyan);
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+
+        ul, ol {
+            padding-left: 22px;
+            margin-bottom: 1.2rem;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .practice-task-card {
+            background: rgba(13, 20, 36, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 10px;
+            padding: 18px 22px;
+            margin-bottom: 22px;
+        }
+
+        .task-badge {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background: rgba(188, 19, 254, 0.25);
+            color: #e580ff;
+            border: 1px solid rgba(188, 19, 254, 0.4);
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+        .solution-box {
+            margin-top: 12px;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            border-radius: 6px;
+            background: rgba(4, 7, 17, 0.8);
+            padding: 14px 18px;
+            border-left: 3px solid var(--holo-green);
+        }
+
+        .solution-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            color: var(--holo-green);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 6px;
+        }
+
+        footer.page-footer {
+            margin-top: 30px;
+            padding: 20px;
+            text-align: center;
+            font-size: 0.85rem;
+            color: #64748b;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        /* 4. RESPONSIVE BREAKPOINTS */
+        @media (max-width: 900px) {
+            .sim-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .canvas-wrapper {
+                min-height: 380px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 10px;
+            }
+
+            main#simulator-container, section.educational-content {
+                padding: 15px;
+            }
+
+            .canvas-wrapper {
+                min-height: 330px;
+            }
+
+            .action-btns-row {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    
-    <!-- 1. NAVIGATION -->
-    <a href="../index.html" class="back-btn">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
-        </svg>
-        Back to LuyaliSims
-    </a>
-    
-    <h1>Stationary Waves Simulator Pro</h1>
-    <div class="flex justify-center mb-8">
-        <div class="bg-indigo-950/80 border border-indigo-500/30 rounded-full px-5 py-1.5 text-sm text-indigo-200 shadow-lg tracking-wide">
-            Designed by <span class="font-bold text-white">Ian Luyali</span> | Contact: <span class="font-mono text-emerald-400">0727987669</span>
-        </div>
-    </div>
 
-    <!-- 2. THE SIMULATOR APP -->
-    <div id="simulator-container">
+    <!-- 1. SEMANTIC HEADER & NAVIGATION -->
+    <header class="app-header">
+        <nav class="nav-bar" aria-label="Main Navigation">
+            <a href="../index.html" class="back-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Back to LuyaliSims
+            </a>
+
+            <div class="author-badge">
+                Designed by <span class="author-name">Ian Luyali</span> | Contact: <span class="contact">0727987669</span>
+            </div>
+        </nav>
+
+        <h1 class="main-title">Stationary Waves Simulator Pro</h1>
+        <p class="title-subtext">Interactive 3D Holographic Standing Wave Resonance & Boundary Mechanics</p>
+    </header>
+
+    <!-- TOP SAFE AD PLACEMENT ZONE (AdSense Ready) -->
+    <aside class="ads-container" aria-label="Advertisement Banner">
+        <span>Google AdSense Responsive Unit - Top Leaderboard Placement Area</span>
+    </aside>
+
+    <!-- 2. THE MAIN INTERACTIVE SIMULATOR APPARATUS -->
+    <main id="simulator-container">
         
-        <!-- Header: Tabs & Instruments -->
-        <div class="fs-header mb-6">
-            <div class="flex justify-between items-end mb-4">
-                <span class="block text-sm font-bold uppercase tracking-wider text-slate-400">1. Select Wave System or Instrument</span>
-                <button onclick="toggleFullscreen()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded text-xs font-semibold shadow flex items-center gap-2 transition uppercase tracking-wider">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
-                    <span id="fs-btn-text">Fullscreen Mode</span>
-                </button>
+        <!-- System Mode & Instrument Preset Bar -->
+        <section class="system-presets-bar" aria-label="Acoustic Medium Selector">
+            <div class="mode-selection-group">
+                <button id="mode-string" class="tab-btn active" onclick="setSystemType('string')">Vibrating String</button>
+                <button id="mode-closed" class="tab-btn" onclick="setSystemType('closed')">Closed Air Column</button>
+                <button id="mode-open" class="tab-btn" onclick="setSystemType('open')">Open Air Column</button>
             </div>
+
+            <div class="preset-instruments-group">
+                <button id="inst-guitar" class="inst-btn" onclick="loadInstrument('guitar')">🎸 Guitar (E2)</button>
+                <button id="inst-violin" class="inst-btn" onclick="loadInstrument('violin')">🎻 Violin (A4)</button>
+                <button id="inst-flute" class="inst-btn" onclick="loadInstrument('flute')">💨 Flute (C4)</button>
+                <button id="inst-clarinet" class="inst-btn" onclick="loadInstrument('clarinet')">📯 Clarinet (D3)</button>
+            </div>
+
+            <div id="instrument-desc" class="instrument-info-callout" role="status"></div>
+        </section>
+
+        <!-- Two-Column Interactive Simulation Layout -->
+        <div class="sim-layout">
             
-            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-7 gap-3">
-                <button id="tab-string" onclick="setSystemType('string')" class="col-span-1 py-2 px-3 rounded text-sm font-medium bg-slate-800/80 text-slate-300 border border-slate-600 hover:bg-slate-700 transition">Vibrating String</button>
-                <button id="tab-closed" onclick="setSystemType('closed')" class="col-span-1 py-2 px-3 rounded text-sm font-medium bg-slate-800/80 text-slate-300 border border-slate-600 hover:bg-slate-700 transition">Closed Air Column</button>
-                <button id="tab-open" onclick="setSystemType('open')" class="col-span-1 py-2 px-3 rounded text-sm font-medium bg-slate-800/80 text-slate-300 border border-slate-600 hover:bg-slate-700 transition">Open Air Column</button>
-                
-                <div class="col-span-1 md:col-span-3 lg:col-span-4 flex gap-2 border-l-2 border-slate-700 pl-3">
-                    <button onclick="loadInstrument('guitar')" class="flex-1 py-2 px-2 bg-indigo-900/40 text-indigo-300 hover:bg-indigo-800/60 rounded text-sm font-medium border border-indigo-500/30 transition">🎸 Guitar</button>
-                    <button onclick="loadInstrument('violin')" class="flex-1 py-2 px-2 bg-indigo-900/40 text-indigo-300 hover:bg-indigo-800/60 rounded text-sm font-medium border border-indigo-500/30 transition">🎻 Violin</button>
-                    <button onclick="loadInstrument('flute')" class="flex-1 py-2 px-2 bg-indigo-900/40 text-indigo-300 hover:bg-indigo-800/60 rounded text-sm font-medium border border-indigo-500/30 transition">💨 Flute</button>
-                    <button onclick="loadInstrument('clarinet')" class="flex-1 py-2 px-2 bg-indigo-900/40 text-indigo-300 hover:bg-indigo-800/60 rounded text-sm font-medium border border-indigo-500/30 transition">📯 Clarinet</button>
+            <!-- 3D Holographic Canvas Wrapper -->
+            <div class="canvas-wrapper">
+                <div class="canvas-toolbar">
+                    <span id="canvas-label" class="canvas-title-badge">Holographic Visualizer</span>
+                    <div class="view-controls">
+                        <button onclick="toggle3DView()" id="btn-3d-toggle" class="icon-btn active" title="Toggle 3D View">3D Ribbon</button>
+                        <button onclick="zoomCanvas(1.15)" class="icon-btn" title="Zoom In">+</button>
+                        <button onclick="zoomCanvas(0.85)" class="icon-btn" title="Zoom Out">&minus;</button>
+                        <button onclick="resetView()" class="icon-btn" title="Reset View">1:1</button>
+                        <button onclick="toggleFullscreen()" id="fs-btn" class="icon-btn" title="Toggle Fullscreen">
+                            <span id="fs-icon">⛶</span> <span id="fs-text">Fullscreen</span>
+                        </button>
+                    </div>
                 </div>
-            </div>
-            <div id="instrument-desc" class="hidden mt-4 p-3 bg-indigo-950/60 border-l-4 border-cyan-400 rounded text-sm text-slate-300 italic"></div>
-        </div>
 
-        <!-- Simulator Split Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6" id="fs-grid-container">
-            
-            <!-- Canvas Area (Left side) -->
-            <div class="fs-canvas-area lg:col-span-8 flex flex-col">
-                <div class="bg-[#050b14] rounded-xl p-4 shadow-inner relative flex flex-col flex-grow border border-slate-800">
-                    
-                    <div class="flex justify-between items-center mb-3 z-10">
-                        <span id="canvas-label" class="text-sm font-bold text-cyan-400 uppercase tracking-wider font-['Orbitron']">Visualizer</span>
-                        
-                        <div class="flex items-center gap-1 bg-slate-800/80 rounded p-1 border border-slate-700">
-                            <button onclick="setTool('select')" id="tool-select" class="p-1.5 rounded bg-slate-700 text-cyan-400 hover:bg-slate-600 transition" title="Select Tool">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path></svg>
-                            </button>
-                            <button onclick="setTool('pan')" id="tool-pan" class="p-1.5 rounded text-slate-400 hover:bg-slate-600 hover:text-white transition" title="Pan Tool (Click & Drag)">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11"></path></svg>
-                            </button>
-                            <div class="w-px h-4 bg-slate-600 mx-1"></div>
-                            <button onclick="zoomCanvas(1.2)" class="p-1.5 rounded text-slate-300 hover:bg-slate-600 transition" title="Zoom In">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
-                            </button>
-                            <button onclick="zoomCanvas(0.8)" class="p-1.5 rounded text-slate-300 hover:bg-slate-600 transition" title="Zoom Out">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"></path></svg>
-                            </button>
-                            <button onclick="resetView()" class="p-1.5 rounded text-slate-300 hover:bg-slate-600 text-xs font-bold font-mono transition" title="Reset View">1:1</button>
-                        </div>
-                    </div>
-                    
-                    <div class="flex-grow relative overflow-hidden rounded border border-slate-700/50 cursor-crosshair h-64 lg:h-auto">
-                        <canvas id="waveCanvas" class="w-full h-full absolute inset-0"></canvas>
-                    </div>
-                    
-                    <div class="flex flex-wrap gap-4 mt-4 text-xs justify-center text-slate-400 font-medium">
-                        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-cyan-400 shadow-[0_0_8px_#22d3ee]"></span> Instantaneous Displacement</span>
-                        <span class="flex items-center gap-1.5"><span class="w-3 h-0.5 border-t-2 border-dashed border-yellow-400"></span> Envelope</span>
-                        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-red-500"></span> Node (N)</span>
-                        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-green-500"></span> Antinode (A)</span>
-                    </div>
+                <canvas id="simCanvas" width="800" height="490"></canvas>
+
+                <div class="canvas-legend">
+                    <div class="legend-item"><span class="indicator-dot" style="background: var(--holo-cyan); box-shadow: 0 0 6px var(--holo-cyan);"></span> Instant Wave</div>
+                    <div class="legend-item"><span class="indicator-dot" style="background: var(--holo-amber);"></span> Boundary Envelope</div>
+                    <div class="legend-item"><span class="indicator-dot" style="background: var(--holo-red);"></span> Node (N)</div>
+                    <div class="legend-item"><span class="indicator-dot" style="background: var(--holo-green);"></span> Antinode (A)</div>
                 </div>
             </div>
 
-            <!-- Controls & Math Area (Right side) -->
-            <div class="fs-controls-area lg:col-span-4 flex flex-col gap-5">
-                
-                <!-- Sliders -->
-                <div class="bg-slate-800/50 p-5 rounded-lg border border-slate-700">
-                    <span class="block text-sm font-bold uppercase tracking-wider text-slate-400 mb-4">2. Tuning Variables</span>
-                    
-                    <div class="space-y-5">
-                        <div>
-                            <div class="flex justify-between mb-1.5 text-slate-200">
-                                <label class="text-sm font-semibold">Harmonic (<i>n</i>)</label>
-                                <span id="harmonic-val" class="text-sm font-mono text-cyan-300">1</span>
-                            </div>
-                            <input type="range" id="harmonic-slider" min="1" max="5" step="1" value="1" oninput="updateHarmonic(this.value)" class="w-full h-1.5 bg-slate-600 rounded appearance-none accent-cyan-400 cursor-pointer">
-                        </div>
-                        <div>
-                            <div class="flex justify-between mb-1.5 text-slate-200">
-                                <label class="text-sm font-semibold">Length (<i>L</i>)</label>
-                                <span id="length-val" class="text-sm font-mono text-cyan-300">1.00 m</span>
-                            </div>
-                            <input type="range" id="length-slider" min="0.3" max="2.0" step="0.05" value="1.0" oninput="updateLength(this.value)" class="w-full h-1.5 bg-slate-600 rounded appearance-none accent-cyan-400 cursor-pointer">
-                        </div>
-                        <div>
-                            <div class="flex justify-between mb-1.5 text-slate-200">
-                                <label id="speed-label" class="text-sm font-semibold">Wave Speed (<i>v</i>)</label>
-                                <span id="speed-val" class="text-sm font-mono text-cyan-300">340 m/s</span>
-                            </div>
-                            <input type="range" id="speed-slider" min="100" max="600" step="5" value="340" oninput="updateSpeed(this.value)" class="w-full h-1.5 bg-slate-600 rounded appearance-none accent-cyan-400 cursor-pointer">
-                        </div>
-                    </div>
+            <!-- Controls & Real-Time Calculation HUD -->
+            <div class="controls-panel">
+                <h3 class="panel-heading">1. Variable Calibration</h3>
+
+                <div class="control-group">
+                    <label for="harmonicSlider">
+                        Harmonic Mode (<i>n</i>)
+                        <span id="harmonicVal" class="value-display">1</span>
+                    </label>
+                    <input type="range" id="harmonicSlider" min="1" max="5" step="1" value="1" oninput="updateHarmonic(this.value)">
                 </div>
 
-                <!-- Audio Output -->
-                <div class="bg-slate-800/50 p-4 rounded-lg border border-slate-700 flex justify-between items-center">
-                    <div class="text-sm font-semibold text-slate-300">Audio Output:</div>
-                    <button id="mute-btn" onclick="toggleMute()" class="px-4 py-2 bg-emerald-600/80 hover:bg-emerald-500 text-white rounded text-sm font-bold shadow-lg transition flex items-center gap-2 border border-emerald-500/50">
+                <div class="control-group">
+                    <label for="lengthSlider">
+                        Length (<i>L</i>)
+                        <span id="lengthVal" class="value-display">1.00 m</span>
+                    </label>
+                    <input type="range" id="lengthSlider" min="0.30" max="2.00" step="0.05" value="1.00" oninput="updateLength(this.value)">
+                </div>
+
+                <div class="control-group">
+                    <label for="speedSlider">
+                        <span id="speedLabel">Wave Speed (<i>v</i>)</span>
+                        <span id="speedVal" class="value-display">340 m/s</span>
+                    </label>
+                    <input type="range" id="speedSlider" min="100" max="600" step="5" value="340" oninput="updateSpeed(this.value)">
+                </div>
+
+                <!-- Action Buttons: Audio and Reset -->
+                <div class="action-btns-row">
+                    <button id="audioBtn" class="sim-btn" onclick="toggleAudio()">
                         🔊 Play Tone
+                    </button>
+                    <button id="resetBtn" class="sim-btn btn-magenta" onclick="resetDefaults()">
+                        ⟲ Reset
                     </button>
                 </div>
 
-                <!-- Mathematical Sub Box -->
-                <div class="bg-slate-900/80 p-5 rounded-lg border border-slate-700 flex-grow shadow-inner">
-                    <span class="block text-sm font-bold uppercase tracking-wider text-slate-400 mb-4">3. Live Mathematics</span>
-                    
-                    <div class="grid grid-cols-2 gap-3 font-mono text-center mb-4">
-                        <div class="bg-[#050b14] p-3 rounded border border-slate-800">
-                            <span class="text-xs text-slate-500 block mb-1 uppercase tracking-widest">Wavelength (&lambda;)</span>
-                            <span id="calc-wavelength" class="text-lg font-bold text-cyan-400 drop-shadow-[0_0_5px_rgba(34,211,238,0.5)]">2.00 m</span>
+                <!-- Live Mathematics HUD -->
+                <h3 class="panel-heading" style="margin-top: 4px;">2. Live Mathematics HUD</h3>
+                <div class="math-hud-box">
+                    <div class="hud-metrics-row">
+                        <div class="metric-cell">
+                            <span class="metric-title">Wavelength (&lambda;)</span>
+                            <span id="hud-wavelength" class="metric-val" style="color: var(--holo-cyan);">2.00 m</span>
                         </div>
-                        <div class="bg-[#050b14] p-3 rounded border border-slate-800">
-                            <span class="text-xs text-slate-500 block mb-1 uppercase tracking-widest">Frequency (<i>f</i>)</span>
-                            <span id="calc-frequency" class="text-lg font-bold text-purple-400 drop-shadow-[0_0_5px_rgba(188,19,254,0.5)]">170.0 Hz</span>
+                        <div class="metric-cell">
+                            <span class="metric-title">Frequency (<i>f</i>)</span>
+                            <span id="hud-frequency" class="metric-val" style="color: #e580ff;">170.0 Hz</span>
                         </div>
                     </div>
-
-                    <div class="bg-[#050b14] p-3.5 rounded border border-slate-800">
-                        <span class="block text-xs text-slate-500 uppercase tracking-widest mb-2 border-b border-slate-800 pb-2">Derivation Path</span>
-                        <div id="dynamic-formula-sub" class="font-mono text-sm text-slate-300 leading-relaxed space-y-1 mt-2">
-                            <!-- Dynamic JS Math Inserted here -->
-                        </div>
+                    <div id="dynamic-derivation" class="derivation-path">
+                        <!-- Dynamically filled with clean HTML equations (no dollar signs) -->
                     </div>
                 </div>
+
             </div>
+
         </div>
+    </main>
 
-        <!-- Context-Aware Guided Questions Section -->
-        <div class="mt-6 bg-slate-900/60 p-6 rounded-xl border border-slate-700 relative overflow-hidden">
-            <h2 class="text-xl font-bold text-slate-100 mb-4 border-b border-slate-700 pb-2 mt-0 font-['Orbitron']">Contextual Guided Derivations</h2>
-            <p class="text-sm text-slate-400 mb-6">Read the instructions specific to the currently selected mode and observe the physical wave boundaries.</p>
+    <!-- IN-CONTENT AD PLACEMENT ZONE (AdSense Ready) -->
+    <aside class="ads-container" aria-label="In-Article Advertisement">
+        <span>Google AdSense In-Article Responsive Banner Placement</span>
+    </aside>
 
-            <!-- Only visible when String Mode is active -->
-            <div id="q-string" class="question-block hidden">
-                <div class="border border-slate-700 rounded-lg p-5 bg-slate-800/40">
-                    <div class="flex justify-between items-start gap-4">
-                        <div>
-                            <span class="inline-block px-2.5 py-1 bg-indigo-900/50 text-indigo-300 font-mono text-xs rounded mb-3 border border-indigo-700/50">Question: Vibrating Strings / Guitars / Violins</span>
-                            <h3 class="font-semibold text-slate-200 text-lg mt-0">How is the fundamental relationship between string length (<i>L</i>) and wavelength (&lambda;) derived?</h3>
-                        </div>
-                    </div>
-                    <div class="mt-4 text-sm text-slate-300 space-y-4">
-                        <p class="bg-cyan-900/20 p-3 rounded italic text-cyan-200 border-l-4 border-cyan-500">
-                            <strong class="text-cyan-100">Observation Task:</strong> Set the harmonic slider to <span class="font-semibold">n = 1</span>. Note the distance between the two fixed ends (Nodes) on the instrument.
-                        </p>
-                        <p>Because a single full wavelength (&lambda;) is formed by TWO complete loops (one up, one down), the single loop you see vibrating is exactly half a wavelength (&lambda; / 2).</p>
-                        <div class="p-4 bg-[#050b14] border border-slate-800 rounded-lg space-y-2 font-mono text-sm">
-                            <p>1. Length = half wavelength: <strong class="text-indigo-400"><i>L</i> = &lambda;<sub>1</sub> / 2</strong></p>
-                            <p>2. Therefore Wavelength is: <strong class="text-indigo-400">&lambda;<sub>1</sub> = 2<i>L</i></strong></p>
-                            <p>3. Frequency (<i>v = f &lambda;</i>): <strong class="text-indigo-400"><i>f</i><sub>1</sub> = <i>v</i> / 2<i>L</i></strong></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Only visible when Closed Mode is active -->
-            <div id="q-closed" class="question-block hidden">
-                <div class="border border-slate-700 rounded-lg p-5 bg-slate-800/40">
-                    <div class="flex justify-between items-start gap-4">
-                        <div>
-                            <span class="inline-block px-2.5 py-1 bg-indigo-900/50 text-indigo-300 font-mono text-xs rounded mb-3 border border-indigo-700/50">Question: Closed Air Columns / Clarinet</span>
-                            <h3 class="font-semibold text-slate-200 text-lg mt-0">Why do closed pipes physically skip even harmonics (n=2,4...)?</h3>
-                        </div>
-                    </div>
-                    <div class="mt-4 text-sm text-slate-300 space-y-4">
-                        <p class="bg-cyan-900/20 p-3 rounded italic text-cyan-200 border-l-4 border-cyan-500">
-                            <strong class="text-cyan-100">Observation Task:</strong> Slide the harmonic to <span class="font-semibold">n = 3</span>. Notice how the left end is blocked (Node) and the right end is open (Antinode).
-                        </p>
-                        <p>To keep these physical boundary conditions true (a Node must exist at the closed end, an Antinode at the open end), you can only add "half-wavelength loops" one at a time. This results in quarter-wavelength steps: 1/4, 3/4, 5/4. You can never fit exactly 2/4 (which would incorrectly require a node at both ends).</p>
-                        <div class="p-4 bg-[#050b14] border border-slate-800 rounded-lg space-y-2 font-mono text-sm">
-                            <p>1. Fundamental (Node to Antinode): <strong class="text-indigo-400"><i>L</i> = &lambda; / 4 &rArr; &lambda; = 4<i>L</i></strong></p>
-                            <p>2. Next mode requires adding &lambda;/2: <strong class="text-indigo-400"><i>L</i> = 3&lambda; / 4 &rArr; &lambda; = 4<i>L</i> / 3</strong></p>
-                            <p>3. Frequency: <strong class="text-indigo-400"><i>f</i><sub>n</sub> = <i>n v</i> / 4<i>L</i> (where n=1,3,5...)</strong></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Only visible when Open Mode is active -->
-            <div id="q-open" class="question-block hidden">
-                <div class="border border-slate-700 rounded-lg p-5 bg-slate-800/40">
-                    <div class="flex justify-between items-start gap-4">
-                        <div>
-                            <span class="inline-block px-2.5 py-1 bg-indigo-900/50 text-indigo-300 font-mono text-xs rounded mb-3 border border-indigo-700/50">Question: Open Air Columns / Flute</span>
-                            <h3 class="font-semibold text-slate-200 text-lg mt-0">How does opening both ends change the harmonic series compared to a closed pipe?</h3>
-                        </div>
-                    </div>
-                    <div class="mt-4 text-sm text-slate-300 space-y-4">
-                        <p class="bg-cyan-900/20 p-3 rounded italic text-cyan-200 border-l-4 border-cyan-500">
-                            <strong class="text-cyan-100">Observation Task:</strong> View <span class="font-semibold">n = 1</span>. Note that Antinodes (max amplitude) appear at BOTH ends because air is free to move.
-                        </p>
-                        <p>Because there is an antinode at each open end and one node in the middle, the distance is exactly half a wavelength (Antinode &rarr; Node = &lambda;/4, Node &rarr; Antinode = &lambda;/4). Thus, it mimics the mathematics of the vibrating string, allowing all integer harmonics.</p>
-                        <div class="p-4 bg-[#050b14] border border-slate-800 rounded-lg space-y-2 font-mono text-sm">
-                            <p>1. Total Length: <strong class="text-indigo-400"><i>L</i> = 2 &times; (&lambda; / 4) = &lambda; / 2</strong></p>
-                            <p>2. Wavelength: <strong class="text-indigo-400">&lambda; = 2<i>L</i></strong></p>
-                            <p>3. Frequency: <strong class="text-indigo-400"><i>f</i><sub>n</sub> = <i>n v</i> / 2<i>L</i> (where n=1,2,3...)</strong></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> <!-- END SIMULATOR APP -->
-
-    <!-- 3. THE EDUCATIONAL CONTENT -->
-    <div class="educational-content">
+    <!-- 3. COMPREHENSIVE EDUCATIONAL LESSON CONTENT -->
+    <section class="educational-content" id="physics-lesson">
         <h2>How to Use This Simulator</h2>
-        <p>This professional-grade physics interactive tool visualizes mechanical stationary (standing) waves. You can interact with it using the following steps:</p>
+        <p>This virtual wave laboratory allows you to observe, manipulate, and analyze transverse and longitudinal standing waves in real time. Follow these steps to conduct experiments:</p>
+        <ol>
+            <li><strong>Select an Acoustic Medium or Instrument:</strong> Choose between a <strong>Vibrating String</strong>, a <strong>Closed Air Column</strong>, or an <strong>Open Air Column</strong> using the top mode selectors. Alternatively, load real-world musical instruments such as the acoustic guitar, violin, concert flute, or clarinet to explore how specific physical geometry determines natural resonance.</li>
+            <li><strong>Alter Resonant Variables:</strong> Adjust the sliders to see immediate physical responses:
+                <ul>
+                    <li><strong>Harmonic Mode (<i>n</i>):</strong> Selects the fundamental frequency or higher overtones. Notice how closed air columns only permit odd integers (1, 3, 5, 7).</li>
+                    <li><strong>Length (<i>L</i>):</strong> Scales the physical span of the string or air pipe in meters.</li>
+                    <li><strong>Wave Speed (<i>v</i>):</strong> Adjusts propagation velocity through the medium (e.g., tension-dependent velocity on strings or sound velocity in air).</li>
+                </ul>
+            </li>
+            <li><strong>Inspect the 3D Holographic Rendering:</strong> Toggle between the <strong>3D Ribbon</strong> and 2D planar modes. Click <strong>Fullscreen</strong> to expand the visualizer to your entire screen for optimal classroom and demonstration viewing.</li>
+            <li><strong>Listen to Real-Time Synthesized Audio:</strong> Toggle <strong>Play Tone</strong> to synthesize the precise standing-wave frequency using the Web Audio API.</li>
+        </ol>
+
+        <h2>The Physical Theory Behind Stationary Waves</h2>
+        <p>A <strong>stationary (or standing) wave</strong> is the resultant disturbance created when two progressive waves of identical frequency, wavelength, and amplitude travel in opposite directions along the same medium and undergo continuous <strong>wave superposition</strong>.</p>
+        
+        <p>Unlike traveling progressive waves, stationary waves <strong>do not transmit net energy</strong> across space. Instead, energy remains localized between fixed spatial positions:</p>
         <ul>
-            <li><strong>Select a System:</strong> Choose between a "Vibrating String", "Closed Air Column", or "Open Air Column" using the top tabs. Alternatively, choose a real-world instrument preset (like the Guitar or Clarinet) to load scientifically accurate boundary conditions and tuning constants.</li>
-            <li><strong>Tune Variables:</strong> Use the sliders on the right to manually alter the Harmonic Number (<i>n</i>), the Length of the medium (<i>L</i> in meters), and the Speed of the wave (<i>v</i> in meters per second).</li>
-            <li><strong>Analyze the Mathematics:</strong> Watch the "Live Mathematics" pane calculate real-time Wavelength (&lambda;) and Frequency (<i>f</i>) data. The derivation path updates dynamically based on your chosen physical boundary conditions.</li>
-            <li><strong>Audio and Visuals:</strong> Enable the "Play Tone" feature to hear the exact frequency being generated. Use the Canvas tools (Pan and Zoom) to closely inspect Nodes (red) and Antinodes (green).</li>
+            <li><strong>Displacement Nodes (N):</strong> Points along the medium that undergo permanent destructive interference. The net displacement, particle velocity, and mechanical kinetic energy at an ideal node are always zero.</li>
+            <li><strong>Displacement Antinodes (A):</strong> Points situated midway between adjacent nodes where constructive interference creates maximum vibrational excursion.</li>
+            <li><strong>Spatial Relationships:</strong> The distance between two consecutive nodes or two consecutive antinodes is exactly equal to <strong>half a wavelength (&lambda; / 2)</strong>. The distance between an adjacent node and antinode is <strong>one quarter of a wavelength (&lambda; / 4)</strong>.</li>
         </ul>
 
-        <h2>The Theory Behind Stationary Waves</h2>
-        <p>A stationary wave, also known as a standing wave, is a wave that remains in a constant position over time. In physics, this phenomenon occurs when two waves of the exact same frequency and amplitude travel in opposite directions across the same medium and interfere with one another.</p>
-        <p>According to the principle of <strong>Superposition</strong>, when these waves cross, their individual displacements are added together. At certain points, the waves always cancel each other out (destructive interference), creating points of zero amplitude known as <strong>Nodes</strong>. At other points, they reinforce one another (constructive interference), creating regions of maximum amplitude known as <strong>Antinodes</strong>.</p>
-        
-        <h3>The Formulas Used</h3>
-        <p>The mathematical boundaries dictate which frequencies can naturally resonate within the system. These natural resonance states are called harmonics.</p>
-        <ul>
-            <li><strong>Strings & Open Pipes:</strong> Since the boundaries require identical states at both ends (either two Nodes for a string, or two Antinodes for an open pipe), the wavelength fits into the length of the system in half-wavelength intervals. 
-            <br><br>
-            Wavelength: <strong>&lambda;<sub>n</sub> = 2<i>L</i> / <i>n</i></strong><br>
-            Frequency: <strong><i>f</i><sub>n</sub> = (<i>n</i> &middot; <i>v</i>) / 2<i>L</i></strong><br>
-            Where <i>n</i> is any integer (1, 2, 3, 4...).</li>
-            
-            <br>
-            
-            <li><strong>Closed Pipes:</strong> One end must be a Node (blocked) and the other an Antinode (open). The wave fits in quarter-wavelength intervals, physically preventing the formation of even-numbered harmonics. 
-            <br><br>
-            Wavelength: <strong>&lambda;<sub>n</sub> = 4<i>L</i> / <i>n</i></strong><br>
-            Frequency: <strong><i>f</i><sub>n</sub> = (<i>n</i> &middot; <i>v</i>) / 4<i>L</i></strong><br>
-            Where <i>n</i> is an odd integer (1, 3, 5, 7...).</li>
-        </ul>
-        
-        <h2>Real World Applications</h2>
-        <p>Standing waves aren't just limited to the music of guitars and flutes; they are fundamental principles applied across all domains of engineering and physics:</p>
-        <ul>
-            <li><strong>Acoustical Engineering:</strong> When designing concert halls or recording studios, architects must calculate the room's dimensions to prevent "room modes" (standing sound waves) from creating dead spots where specific bass notes disappear due to nodal interference.</li>
-            <li><strong>Microwave Ovens:</strong> A microwave cooks food by creating three-dimensional standing electromagnetic waves inside the metal box. The turntable rotates your food specifically to ensure it moves through both nodes and antinodes, preventing cold spots.</li>
-            <li><strong>Quantum Mechanics:</strong> At the subatomic level, electrons orbiting a nucleus do not move like planets. Instead, their probability distributions behave precisely like three-dimensional standing waves wrapped around the atom.</li>
-        </ul>
-    </div>
+        <h2>Mathematical Formulations and Boundary Mechanics</h2>
+        <p>The natural resonant frequencies of any medium are strictly governed by its physical boundary conditions:</p>
 
-    <!-- JavaScript Engine -->
+        <article class="formula-callout">
+            <h3>1. Vibrating Strings and Open-Ended Air Columns</h3>
+            <p>A string clamped at both extremities forces a displacement node at each end. Similarly, an air pipe open at both ends permits free air particle movement, forcing a displacement antinode at each end. Because both configurations possess symmetric boundaries, their resonant lengths equal an integral number of half-wavelength loops:</p>
+            <p>Length Condition: <strong><i>L</i> = <i>n</i> &middot; (&lambda; / 2)</strong>, where <i>n</i> = 1, 2, 3, 4, ...</p>
+            <p>Resonant Wavelength: <span class="formula-highlight">&lambda;<sub>n</sub> = 2<i>L</i> / <i>n</i></span></p>
+            <p>Harmonic Frequency: <span class="formula-highlight"><i>f</i><sub>n</sub> = (<i>n</i> &middot; <i>v</i>) / 2<i>L</i> = <i>n</i> &middot; <i>f</i><sub>1</sub></span></p>
+            <p>These systems naturally support <strong>all integer harmonics</strong> (both odd and even multiples of the fundamental frequency <i>f</i><sub>1</sub>).</p>
+        </article>
+
+        <article class="formula-callout">
+            <h3>2. Closed-Ended Air Columns (One End Fixed, One End Open)</h3>
+            <p>An air column closed at one end and open at the other forces a displacement node at the rigid wall and an antinode at the open boundary. Therefore, the column must contain an odd number of quarter-wavelength segments:</p>
+            <p>Fundamental Mode (<i>n</i> = 1): <strong><i>L</i> = &lambda; / 4</strong> &rArr; <strong>&lambda;<sub>1</sub> = 4<i>L</i></strong></p>
+            <p>General Resonance: <span class="formula-highlight">&lambda;<sub>n</sub> = 4<i>L</i> / <i>n</i></span>, where <strong><i>n</i> = 1, 3, 5, 7, ... (odd integers only)</strong></p>
+            <p>Harmonic Frequency: <span class="formula-highlight"><i>f</i><sub>n</sub> = (<i>n</i> &middot; <i>v</i>) / 4<i>L</i> = <i>n</i> &middot; <i>f</i><sub>1</sub></span></p>
+            <p>Even harmonics (<i>n</i> = 2, 4, 6, ...) cannot exist because having an even number of quarter-wavelengths would require identical conditions at both ends (either both nodes or both antinodes), violating the physical closed-open boundary.</p>
+        </article>
+
+        <h2>Real-World Engineering &amp; Scientific Applications</h2>
+        <ul>
+            <li><strong>Acoustic Instrument Design:</strong> Guitars, violins, pianos, and harps adjust string length, tension, and linear mass density (&mu;) to establish specific fundamental frequencies according to Mersenne's laws: <i>v</i> = &radic;(<i>T</i> / &mu;). Woodwinds like the flute and clarinet rely on opened tone holes to shorten the effective column length <i>L</i>, raising the pitch.</li>
+            <li><strong>Microwave Ovens:</strong> A magnetron emits 2.45 GHz radio waves that reflect within the metallic cooking chamber to establish an electromagnetic standing wave. Because nodal points provide zero electric field oscillation, a motorized turntable rotates the food through antinodal "hot spots" to ensure uniform heating.</li>
+            <li><strong>Quantum Wave Mechanics:</strong> In quantum theory, bound electrons around an atomic nucleus are described by standing de Broglie matter waves. Only integer harmonic wavefunctions that fit constructively around the atom are stable, explaining the discrete, quantized energy levels of atoms.</li>
+            <li><strong>Architectural Acoustics and Room Modes:</strong> In auditoriums and recording studios, low-frequency sound reflections can establish room standing waves ("standing room modes"), creating dead zones where specific musical bass notes disappear or boomy zones where bass is unnaturally amplified.</li>
+        </ul>
+
+        <h2>Practice Sample Tasks &amp; Complete Solutions</h2>
+        <p>Work through the following five physics problems to consolidate your understanding of standing wave mechanics. Every problem includes a fully calculated solution:</p>
+
+        <!-- Problem 1 -->
+        <article class="practice-task-card">
+            <span class="task-badge">Task 1: Fundamental Guitar String Pitch</span>
+            <p><strong>Question:</strong> An acoustic guitar string has an active vibrating length of <i>L</i> = 0.65 m between its nut and bridge. When plucked, transverse mechanical waves travel along the string at <i>v</i> = 107.25 m/s. Calculate the fundamental resonant wavelength &lambda;<sub>1</sub> and the resulting fundamental frequency <i>f</i><sub>1</sub>.</p>
+            
+            <div class="solution-box">
+                <div class="solution-title">Fully Worked Solution:</div>
+                <p><strong>1. Calculate fundamental wavelength (&lambda;<sub>1</sub>):</strong></p>
+                <p>For a string fixed at both ends in its fundamental mode (<i>n</i> = 1):</p>
+                <p>&lambda;<sub>1</sub> = 2<i>L</i> / <i>n</i> = (2 &times; 0.65 m) / 1 = <strong>1.30 m</strong></p>
+                <p><strong>2. Calculate fundamental frequency (<i>f</i><sub>1</sub>):</strong></p>
+                <p>Using the wave equation <i>v</i> = <i>f</i> &lambda;:</p>
+                <p><i>f</i><sub>1</sub> = <i>v</i> / &lambda;<sub>1</sub> = 107.25 m/s / 1.30 m = <strong>82.5 Hz</strong> (Standard musical note E2)</p>
+            </div>
+        </article>
+
+        <!-- Problem 2 -->
+        <article class="practice-task-card">
+            <span class="task-badge">Task 2: Closed Organ Pipe First Overtone</span>
+            <p><strong>Question:</strong> A pipe closed at one end has an internal air column of length <i>L</i> = 0.85 m. Taking the speed of sound in air as <i>v</i> = 340 m/s, determine the harmonic number <i>n</i>, the resonant wavelength &lambda;, and the frequency <i>f</i> corresponding to the <strong>first overtone</strong> of this pipe.</p>
+            
+            <div class="solution-box">
+                <div class="solution-title">Fully Worked Solution:</div>
+                <p><strong>1. Identify the harmonic number for the first overtone:</strong></p>
+                <p>A closed pipe supports only odd harmonics (<i>n</i> = 1, 3, 5, ...). The fundamental is <i>n</i> = 1. Therefore, the first overtone corresponds to the third harmonic: <strong><i>n</i> = 3</strong>.</p>
+                <p><strong>2. Calculate the resonant wavelength (&lambda;<sub>3</sub>):</strong></p>
+                <p>&lambda;<sub>3</sub> = 4<i>L</i> / 3 = (4 &times; 0.85 m) / 3 = 3.40 m / 3 &asymp; <strong>1.13 m</strong></p>
+                <p><strong>3. Calculate the frequency (<i>f</i><sub>3</sub>):</strong></p>
+                <p><i>f</i><sub>3</sub> = (3 &times; <i>v</i>) / 4<i>L</i> = (3 &times; 340 m/s) / (4 &times; 0.85 m) = 1020 / 3.40 = <strong>300.0 Hz</strong></p>
+            </div>
+        </article>
+
+        <!-- Problem 3 -->
+        <article class="practice-task-card">
+            <span class="task-badge">Task 3: Open Flute Node and Antinode Topology</span>
+            <p><strong>Question:</strong> A concert flute acts as an open air column of length <i>L</i> = 0.60 m. When vibrating in its third harmonic mode (<i>n</i> = 3), how many displacement nodes and displacement antinodes are formed along the column, and what is the distance between two consecutive displacement nodes?</p>
+            
+            <div class="solution-box">
+                <div class="solution-title">Fully Worked Solution:</div>
+                <p><strong>1. Count nodes and antinodes:</strong></p>
+                <p>For an open column in mode <i>n</i>: Number of displacement nodes = <i>n</i> = <strong>3 nodes</strong>. Number of displacement antinodes = <i>n</i> + 1 = <strong>4 antinodes</strong>.</p>
+                <p><strong>2. Find the resonant wavelength (&lambda;<sub>3</sub>):</strong></p>
+                <p>&lambda;<sub>3</sub> = 2<i>L</i> / 3 = (2 &times; 0.60 m) / 3 = 1.20 m / 3 = <strong>0.40 m</strong></p>
+                <p><strong>3. Distance between consecutive nodes:</strong></p>
+                <p>The distance between adjacent nodes is always &lambda; / 2: <i>d</i><sub>N-N</sub> = 0.40 m / 2 = <strong>0.20 m</strong>.</p>
+            </div>
+        </article>
+
+        <!-- Problem 4 -->
+        <article class="practice-task-card">
+            <span class="task-badge">Task 4: Wave Speed on a Concert Violin String</span>
+            <p><strong>Question:</strong> A violin string of vibrating length <i>L</i> = 0.33 m resonates in its fundamental mode (<i>n</i> = 1) at concert pitch <i>f</i><sub>1</sub> = 440.0 Hz (Note A4). What is the transverse wave propagation speed <i>v</i> along this string?</p>
+            
+            <div class="solution-box">
+                <div class="solution-title">Fully Worked Solution:</div>
+                <p><strong>1. Calculate the fundamental wavelength:</strong></p>
+                <p>&lambda;<sub>1</sub> = 2<i>L</i> = 2 &times; 0.33 m = <strong>0.66 m</strong></p>
+                <p><strong>2. Compute the wave speed:</strong></p>
+                <p><i>v</i> = <i>f</i><sub>1</sub> &times; &lambda;<sub>1</sub> = 440.0 Hz &times; 0.66 m = <strong>290.4 m/s</strong></p>
+            </div>
+        </article>
+
+        <!-- Problem 5 -->
+        <article class="practice-task-card">
+            <span class="task-badge">Task 5: Comparative Open vs Closed Column Fundamental Frequencies</span>
+            <p><strong>Question:</strong> Two organ pipes, Pipe 1 (open at both ends) and Pipe 2 (closed at one end), have the exact same physical length of <i>L</i> = 1.20 m. If the speed of sound is <i>v</i> = 340 m/s in both pipes, what is the frequency difference between their fundamental tones (<i>f</i><sub>1,open</sub> &minus; <i>f</i><sub>1,closed</sub>)?</p>
+            
+            <div class="solution-box">
+                <div class="solution-title">Fully Worked Solution:</div>
+                <p><strong>1. Calculate the open pipe fundamental:</strong></p>
+                <p><i>f</i><sub>1,open</sub> = <i>v</i> / 2<i>L</i> = 340 m/s / (2 &times; 1.20 m) = 340 / 2.40 &asymp; <strong>141.67 Hz</strong></p>
+                <p><strong>2. Calculate the closed pipe fundamental:</strong></p>
+                <p><i>f</i><sub>1,closed</sub> = <i>v</i> / 4<i>L</i> = 340 m/s / (4 &times; 1.20 m) = 340 / 4.80 &asymp; <strong>70.83 Hz</strong></p>
+                <p><strong>3. Calculate the frequency difference:</strong></p>
+                <p>&Delta;<i>f</i> = 141.67 Hz &minus; 70.83 Hz = <strong>70.84 Hz</strong> (An open pipe resonates at twice the frequency of a closed pipe of identical length).</p>
+            </div>
+        </article>
+    </section>
+
+    <!-- FOOTER AD PLACEMENT ZONE (AdSense Ready) -->
+    <aside class="ads-container" aria-label="Footer Advertisement">
+        <span>Google AdSense Responsive Unit - Bottom Banner Placement Area</span>
+    </aside>
+
+    <footer class="page-footer">
+        &copy; 2026 LuyaliSims Pro Physics Suite. Interactive educational content engineered for high performance, standard accessibility, and cross-platform physics education.
+    </footer>
+
+    <!-- 4. ENGINE SCRIPT -->
     <script>
-        // Data & State
-        let systemType = 'string'; // string, closed, open
-        let activeInstrument = null; // 'guitar', 'violin', 'flute', 'clarinet', null
-        let harmonic = 1;          
-        let length = 1.0;          
-        let speed = 340;           
-        
-        // Canvas & Tool States
-        const canvas = document.getElementById('waveCanvas');
+        // Physics Simulation State
+        let systemType = 'string'; // 'string', 'closed', 'open'
+        let activeInstrument = null;
+        let harmonic = 1;
+        let length = 1.0;
+        let speed = 340;
+
+        // Visual & 3D Holographic Rendering State
+        const canvas = document.getElementById('simCanvas');
         const ctx = canvas.getContext('2d');
-        let t = 0; 
-        
+        let t = 0;
         let zoom = 1.0;
+        let is3DMode = true;
+
+        // Internal Balanced 3D Constants (Cleaned from UI to avoid clutter)
+        const tiltAngleDeg = 35;
+        const holoDepthPx = 30;
+
+        // Pointer / Touch Navigation State
+        let isDragging = false;
+        let panStartX = 0;
+        let panStartY = 0;
         let offsetX = 0;
         let offsetY = 0;
-        let currentTool = 'select'; // 'select' or 'pan'
-        let isDragging = false;
-        let dragStartX = 0;
-        let dragStartY = 0;
 
-        // Audio
+        // Audio Context & Synthesizer State
         let audioCtx = null;
         let oscillator = null;
         let gainNode = null;
-        let isMuted = true;
+        let isAudioPlaying = false;
 
-        // Instrument Presets
+        // Instrument Presets with Scientifically Accurate Acoustical Constants
         const instruments = {
-            guitar: { type: 'string', n: 1, L: 0.65, v: 107.25, desc: "🎸 <strong>Acoustic Guitar (E2):</strong> Plucking excites the string fixed at the bridge and nut." },
-            violin: { type: 'string', n: 1, L: 0.33, v: 290.4, desc: "🎻 <strong>Violin (A4):</strong> Drawing a bow creates stick-slip standing waves between the bridge and fingerboard nut." },
-            flute: { type: 'open', n: 1, L: 0.65, v: 340, desc: "💨 <strong>Flute (C4 Key):</strong> Blowing across the embouchure hole creates pressure waves open at both ends." },
-            clarinet: { type: 'closed', n: 1, L: 0.58, v: 340, desc: "📯 <strong>Clarinet (D3 Key):</strong> The reed acts as a closed node boundary; the bell acts as an open antinode boundary." }
+            guitar: { type: 'string', n: 1, L: 0.65, v: 107.25, desc: "Acoustic Guitar (E2): Tensioned steel string fixed between bridge saddle and bone nut; vibrating length 0.65 m yields fundamental frequency 82.5 Hz." },
+            violin: { type: 'string', n: 1, L: 0.33, v: 290.4, desc: "Concert Violin (A4): Short fingerboard scale length of 0.33 m with high string tension produces concert standard A pitch (440.0 Hz)." },
+            flute: { type: 'open', n: 1, L: 0.65, v: 340.0, desc: "Concert Flute (C4): Transverse embouchure hole and foot joint both act as pressure nodes / displacement antinodes, producing middle C (261.6 Hz)." },
+            clarinet: { type: 'closed', n: 1, L: 0.58, v: 340.0, desc: "Clarinet (D3): Cylindrical bore with reed acts as a displacement node, open flared bell acts as an antinode, generating only odd harmonics (146.5 Hz)." }
         };
 
-        window.onload = function() {
-            resizeCanvas();
-            window.addEventListener('resize', resizeCanvas);
-            setupCanvasEvents();
+        window.addEventListener('load', () => {
+            fitCanvasToScreen();
             setSystemType('string');
-            animate();
-        };
+            requestAnimationFrame(renderLoop);
+        });
 
-        // --- FULLSCREEN & LAYOUT LOGIC ---
+        window.addEventListener('resize', fitCanvasToScreen);
+
+        function fitCanvasToScreen() {
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = Math.floor(rect.width);
+            canvas.height = Math.floor(rect.height);
+        }
+
+        // --- FULLSCREEN LOGIC ---
         function toggleFullscreen() {
-            const elem = document.getElementById("simulator-container");
-            const btnText = document.getElementById("fs-btn-text");
+            const container = document.getElementById("simulator-container");
+            const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
 
-            if (!document.fullscreenElement) {
-                if (elem.requestFullscreen) { elem.requestFullscreen(); }
-                else if (elem.webkitRequestFullscreen) { elem.webkitRequestFullscreen(); }
-                else if (elem.msRequestFullscreen) { elem.msRequestFullscreen(); }
-                btnText.innerText = "Exit Fullscreen";
+            if (!isFs) {
+                if (container.requestFullscreen) {
+                    container.requestFullscreen();
+                } else if (container.webkitRequestFullscreen) {
+                    container.webkitRequestFullscreen();
+                } else if (container.mozRequestFullScreen) {
+                    container.mozRequestFullScreen();
+                } else if (container.msRequestFullscreen) {
+                    container.msRequestFullscreen();
+                }
             } else {
-                if (document.exitFullscreen) { document.exitFullscreen(); }
-                btnText.innerText = "Fullscreen Mode";
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
             }
         }
 
-        function resizeCanvas() {
-            const rect = canvas.parentElement.getBoundingClientRect();
-            canvas.width = rect.width;
-            canvas.height = rect.height;
+        function handleFsChange() {
+            const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+            const fsBtn = document.getElementById('fs-btn');
+            const fsIcon = document.getElementById('fs-icon');
+            const fsText = document.getElementById('fs-text');
+
+            if (isFs) {
+                fsBtn.classList.add('fs-active');
+                fsIcon.innerHTML = "🗗";
+                fsText.innerText = "Exit";
+            } else {
+                fsBtn.classList.remove('fs-active');
+                fsIcon.innerHTML = "⛶";
+                fsText.innerText = "Fullscreen";
+            }
+
+            // Smooth high-DPI canvas realignment
+            setTimeout(fitCanvasToScreen, 120);
         }
 
-        document.addEventListener('fullscreenchange', () => {
-            setTimeout(resizeCanvas, 50); 
-            const btnText = document.getElementById("fs-btn-text");
-            if (!document.fullscreenElement) btnText.innerText = "Fullscreen Mode";
-        });
+        document.addEventListener('fullscreenchange', handleFsChange);
+        document.addEventListener('webkitfullscreenchange', handleFsChange);
+        document.addEventListener('mozfullscreenchange', handleFsChange);
+        document.addEventListener('MSFullscreenChange', handleFsChange);
 
-        // --- TOOLBAR & PAN/ZOOM LOGIC ---
-        function setTool(tool) {
-            currentTool = tool;
-            document.getElementById('tool-select').className = tool === 'select' 
-                ? "p-1.5 rounded bg-slate-700 text-cyan-400 transition" 
-                : "p-1.5 rounded text-slate-400 hover:bg-slate-600 transition";
-            document.getElementById('tool-pan').className = tool === 'pan' 
-                ? "p-1.5 rounded bg-slate-700 text-cyan-400 transition" 
-                : "p-1.5 rounded text-slate-400 hover:bg-slate-600 transition";
-            canvas.style.cursor = tool === 'pan' ? 'grab' : 'crosshair';
+        // --- 3D VIEW & TOUCH NAVIGATION ---
+        function toggle3DView() {
+            is3DMode = !is3DMode;
+            const btn = document.getElementById('btn-3d-toggle');
+            if (is3DMode) {
+                btn.classList.add('active');
+                btn.innerText = "3D Ribbon";
+            } else {
+                btn.classList.remove('active');
+                btn.innerText = "2D Plane";
+            }
         }
 
         function zoomCanvas(factor) {
-            const newZoom = Math.min(Math.max(zoom * factor, 0.5), 4.0);
-            const scaleChange = newZoom / zoom;
-            
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
-            
-            offsetX = centerX - (centerX - offsetX) * scaleChange;
-            offsetY = centerY - (centerY - offsetY) * scaleChange;
-            zoom = newZoom;
+            zoom = Math.min(Math.max(zoom * factor, 0.6), 3.0);
         }
 
         function resetView() {
             zoom = 1.0;
             offsetX = 0;
             offsetY = 0;
-            setTool('select');
         }
 
-        function setupCanvasEvents() {
-            canvas.addEventListener('mousedown', (e) => {
-                if (currentTool === 'pan') {
-                    isDragging = true;
-                    dragStartX = e.clientX - offsetX;
-                    dragStartY = e.clientY - offsetY;
-                    canvas.style.cursor = 'grabbing';
-                }
-            });
-            window.addEventListener('mouseup', () => {
-                isDragging = false;
-                if(currentTool === 'pan') canvas.style.cursor = 'grab';
-            });
-            window.addEventListener('mousemove', (e) => {
-                if (isDragging && currentTool === 'pan') {
-                    offsetX = e.clientX - dragStartX;
-                    offsetY = e.clientY - dragStartY;
-                }
-            });
-            canvas.addEventListener('wheel', (e) => {
-                e.preventDefault();
-                const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
-                
-                const rect = canvas.getBoundingClientRect();
-                const mouseX = e.clientX - rect.left;
-                const mouseY = e.clientY - rect.top;
-                
-                const newZoom = Math.min(Math.max(zoom * zoomFactor, 0.5), 4.0);
-                const scaleChange = newZoom / zoom;
-                
-                offsetX = mouseX - (mouseX - offsetX) * scaleChange;
-                offsetY = mouseY - (mouseY - offsetY) * scaleChange;
-                zoom = newZoom;
-            }, { passive: false });
-        }
+        // Pointer Handling (Unified Touch + Mouse)
+        canvas.addEventListener('pointerdown', (e) => {
+            isDragging = true;
+            panStartX = e.clientX - offsetX;
+            panStartY = e.clientY - offsetY;
+            canvas.setPointerCapture(e.pointerId);
+        });
 
-        // --- AUDIO LOGIC ---
-        function initAudio() {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        function playSound(freq) {
-            initAudio();
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            if (!oscillator) {
-                oscillator = audioCtx.createOscillator();
-                gainNode = audioCtx.createGain();
-                oscillator.type = 'sine';
-                oscillator.connect(gainNode);
-                gainNode.connect(audioCtx.destination);
-                oscillator.start();
+        canvas.addEventListener('pointermove', (e) => {
+            if (!isDragging) return;
+            offsetX = e.clientX - panStartX;
+            offsetY = e.clientY - panStartY;
+        });
+
+        canvas.addEventListener('pointerup', (e) => {
+            isDragging = false;
+            try { canvas.releasePointerCapture(e.pointerId); } catch (_) {}
+        });
+
+        canvas.addEventListener('pointercancel', () => { isDragging = false; });
+
+        canvas.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const factor = e.deltaY < 0 ? 1.08 : 0.92;
+            zoomCanvas(factor);
+        }, { passive: false });
+
+        // --- SYSTEM TYPE & PRESET LOGIC ---
+        function setSystemType(type, fromPreset = false) {
+            systemType = type;
+            if (!fromPreset) {
+                activeInstrument = null;
+                document.getElementById('instrument-desc').style.display = 'none';
+                clearActiveInstrumentButtons();
             }
-            if (isMuted) gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-            else gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime); 
-            
-            oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime);
-        }
-        function toggleMute() {
-            isMuted = !isMuted;
-            const muteBtn = document.getElementById('mute-btn');
-            if (isMuted) {
-                muteBtn.innerHTML = "🔊 Play Tone";
-                muteBtn.className = "px-4 py-2 bg-emerald-600/80 hover:bg-emerald-500 text-white rounded text-sm font-bold shadow-lg transition flex items-center gap-2 border border-emerald-500/50";
-                if (gainNode) gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+
+            ['string', 'closed', 'open'].forEach(m => {
+                const btn = document.getElementById(`mode-${m}`);
+                if (m === type) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+
+            const hSlider = document.getElementById('harmonicSlider');
+            const speedSlider = document.getElementById('speedSlider');
+            const speedLabel = document.getElementById('speedLabel');
+
+            if (type === 'closed') {
+                hSlider.min = 1;
+                hSlider.max = 7;
+                hSlider.step = 2;
+                if (harmonic % 2 === 0) harmonic = Math.max(1, harmonic - 1);
+                hSlider.value = harmonic;
+
+                speedLabel.innerHTML = "Speed of Sound (<i>v</i>)";
+                if (!fromPreset && (speed < 300 || speed > 380)) speed = 340;
+                speedSlider.value = speed;
+            } else if (type === 'open') {
+                hSlider.min = 1;
+                hSlider.max = 5;
+                hSlider.step = 1;
+                hSlider.value = harmonic;
+
+                speedLabel.innerHTML = "Speed of Sound (<i>v</i>)";
+                if (!fromPreset && (speed < 300 || speed > 380)) speed = 340;
+                speedSlider.value = speed;
             } else {
-                muteBtn.innerHTML = "🔇 Mute Tone";
-                muteBtn.className = "px-4 py-2 bg-red-600/80 hover:bg-red-500 text-white rounded text-sm font-bold shadow-lg transition flex items-center gap-2 border border-red-500/50";
-                updateUI();
+                hSlider.min = 1;
+                hSlider.max = 5;
+                hSlider.step = 1;
+                hSlider.value = harmonic;
+
+                speedLabel.innerHTML = "Wave Speed (<i>v</i>)";
+                if (!fromPreset && (speed < 100 || speed > 600)) speed = 250;
+                speedSlider.value = speed;
             }
+
+            updateMathHUD();
         }
 
-        // --- SYSTEM & INSTRUMENT CONTROL ---
         function loadInstrument(key) {
             activeInstrument = key;
             const inst = instruments[key];
-            
-            systemType = inst.type;
+
+            clearActiveInstrumentButtons();
+            const btn = document.getElementById(`inst-${key}`);
+            if (btn) btn.classList.add('active-inst');
+
             harmonic = inst.n;
             length = inst.L;
             speed = inst.v;
 
-            document.getElementById('harmonic-slider').value = harmonic;
-            document.getElementById('length-slider').value = length;
-            document.getElementById('speed-slider').value = speed;
+            document.getElementById('harmonicSlider').value = harmonic;
+            document.getElementById('lengthSlider').value = length;
+            document.getElementById('speedSlider').value = speed;
 
             setSystemType(inst.type, true);
 
             const descBox = document.getElementById('instrument-desc');
-            descBox.innerHTML = inst.desc;
-            descBox.classList.remove('hidden');
-            
+            descBox.innerHTML = `<strong>${key.toUpperCase()} RESONANCE:</strong> ${inst.desc}`;
+            descBox.style.display = 'block';
             resetView();
         }
 
-        function setSystemType(type, isFromPreset = false) {
-            if (!isFromPreset) {
-                activeInstrument = null;
-                document.getElementById('instrument-desc').classList.add('hidden');
-            }
-            systemType = type;
-            
-            const hSlider = document.getElementById('harmonic-slider');
-            const speedSlider = document.getElementById('speed-slider');
-            const speedLabel = document.getElementById('speed-label');
-            
-            if (type === 'closed') {
-                hSlider.min = 1; hSlider.max = 7; hSlider.step = 2;
-                if (harmonic % 2 === 0) harmonic = Math.max(1, harmonic - 1);
-                hSlider.value = harmonic;
-                
-                speedLabel.innerHTML = "Speed of Sound (<i>v</i>)";
-                if (!isFromPreset && (speed < 300 || speed > 360)) speed = 340;
-                speedSlider.value = speed;
-            } else if (type === 'open') {
-                hSlider.min = 1; hSlider.max = 5; hSlider.step = 1;
-                hSlider.value = harmonic;
-                
-                speedLabel.innerHTML = "Speed of Sound (<i>v</i>)";
-                if (!isFromPreset && (speed < 300 || speed > 360)) speed = 340;
-                speedSlider.value = speed;
-            } else { 
-                hSlider.min = 1; hSlider.max = 5; hSlider.step = 1;
-                hSlider.value = harmonic;
-                
-                speedLabel.innerHTML = "Wave Speed (<i>v</i>)";
-                if (!isFromPreset && (speed < 100 || speed > 600)) speed = 200;
-                speedSlider.value = speed;
-            }
-            
-            // Tab styling update for dark mode
-            const tabs = ['string', 'closed', 'open'];
-            tabs.forEach(t => {
-                const btn = document.getElementById(`tab-${t}`);
-                if (t === type) {
-                    btn.className = "col-span-1 py-2 px-3 rounded text-sm font-bold bg-cyan-600 text-white shadow-[0_0_10px_rgba(34,211,238,0.4)] border border-cyan-400 transition";
-                } else {
-                    btn.className = "col-span-1 py-2 px-3 rounded text-sm font-medium bg-slate-800/80 text-slate-300 border border-slate-600 hover:bg-slate-700 transition";
-                }
+        function clearActiveInstrumentButtons() {
+            ['guitar', 'violin', 'flute', 'clarinet'].forEach(k => {
+                const b = document.getElementById(`inst-${k}`);
+                if (b) b.classList.remove('active-inst');
             });
-
-            // Context Questions Logic
-            document.querySelectorAll('.question-block').forEach(el => el.classList.add('hidden'));
-            document.getElementById(`q-${type}`).classList.remove('hidden');
-
-            updateUI();
         }
 
-        function updateHarmonic(val) { harmonic = parseInt(val); updateUI(); }
-        function updateLength(val) { length = parseFloat(val); updateUI(); }
-        function updateSpeed(val) { speed = parseFloat(val); updateUI(); }
+        function updateHarmonic(val) {
+            harmonic = parseInt(val, 10);
+            updateMathHUD();
+        }
 
-        function updateUI() {
-            document.getElementById('harmonic-val').innerText = harmonic;
-            document.getElementById('length-val').innerText = `${length.toFixed(2)} m`;
-            document.getElementById('speed-val').innerText = `${Math.round(speed)} m/s`;
-            
-            let classText = "Fundamental Harmonic";
-            if (harmonic > 1) {
-                const overtone = systemType === 'closed' ? (harmonic - 1) / 2 : harmonic - 1;
-                classText = `${overtone}${getOrdinal(overtone)} Overtone (${harmonic}${getOrdinal(harmonic)} Harmonic)`;
-            }
-            document.getElementById('canvas-label').innerText = activeInstrument ? `Visualizer: ${activeInstrument.toUpperCase()} - ${classText}` : `Visualizer: ${classText}`;
+        function updateLength(val) {
+            length = parseFloat(val);
+            updateMathHUD();
+        }
 
-            let wl = (systemType === 'closed' ? 4 : 2) * length / harmonic;
+        function updateSpeed(val) {
+            speed = parseFloat(val);
+            updateMathHUD();
+        }
+
+        function resetDefaults() {
+            setSystemType('string');
+            harmonic = 1;
+            length = 1.0;
+            speed = 340;
+            document.getElementById('harmonicSlider').value = 1;
+            document.getElementById('lengthSlider').value = 1.0;
+            document.getElementById('speedSlider').value = 340;
+            resetView();
+            updateMathHUD();
+        }
+
+        // --- MATH HUD UPDATE (STRICTLY NO DOLLAR SIGNS) ---
+        function updateMathHUD() {
+            document.getElementById('harmonicVal').innerText = harmonic;
+            document.getElementById('lengthVal').innerText = `${length.toFixed(2)} m`;
+            document.getElementById('speedVal').innerText = `${Math.round(speed)} m/s`;
+
+            const divisor = (systemType === 'closed') ? 4 : 2;
+            const wl = (divisor * length) / harmonic;
             const freq = speed / wl;
-            
-            document.getElementById('calc-wavelength').innerText = `${wl.toFixed(2)} m`;
-            document.getElementById('calc-frequency').innerText = `${freq.toFixed(1)} Hz`;
 
-            // Derivation Maths Update
-            const formBox = document.getElementById('dynamic-formula-sub');
-            const formulaDiv = (systemType === 'closed') ? 4 : 2;
-            formBox.innerHTML = `
-                <div class="text-indigo-300 font-bold mb-1">${classText}</div>
-                <div><i>f<sub>n</sub></i> = <i>n &middot; v</i> / ${formulaDiv}<i>L</i></div>
-                <div class="mt-2 text-slate-400"><i>f</i> = (${harmonic} &middot; ${Math.round(speed)}) / (${formulaDiv} &middot; ${length.toFixed(2)})</div>
-                <div class="text-cyan-400 font-bold mt-2 text-base">&rarr; ${freq.toFixed(1)} Hz</div>
+            document.getElementById('hud-wavelength').innerText = `${wl.toFixed(2)} m`;
+            document.getElementById('hud-frequency').innerText = `${freq.toFixed(1)} Hz`;
+
+            let modeName = "Fundamental Mode (n = 1)";
+            if (harmonic > 1) {
+                const overtoneNum = (systemType === 'closed') ? (harmonic - 1) / 2 : (harmonic - 1);
+                modeName = `Overtone ${overtoneNum} (Harmonic n = ${harmonic})`;
+            }
+
+            const canvasLabel = document.getElementById('canvas-label');
+            canvasLabel.innerText = activeInstrument 
+                ? `${activeInstrument.toUpperCase()} : ${modeName}`
+                : `HOLOGRAPHIC : ${modeName}`;
+
+            const derivationBox = document.getElementById('dynamic-derivation');
+            derivationBox.innerHTML = `
+                <div style="color: #67e8f9; font-weight: 700; margin-bottom: 4px;">Boundary Condition: ${systemType === 'closed' ? 'Quarter-Wavelength Modes' : 'Half-Wavelength Modes'}</div>
+                <div>Formula: <i>f</i><sub>n</sub> = (<i>n</i> &middot; <i>v</i>) / (${divisor} &middot; <i>L</i>)</div>
+                <div>Calculation: <i>f</i> = (${harmonic} &middot; ${Math.round(speed)} m/s) / (${divisor} &middot; ${length.toFixed(2)} m)</div>
+                <div style="color: #e580ff; font-weight: 700; margin-top: 4px;">Output Frequency: <i>f</i> = ${freq.toFixed(1)} Hz</div>
             `;
 
-            if (!isMuted) playSound(freq);
+            if (isAudioPlaying && oscillator && gainNode) {
+                oscillator.frequency.setTargetAtTime(freq, audioCtx.currentTime, 0.05);
+            }
         }
 
-        function getOrdinal(n) {
-            if(n===1) return "st"; if(n===2) return "nd"; if(n===3) return "rd"; return "th";
+        // --- AUDIO SYNTHESIS ---
+        function initAudioContext() {
+            if (!audioCtx) {
+                const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioCtxClass();
+            }
         }
 
-        // --- CANVAS RENDERING LOGIC ---
-        function animate() {
-            let wl = (systemType === 'closed' ? 4 : 2) * length / harmonic;
+        function toggleAudio() {
+            initAudioContext();
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const btn = document.getElementById('audioBtn');
+            const divisor = (systemType === 'closed') ? 4 : 2;
+            const freq = speed / ((divisor * length) / harmonic);
+
+            if (!isAudioPlaying) {
+                oscillator = audioCtx.createOscillator();
+                gainNode = audioCtx.createGain();
+
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+                gainNode.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.08, audioCtx.currentTime + 0.08);
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                oscillator.start();
+
+                isAudioPlaying = true;
+                btn.innerHTML = "🔇 Mute Tone";
+                btn.classList.add('active-audio');
+            } else {
+                if (gainNode) {
+                    gainNode.gain.setValueAtTime(gainNode.gain.value, audioCtx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.05);
+                    setTimeout(() => {
+                        if (oscillator) {
+                            oscillator.stop();
+                            oscillator.disconnect();
+                            oscillator = null;
+                        }
+                    }, 60);
+                }
+                isAudioPlaying = false;
+                btn.innerHTML = "🔊 Play Tone";
+                btn.classList.remove('active-audio');
+            }
+        }
+
+        // --- 3D CANVAS RENDERING ENGINE WITH INSTRUMENTS ---
+        function renderLoop() {
+            const divisor = (systemType === 'closed') ? 4 : 2;
+            const wl = (divisor * length) / harmonic;
             const freq = speed / wl;
-            const frameInc = Math.min(0.2, Math.max(0.02, freq * 0.0002));
-            t += frameInc; 
 
-            drawCanvas();
-            requestAnimationFrame(animate);
+            const dt = Math.min(0.25, Math.max(0.03, freq * 0.00025));
+            t += dt;
+
+            drawHologramScene();
+            requestAnimationFrame(renderLoop);
         }
 
-        function drawCanvas() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height); // Transparent to blend with CSS background
-            
-            const paddingX = canvas.width * 0.15;
-            const maxL = 2.0; 
-            const activeWidth = (canvas.width - 2 * paddingX) * (length / maxL);
-            const startX = paddingX;
-            const endX = startX + activeWidth;
-            const centerY = canvas.height / 2;
-            
+        function drawHologramScene() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const w = canvas.width;
+            const h = canvas.height;
+            const midY = h / 2;
+
             ctx.save();
-            ctx.translate(offsetX, offsetY);
+            ctx.translate(w / 2 + offsetX, midY + offsetY);
             ctx.scale(zoom, zoom);
 
-            drawSystemBackground(startX, endX, centerY, activeWidth);
-            drawWaves(startX, endX, centerY, activeWidth);
+            // Active vibrating width
+            const maxL = 2.0;
+            const totalSimWidth = Math.min(w * 0.78, 620);
+            const activeWidth = totalSimWidth * (length / maxL);
+            const sx = -activeWidth / 2;
+            const ex = activeWidth / 2;
+
+            const tiltRad = (tiltAngleDeg * Math.PI) / 180;
+            const depthY = is3DMode ? holoDepthPx * Math.sin(tiltRad) : 0;
+            const depthX = is3DMode ? holoDepthPx * Math.cos(tiltRad) * 0.5 : 0;
+
+            drawHoloFloorGrid(sx, ex, activeWidth, depthX, depthY);
+            
+            // Draw Selected Instrument or Generic Hardware
+            if (activeInstrument === 'guitar') {
+                drawHoloAcousticGuitar(sx, ex, activeWidth, depthX, depthY);
+            } else if (activeInstrument === 'violin') {
+                drawHoloViolin(sx, ex, activeWidth, depthX, depthY);
+            } else if (activeInstrument === 'flute') {
+                drawHoloFlute(sx, ex, activeWidth, depthX, depthY);
+            } else if (activeInstrument === 'clarinet') {
+                drawHoloClarinet(sx, ex, activeWidth, depthX, depthY);
+            } else {
+                drawGenericHardware(sx, ex, activeWidth, depthX, depthY);
+            }
+
+            // Draw the Standing Wave Oscillating on the Instrument
+            drawHolographicWaveRibbon(sx, ex, activeWidth, depthX, depthY);
 
             ctx.restore();
         }
 
-        function drawSystemBackground(sx, ex, cy, w) {
-            ctx.lineWidth = 2;
-            
-            if (activeInstrument === 'guitar') {
-                ctx.fillStyle = '#5c4033'; 
-                ctx.fillRect(sx - 20, cy - 10, w + 40, 20);
-                
-                ctx.strokeStyle = '#a8a29e';
-                for(let i=1; i<10; i++){
-                    ctx.beginPath(); ctx.moveTo(sx + i*20, cy-10); ctx.lineTo(sx + i*20, cy+10); ctx.stroke();
-                }
-                
-                ctx.fillStyle = '#8b5a2b';
-                ctx.beginPath(); ctx.arc(ex + 40, cy, 50, 0, Math.PI*2); ctx.fill();
-                ctx.fillStyle = '#050b14'; 
-                ctx.beginPath(); ctx.arc(ex + 40, cy, 25, 0, Math.PI*2); ctx.fill();
+        // Isometric Holographic Depth Grid
+        function drawHoloFloorGrid(sx, ex, activeW, dx, dy) {
+            ctx.save();
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.08)';
+            ctx.lineWidth = 1;
 
-                ctx.fillStyle = '#e5e7eb'; 
-                ctx.fillRect(sx - 5, cy - 12, 5, 24); 
-                ctx.fillRect(ex, cy - 12, 8, 24);     
-            } else if (activeInstrument === 'violin') {
-                ctx.fillStyle = '#1c1917'; 
-                ctx.fillRect(sx - 30, cy - 8, w * 0.7, 16);
-                
-                ctx.fillStyle = '#a0522d'; 
+            const gridY = 95;
+            const numLines = 7;
+            for (let i = 0; i <= numLines; i++) {
+                const frac = i / numLines;
+                const curY = gridY + frac * 50;
+                const offsetD = frac * 35;
                 ctx.beginPath();
-                ctx.ellipse(ex + 10, cy, 70, 45, 0, 0, Math.PI*2);
-                ctx.fill();
-
-                ctx.fillStyle = '#f5deb3'; 
-                ctx.fillRect(ex, cy - 15, 6, 30);
-                ctx.fillStyle = '#d6d3d1';
-                ctx.fillRect(sx, cy - 10, 4, 20); 
-
-            } else if (activeInstrument === 'flute') {
-                const h = 24;
-                const grad = ctx.createLinearGradient(0, cy - h/2, 0, cy + h/2);
-                grad.addColorStop(0, '#94a3b8'); grad.addColorStop(0.5, '#f1f5f9'); grad.addColorStop(1, '#64748b');
-                ctx.fillStyle = grad;
-                ctx.fillRect(sx - 30, cy - h/2, w + 60, h);
-                
-                ctx.fillStyle = '#0f172a';
-                ctx.beginPath(); ctx.ellipse(sx, cy, 10, 6, 0, 0, Math.PI*2); ctx.fill();
-                
-                ctx.fillStyle = '#cbd5e1';
-                ctx.strokeStyle = '#475569';
-                for(let i=1; i<=5; i++){
-                    ctx.beginPath(); ctx.arc(sx + w * 0.2 * i, cy, 8, 0, Math.PI*2); ctx.fill(); ctx.stroke();
-                }
-
-            } else if (activeInstrument === 'clarinet') {
-                const h = 22;
-                ctx.fillStyle = '#111827'; 
-                ctx.fillRect(sx, cy - h/2, w, h);
-                
-                ctx.fillStyle = '#1f2937';
-                ctx.beginPath(); ctx.moveTo(sx, cy-h/2); ctx.lineTo(sx-30, cy - 5); ctx.lineTo(sx-30, cy + h/2); ctx.lineTo(sx, cy+h/2); ctx.fill();
-                
-                ctx.beginPath(); ctx.moveTo(ex, cy-h/2); ctx.lineTo(ex+40, cy-h); ctx.lineTo(ex+40, cy+h); ctx.lineTo(ex, cy+h/2); ctx.fill();
-
-                ctx.fillStyle = '#e2e8f0';
-                for(let i=1; i<=4; i++){
-                    ctx.fillRect(sx + w * 0.2 * i, cy - h/2 - 4, 6, h+8);
-                }
-
-            } else {
-                ctx.lineWidth = 4;
-                if (systemType === 'string') {
-                    ctx.fillStyle = '#64748b';
-                    ctx.fillRect(sx - 8, cy - 30, 8, 60); ctx.fillRect(ex, cy - 30, 8, 60);
-                    ctx.strokeStyle = '#475569'; ctx.beginPath(); ctx.moveTo(sx, cy); ctx.lineTo(ex, cy); ctx.stroke();
-                } else if (systemType === 'closed') {
-                    ctx.strokeStyle = '#475569';
-                    ctx.beginPath(); ctx.moveTo(sx, cy-40); ctx.lineTo(sx, cy+40); 
-                    ctx.moveTo(sx, cy-40); ctx.lineTo(ex, cy-40); 
-                    ctx.moveTo(sx, cy+40); ctx.lineTo(ex, cy+40); ctx.stroke();
-                } else if (systemType === 'open') {
-                    ctx.strokeStyle = '#475569';
-                    ctx.beginPath(); ctx.moveTo(sx, cy-40); ctx.lineTo(ex, cy-40); 
-                    ctx.moveTo(sx, cy+40); ctx.lineTo(ex, cy+40); ctx.stroke();
-                }
+                ctx.moveTo(sx - 40 - offsetD, curY);
+                ctx.lineTo(ex + 40 + offsetD, curY);
+                ctx.stroke();
             }
+            ctx.restore();
         }
 
-        function drawWaves(sx, ex, cy, w) {
-            const maxAmp = (systemType === 'string') ? 35 : 45; 
-            const osc = Math.sin(t);
+        // --- AESTHETIC HOLOGRAPHIC GUITAR ---
+        function drawHoloAcousticGuitar(sx, ex, w, dx, dy) {
+            ctx.save();
+            const neckLen = w * 0.65;
+            const bodyStartX = sx + neckLen;
+            const bodyLen = (ex - bodyStartX) + 60;
+            const waistX = bodyStartX + bodyLen * 0.42;
 
-            // Envelope
-            ctx.strokeStyle = 'rgba(234, 179, 8, 0.4)';
+            if (is3DMode && holoDepthPx > 0) {
+                ctx.fillStyle = 'rgba(188, 19, 254, 0.05)';
+                ctx.strokeStyle = 'rgba(188, 19, 254, 0.2)';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                drawGuitarBodyPath(bodyStartX + dx, ex + 60 + dx, waistX + dx, -dy);
+                ctx.fill();
+                ctx.stroke();
+            }
+
+            const bodyGrad = ctx.createRadialGradient(ex, 0, 10, ex, 0, 120);
+            bodyGrad.addColorStop(0, 'rgba(0, 243, 255, 0.12)');
+            bodyGrad.addColorStop(0.7, 'rgba(188, 19, 254, 0.08)');
+            bodyGrad.addColorStop(1, 'rgba(6, 10, 25, 0.7)');
+            ctx.fillStyle = bodyGrad;
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.6)';
             ctx.lineWidth = 2;
+            ctx.beginPath();
+            drawGuitarBodyPath(bodyStartX, ex + 60, waistX, 0);
+            ctx.fill();
+            ctx.stroke();
+
+            const holeX = bodyStartX + bodyLen * 0.32;
+            ctx.fillStyle = '#030712';
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.8)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(holeX, 0, 28, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.strokeStyle = 'rgba(188, 19, 254, 0.6)';
             ctx.setLineDash([4, 4]);
-            ctx.beginPath(); plotCurve(sx, ex, cy, w, maxAmp, 1); ctx.stroke();
-            ctx.beginPath(); plotCurve(sx, ex, cy, w, maxAmp, -1); ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(holeX, 0, 34, 0, Math.PI * 2);
+            ctx.stroke();
             ctx.setLineDash([]);
 
-            // Instant Wave (Cyan Neon)
+            ctx.fillStyle = '#1e1b4b';
             ctx.strokeStyle = '#00f3ff';
-            ctx.shadowColor = '#00f3ff';
-            ctx.shadowBlur = 10;
-            ctx.lineWidth = 3;
-            ctx.beginPath(); plotCurve(sx, ex, cy, w, maxAmp, osc); ctx.stroke();
-            ctx.shadowBlur = 0; 
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.roundRect(ex - 6, -26, 16, 52, 4);
+            ctx.fill();
+            ctx.stroke();
 
-            // Calc Dots
-            let nodes = [], antinodes = [];
-            if (systemType === 'string') {
-                for (let i = 0; i <= harmonic; i++) nodes.push(sx + (i/harmonic)*w);
-                for (let i = 0; i < harmonic; i++) antinodes.push(sx + ((i+0.5)/harmonic)*w);
-            } else if (systemType === 'closed') {
-                for (let i = 0; i <= harmonic; i++) {
-                    let px = sx + (i/harmonic)*w;
-                    (i % 2 === 0) ? nodes.push(px) : antinodes.push(px);
-                }
-            } else if (systemType === 'open') {
-                for (let i = 0; i <= harmonic*2; i++) {
-                    let px = sx + (i/(harmonic*2))*w;
-                    (i % 2 === 1) ? nodes.push(px) : antinodes.push(px);
-                }
+            ctx.fillStyle = '#e2e8f0';
+            for (let p = -18; p <= 18; p += 7) {
+                ctx.beginPath();
+                ctx.arc(ex + 4, p, 2, 0, Math.PI * 2);
+                ctx.fill();
             }
 
-            ctx.font = `bold ${10 / zoom}px sans-serif`; 
+            const neckW = 20;
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.7)';
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.4)';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.rect(sx, -neckW / 2, neckLen, neckW);
+            ctx.fill();
+            ctx.stroke();
 
-            nodes.forEach(pos => {
-                ctx.fillStyle = '#ef4444';
-                ctx.beginPath(); ctx.arc(pos, cy, 4/zoom, 0, Math.PI*2); ctx.fill();
-                ctx.fillStyle = '#fca5a5';
-                ctx.fillText('N', pos - (4/zoom), cy - (12/zoom));
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.lineWidth = 1;
+            const frets = 14;
+            for (let f = 1; f <= frets; f++) {
+                const fretX = sx + neckLen * (1 - Math.pow(0.94, f));
+                ctx.beginPath();
+                ctx.moveTo(fretX, -neckW / 2);
+                ctx.lineTo(fretX, neckW / 2);
+                ctx.stroke();
+            }
+
+            ctx.fillStyle = '#f8fafc';
+            ctx.fillRect(sx - 4, -14, 5, 28);
+
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+            ctx.strokeStyle = 'rgba(188, 19, 254, 0.6)';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(sx - 4, -12);
+            ctx.lineTo(sx - 48, -18);
+            ctx.lineTo(sx - 52, 18);
+            ctx.lineTo(sx - 4, 12);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#00f3ff';
+            [-1, 1].forEach(side => {
+                for (let p = 0; p < 3; p++) {
+                    const px = sx - 16 - p * 12;
+                    const py = side * 22;
+                    ctx.beginPath();
+                    ctx.arc(px, py, 3.5, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.moveTo(px, side * 12);
+                    ctx.lineTo(px, py);
+                    ctx.stroke();
+                }
             });
 
-            antinodes.forEach(pos => {
-                let localY = cy;
-                const relX = (pos - sx) / w;
-                if (systemType === 'string') localY += maxAmp * Math.sin(harmonic * Math.PI * relX) * osc;
-                else if (systemType === 'closed') localY += maxAmp * Math.sin((harmonic * Math.PI * relX)/2) * osc;
-                else localY += maxAmp * Math.cos(harmonic * Math.PI * relX) * osc;
-
-                ctx.fillStyle = '#22c55e';
-                ctx.beginPath(); ctx.arc(pos, localY, 4/zoom, 0, Math.PI*2); ctx.fill();
-                ctx.fillStyle = '#86efac';
-                ctx.fillText('A', pos - (4/zoom), localY - (12/zoom));
-            });
+            ctx.restore();
         }
 
-        function plotCurve(sx, ex, cy, w, amp, scale) {
-            for (let x = sx; x <= ex; x++) {
-                const rel = (x - sx) / w;
-                let y = 0;
-                if (systemType === 'string') y = amp * Math.sin(harmonic * Math.PI * rel) * scale;
-                else if (systemType === 'closed') y = amp * Math.sin((harmonic * Math.PI * rel)/2) * scale;
-                else if (systemType === 'open') y = amp * Math.cos(harmonic * Math.PI * rel) * scale;
-                
-                (x === sx) ? ctx.moveTo(x, cy + y) : ctx.lineTo(x, cy + y);
+        function drawGuitarBodyPath(startX, endX, waistX, yOff) {
+            const hUpper = 46;
+            const hWaist = 34;
+            const hLower = 62;
+            
+            ctx.moveTo(startX, -hUpper + yOff);
+            ctx.bezierCurveTo(startX + (waistX - startX)*0.5, -hUpper + yOff, waistX - 10, -hWaist + yOff, waistX, -hWaist + yOff);
+            ctx.bezierCurveTo(waistX + 15, -hWaist + yOff, endX - 25, -hLower + yOff, endX, -hLower + 15 + yOff);
+            ctx.quadraticCurveTo(endX + 15, 0 + yOff, endX, hLower - 15 + yOff);
+            ctx.bezierCurveTo(endX - 25, hLower + yOff, waistX + 15, hWaist + yOff, waistX, hWaist + yOff);
+            ctx.bezierCurveTo(waistX - 10, hWaist + yOff, startX + (waistX - startX)*0.5, hUpper + yOff, startX, hUpper + yOff);
+            ctx.closePath();
+        }
+
+        // --- AESTHETIC HOLOGRAPHIC VIOLIN ---
+        function drawHoloViolin(sx, ex, w, dx, dy) {
+            ctx.save();
+            const bodyLen = w * 0.75;
+            const bodyStartX = ex - bodyLen;
+            const waistX = bodyStartX + bodyLen * 0.48;
+
+            ctx.fillStyle = 'rgba(188, 19, 254, 0.08)';
+            ctx.strokeStyle = 'rgba(188, 19, 254, 0.6)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            drawViolinBodyPath(bodyStartX, ex + 25, waistX);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.85)';
+            ctx.lineWidth = 2;
+            [-1, 1].forEach(side => {
+                const fy = side * 22;
+                ctx.beginPath();
+                ctx.moveTo(waistX - 15, fy - side * 6);
+                ctx.bezierCurveTo(waistX - 5, fy + side * 10, waistX + 5, fy - side * 10, waistX + 18, fy + side * 6);
+                ctx.stroke();
+                ctx.fillStyle = '#00f3ff';
+                ctx.beginPath(); ctx.arc(waistX - 15, fy - side * 6, 2.5, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(waistX + 18, fy + side * 6, 2.5, 0, Math.PI * 2); ctx.fill();
+            });
+
+            ctx.fillStyle = '#fde68a';
+            ctx.strokeStyle = '#d97706';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.rect(ex - 4, -22, 8, 44);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#0f172a';
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.5)';
+            ctx.beginPath();
+            ctx.moveTo(ex + 8, -12);
+            ctx.lineTo(ex + 35, -7);
+            ctx.lineTo(ex + 35, 7);
+            ctx.lineTo(ex + 8, 12);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            const fbW = 16;
+            ctx.fillStyle = '#090d1a';
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.4)';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.rect(sx, -fbW / 2, (ex - sx) * 0.72, fbW);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#e2e8f0';
+            ctx.fillRect(sx - 3, -10, 4, 20);
+
+            ctx.strokeStyle = 'rgba(188, 19, 254, 0.8)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.rect(sx - 32, -8, 29, 16);
+            ctx.stroke();
+
+            ctx.fillStyle = '#bc13fe';
+            [-1, 1].forEach(side => {
+                [-22, -10].forEach(px => {
+                    ctx.beginPath();
+                    ctx.arc(sx + px, side * 14, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+            });
+
+            ctx.beginPath();
+            ctx.arc(sx - 40, -2, 7, 0, Math.PI * 1.5);
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        function drawViolinBodyPath(startX, endX, waistX) {
+            const hUpper = 44;
+            const hC = 26;
+            const hLower = 54;
+            
+            ctx.moveTo(startX, -hUpper);
+            ctx.bezierCurveTo(startX + 20, -hUpper, waistX - 25, -hUpper, waistX - 15, -hC - 8);
+            ctx.lineTo(waistX - 12, -hC);
+            ctx.bezierCurveTo(waistX, -hC + 6, waistX, -hC + 6, waistX + 12, -hC);
+            ctx.lineTo(waistX + 15, -hC - 8);
+            ctx.bezierCurveTo(waistX + 25, -hLower, endX - 15, -hLower, endX, 0);
+            ctx.bezierCurveTo(endX - 15, hLower, waistX + 25, hLower, waistX + 15, hC + 8);
+            ctx.lineTo(waistX + 12, hC);
+            ctx.bezierCurveTo(waistX, hC - 6, waistX, hC - 6, waistX - 12, hC);
+            ctx.lineTo(waistX - 15, hC + 8);
+            ctx.bezierCurveTo(waistX - 25, hUpper, startX + 20, hUpper, startX, hUpper);
+            ctx.closePath();
+        }
+
+        // --- AESTHETIC HOLOGRAPHIC CONCERT FLUTE ---
+        function drawHoloFlute(sx, ex, w, dx, dy) {
+            ctx.save();
+            const radius = 18;
+            const headX = sx - 35;
+            const footX = ex + 25;
+
+            const grad = ctx.createLinearGradient(0, -radius, 0, radius);
+            grad.addColorStop(0, 'rgba(0, 243, 255, 0.25)');
+            grad.addColorStop(0.3, 'rgba(255, 255, 255, 0.4)');
+            grad.addColorStop(0.7, 'rgba(0, 243, 255, 0.15)');
+            grad.addColorStop(1, 'rgba(15, 23, 42, 0.7)');
+            ctx.fillStyle = grad;
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.7)';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.roundRect(headX, -radius, (footX - headX), radius * 2, 4);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#bc13fe';
+            ctx.fillRect(headX - 6, -radius - 2, 6, (radius * 2) + 4);
+
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            ctx.beginPath();
+            ctx.roundRect(sx - 12, -radius - 5, 24, 6, 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#020617';
+            ctx.strokeStyle = '#00f3ff';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.ellipse(sx, -radius - 2, 6, 3, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(sx + 35, -radius - 8);
+            ctx.lineTo(ex, -radius - 8);
+            ctx.stroke();
+
+            const numKeys = 8;
+            for (let k = 1; k <= numKeys; k++) {
+                const kx = sx + (w * 0.12) * k;
+                if (kx < ex + 10) {
+                    ctx.fillStyle = '#0f172a';
+                    ctx.strokeStyle = '#00f3ff';
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.arc(kx, -radius - 4, 6, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+                    ctx.beginPath();
+                    ctx.moveTo(kx, -radius);
+                    ctx.lineTo(kx, -radius - 8);
+                    ctx.stroke();
+                }
             }
+
+            ctx.strokeStyle = '#00f3ff';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.ellipse(footX, 0, 4, radius, 0, 0, Math.PI * 2);
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        // --- AESTHETIC HOLOGRAPHIC CLARINET ---
+        function drawHoloClarinet(sx, ex, w, dx, dy) {
+            ctx.save();
+            const radius = 17;
+
+            const mpX = sx - 35;
+            ctx.fillStyle = '#020617';
+            ctx.strokeStyle = 'rgba(188, 19, 254, 0.8)';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(sx, -radius);
+            ctx.lineTo(mpX, -8);
+            ctx.quadraticCurveTo(mpX - 10, 0, mpX, 8);
+            ctx.lineTo(sx, radius);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#f59e0b';
+            ctx.fillRect(sx - 24, -radius - 1, 10, (radius * 2) + 2);
+            ctx.fillStyle = '#fde68a';
+            ctx.fillRect(mpX + 4, 3, 24, 3);
+
+            const grad = ctx.createLinearGradient(0, -radius, 0, radius);
+            grad.addColorStop(0, 'rgba(15, 23, 42, 0.9)');
+            grad.addColorStop(0.5, 'rgba(30, 41, 59, 0.7)');
+            grad.addColorStop(1, 'rgba(15, 23, 42, 0.95)');
+            ctx.fillStyle = grad;
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.5)';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.rect(sx, -radius, w, radius * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#94a3b8';
+            ctx.fillRect(sx + w * 0.45, -radius - 2, 5, (radius * 2) + 4);
+            ctx.fillRect(sx + w * 0.88, -radius - 2, 5, (radius * 2) + 4);
+
+            const keys = 7;
+            for (let k = 1; k <= keys; k++) {
+                const kx = sx + (w * 0.13) * k;
+                ctx.strokeStyle = '#e2e8f0';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(kx, 0, 5, 0, Math.PI * 2);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(kx, -radius);
+                ctx.lineTo(kx + 6, -radius - 5);
+                ctx.stroke();
+            }
+
+            const bellLen = 42;
+            const bellR = 40;
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.95)';
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.85)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(ex, -radius);
+            ctx.quadraticCurveTo(ex + bellLen * 0.6, -radius, ex + bellLen, -bellR);
+            ctx.lineTo(ex + bellLen, bellR);
+            ctx.quadraticCurveTo(ex + bellLen * 0.6, radius, ex, radius);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.strokeStyle = '#bc13fe';
+            ctx.beginPath();
+            ctx.ellipse(ex + bellLen, 0, 8, bellR, 0, 0, Math.PI * 2);
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        // --- GENERIC TESTBENCH HARMONIC HARDWARE ---
+        function drawGenericHardware(sx, ex, w, dx, dy) {
+            ctx.save();
+            const radius = 48;
+
+            if (systemType === 'string') {
+                [-1, 1].forEach((dir) => {
+                    const px = dir === -1 ? sx : ex;
+                    ctx.fillStyle = '#1e293b';
+                    ctx.strokeStyle = 'rgba(0, 243, 255, 0.6)';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.roundRect(px - 7, -50, 14, 100, 4);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    ctx.fillStyle = '#bc13fe';
+                    ctx.shadowColor = '#bc13fe';
+                    ctx.shadowBlur = 10;
+                    ctx.beginPath();
+                    ctx.arc(px, 0, 5, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                });
+            } else {
+                const isClosed = (systemType === 'closed');
+                const grad = ctx.createLinearGradient(0, -radius, 0, radius);
+                grad.addColorStop(0, 'rgba(0, 243, 255, 0.08)');
+                grad.addColorStop(0.5, 'rgba(0, 243, 255, 0.01)');
+                grad.addColorStop(1, 'rgba(0, 243, 255, 0.12)');
+                ctx.fillStyle = grad;
+                ctx.fillRect(sx, -radius, w, radius * 2);
+
+                ctx.strokeStyle = 'rgba(0, 243, 255, 0.4)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(sx, -radius); ctx.lineTo(ex, -radius);
+                ctx.moveTo(sx, radius); ctx.lineTo(ex, radius);
+                ctx.stroke();
+
+                if (isClosed) {
+                    ctx.fillStyle = 'rgba(239, 68, 68, 0.4)';
+                    ctx.strokeStyle = '#ef4444';
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.ellipse(sx, 0, 10, radius, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+                } else {
+                    ctx.strokeStyle = 'rgba(0, 243, 255, 0.7)';
+                    ctx.beginPath();
+                    ctx.ellipse(sx, 0, 10, radius, 0, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+
+                ctx.strokeStyle = 'rgba(0, 243, 255, 0.7)';
+                ctx.beginPath();
+                ctx.ellipse(ex, 0, 10, radius, 0, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+            ctx.restore();
+        }
+
+        // --- HOLOGRAPHIC WAVE RIBBON ENGINE ---
+        function drawHolographicWaveRibbon(sx, ex, w, dx, dy) {
+            const maxAmp = (systemType === 'string') ? 38 : 46;
+            const osc = Math.sin(t);
+            const steps = 180;
+
+            // 1. Oscillating Wave Envelope (Amber dashed)
+            ctx.save();
+            ctx.strokeStyle = 'rgba(245, 158, 11, 0.45)';
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([5, 5]);
+
+            [1, -1].forEach(sign => {
+                ctx.beginPath();
+                for (let i = 0; i <= steps; i++) {
+                    const frac = i / steps;
+                    const px = sx + frac * w;
+                    const py = getDisplacement(frac, maxAmp) * sign;
+                    if (i === 0) ctx.moveTo(px, py);
+                    else ctx.lineTo(px, py);
+                }
+                ctx.stroke();
+            });
+            ctx.restore();
+
+            // 2. 3D Holographic Ribbon Extrusion (Perspective Layers)
+            if (is3DMode && holoDepthPx > 0) {
+                const layers = 5;
+                for (let l = layers; l >= 1; l--) {
+                    const depthFrac = l / layers;
+                    const curDx = dx * depthFrac;
+                    const curDy = dy * depthFrac;
+                    const alpha = 0.08 * (1 - depthFrac * 0.5);
+
+                    ctx.save();
+                    ctx.fillStyle = `rgba(188, 19, 254, ${alpha})`;
+                    ctx.beginPath();
+                    
+                    for (let i = 0; i <= steps; i++) {
+                        const frac = i / steps;
+                        const px = sx + frac * w + curDx;
+                        const py = getDisplacement(frac, maxAmp) * osc - curDy;
+                        if (i === 0) ctx.moveTo(px, py);
+                        else ctx.lineTo(px, py);
+                    }
+                    for (let i = steps; i >= 0; i--) {
+                        const frac = i / steps;
+                        const px = sx + frac * w;
+                        const py = getDisplacement(frac, maxAmp) * osc;
+                        ctx.lineTo(px, py);
+                    }
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.restore();
+                }
+            }
+
+            // 3. Instantaneous Luminous Wave Line (Cyan Laser Beam)
+            ctx.save();
+            ctx.strokeStyle = '#00f3ff';
+            ctx.shadowColor = '#00f3ff';
+            ctx.shadowBlur = 14;
+            ctx.lineWidth = 3.5;
+
+            ctx.beginPath();
+            for (let i = 0; i <= steps; i++) {
+                const frac = i / steps;
+                const px = sx + frac * w;
+                const py = getDisplacement(frac, maxAmp) * osc;
+                if (i === 0) ctx.moveTo(px, py);
+                else ctx.lineTo(px, py);
+            }
+            ctx.stroke();
+            ctx.restore();
+
+            // 4. Render Nodes (N) and Antinodes (A)
+            renderNodesAndAntinodes(sx, ex, w, maxAmp, osc);
+        }
+
+        function getDisplacement(frac, amp) {
+            if (systemType === 'string') {
+                return amp * Math.sin(harmonic * Math.PI * frac);
+            } else if (systemType === 'closed') {
+                return amp * Math.sin((harmonic * Math.PI * frac) / 2);
+            } else {
+                return amp * Math.cos(harmonic * Math.PI * frac);
+            }
+        }
+
+        function renderNodesAndAntinodes(sx, ex, w, maxAmp, osc) {
+            let nodes = [];
+            let antinodes = [];
+
+            if (systemType === 'string') {
+                for (let i = 0; i <= harmonic; i++) nodes.push(i / harmonic);
+                for (let i = 0; i < harmonic; i++) antinodes.push((i + 0.5) / harmonic);
+            } else if (systemType === 'closed') {
+                for (let i = 0; i <= harmonic; i++) {
+                    const frac = i / harmonic;
+                    if (i % 2 === 0) nodes.push(frac);
+                    else antinodes.push(frac);
+                }
+            } else {
+                for (let i = 0; i <= harmonic * 2; i++) {
+                    const frac = i / (harmonic * 2);
+                    if (i % 2 === 1) nodes.push(frac);
+                    else antinodes.push(frac);
+                }
+            }
+
+            ctx.save();
+            ctx.font = 'bold 12px "Orbitron", sans-serif';
+            ctx.textAlign = 'center';
+
+            // Nodes (N) - Red Points
+            nodes.forEach(frac => {
+                const px = sx + frac * w;
+                const py = 0;
+
+                ctx.fillStyle = '#ef4444';
+                ctx.shadowColor = '#ef4444';
+                ctx.shadowBlur = 8;
+                ctx.beginPath();
+                ctx.arc(px, py, 5, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = '#fca5a5';
+                ctx.fillText('N', px, py - 14);
+            });
+
+            // Antinodes (A) - Green Points
+            antinodes.forEach(frac => {
+                const px = sx + frac * w;
+                const py = getDisplacement(frac, maxAmp) * osc;
+
+                ctx.fillStyle = '#10b981';
+                ctx.shadowColor = '#10b981';
+                ctx.shadowBlur = 8;
+                ctx.beginPath();
+                ctx.arc(px, py, 5, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = '#a7f3d0';
+                ctx.fillText('A', px, py + (py >= 0 ? 18 : -14));
+            });
+
+            ctx.restore();
         }
     </script>
 </body>
