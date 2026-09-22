@@ -3,16 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LuyaliSims - Interactive Virtual Simulators</title>
+    <meta name="description" content="LuyaliSims provides interactive 3D virtual STEM simulations, science laboratory models, and gamified educational experiences for students and educators.">
+    <title>LuyaliSims - Interactive Virtual STEM Simulators</title>
+    
     <!-- Importing futuristic fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Rajdhani:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
+
+    <!-- 1. STICKY TOP NAVIGATION BAR -->
+    <nav class="site-nav" aria-label="Main Navigation">
+        <a href="#top" class="nav-brand">
+            ⚡ LuyaliSims
+        </a>
+        <ul class="nav-links">
+            <li><a href="#top">Home</a></li>
+            <li><a href="#simulatorGrid">Simulators</a></li>
+            <li><a href="#about-section">About Us</a></li>
+            <li><a href="#contact-section">Contact Us</a></li>
+            <li><a onclick="openModal('privacyModal')">Privacy Policy</a></li>
+            <li><a onclick="openModal('termsModal')">Terms of Service</a></li>
+        </ul>
+    </nav>
+
+    <!-- 2. HERO / SEARCH HEADER -->
+    <header id="top">
         <div class="logo-container">
             <!-- Futuristic Atom Icon -->
-            <svg class="logo-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <svg class="logo-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-label="LuyaliSims Atom Logo">
                 <circle cx="50" cy="50" r="10" fill="#00f3ff" />
                 <ellipse cx="50" cy="50" rx="40" ry="15" fill="none" stroke="#00f3ff" stroke-width="2" transform="rotate(30 50 50)"/>
                 <ellipse cx="50" cy="50" rx="40" ry="15" fill="none" stroke="#bc13fe" stroke-width="2" transform="rotate(90 50 50)"/>
@@ -20,12 +39,12 @@
             </svg>
             <h1>LuyaliSims</h1>
         </div>
-        <p class="subtitle">Next-Generation Interactive Educational Simulators</p>
+        <p class="subtitle">Next-Generation Interactive Educational Simulators & Science Labs</p>
         
-        <!-- Search and Filter -->
+        <!-- Search and Filter Controls -->
         <div class="controls">
-            <input type="text" id="searchInput" placeholder="Search simulators...">
-            <select id="categoryFilter">
+            <input type="text" id="searchInput" placeholder="Search physics, chemistry, electronics simulators...">
+            <select id="categoryFilter" aria-label="Filter simulators by category">
                 <option value="All">All Categories</option>
                 <option value="Sciences">Sciences</option>
                 <option value="Exploration & Others">Exploration & Others</option>
@@ -33,15 +52,17 @@
         </div>
     </header>
 
+    <!-- 3. MAIN SIMULATOR DIRECTORY -->
     <main id="simulatorGrid" class="grid-container">
-        <!-- Cards injected by JS -->
+        <!-- Interactive Simulator Cards injected dynamically by script.js -->
     </main>
 
-    <!-- Load More Button Container -->
+    <!-- Load More Button -->
     <div id="loadMoreContainer" class="load-more-container">
         <button id="loadMoreBtn" class="load-more-btn">Show More Simulators</button>
     </div>
-    <!-- Community Feedback & Reviews Section -->
+
+    <!-- 4. COMMUNITY FEEDBACK & REVIEWS SECTION -->
     <section class="community-feedback-section">
         <div class="feedback-card google-card">
             <div class="feedback-badge">Public Reviews</div>
@@ -70,34 +91,101 @@
         </div>
     </section>
 
-    <footer>
-        <!-- your existing footer content remains here -->
+    <!-- 5. COMPREHENSIVE SITE FOOTER -->
     <footer>
         <div class="footer-container">
-            <div class="footer-col">
+            <!-- About Platform -->
+            <div class="footer-col" id="about-section">
                 <h3>About LuyaliSims</h3>
-                <p>LuyaliSims is a dynamic educational platform designed to empower learners and educators through visual, interactive simulations. By transforming abstract scientific data and complex concepts into manipulable, hands-on experiences, we foster a deeper and more engaging learning environment.</p>
-                <p class="highlight-text">🚀 New content is updated weekly! For any special requests for custom simulators or learning content, please reach out.</p>
+                <p>LuyaliSims is a dedicated open-access educational repository offering browser-based scientific simulations. By transforming abstract mathematical data and physical laws into interactive 3D tools, we make STEM learning experiential, verifiable, and globally accessible.</p>
+                <p class="highlight-text">🚀 Content updated weekly. Built to assist secondary and collegiate STEM curricula worldwide.</p>
             </div>
+
+            <!-- Author & Editorial Credentials -->
             <div class="footer-col">
                 <h3>About the Author</h3>
-                <p><strong>Ian Luyali</strong> is an educator, EdTech developer, and creative strategist. As the founder of Click & Draft, he crafts custom curriculum solutions and AI workflows for modern educators, alongside building web application prototypes and digital media.</p>
+                <p><strong>Ian Luyali</strong> is an educator, EdTech developer, and creative strategist. Through Click & Draft, he develops digital instructional media, curriculum tools, and interactive browser laboratories designed to lower the barrier to science comprehension.</p>
             </div>
-            <div class="footer-col contact-info">
-                <h3>Contact Info</h3>
+
+            <!-- Contact Information -->
+            <div class="footer-col contact-info" id="contact-section">
+                <h3>Contact Us</h3>
                 <ul>
+                    <li><strong>Location:</strong> Kenya</li>
                     <li><strong>Phone:</strong> +254 727 987 669</li>
-                    <li><strong>Email 1:</strong> <a href="mailto:luyashliz@gmail.com">luyashliz@gmail.com</a></li>
-                    <li><strong>Email 2:</strong> <a href="mailto:ianlinyali@gmail.com">ianlinyali@gmail.com</a></li>
-                    <li><strong>Work Email:</strong> <a href="mailto:ianlinyali78@mwalimu.tsc.go.ke">ianlinyali78@mwalimu.tsc.go.ke</a></li>
+                    <li><strong>General Inquiries:</strong> <a href="mailto:luyashliz@gmail.com">luyashliz@gmail.com</a></li>
+                    <li><strong>Developer Contact:</strong> <a href="mailto:ianlinyali@gmail.com">ianlinyali@gmail.com</a></li>
+                    <li><strong>Institutional/TSC:</strong> <a href="mailto:ianlinyali78@mwalimu.tsc.go.ke">ianlinyali78@mwalimu.tsc.go.ke</a></li>
                 </ul>
             </div>
         </div>
+
+        <!-- AdSense Mandated Legal Quick-Links -->
+        <div class="footer-legal-links">
+            <a href="#top">Home</a>
+            <a href="#about-section">About Us</a>
+            <a onclick="openModal('privacyModal')">Privacy Policy</a>
+            <a onclick="openModal('termsModal')">Terms of Service</a>
+            <a href="#contact-section">Contact Us</a>
+            <a href="https://forms.gle/fYxxaNKAh21dPUoBA" target="_blank" rel="noopener noreferrer">Simulator Suggestions</a>
+        </div>
+
         <div class="footer-bottom">
-            &copy; 2026 LuyaliSims | Engineered by Click & Draft
+            &copy; 2026 LuyaliSims | Engineered by Click & Draft | Dedicated to Open STEM Education
         </div>
     </footer>
 
+    <!-- 6. POPUP PRIVACY POLICY MODAL (AdSense & GDPR Compliant) -->
+    <div id="privacyModal" class="policy-modal" role="dialog" aria-modal="true" aria-labelledby="privacyTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeModal('privacyModal')">Close [✕]</button>
+            <h2 id="privacyTitle">Privacy Policy</h2>
+            <p><strong>Last Updated: September 2026</strong></p>
+            <p>Welcome to LuyaliSims. We respect your privacy and are committed to protecting your personal data. This privacy policy explains how we treat information when you interact with our educational simulators.</p>
+            
+            <h3>1. Educational Purpose & Information Collection</h3>
+            <p>LuyaliSims is a free educational portal. We do not require account registration, passwords, or personal login information to run any simulation. All simulation calculations (e.g., mass, voltage, deflection) occur locally within your browser using client-side JavaScript.</p>
+
+            <h3>2. Google AdSense & Third-Party Cookies</h3>
+            <p>We may display advertisements served by Google AdSense to fund our free educational tools. Google, as a third-party vendor, uses cookies to serve ads on our site based on users' visits to this and other sites on the Internet.</p>
+            <ul>
+                <li>Google's use of advertising cookies enables it and its partners to serve ads based on your visit to LuyaliSims and other sites.</li>
+                <li>Users may opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" style="color: var(--neon-cyan);">Google Ads Settings</a>.</li>
+            </ul>
+
+            <h3>3. Log Files & Analytics</h3>
+            <p>Like standard websites, our hosting servers collect anonymous log records (including IP addresses, browser types, and timestamp references) to monitor server uptime, fix script errors, and optimize simulator performance.</p>
+
+            <h3>4. Children's Online Privacy (COPPA Compliance)</h3>
+            <p>Our educational simulators are built for students and educators of all ages. We do not knowingly solicit or collect personally identifiable information from children under 13.</p>
+
+            <h3>5. Contact Regarding Privacy</h3>
+            <p>If you have any questions regarding this policy, contact us at: <a href="mailto:luyashliz@gmail.com" style="color: var(--neon-cyan);">luyashliz@gmail.com</a>.</p>
+        </div>
+    </div>
+
+    <!-- 7. POPUP TERMS OF SERVICE MODAL -->
+    <div id="termsModal" class="policy-modal" role="dialog" aria-modal="true" aria-labelledby="termsTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeModal('termsModal')">Close [✕]</button>
+            <h2 id="termsTitle">Terms of Service</h2>
+            <p><strong>Effective Date: September 2026</strong></p>
+
+            <h3>1. Permitted Educational Use</h3>
+            <p>All interactive models, simulations, practice problems, and laboratory worksheets on LuyaliSims are made freely available for classroom demonstrations, academic study, tutoring, and self-paced individual learning.</p>
+
+            <h3>2. Intellectual Property</h3>
+            <p>The code architecture, layout designs, and custom interactive engines are the intellectual property of Ian Luyali and Click & Draft. You may use our simulators online in academic settings, but mirroring or re-hosting our code for commercial resale without permission is prohibited.</p>
+
+            <h3>3. Disclaimer of Scientific Warranty</h3>
+            <p>While simulations are engineered to accurately replicate classical mechanics, thermodynamics, and electronics, they are provided as conceptual learning aids. LuyaliSims is not liable for outcomes in real-world high-voltage or hazardous laboratory environments constructed without professional teacher supervision.</p>
+
+            <h3>4. Updates to Terms</h3>
+            <p>We reserve the right to refine these terms as new laboratory modules and features are introduced.</p>
+        </div>
+    </div>
+
+    <!-- 8. EXTERNAL SCRIPT -->
     <script src="script.js"></script>
 </body>
 </html>
