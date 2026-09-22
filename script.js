@@ -135,25 +135,27 @@ function loadMoreCards() {
 }
 
 // ===================================================
-// 6. POLICY MODAL CONTROLS (AdSense & Accessibility)
+// 6. POLICY MODAL CONTROLS (AdSense & UI Fixed)
 // ===================================================
 function openModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
+        modal.style.display = 'flex';
         modal.classList.add('active');
-        document.body.style.overflow = 'hidden'; // Lock background scrolling
+        document.body.style.overflow = 'hidden'; // Freeze page scrolling
     }
 }
 
 function closeModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
+        modal.style.display = 'none';
         modal.classList.remove('active');
-        document.body.style.overflow = 'auto'; // Restore background scrolling
+        document.body.style.overflow = 'auto'; // Restore page scrolling
     }
 }
 
-// Ensure functions are globally attached for inline onclick attributes in HTML
+// Attach globally to the window object so inline onclick attributes work 100% of the time
 window.openModal = openModal;
 window.closeModal = closeModal;
 
