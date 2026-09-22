@@ -2,30 +2,45 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oil Drop Monolayer Simulator - LuyaliSims</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>3D Holographic Oil Drop Monolayer Simulator - LuyaliSims</title>
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Three.js -->
+    <!-- Three.js & OrbitControls -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <!-- OrbitControls -->
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     
-    <!-- Import Futuristic Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Rajdhani:wght@400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Futuristic Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
     
     <style>
-        /* Base Theme to match the main page */
+        /* Base Reset & Theme */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --holo-cyan: #00f3ff;
+            --holo-magenta: #bc13fe;
+            --holo-emerald: #10b981;
+            --holo-bg-dark: #060a12;
+            --holo-panel: rgba(10, 16, 30, 0.72);
+            --holo-border: rgba(0, 243, 255, 0.35);
+        }
+
         body {
             font-family: 'Rajdhani', sans-serif;
-            background-color: #0a0e17;
-            background-image: radial-gradient(circle at top right, rgba(0, 243, 255, 0.05), transparent 40%),
-                              radial-gradient(circle at bottom left, rgba(188, 19, 254, 0.05), transparent 40%);
+            background-color: var(--holo-bg-dark);
+            background-image: 
+                radial-gradient(circle at 80% 10%, rgba(0, 243, 255, 0.08), transparent 45%),
+                radial-gradient(circle at 15% 85%, rgba(188, 19, 254, 0.08), transparent 45%),
+                linear-gradient(rgba(0, 243, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 35px 35px, 35px 35px;
             color: #e2e8f0;
             margin: 0;
-            padding: 30px;
+            padding: 20px;
             min-height: 100vh;
+            overflow-x: hidden;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -33,89 +48,420 @@
 
         .font-mono { font-family: 'Fira Code', monospace; }
 
-        /* 1. NAVIGATION: Futuristic Back Button */
+        /* 1. NAVIGATION */
         .header-wrapper {
             width: 100%;
-            max-width: 1280px;
-            margin-bottom: 10px;
+            max-width: 1180px;
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
-        
+
         .back-btn {
+            align-self: flex-start;
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 20px;
-            padding: 10px 20px;
-            background: rgba(16, 24, 43, 0.6);
-            backdrop-filter: blur(8px);
+            padding: 9px 18px;
+            background: rgba(16, 24, 43, 0.7);
+            backdrop-filter: blur(10px);
             border: 1px solid rgba(188, 19, 254, 0.5);
             color: #e580ff;
             text-decoration: none;
             border-radius: 8px;
             font-weight: 600;
-            font-size: 1.1rem;
+            font-size: 0.95rem;
             text-transform: uppercase;
             letter-spacing: 1px;
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.2);
             transition: all 0.3s ease;
         }
 
         .back-btn:hover {
-            background: rgba(188, 19, 254, 0.15);
+            background: rgba(188, 19, 254, 0.2);
             border-color: #bc13fe;
             color: #fff;
-            box-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
-            transform: translateX(-5px);
+            box-shadow: 0 0 20px rgba(188, 19, 254, 0.6);
+            transform: translateX(-4px);
         }
 
-        .back-btn svg { transition: transform 0.3s ease; }
-        .back-btn:hover svg { transform: translateX(-3px); }
-
-        /* Headings */
         h1 {
             font-family: 'Orbitron', sans-serif;
             color: #00f3ff;
-            text-shadow: 0px 0px 15px rgba(0, 243, 255, 0.3);
-            margin-top: 0;
-            font-size: 2.2rem;
-            margin-bottom: 25px;
+            text-shadow: 0 0 15px rgba(0, 243, 255, 0.5), 0 0 35px rgba(0, 243, 255, 0.2);
+            margin: 0;
+            font-size: clamp(1.4rem, 3.6vw, 2.3rem);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
         }
-        
+
+        /* 2. MAIN SIMULATOR CONTAINER */
+        #simulator-container {
+            background: var(--holo-panel);
+            backdrop-filter: blur(14px);
+            border: 1px solid var(--holo-border);
+            border-radius: 16px;
+            padding: 22px;
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.6), inset 0 0 30px rgba(0, 243, 255, 0.05);
+            margin-bottom: 35px;
+            max-width: 1180px;
+            width: 100%;
+            position: relative;
+        }
+
+        .sim-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(0, 243, 255, 0.15);
+        }
+
+        .sim-subtitle {
+            font-size: 0.95rem;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .tool-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-aux {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            color: #cbd5e1;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.25s ease;
+        }
+
+        .btn-aux:hover {
+            border-color: #00f3ff;
+            color: #fff;
+            box-shadow: 0 0 12px rgba(0, 243, 255, 0.35);
+        }
+
+        .sim-layout {
+            display: grid;
+            grid-template-columns: 1.55fr 1fr;
+            gap: 22px;
+            align-items: start;
+        }
+
+        /* 3D Holographic Canvas Wrapper */
+        .canvas-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 10;
+            background: radial-gradient(circle at center, #0c1527 0%, #050811 85%);
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: inset 0 0 40px rgba(0, 243, 255, 0.12), 0 0 25px rgba(0, 0, 0, 0.8);
+            touch-action: none;
+        }
+
+        #canvas-container {
+            width: 100%;
+            height: 100%;
+            cursor: grab;
+        }
+
+        #canvas-container:active {
+            cursor: grabbing;
+        }
+
+        .holo-overlay {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 243, 255, 0.015) 0px,
+                rgba(0, 243, 255, 0.015) 2px,
+                transparent 2px,
+                transparent 4px
+            );
+            z-index: 5;
+        }
+
+        .canvas-hud {
+            position: absolute;
+            z-index: 10;
+            pointer-events: none;
+            background: rgba(6, 10, 18, 0.78);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 0.75rem;
+            color: #94a3b8;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
+
+        .canvas-hud.top-left { top: 12px; left: 12px; }
+        .canvas-hud.top-right { top: 12px; right: 12px; }
+        .canvas-hud.bottom-bar {
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 16px;
+            white-space: nowrap;
+        }
+
+        .hud-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .hud-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        #canvas-prompt {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 243, 255, 0.1);
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            color: #00f3ff;
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 10px 18px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            text-align: center;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+            box-shadow: 0 0 25px rgba(0, 243, 255, 0.25);
+            z-index: 10;
+        }
+
+        /* Controls Panel */
+        .controls-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .control-card {
+            background: rgba(10, 14, 25, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: inset 0 0 15px rgba(0, 243, 255, 0.02);
+        }
+
+        .control-card-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            padding-bottom: 8px;
+        }
+
+        .badge-step {
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .badge-cyan {
+            background: rgba(0, 243, 255, 0.15);
+            color: #00f3ff;
+            border: 1px solid rgba(0, 243, 255, 0.4);
+        }
+
+        .badge-magenta {
+            background: rgba(188, 19, 254, 0.15);
+            color: #bc13fe;
+            border: 1px solid rgba(188, 19, 254, 0.4);
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .control-label-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95rem;
+        }
+
+        .val-pill {
+            padding: 3px 9px;
+            border-radius: 6px;
+            background: #020617;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #1e293b;
+            outline: none;
+            cursor: pointer;
+            margin: 6px 0;
+        }
+
+        .slider-cyan::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #00f3ff;
+            box-shadow: 0 0 12px #00f3ff, inset 0 0 4px #ffffff;
+            border: 2px solid #ffffff;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .slider-cyan::-webkit-slider-thumb:hover { transform: scale(1.15); }
+
+        .slider-magenta::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #bc13fe;
+            box-shadow: 0 0 12px #bc13fe, inset 0 0 4px #ffffff;
+            border: 2px solid #ffffff;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .slider-magenta::-webkit-slider-thumb:hover { transform: scale(1.15); }
+
+        .sim-btn-holo {
+            width: 100%;
+            min-height: 48px;
+            padding: 12px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.92rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: #030712;
+            background: linear-gradient(135deg, #00f3ff, #38bdf8);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.45);
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .sim-btn-holo:hover {
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.7);
+            transform: translateY(-2px);
+        }
+
+        .sim-btn-holo:active {
+            transform: scale(0.98);
+        }
+
+        .hud-analysis-box {
+            background: rgba(3, 7, 18, 0.85);
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            border-radius: 12px;
+            padding: 16px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0, 243, 255, 0.04);
+        }
+
+        .hud-header {
+            font-size: 0.75rem;
+            color: #64748b;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .hud-data-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 10px;
+            border-radius: 8px;
+            background: rgba(15, 23, 42, 0.45);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            margin-bottom: 8px;
+        }
+
+        .hud-formula {
+            font-size: 0.68rem;
+            color: #64748b;
+        }
+
+        .hud-final-metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 10px;
+            margin-top: 6px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.12);
+        }
+
+        /* 3. EDUCATIONAL CONTENT SECTION */
+        .educational-content {
+            max-width: 1180px;
+            width: 100%;
+            line-height: 1.7;
+            font-size: 1.05rem;
+            color: #94a3b8;
+            background: rgba(10, 14, 23, 0.82);
+            padding: 30px;
+            border-radius: 14px;
+            border-left: 4px solid #00f3ff;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            margin-bottom: 30px;
+        }
+
         .educational-content h2, .educational-content h3 {
             font-family: 'Orbitron', sans-serif;
             color: #bc13fe;
-            margin-top: 1.5em;
-            margin-bottom: 0.5em;
+            margin-top: 1.4em;
+            margin-bottom: 0.4em;
         }
-
-        /* 2. THE SIMULATOR APP CONTAINER */
-        #simulator-container {
-            background: rgba(16, 24, 43, 0.6);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(0, 243, 255, 0.3);
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(0, 243, 255, 0.05);
-            margin-bottom: 40px;
-            width: 100%;
-            max-width: 1280px;
-        }
-
-        /* 3. EDUCATIONAL CONTENT */
-        .educational-content {
-            width: 100%;
-            max-width: 1280px;
-            line-height: 1.7;
-            font-size: 1.1rem;
-            color: #94a3b8;
-            background: rgba(10, 14, 23, 0.8);
-            padding: 40px;
-            border-radius: 15px;
-            border-left: 4px solid #00f3ff;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-            margin-bottom: 40px;
-        }
-
-        .educational-content p { margin-bottom: 1.2em; }
 
         .educational-content strong {
             color: #fff;
@@ -125,35 +471,82 @@
         }
 
         .task-box { 
-            background: rgba(30, 41, 59, 0.5); 
+            background: rgba(20, 30, 48, 0.6); 
             border-left: 4px solid #06b6d4; 
-            padding: 20px; 
-            margin-bottom: 20px; 
+            padding: 18px; 
+            margin: 18px 0; 
             border-radius: 0 8px 8px 0; 
         }
-        .task-box h4 { color: #38bdf8; font-weight: 600; margin-bottom: 10px; font-size: 1.2rem; font-family: 'Rajdhani', sans-serif;}
 
-        /* Custom Slider Styles */
-        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
-        input[type=range]:focus { outline: none; }
-        
-        .slider-amber::-webkit-slider-thumb {
-            -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%;
-            background: #00f3ff; cursor: pointer; margin-top: -7px;
-            box-shadow: 0 0 12px rgba(0, 243, 255, 0.7); border: 2px solid #fff; transition: transform 0.1s;
+        .task-box h4 { 
+            color: #38bdf8; 
+            margin: 0 0 8px 0; 
+            font-size: 1.15rem; 
+            font-family: 'Rajdhani', sans-serif; 
         }
-        .slider-amber::-webkit-slider-thumb:active { transform: scale(1.1); }
-        .slider-amber::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #334155; border-radius: 2px; }
-        
-        .slider-cyan::-webkit-slider-thumb {
-            -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%;
-            background: #bc13fe; cursor: pointer; margin-top: -7px;
-            box-shadow: 0 0 12px rgba(188, 19, 254, 0.7); border: 2px solid #fff; transition: transform 0.1s;
-        }
-        .slider-cyan::-webkit-slider-thumb:active { transform: scale(1.1); }
-        .slider-cyan::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #334155; border-radius: 2px; }
 
-        .glass-panel { background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(12px); border: 1px solid rgba(51, 65, 85, 0.5); }
+        .task-formula-callout {
+            display: block;
+            margin: 10px 0;
+            padding: 8px 14px;
+            background: rgba(0, 243, 255, 0.05);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            border-radius: 6px;
+            font-family: 'Fira Code', monospace;
+            color: #00f3ff;
+            font-size: 0.95rem;
+        }
+
+        footer.author-footer {
+            max-width: 1180px;
+            width: 100%;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 16px 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            color: #94a3b8;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+
+            #simulator-container, .educational-content {
+                padding: 16px;
+            }
+
+            .sim-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .canvas-wrapper {
+                aspect-ratio: 4 / 3;
+            }
+
+            .sim-btn-holo, .btn-aux {
+                width: 100%;
+            }
+
+            .canvas-hud.top-left, .canvas-hud.top-right {
+                padding: 6px 8px;
+                font-size: 0.68rem;
+            }
+
+            .canvas-hud.bottom-bar {
+                gap: 8px;
+                font-size: 0.68rem;
+            }
+
+            footer.author-footer {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
     </style>
 </head>
 <body>
@@ -161,7 +554,7 @@
     <!-- 1. NAVIGATION -->
     <div class="header-wrapper">
         <a href="../index.html" class="back-btn">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="19" y1="12" x2="5" y2="12"></line>
                 <polyline points="12 19 5 12 12 5"></polyline>
             </svg>
@@ -170,233 +563,245 @@
         <h1>3D Oil Drop Monolayer Simulator</h1>
     </div>
 
-    <!-- 2. THE SIMULATOR APP -->
+    <!-- 2. SIMULATOR WORKSPACE -->
     <div id="simulator-container">
         
-        <!-- Simulator Toolbar -->
-        <div class="flex flex-wrap justify-between items-center mb-6 gap-4">
-            <p class="text-sm text-slate-400 font-medium">Observe 3D molecules transform from a droplet into a 1-molecule thick layer.</p>
-            <div class="flex gap-3">
-                <button onclick="toggleFullScreen()" class="flex items-center gap-2 bg-slate-800/80 hover:bg-slate-700 text-slate-200 text-sm px-4 py-2 rounded-lg border border-slate-600 transition shadow hover:shadow-md font-semibold">
-                    🖵 Full Screen
-                </button>
-                <button id="btn-reset-default" class="flex items-center gap-2 bg-slate-800/80 hover:bg-slate-700 text-slate-200 text-sm px-4 py-2 rounded-lg border border-slate-600 transition shadow hover:shadow-md font-semibold">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+        <div class="sim-toolbar">
+            <span class="sim-subtitle">Holographic Nanoscale Surface Film Visualization</span>
+            <div class="tool-actions">
+                <button onclick="toggleFullScreen()" class="btn-aux">🖵 Full Screen</button>
+                <button id="btn-reset-default" class="btn-aux">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                     Reset Scene
                 </button>
             </div>
         </div>
 
-        <!-- Main Content Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-10">
+        <div class="sim-layout">
             
-            <!-- 3D Canvas Column -->
-            <div class="lg:col-span-8 flex flex-col relative">
-                <div class="relative glass-panel rounded-2xl w-full aspect-[4/3] lg:aspect-[16/10] overflow-hidden shadow-2xl flex items-center justify-center bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-800/40 via-slate-900/10 to-transparent">
-                    
-                    <div id="canvas-container" class="w-full h-full cursor-grab active:cursor-grabbing outline-none"></div>
-                    
-                    <!-- Controls Overlay -->
-                    <div class="absolute top-4 left-4 bg-slate-900/80 border border-slate-700/50 text-xs text-slate-300 px-4 py-3 rounded-xl backdrop-blur-md pointer-events-none space-y-1.5 shadow-lg z-10">
-                        <div class="flex items-center gap-2"><span class="text-lg">🖱️</span> <strong>Left Drag:</strong> Rotate</div>
-                        <div class="flex items-center gap-2"><span class="text-lg">📜</span> <strong>Scroll:</strong> Zoom</div>
-                        <div class="flex items-center gap-2"><span class="text-lg">✋</span> <strong>Right Drag:</strong> Pan</div>
-                    </div>
+            <!-- 3D Canvas Box -->
+            <div class="canvas-wrapper">
+                <div class="holo-overlay"></div>
+                <div id="canvas-container"></div>
+                
+                <!-- HUD Controls Overlay -->
+                <div class="canvas-hud top-left">
+                    <div>🖱️ <strong>Left-Drag:</strong> Orbit</div>
+                    <div>📜 <strong>Scroll:</strong> Zoom</div>
+                    <div>✋ <strong>Right-Drag:</strong> Pan</div>
+                </div>
 
-                    <!-- Molecule Legend Overlay -->
-                    <div class="absolute top-4 right-4 bg-slate-900/80 border border-slate-700/50 text-xs text-slate-300 px-4 py-3 rounded-xl backdrop-blur-md pointer-events-none shadow-lg z-10">
-                        <div class="font-semibold text-slate-100 border-b border-slate-700 pb-1.5 mb-2 text-[11px] uppercase tracking-wider">Molecular View</div>
-                        <div class="flex items-center gap-2">
-                            <div class="w-3 h-3 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)]"></div>
-                            <span><strong>Oleic Acid Molecule</strong></span>
-                        </div>
+                <div class="canvas-hud top-right">
+                    <div style="color:#00f3ff; font-weight:700; border-bottom:1px solid rgba(0,243,255,0.3); padding-bottom:3px; margin-bottom:4px;">HOLO-SENSOR</div>
+                    <div class="hud-item">
+                        <div class="hud-dot" style="background:#00f3ff; box-shadow:0 0 8px #00f3ff;"></div>
+                        <span>Oleic Acid Monomer</span>
                     </div>
+                </div>
 
-                    <!-- Environment Labels Overlay -->
-                    <div class="absolute bottom-6 left-0 w-full flex justify-around text-xs font-medium tracking-wide text-slate-300 pointer-events-none px-4 md:px-12 z-10">
-                        <div class="bg-slate-900/80 backdrop-blur-md px-4 py-1.5 rounded-full border border-slate-700/50 shadow-lg flex items-center gap-2">
-                            <div class="w-2 h-2 rounded-full bg-[cyan] animate-[pulse_2s_ease-in-out_infinite]"></div>
-                            3D Droplet
-                        </div>
-                        <div class="bg-slate-900/80 backdrop-blur-md px-4 py-1.5 rounded-full border border-slate-700/50 shadow-lg flex items-center gap-2">
-                            <div class="w-2 h-2 rounded-full bg-[#bc13fe] animate-[pulse_2s_ease-in-out_infinite]"></div>
-                            Monolayer Basin
-                        </div>
+                <div class="canvas-hud bottom-bar">
+                    <div class="hud-item">
+                        <div class="hud-dot" style="background:#00f3ff; box-shadow:0 0 6px #00f3ff;"></div>
+                        <span>3D Spherical Drop</span>
                     </div>
+                    <div class="hud-item">
+                        <div class="hud-dot" style="background:#bc13fe; box-shadow:0 0 6px #bc13fe;"></div>
+                        <span>1-Molecule Monolayer</span>
+                    </div>
+                </div>
 
-                    <!-- Floating Prompt -->
-                    <div id="canvas-prompt" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#00f3ff]/10 border border-[#00f3ff]/30 text-[#00f3ff] text-sm px-6 py-3 rounded-2xl shadow-2xl backdrop-blur-md pointer-events-none transition-opacity duration-500 font-medium text-center z-20">
-                        Adjust size to see coupled effects, <br> then click "Execute Experiment"
-                    </div>
+                <div id="canvas-prompt">
+                    Adjust variables, then tap "Execute Experiment"
                 </div>
             </div>
 
-            <!-- Controls Column -->
-            <div class="lg:col-span-4 flex flex-col gap-6">
+            <!-- Controls & Live Calculations -->
+            <div class="controls-panel">
                 
-                <!-- Inputs Section -->
-                <div class="glass-panel rounded-2xl p-5 space-y-6 shadow-xl relative overflow-hidden">
-                    
-                    <div class="bg-blue-500/10 border border-blue-500/20 text-blue-300 text-[10px] px-3 py-2 rounded-lg flex gap-2 items-start">
-                        <svg class="w-4 h-4 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
-                        <p><strong>Coupled Variables:</strong> Drop and Patch size are physically linked based on constant molecule size.</p>
-                    </div>
+                <!-- Variable Coupling Note -->
+                <div style="background:rgba(0,243,255,0.06); border:1px solid rgba(0,243,255,0.25); border-radius:8px; padding:10px 12px; font-size:0.8rem; color:#38bdf8; display:flex; gap:8px;">
+                    <span style="font-size:1.1rem;">🔗</span>
+                    <span><strong>Coupled Dimensions:</strong> Volume is conserved based on a constant single-molecule height (~2.5 nm).</span>
+                </div>
 
-                    <div class="space-y-4">
-                        <div class="flex items-center gap-3 border-b border-slate-700/50 pb-3">
-                            <div class="w-7 h-7 rounded-lg bg-[#00f3ff]/20 text-[#00f3ff] flex items-center justify-center text-sm font-bold border border-[#00f3ff]/30">1</div>
-                            <h2 class="text-sm font-semibold text-slate-100" style="margin:0; font-family:'Rajdhani', sans-serif; color:white;">Set Droplet Size</h2>
-                        </div>
-                        <div>
-                            <div class="flex justify-between text-xs mb-2.5 items-end">
-                                <span class="text-slate-400 font-medium">Diameter of drop <span class="text-[#00f3ff] font-mono text-[10px]">(d)</span></span>
-                                <span id="val-diameter" class="font-mono text-[#00f3ff] font-bold bg-slate-950 px-2.5 py-1 rounded-md border border-slate-800 shadow-inner">0.50 mm</span>
-                            </div>
-                            <input type="range" id="input-diameter" min="0.2" max="1.0" step="0.01" value="0.5" class="slider-amber">
-                        </div>
+                <!-- Step 1: Droplet -->
+                <div class="control-card">
+                    <div class="control-card-header">
+                        <div class="badge-step badge-cyan">1</div>
+                        <strong style="color:#fff; font-size:0.95rem;">Spherical Drop Diameter (d)</strong>
                     </div>
-
-                    <div class="space-y-4 pt-2">
-                        <div class="flex items-center gap-3 border-b border-slate-700/50 pb-3">
-                            <div class="w-7 h-7 rounded-lg bg-[#bc13fe]/20 text-[#bc13fe] flex items-center justify-center text-sm font-bold border border-[#bc13fe]/30">2</div>
-                            <h2 class="text-sm font-semibold text-slate-100" style="margin:0; font-family:'Rajdhani', sans-serif; color:white;">Set Spread Patch Size</h2>
+                    <div class="control-group">
+                        <div class="control-label-row">
+                            <span style="color:#94a3b8; font-size:0.85rem;">Micro-droplet</span>
+                            <span id="val-diameter" class="font-mono val-pill" style="color:#00f3ff; border-color:rgba(0,243,255,0.3);">0.50 mm</span>
                         </div>
-                        <div>
-                            <div class="flex justify-between text-xs mb-2.5 items-end">
-                                <span class="text-slate-400 font-medium">Diameter of patch <span class="text-[#bc13fe] font-mono text-[10px]">(D)</span></span>
-                                <span id="val-patch" class="font-mono text-[#bc13fe] font-bold bg-slate-950 px-2.5 py-1 rounded-md border border-slate-800 shadow-inner">18.2 cm</span>
-                            </div>
-                            <input type="range" id="input-patch" min="5.0" max="40.0" step="0.1" value="18.2" class="slider-cyan">
-                        </div>
-                    </div>
-
-                    <div class="pt-4">
-                        <button id="btn-drop" class="w-full relative group overflow-hidden bg-gradient-to-r from-[#00f3ff] to-blue-500 hover:from-blue-400 hover:to-[#00f3ff] text-slate-900 font-bold text-sm py-3.5 rounded-xl transition-all shadow-[0_0_15px_rgba(0,243,255,0.4)] transform hover:-translate-y-0.5 border border-white/20 uppercase tracking-widest">
-                            <span class="relative z-10 flex items-center justify-center gap-2 drop-shadow-md">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
-                                Execute Experiment
-                            </span>
-                        </button>
+                        <input type="range" id="input-diameter" min="0.2" max="1.0" step="0.01" value="0.5" class="slider-cyan">
                     </div>
                 </div>
 
-                <!-- Calculations Output Panel -->
-                <div class="bg-slate-950/90 rounded-2xl p-5 border border-slate-800 shadow-2xl relative overflow-hidden flex-grow flex flex-col justify-center">
-                    <div class="absolute top-0 right-0 w-40 h-40 bg-[#bc13fe]/10 rounded-full blur-3xl pointer-events-none"></div>
-                    
-                    <div class="text-[10px] text-slate-500 mb-5 font-bold tracking-[0.2em] uppercase flex items-center gap-2">
-                        <div class="w-1.5 h-1.5 rounded-full bg-[#00f3ff] animate-pulse"></div>
+                <!-- Step 2: Monolayer Patch -->
+                <div class="control-card">
+                    <div class="control-card-header">
+                        <div class="badge-step badge-magenta">2</div>
+                        <strong style="color:#fff; font-size:0.95rem;">Spread Patch Diameter (D)</strong>
+                    </div>
+                    <div class="control-group">
+                        <div class="control-label-row">
+                            <span style="color:#94a3b8; font-size:0.85rem;">Basin Film</span>
+                            <span id="val-patch" class="font-mono val-pill" style="color:#e580ff; border-color:rgba(188,19,254,0.3);">18.2 cm</span>
+                        </div>
+                        <input type="range" id="input-patch" min="5.0" max="40.0" step="0.1" value="18.2" class="slider-magenta">
+                    </div>
+                </div>
+
+                <!-- Run Simulation Button -->
+                <button id="btn-drop" class="sim-btn-holo">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                    Execute Experiment
+                </button>
+
+                <!-- Calculations HUD -->
+                <div class="hud-analysis-box">
+                    <div class="hud-header">
+                        <span style="width:7px; height:7px; border-radius:50%; background:#00f3ff; display:inline-block; box-shadow:0 0 8px #00f3ff;"></span>
                         Real-Time Analysis
                     </div>
-                    
-                    <div class="space-y-4">
-                        <!-- Volume Form -->
-                        <div class="flex justify-between items-center group bg-slate-900/50 p-3 rounded-xl border border-slate-800/50 transition-colors hover:bg-slate-900">
-                            <div>
-                                <div class="text-slate-300 text-xs font-medium mb-1">Drop Volume <span class="text-[#00f3ff] font-mono text-[10px]">(V)</span></div>
-                                <div class="text-slate-500 text-[10px] font-mono">V = <sup>4</sup>/<sub>3</sub> &pi; (d/2)<sup>3</sup></div>
-                            </div>
-                            <div class="text-right">
-                                <div id="calc-volume" class="font-mono text-[#00f3ff] text-base font-semibold group-hover:scale-105 transition-transform origin-right">0.00</div>
-                                <div class="text-[10px] text-slate-500">mm<sup>3</sup></div>
-                            </div>
+
+                    <div class="hud-data-row">
+                        <div>
+                            <div style="font-size:0.8rem; color:#cbd5e1;">Drop Volume <span class="font-mono" style="color:#00f3ff;">(V)</span></div>
+                            <div class="hud-formula font-mono">V = 4/3 &pi; (d/2)³</div>
                         </div>
-                        
-                        <!-- Area Form -->
-                        <div class="flex justify-between items-center group bg-slate-900/50 p-3 rounded-xl border border-slate-800/50 transition-colors hover:bg-slate-900">
-                            <div>
-                                <div class="text-slate-300 text-xs font-medium mb-1">Patch Area <span class="text-[#bc13fe] font-mono text-[10px]">(A)</span></div>
-                                <div class="text-slate-500 text-[10px] font-mono">A = &pi; (D/2)<sup>2</sup></div>
-                            </div>
-                            <div class="text-right">
-                                <div id="calc-area" class="font-mono text-[#bc13fe] text-base font-semibold group-hover:scale-105 transition-transform origin-right">0.00</div>
-                                <div class="text-[10px] text-slate-500">cm<sup>2</sup></div>
-                            </div>
+                        <div style="text-align:right;">
+                            <div id="calc-volume" class="font-mono" style="color:#00f3ff; font-weight:600; font-size:1rem;">0.065</div>
+                            <div style="font-size:0.65rem; color:#64748b;">mm³</div>
                         </div>
-                        
-                        <div class="h-px bg-gradient-to-r from-transparent via-slate-700 to-transparent w-full my-4"></div>
-                        
-                        <!-- Output Result -->
-                        <div class="flex justify-between items-center group px-1">
-                            <div>
-                                <div class="text-white text-sm font-semibold mb-1">Molecule Size <span class="text-emerald-400 font-mono text-xs">(t)</span></div>
-                                <div class="text-slate-400 text-[11px] font-mono">t = V / A</div>
-                                <div class="text-[9px] text-slate-500 italic mt-1">Physical constant (conserved)</div>
-                            </div>
-                            <div class="text-right">
-                                <div id="calc-thickness" class="font-mono text-emerald-400 text-2xl font-bold drop-shadow-[0_0_12px_rgba(16,185,129,0.3)] group-hover:scale-105 transition-transform origin-right">0.00</div>
-                                <div class="text-xs text-emerald-600/80 font-medium mt-0.5">nanometers (nm)</div>
-                            </div>
+                    </div>
+
+                    <div class="hud-data-row">
+                        <div>
+                            <div style="font-size:0.8rem; color:#cbd5e1;">Patch Area <span class="font-mono" style="color:#bc13fe;">(A)</span></div>
+                            <div class="hud-formula font-mono">A = &pi; (D/2)²</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div id="calc-area" class="font-mono" style="color:#e580ff; font-weight:600; font-size:1rem;">260.16</div>
+                            <div style="font-size:0.65rem; color:#64748b;">cm²</div>
+                        </div>
+                    </div>
+
+                    <div class="hud-final-metric">
+                        <div>
+                            <div style="font-size:0.9rem; color:#fff; font-weight:700;">Molecule Length <span class="font-mono" style="color:#10b981;">(t)</span></div>
+                            <div class="hud-formula font-mono">t = V / A (Conserved)</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div id="calc-thickness" class="font-mono" style="color:#10b981; font-weight:700; font-size:1.45rem; text-shadow:0 0 12px rgba(16,185,129,0.45);">2.50</div>
+                            <div style="font-size:0.7rem; color:#059669; font-weight:600;">nanometers (nm)</div>
                         </div>
                     </div>
                 </div>
+
             </div>
+
         </div>
-        
-        <!-- Inline Footer / Author Section -->
-        <footer class="mt-6 border-t border-slate-700/50 pt-4 flex flex-col md:flex-row justify-between items-center gap-4 text-sm w-full">
-            <div class="text-slate-400">
-                Designed by <strong style="color: #00f3ff; background:transparent; padding:0;">Ian Luyali</strong>
-            </div>
-            <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-slate-400">
-                <span class="flex items-center gap-1">📞 0727987669</span>
-                <span class="hidden md:inline text-slate-600">|</span>
-                <span class="flex items-center gap-1">✉️ luyashliz@gmail.com</span>
-            </div>
-            <div class="text-xs text-slate-500 italic text-center md:text-right">
-                Contact to order or request any educational simulator.
-            </div>
-        </footer>
 
     </div>
 
-    <!-- 3. THE EDUCATIONAL CONTENT (AdSense / SEO Section) -->
+    <!-- 3. EDUCATIONAL CONTENT SECTION -->
     <div class="educational-content">
-        
         <h2>How to Use This Simulator</h2>
-        <p>To use this 3D Monolayer Simulator, adjust the <strong>Droplet Size (d)</strong> or the <strong>Patch Size (D)</strong> using the sliders on the right. Because the actual size of an oil molecule is constant, moving one slider will mathematically force the other to adjust! Click the <strong>Execute Experiment</strong> button to watch the 3D spherical drop fall onto the water and violently spread outward into a film that is exactly one molecule thick.</p>
-        <p>You can left-click and drag on the 3D canvas to rotate the camera, right-click to pan, and scroll to zoom in and see the individual molecular representation.</p>
+        <p>Use the sliders to adjust either the <strong>Droplet Diameter (d)</strong> or the <strong>Patch Diameter (D)</strong>. Because the molecular length of oleic acid is an unvarying physical constant, modifying one dimension computes the conjugate value instantly.</p>
+        <p>Click <strong>Execute Experiment</strong> to launch the 3D falling drop. Upon hitting the water, it spreads outwards into a thin monolayer disc. Left-click/drag on the scene to orbit, scroll to zoom in close to see the individual molecular instances, and right-drag to pan.</p>
 
         <h2>The Theory Behind the Oil Drop Experiment</h2>
-        <p>Originally performed by Lord Rayleigh and Agnes Pockels, the Oil Drop Experiment is a brilliant, classical physics method used to determine the exact length of a single molecule using only macro-scale measurements (rulers and graduated cylinders).</p>
-        <p>When a tiny drop of oleic acid (a fatty acid found in olive oil) is placed on a basin of water dusted with lycopodium powder, it spreads rapidly outward. It continues to spread until it physically cannot spread any thinner. At this point, the patch on the water is a <strong>monolayer</strong>—a flat cylinder of oil that is exactly one molecule thick.</p>
+        <p>Devised by Lord Rayleigh and refined by Agnes Pockels, this classical experiment allows one to estimate the dimension of a single molecule using basic laboratory apparatus (pipettes and shallow basins).</p>
+        <p>Oleic acid molecules possess a hydrophilic (water-attracting) carboxyl head and a hydrophobic (water-repelling) hydrocarbon tail. When placed onto water dusted with lycopodium powder, the molecules stand vertically side-by-side, forming a layer exactly <strong>one molecule thick</strong>.</p>
         
         <h3>The Formula Used</h3>
-        <p>The mathematical magic of this experiment lies in the <em>Conservation of Volume</em>. The volume of the initial spherical drop is completely equal to the volume of the large, flat cylindrical patch.</p>
+        <p>The calculation is rooted in the <em>Principle of Conservation of Volume</em>:</p>
         <ul>
-            <li><strong>Volume of Spherical Drop (V):</strong> V = <sup>4</sup>/<sub>3</sub> &pi; (d/2)<sup>3</sup></li>
-            <li><strong>Area of Flat Patch (A):</strong> A = &pi; (D/2)<sup>2</sup></li>
-            <li><strong>Thickness of one molecule (t):</strong> Since the volume of a cylinder is V = A &times; t, we can rearrange this to find the thickness: <strong>t = V / A</strong>.</li>
+            <li><strong>Volume of the Drop (V):</strong> V = <sup>4</sup>/<sub>3</sub> &pi; (d/2)<sup>3</sup></li>
+            <li><strong>Area of the Patch (A):</strong> A = &pi; (D/2)<sup>2</sup></li>
+            <li><strong>Thickness of one molecule (t):</strong> Modeling the monolayer as a flat cylinder of height <em>t</em>, V = A &times; t &rArr; <strong>t = V / A</strong>.</li>
         </ul>
-        <p>By dividing the small volume (in cm<sup>3</sup>) by the large area (in cm<sup>2</sup>), the result gives us the height of the molecule in centimeters, which typically equates to about 2.5 nanometers for Oleic Acid.</p>
+        <p>Typical experimental results yield approximately <strong>2.5 &times; 10<sup>-7</sup> cm (2.5 nm)</strong>, establishing nanoscale measurements without electron microscopy.</p>
         
         <h2>Guided Exercises for Students</h2>
+
+        <!-- Task 1 -->
         <div class="task-box">
-            <h4>Task 1: Conservation of Volume</h4>
-            <p><strong>Action:</strong> Set a random drop diameter and click "Execute Experiment". Zoom into the 3D scene.<br>
-            <strong>Observation:</strong> Look at the 3D spherical droplet on the left, and the flat 2D patch on the water surface. Even though their shapes are entirely different, the number of molecules (cyan spheres) remains exactly the same. Volume is conserved!</p>
+            <h4>Task 1: Conservation of Volume Across Geometries</h4>
+            <p><strong>Objective:</strong> Prove that the volumetric displacement of oil remains identical regardless of geometric transformation.<br>
+            <strong>Action:</strong> Set a droplet diameter of <strong>d = 0.50 mm</strong> and click <strong>"Execute Experiment"</strong>. Orbit the camera to view both the reference droplet and the spread basin.<br>
+            <strong>Observation & Analysis:</strong> The oil transforms from a compact 3D sphere into a broad 2D disc. Despite this radical change in shape, the total molecular volume is completely conserved: 
+            <span class="task-formula-callout">V<sub>drop</sub> = V<sub>patch</sub> = A &times; t</span></p>
         </div>
+
+        <!-- Task 2 -->
         <div class="task-box">
-            <h4>Task 2: Proving the One-Molecule Thickness</h4>
-            <p><strong>Action:</strong> Look at the "Real-Time Analysis" panel after execution.<br>
-            <strong>Observation:</strong> Notice the calculation <strong>t = V / A</strong>. Because the oil cannot spread any thinner than a single molecule, dividing the volume of the drop by the massive area gives us the physical height. The simulator will always yield roughly 2.5 nanometers.</p>
+            <h4>Task 2: Invariance of Single-Molecule Height (t)</h4>
+            <p><strong>Objective:</strong> Demonstrate why molecular thickness does not depend on the macroscopic volume used.<br>
+            <strong>Action:</strong> Sweep the <em>Droplet Diameter (d)</em> slider across multiple values (e.g., <strong>0.30 mm</strong>, <strong>0.60 mm</strong>, and <strong>0.90 mm</strong>). Observe the <em>Molecule Length (t)</em> readout in the Real-Time Analysis HUD.<br>
+            <strong>Observation & Analysis:</strong> Notice that the calculated thickness remains fixed at <strong>2.50 nm</strong>. Because molecular length is a physical constant determined by chemical bonds (the 18-carbon chain of oleic acid), adding more oil merely enlarges the surface area (A) rather than stacking molecules into thicker layers.</p>
+        </div>
+
+        <!-- Task 3 -->
+        <div class="task-box">
+            <h4>Task 3: Non-Linear Scaling Law (D &prop; d<sup>1.5</sup>)</h4>
+            <p><strong>Objective:</strong> Investigate the geometric relationship between the drop diameter (d) and patch diameter (D).<br>
+            <strong>Action:</strong> Double the droplet diameter from <strong>0.40 mm</strong> to <strong>0.80 mm</strong>, and record the corresponding patch diameter (D) in both states.<br>
+            <strong>Observation & Analysis:</strong> When d doubles (2&times;), the patch diameter does <em>not</em> simply double; it increases by a factor of approximately 2<sup>1.5</sup> &approx; 2.83 times!
+            <span class="task-formula-callout">Since V &prop; d<sup>3</sup> and A = (&pi;/4) D<sup>2</sup> = V / t &prop; d<sup>3</sup> &rArr; D &prop; d<sup>3/2</sup> (or d<sup>1.5</sup>)</span>
+            This non-linear scaling demonstrates how three-dimensional cubic volume expansion drives two-dimensional surface dispersion.</p>
+        </div>
+
+        <!-- Task 4 -->
+        <div class="task-box">
+            <h4>Task 4: Manual Unit Conversion & Thickness Calculation</h4>
+            <p><strong>Objective:</strong> Master laboratory unit conversions from millimetres and centimetres to nanometres.<br>
+            <strong>Action:</strong> Set <strong>d = 0.60 mm</strong> and note the resulting patch diameter <strong>D = 23.9 cm</strong>. Calculate the thickness by hand using standard scientific notation without looking at the final metric box:<br>
+            1. Find volume: V = <sup>4</sup>/<sub>3</sub> &pi; (0.06 cm / 2)<sup>3</sup> cm<sup>3</sup><br>
+            2. Find area: A = &pi; (23.9 cm / 2)<sup>2</sup> cm<sup>2</sup><br>
+            3. Find thickness: t = (V / A) cm, then multiply by 10<sup>7</sup> to convert into nanometres (nm).<br>
+            <strong>Observation & Analysis:</strong> Compare your manual step-by-step result with the HUD readout to verify how microscopic dimensions are deduced purely from macro-scale ruler measurements.</p>
+        </div>
+
+        <!-- Task 5 -->
+        <div class="task-box">
+            <h4>Task 5: Evaluating Experimental Assumptions & Error Sources</h4>
+            <p><strong>Objective:</strong> Identify critical assumptions made during the physical laboratory experiment.<br>
+            <strong>Action:</strong> Zoom closely into the holographic patch molecules in the 3D scene and compare the ideal simulation with a real water trough.<br>
+            <strong>Observation & Analysis:</strong> The calculation assumes three major physical conditions:
+            <ul style="margin: 8px 0 0 20px; padding: 0; list-style-type: disc;">
+                <li><strong>Strict Monolayer:</strong> Assumes oil spreads until it is exactly 1 molecule thick with no overlapping bilayers or unspread lenses.</li>
+                <li><strong>Geometric Packing:</strong> Assumes molecules are tightly packed, upright cylinders with zero voids or inter-molecular gaps.</li>
+                <li><strong>Circular Symmetry:</strong> Assumes surface tension and lycopodium dust resistance produce a perfect circle rather than an irregular polygon.</li>
+            </ul>
+            <p style="margin-top: 10px;"><em>Critical Thinking:</em> If surface contamination on the water prevents the oil from spreading fully, would your experimental estimate for molecular thickness (t) be <strong>larger</strong> or <strong>smaller</strong> than the true value? (Answer: <strong>Larger</strong>, because a smaller measured area A in t = V / A artificially inflates the computed thickness).</p>
         </div>
 
         <h2>Real World Applications</h2>
-        <p>Engineers and scientists use the properties of monolayers in several modern applications:</p>
         <ul>
-            <li><strong>Water Conservation:</strong> In arid regions, safe chemical monolayers are spread across the surface of large reservoirs. Being one molecule thick, it uses very little material, but it creates a physical barrier that drastically reduces water evaporation.</li>
-            <li><strong>Biological Cell Membranes:</strong> Every living cell is encased in a lipid bilayer (two monolayers stacked back-to-back). Understanding how molecules naturally align themselves on water helps biologists understand cellular structure.</li>
-            <li><strong>Anti-Reflective Coatings:</strong> By depositing a thin film exactly one molecule thick onto glasses or camera lenses, optical engineers can cancel out specific wavelengths of light glare via destructive interference.</li>
+            <li><strong>Reservoir Water Conservation:</strong> Monomolecular films spread over large open reservoirs significantly suppress evaporation losses in dry climates without cutting off aquatic aeration.</li>
+            <li><strong>Biological Bilayers:</strong> Cell membranes are lipid bilayers consisting of two opposing monolayers, functioning as selective barriers in every living organism.</li>
+            <li><strong>Anti-Reflective Optics:</strong> Langmuir-Blodgett monolayers applied to lenses create destructive interference for incoming glare.</li>
         </ul>
-        
     </div>
 
-    <!-- Three.js Simulation Logic -->
+    <!-- Inline Footer -->
+    <footer class="author-footer">
+        <div>Designed by <strong style="color: #00f3ff; background:transparent; padding:0;">Ian Luyali</strong></div>
+        <div style="display:flex; gap:14px; flex-wrap:wrap;">
+            <span>📞 0727987669</span>
+            <span>✉️ luyashliz@gmail.com</span>
+        </div>
+        <div style="font-size:0.8rem; color:#64748b; font-style:italic;">
+            Custom educational simulations & mechanics interactive modules.
+        </div>
+    </footer>
+
+    <!-- 4. THREE.JS & INTERACTIVE ENGINE -->
     <script>
-        // -------------------------
-        // Application Logic & State
-        // -------------------------
         const OLEIC_ACID_THICKNESS_CM = 2.5e-7; 
         
         const container = document.getElementById('canvas-container');
@@ -418,24 +823,19 @@
         let rippleActive = false;
         let rippleProgress = 0;
 
-        // -------------------------
-        // Full Screen logic
-        // -------------------------
         window.toggleFullScreen = () => {
             const simContainer = document.getElementById('simulator-container');
             if (!document.fullscreenElement) {
                 simContainer.requestFullscreen().catch((err) => {
-                    alert(`Error attempting to enable fullscreen mode: ${err.message}`);
+                    alert(`Fullscreen request error: ${err.message}`);
                 });
             } else {
                 document.exitFullscreen();
             }
         };
 
-        // -------------------------
-        // Molecule Config
-        // -------------------------
-        const MOL_COUNT = 800;
+        // Molecular instancing geometry distribution
+        const MOL_COUNT = 850;
         const molData = [];
         const golden_ratio = (1 + Math.sqrt(5)) / 2;
         
@@ -449,96 +849,152 @@
             });
         }
 
-        // -------------------------
-        // Three.js Scene Setup
-        // -------------------------
+        // Scene setup
         const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0x020617, 0.012);
+        scene.fog = new THREE.FogExp2(0x060a12, 0.015);
 
         const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-        camera.position.set(0, 8, 14);
+        camera.position.set(0, 9, 15);
 
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
         renderer.setSize(container.clientWidth, container.clientHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         renderer.setClearColor(0x000000, 0); 
         container.appendChild(renderer.domElement);
 
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
         controls.dampingFactor = 0.05;
-        controls.maxPolarAngle = Math.PI / 2 - 0.02;
-        controls.minDistance = 3;
-        controls.maxDistance = 25;
+        controls.maxPolarAngle = Math.PI / 2 - 0.03;
+        controls.minDistance = 3.5;
+        controls.maxDistance = 28;
 
-        // Lighting
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
+        // Holographic Lighting Setup
+        const ambientLight = new THREE.AmbientLight(0x38bdf8, 0.85);
         scene.add(ambientLight);
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
-        directionalLight.position.set(10, 20, 10);
-        scene.add(directionalLight);
+        
+        const dirLight = new THREE.DirectionalLight(0x00f3ff, 1.2);
+        dirLight.position.set(10, 20, 10);
+        scene.add(dirLight);
 
-        // Water Basin Surface
-        const waterGeometry = new THREE.PlaneGeometry(35, 35);
-        const waterMaterial = new THREE.MeshPhysicalMaterial({
-            color: 0x082f49, emissive: 0x020617, roughness: 0.1, metalness: 0.8,
-            transparent: true, opacity: 0.85, clearcoat: 1.0
+        const rimLight = new THREE.DirectionalLight(0xbc13fe, 1.5);
+        rimLight.position.set(-10, -5, -10);
+        scene.add(rimLight);
+
+        // Holographic Water Grid Surface
+        const waterGeo = new THREE.PlaneGeometry(40, 40, 40, 40);
+        const waterMat = new THREE.MeshPhysicalMaterial({
+            color: 0x051626,
+            roughness: 0.1,
+            metalness: 0.8,
+            transmission: 0.7,
+            transparent: true,
+            opacity: 0.85,
+            clearcoat: 1.0
         });
-        const waterMesh = new THREE.Mesh(waterGeometry, waterMaterial);
+        const waterMesh = new THREE.Mesh(waterGeo, waterMat);
         waterMesh.rotation.x = -Math.PI / 2;
         scene.add(waterMesh);
+
+        // Cyber Grid Lines on Surface
+        const holoGrid = new THREE.GridHelper(40, 40, 0x00f3ff, 0x1e293b);
+        holoGrid.position.y = 0.01;
+        scene.add(holoGrid);
+
+        // Holographic Projection Reticles
+        function createHoloReticle(x, z, color) {
+            const group = new THREE.Group();
+            group.position.set(x, 0.02, z);
+            
+            const ring1 = new THREE.Mesh(
+                new THREE.RingGeometry(1.4, 1.45, 48),
+                new THREE.MeshBasicMaterial({ color: color, side: THREE.DoubleSide, transparent: true, opacity: 0.6 })
+            );
+            ring1.rotation.x = -Math.PI / 2;
+            group.add(ring1);
+
+            const ring2 = new THREE.Mesh(
+                new THREE.RingGeometry(1.65, 1.68, 48),
+                new THREE.MeshBasicMaterial({ color: color, side: THREE.DoubleSide, transparent: true, opacity: 0.25 })
+            );
+            ring2.rotation.x = -Math.PI / 2;
+            group.add(ring2);
+
+            scene.add(group);
+            return group;
+        }
+
+        const dropReticle = createHoloReticle(-4.5, 0, 0x00f3ff);
+        const patchReticle = createHoloReticle(4.5, 0, 0xbc13fe);
+
+        // Holographic materials
+        const holoGlassOil = new THREE.MeshPhysicalMaterial({
+            color: 0x00f3ff,
+            emissive: 0x003b46,
+            roughness: 0.05,
+            metalness: 0.2,
+            transmission: 0.9,
+            thickness: 1.2,
+            transparent: true,
+            opacity: 0.45,
+            clearcoat: 1.0
+        });
         
-        const gridHelper = new THREE.GridHelper(35, 35, 0x1e293b, 0x0f172a);
-        gridHelper.position.y = 0.01;
-        scene.add(gridHelper);
-
-        const glassOilMat = new THREE.MeshPhysicalMaterial({
-            color: 0x00f3ff, roughness: 0.0, metalness: 0.1, 
-            transmission: 0.95, thickness: 1.0, transparent: true, opacity: 0.1, clearcoat: 1.0
-        });
         const dropSphereGeo = new THREE.SphereGeometry(1, 32, 32);
-
-        const molGeo = new THREE.SphereGeometry(0.06, 16, 16);
-        const molMat = new THREE.MeshPhysicalMaterial({ 
-            color: 0x00f3ff, roughness: 0.1, metalness: 0.1, clearcoat: 1.0
+        const molGeo = new THREE.SphereGeometry(0.065, 14, 14);
+        
+        const molMat = new THREE.MeshStandardMaterial({ 
+            color: 0x00f3ff,
+            emissive: 0x0099aa,
+            emissiveIntensity: 0.6,
+            roughness: 0.2,
+            metalness: 0.8
         });
 
-        // 1. Reference Droplet
+        // 1. Reference Droplet Group
         const dropGroup = new THREE.Group();
-        dropGroup.position.set(-4, 0, 0);
+        dropGroup.position.set(-4.5, 0, 0);
         scene.add(dropGroup);
         
-        const refDropMesh = new THREE.Mesh(dropSphereGeo, glassOilMat);
+        const refDropMesh = new THREE.Mesh(dropSphereGeo, holoGlassOil);
         dropGroup.add(refDropMesh);
         
         const refMols = new THREE.InstancedMesh(molGeo, molMat, MOL_COUNT);
         dropGroup.add(refMols);
 
-        const pedestal = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.5, 0.1, 32), new THREE.MeshStandardMaterial({ color: 0x1e293b }));
-        pedestal.position.y = 0.05;
+        const pedestal = new THREE.Mesh(
+            new THREE.CylinderGeometry(1.2, 1.4, 0.08, 32), 
+            new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.7, roughness: 0.3 })
+        );
+        pedestal.position.y = 0.04;
         dropGroup.add(pedestal);
 
-        // 2. Falling Droplet 
+        // 2. Falling Droplet Group
         const fallingDropGroup = new THREE.Group();
         fallingDropGroup.visible = false;
         scene.add(fallingDropGroup);
         
-        const fallDropMesh = new THREE.Mesh(dropSphereGeo, glassOilMat);
+        const fallDropMesh = new THREE.Mesh(dropSphereGeo, holoGlassOil);
         fallingDropGroup.add(fallDropMesh);
         
         const fallMols = new THREE.InstancedMesh(molGeo, molMat, MOL_COUNT);
         fallingDropGroup.add(fallMols);
 
-        // 3. Monolayer Patch
+        // 3. Monolayer Patch Group
         const patchGroup = new THREE.Group();
-        patchGroup.position.set(4, 0, 0);
+        patchGroup.position.set(4.5, 0, 0);
         scene.add(patchGroup);
 
         const patchBaseGeo = new THREE.CylinderGeometry(1, 1, 1, 64);
-        const patchGlassMat = new THREE.MeshPhysicalMaterial({
-            color: 0xbc13fe, roughness: 0.1, transmission: 0.8, transparent: true, opacity: 0.15
+        const patchHoloMat = new THREE.MeshPhysicalMaterial({
+            color: 0xbc13fe,
+            emissive: 0x4a044e,
+            roughness: 0.15,
+            transmission: 0.82,
+            transparent: true,
+            opacity: 0.45
         });
-        const patchMesh = new THREE.Mesh(patchBaseGeo, patchGlassMat);
+        const patchMesh = new THREE.Mesh(patchBaseGeo, patchHoloMat);
         patchMesh.visible = false;
         patchGroup.add(patchMesh);
 
@@ -546,26 +1002,30 @@
         patchMols.visible = false;
         patchGroup.add(patchMols);
 
-        const ringGeo = new THREE.RingGeometry(0.98, 1.02, 64);
-        const patchRing = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({ color: 0xbc13fe, side: THREE.DoubleSide }));
+        const ringGeo = new THREE.RingGeometry(0.97, 1.03, 64);
+        const patchRing = new THREE.Mesh(
+            ringGeo, 
+            new THREE.MeshBasicMaterial({ color: 0xbc13fe, side: THREE.DoubleSide, transparent: true, opacity: 0.85 })
+        );
         patchRing.rotation.x = -Math.PI / 2;
-        patchRing.position.y = 0.01;
+        patchRing.position.y = 0.015;
         patchRing.visible = false;
         patchGroup.add(patchRing);
 
-        const ripple = new THREE.Mesh(new THREE.RingGeometry(0.1, 0.2, 32), new THREE.MeshBasicMaterial({ color: 0x00f3ff, transparent: true, opacity: 0.5, side: THREE.DoubleSide }));
+        // Shockwave Ripple
+        const ripple = new THREE.Mesh(
+            new THREE.RingGeometry(0.1, 0.25, 48), 
+            new THREE.MeshBasicMaterial({ color: 0x00f3ff, transparent: true, opacity: 0.8, side: THREE.DoubleSide })
+        );
         ripple.rotation.x = -Math.PI / 2;
-        ripple.position.set(4, 0.02, 0);
+        ripple.position.set(4.5, 0.02, 0);
         ripple.visible = false;
         scene.add(ripple);
 
-        // -------------------------
-        // Core Logic
-        // -------------------------
         const dummy = new THREE.Object3D();
 
         function updateMolecules(dropRadius, patchRadiusUnits, spreadFactor) {
-            const usableDropRadius = Math.max(0, dropRadius - 0.08); 
+            const usableDropRadius = Math.max(0, dropRadius - 0.07); 
             
             for (let i = 0; i < MOL_COUNT; i++) {
                 const data = molData[i];
@@ -588,7 +1048,7 @@
                     const currentRadius = patchRadiusUnits * spreadFactor * Math.sqrt(data.t);
                     dummy.position.set(
                         currentRadius * Math.cos(data.angle),
-                        0.03,
+                        0.035,
                         currentRadius * Math.sin(data.angle)
                     );
                     dummy.updateMatrix();
@@ -646,17 +1106,17 @@
             calcArea.textContent = areaCm2.toFixed(2);
             calcThickness.textContent = thicknessNm.toFixed(2);
 
-            const dropScale = (dMm / 0.5) * 0.8; 
+            const dropScale = (dMm / 0.5) * 0.85; 
             refDropMesh.scale.set(dropScale, dropScale, dropScale);
-            refDropMesh.position.y = dropScale + 0.1;
-            refMols.position.y = dropScale + 0.1;
+            refDropMesh.position.y = dropScale + 0.12;
+            refMols.position.y = dropScale + 0.12;
 
             if (dropState === 'idle' || dropState === 'done') {
                 fallDropMesh.scale.set(dropScale, dropScale, dropScale);
             }
 
-            const patchRadiusUnits = (Dcm / 2) * 0.25; 
-            const visualHeight = Math.max(0.015, thicknessNm * 0.005);
+            const patchRadiusUnits = (Dcm / 2) * 0.22; 
+            const visualHeight = Math.max(0.02, thicknessNm * 0.006);
             let currentSpread = (dropState === 'done') ? 1 : ((dropState === 'spreading') ? spreadProgress : 0.0001);
             
             patchMesh.scale.set(patchRadiusUnits * currentSpread, visualHeight, patchRadiusUnits * currentSpread);
@@ -670,12 +1130,15 @@
             requestAnimationFrame(animate);
 
             if (refMols) {
-                refDropMesh.rotation.y += 0.005; refDropMesh.rotation.z += 0.002;
-                refMols.rotation.y += 0.005; refMols.rotation.z += 0.002;
+                refDropMesh.rotation.y += 0.006;
+                refMols.rotation.y += 0.006;
             }
 
+            dropReticle.rotation.y += 0.004;
+            patchReticle.rotation.y -= 0.004;
+
             if (dropState === 'falling') {
-                fallProgress += 0.035; 
+                fallProgress += 0.038; 
                 fallingDropGroup.position.y = 5 - (5 * fallProgress);
                 
                 if (fallProgress >= 1) {
@@ -692,24 +1155,24 @@
                     ripple.visible = true;
                 }
             } else if (dropState === 'spreading') {
-                spreadProgress += (1 - spreadProgress) * 0.08 + 0.01;
-                if (spreadProgress >= 1) {
+                spreadProgress += (1 - spreadProgress) * 0.09 + 0.008;
+                if (spreadProgress >= 0.999) {
                     spreadProgress = 1;
                     dropState = 'done';
                     
                     btnDrop.disabled = false;
-                    btnDrop.innerHTML = '<span class="relative z-10 flex items-center justify-center gap-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> Repeat Simulation</span>';
-                    btnDrop.classList.replace('from-blue-500', 'from-[#bc13fe]');
-                    btnDrop.classList.replace('hover:from-blue-400', 'hover:from-[#bc13fe]');
+                    btnDrop.innerHTML = '<svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> Repeat Experiment';
+                    btnDrop.style.background = 'linear-gradient(135deg, #bc13fe, #ec4899)';
+                    btnDrop.style.boxShadow = '0 0 20px rgba(188, 19, 254, 0.5)';
                 }
                 updateCalculations(); 
             }
 
             if (rippleActive) {
-                rippleProgress += 0.03;
+                rippleProgress += 0.032;
                 const s = 1 + rippleProgress * 18;
                 ripple.scale.set(s, s, 1);
-                ripple.material.opacity = 0.5 * (1 - rippleProgress);
+                ripple.material.opacity = 0.8 * (1 - rippleProgress);
                 if (rippleProgress >= 1) {
                     rippleActive = false;
                     ripple.visible = false;
@@ -720,7 +1183,6 @@
             renderer.render(scene, camera);
         }
 
-        // Listeners
         inputDiameter.addEventListener('input', syncFromDrop);
         inputPatch.addEventListener('input', syncFromPatch);
 
@@ -730,19 +1192,18 @@
                 fallProgress = 0;
                 spreadProgress = 0;
                 
-                fallingDropGroup.position.set(4, 5, 0);
+                fallingDropGroup.position.set(4.5, 5, 0);
                 fallingDropGroup.visible = true;
                 
                 patchMesh.visible = false;
                 patchRing.visible = false;
                 patchMols.visible = false;
                 
-                if(canvasPrompt) canvasPrompt.style.opacity = '0';
+                if (canvasPrompt) canvasPrompt.style.opacity = '0';
                 
                 btnDrop.disabled = true;
-                btnDrop.innerHTML = '<span class="relative z-10 flex items-center justify-center gap-2 animate-pulse">Running Simulation...</span>';
-                btnDrop.classList.replace('from-[#bc13fe]', 'from-blue-500');
-                btnDrop.classList.replace('hover:from-[#bc13fe]', 'hover:from-blue-400');
+                btnDrop.innerHTML = '<span>Simulating Surface Kinetics...</span>';
+                btnDrop.style.background = 'linear-gradient(135deg, #0284c7, #00f3ff)';
                 
                 updateCalculations();
             }
@@ -761,23 +1222,26 @@
             patchMols.visible = false;
             fallingDropGroup.visible = false;
             
-            if(canvasPrompt) canvasPrompt.style.opacity = '1';
+            if (canvasPrompt) canvasPrompt.style.opacity = '1';
             
             btnDrop.disabled = false;
-            btnDrop.innerHTML = '<span class="relative z-10 flex items-center justify-center gap-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg> Execute Experiment</span>';
-            btnDrop.classList.remove('from-[#bc13fe]', 'hover:from-[#bc13fe]');
-            btnDrop.classList.add('from-[#00f3ff]', 'hover:from-blue-400');
+            btnDrop.innerHTML = '<svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg> Execute Experiment';
+            btnDrop.style.background = 'linear-gradient(135deg, #00f3ff, #38bdf8)';
+            btnDrop.style.boxShadow = '0 0 20px rgba(0, 243, 255, 0.45)';
 
-            camera.position.set(0, 8, 14);
+            camera.position.set(0, 9, 15);
             controls.target.set(0, 0, 0);
         });
 
-        window.addEventListener('resize', () => {
+        function onWindowResize() {
             camera.aspect = container.clientWidth / container.clientHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(container.clientWidth, container.clientHeight);
-        });
+        }
 
+        window.addEventListener('resize', onWindowResize);
+
+        // Initial launch
         syncFromDrop();
         animate();
     </script>
