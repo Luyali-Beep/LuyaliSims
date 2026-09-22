@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="description" content="Interactive 3D Holographic Stationary Waves Simulator. Explore standing waves in vibrating strings, open and closed air columns, and real musical instruments.">
+    <meta name="description" content="Interactive 3D Holographic Stationary Waves Simulator. Analyze standing wave resonance, boundary mechanics, harmonics, and sound synthesis in strings and air columns.">
     <title>Stationary Waves Simulator Pro - Interactive 3D Physics Lab - LuyaliSims</title>
     
-    <!-- Futuristic Google Fonts -->
+    <!-- Futuristic Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     
     <style>
         /* Base Reset & Box Sizing */
@@ -18,63 +18,53 @@
         }
 
         :root {
-            --holo-cyan: #00f3ff;
-            --holo-cyan-glow: rgba(0, 243, 255, 0.4);
-            --holo-purple: #bc13fe;
-            --holo-purple-glow: rgba(188, 19, 254, 0.4);
-            --holo-green: #10b981;
-            --holo-amber: #f59e0b;
-            --holo-red: #ef4444;
-            --holo-dark-bg: #060913;
-            --holo-card-bg: rgba(13, 20, 36, 0.78);
-            --holo-border: rgba(0, 243, 255, 0.3);
+            --neon-cyan: #00f3ff;
+            --neon-magenta: #bc13fe;
+            --neon-green: #00ff88;
+            --neon-amber: #f59e0b;
+            --neon-red: #ef4444;
+            --bg-dark: #070a12;
+            --panel-bg: rgba(16, 24, 43, 0.85);
+            --border-glow: rgba(0, 243, 255, 0.35);
             --text-main: #e2e8f0;
             --text-muted: #94a3b8;
         }
 
         body {
             font-family: 'Rajdhani', sans-serif;
-            background-color: var(--holo-dark-bg);
+            background-color: var(--bg-dark);
             background-image: 
-                radial-gradient(circle at 85% 10%, rgba(0, 243, 255, 0.08), transparent 40%),
-                radial-gradient(circle at 10% 85%, rgba(188, 19, 254, 0.08), transparent 40%),
-                linear-gradient(180deg, #060913 0%, #090e1c 100%);
+                radial-gradient(circle at 85% 15%, rgba(0, 243, 255, 0.08), transparent 45%),
+                radial-gradient(circle at 15% 85%, rgba(188, 19, 254, 0.08), transparent 45%),
+                linear-gradient(180deg, #05070e 0%, #0a0e1a 100%);
             color: var(--text-main);
             margin: 0;
-            padding: 20px;
+            padding: 16px 20px;
             min-height: 100vh;
             overflow-x: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
         }
 
-        /* 1. HEADER & NAVIGATION */
-        header.app-header {
-            width: 100%;
+        /* 1. HEADER & TOP NAVIGATION */
+        header {
             max-width: 1200px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 20px;
+            margin: 0 auto 15px auto;
         }
 
-        .nav-bar {
-            width: 100%;
+        .top-nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
             flex-wrap: wrap;
             gap: 12px;
+            margin-bottom: 12px;
         }
 
         .back-btn {
             display: inline-flex;
             align-items: center;
-            gap: 10px;
-            padding: 10px 18px;
-            background: rgba(16, 24, 43, 0.75);
+            gap: 8px;
+            padding: 9px 18px;
+            background: rgba(16, 24, 43, 0.7);
             backdrop-filter: blur(8px);
             border: 1px solid rgba(188, 19, 254, 0.5);
             color: #e580ff;
@@ -89,85 +79,60 @@
 
         .back-btn:hover {
             background: rgba(188, 19, 254, 0.2);
-            border-color: var(--holo-purple);
-            color: #ffffff;
-            box-shadow: 0 0 16px var(--holo-purple-glow);
-            transform: translateX(-4px);
+            border-color: var(--neon-magenta);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
+            transform: translateX(-3px);
         }
 
-        .author-badge {
-            background: rgba(16, 24, 48, 0.85);
-            border: 1px solid rgba(0, 243, 255, 0.3);
-            border-radius: 30px;
-            padding: 8px 18px;
+        .author-tag {
+            font-family: 'Share Tech Mono', monospace;
             font-size: 0.85rem;
-            letter-spacing: 0.5px;
-            color: var(--text-muted);
-        }
-
-        .author-badge span.author-name {
-            font-weight: 700;
-            color: #ffffff;
-        }
-
-        .author-badge span.contact {
-            color: var(--holo-green);
-            font-family: monospace;
-            font-weight: bold;
-        }
-
-        h1.main-title {
-            font-family: 'Orbitron', sans-serif;
-            color: var(--holo-cyan);
-            text-shadow: 0 0 20px var(--holo-cyan-glow);
-            margin: 0 0 6px 0;
-            font-size: clamp(1.5rem, 3.8vw, 2.4rem);
-            text-align: center;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-        }
-
-        .title-subtext {
-            color: var(--text-muted);
-            font-size: 1rem;
-            text-align: center;
-            margin: 0 0 10px 0;
-        }
-
-        /* ADSENSE CONTAINER STYLES */
-        .ads-container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 15px auto;
-            min-height: 90px;
-            background: rgba(10, 15, 28, 0.5);
-            border: 1px dashed rgba(255, 255, 255, 0.15);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             color: #64748b;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            overflow: hidden;
         }
 
-        /* 2. MAIN SIMULATOR WORKSPACE */
-        main#simulator-container {
-            background: var(--holo-card-bg);
+        .author-tag span {
+            color: var(--neon-green);
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+            margin: 6px 0 10px 0;
+            font-size: clamp(1.4rem, 3.8vw, 2.3rem);
+            letter-spacing: 1.5px;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .lead-summary {
+            max-width: 900px;
+            margin: 0 auto 20px auto;
+            text-align: center;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: #cbd5e1;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* 2. SIMULATOR WORKSPACE */
+        #simulator-container {
+            background: linear-gradient(135deg, rgba(16, 24, 43, 0.85) 0%, rgba(8, 12, 22, 0.9) 100%);
             backdrop-filter: blur(12px);
-            border: 1px solid var(--holo-border);
+            border: 1px solid var(--border-glow);
             border-radius: 16px;
             padding: 22px;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), inset 0 0 25px rgba(0, 243, 255, 0.05);
-            margin-bottom: 30px;
-            max-width: 1200px;
-            width: 100%;
-            transition: all 0.3s ease;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 25px rgba(0, 243, 255, 0.12);
+            margin-bottom: 25px;
+            position: relative;
         }
 
-        /* Fullscreen Layout Overrides */
+        /* Fullscreen container styling */
         #simulator-container:fullscreen,
         #simulator-container:-webkit-full-screen {
             width: 100vw !important;
@@ -175,42 +140,75 @@
             height: 100vh !important;
             border-radius: 0 !important;
             margin: 0 !important;
-            padding: 16px 24px !important;
+            padding: 16px 20px !important;
             overflow-y: auto !important;
             background: #060913 !important;
             display: flex !important;
             flex-direction: column !important;
-            gap: 12px;
         }
 
         #simulator-container:fullscreen .sim-layout,
         #simulator-container:-webkit-full-screen .sim-layout {
             flex-grow: 1;
-            min-height: 0;
         }
 
-        #simulator-container:fullscreen .canvas-wrapper,
-        #simulator-container:-webkit-full-screen .canvas-wrapper {
-            height: 100%;
-            min-height: 480px;
+        /* HUD Telemetry Bar */
+        .hud-telemetry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(4, 8, 16, 0.85);
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            border-radius: 10px;
+            padding: 10px 16px;
+            margin-bottom: 18px;
+            font-family: 'Share Tech Mono', monospace;
+            flex-wrap: wrap;
+            gap: 12px;
         }
 
-        /* Mode & Instrument Selector */
+        .telemetry-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.92rem;
+        }
+
+        .tele-label {
+            color: #8da4be;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .tele-val {
+            color: var(--neon-cyan);
+            font-weight: 700;
+        }
+
+        .tele-val.pink {
+            color: #ff55bb;
+        }
+
+        .tele-val.green {
+            color: var(--neon-green);
+        }
+
+        /* Medium & Instrument Selection Bar */
         .system-presets-bar {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            margin-bottom: 20px;
-            background: rgba(8, 13, 25, 0.85);
+            gap: 10px;
+            margin-bottom: 18px;
+            background: rgba(6, 11, 24, 0.85);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 14px;
-            border-radius: 12px;
+            padding: 12px 14px;
+            border-radius: 10px;
         }
 
         .mode-selection-group {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-            gap: 10px;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 8px;
         }
 
         .preset-instruments-group {
@@ -228,27 +226,27 @@
             font-family: 'Rajdhani', sans-serif;
             font-size: 0.95rem;
             font-weight: 600;
-            padding: 10px 14px;
-            border-radius: 8px;
+            padding: 9px 12px;
+            border-radius: 6px;
             cursor: pointer;
             text-transform: uppercase;
             letter-spacing: 0.8px;
-            transition: all 0.25s ease;
+            transition: all 0.2s ease;
             text-align: center;
         }
 
         .tab-btn:hover {
-            border-color: var(--holo-cyan);
-            color: #ffffff;
-            box-shadow: 0 0 12px var(--holo-cyan-glow);
+            border-color: var(--neon-cyan);
+            color: #fff;
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.4);
         }
 
         .tab-btn.active {
             background: linear-gradient(135deg, rgba(0, 243, 255, 0.25), rgba(188, 19, 254, 0.25));
-            border-color: var(--holo-cyan);
+            border-color: var(--neon-cyan);
             color: #ffffff;
             font-weight: 700;
-            box-shadow: 0 0 16px rgba(0, 243, 255, 0.45);
+            box-shadow: 0 0 14px rgba(0, 243, 255, 0.45);
         }
 
         .inst-btn {
@@ -256,9 +254,9 @@
             border: 1px solid rgba(188, 19, 254, 0.35);
             color: #d8b4fe;
             font-family: 'Rajdhani', sans-serif;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
             font-weight: 600;
-            padding: 8px 12px;
+            padding: 7px 10px;
             border-radius: 6px;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -270,73 +268,75 @@
 
         .inst-btn:hover {
             background: rgba(188, 19, 254, 0.25);
-            border-color: var(--holo-purple);
+            border-color: var(--neon-magenta);
             color: #ffffff;
-            box-shadow: 0 0 12px var(--holo-purple-glow);
+            box-shadow: 0 0 10px rgba(188, 19, 254, 0.5);
         }
 
         .inst-btn.active-inst {
-            border-color: var(--holo-purple);
+            border-color: var(--neon-magenta);
             background: rgba(188, 19, 254, 0.35);
             color: #ffffff;
-            box-shadow: 0 0 14px var(--holo-purple-glow);
+            box-shadow: 0 0 14px rgba(188, 19, 254, 0.6);
         }
 
         .instrument-info-callout {
-            font-size: 0.92rem;
-            padding: 10px 14px;
+            font-size: 0.9rem;
+            padding: 8px 12px;
             background: rgba(0, 243, 255, 0.08);
-            border-left: 3px solid var(--holo-cyan);
+            border-left: 3px solid var(--neon-cyan);
             border-radius: 4px;
             color: #93c5fd;
             display: none;
-            margin-top: 4px;
+            line-height: 1.5;
         }
 
-        /* Dual-Pane Responsive Grid Layout */
+        /* Dual-Pane Simulation Layout */
         .sim-layout {
             display: grid;
-            grid-template-columns: 1.65fr 1fr;
+            grid-template-columns: 1.7fr 1fr;
             gap: 20px;
             align-items: stretch;
         }
 
-        /* Holographic 3D Canvas Box */
+        /* 3D Holographic Canvas Wrapper */
         .canvas-wrapper {
             position: relative;
             width: 100%;
-            background: #040711;
-            border: 1px solid rgba(0, 243, 255, 0.35);
+            background: radial-gradient(circle at 50% 50%, #08171a 0%, #02070a 100%);
             border-radius: 12px;
             overflow: hidden;
             touch-action: none;
-            box-shadow: inset 0 0 35px rgba(0, 243, 255, 0.12), 0 8px 25px rgba(0, 0, 0, 0.6);
+            border: 4px solid #1e293b;
+            box-shadow: 
+                0 0 0 2px rgba(0, 243, 255, 0.4),
+                0 15px 35px rgba(0, 0, 0, 0.8),
+                inset 0 0 35px rgba(0, 0, 0, 0.95);
             display: flex;
             flex-direction: column;
-            min-height: 490px;
         }
 
-        /* Scanline Overlay & Glare */
+        /* CRT Screen & Glare Overlay */
         .canvas-wrapper::before {
-            content: "";
+            content: " ";
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
-            background-size: 100% 3px, 6px 100%;
+            background: 
+                linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, transparent 50%),
+                repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.22) 0px, rgba(0, 0, 0, 0.22) 1px, transparent 1px, transparent 3px);
             pointer-events: none;
-            z-index: 4;
+            z-index: 5;
         }
 
         .canvas-toolbar {
             position: absolute;
-            top: 12px;
-            left: 14px;
-            right: 14px;
+            top: 10px;
+            left: 12px;
+            right: 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            z-index: 5;
+            z-index: 6;
             pointer-events: none;
         }
 
@@ -346,22 +346,22 @@
 
         .canvas-title-badge {
             font-family: 'Orbitron', sans-serif;
-            font-size: 0.85rem;
-            color: var(--holo-cyan);
+            font-size: 0.8rem;
+            color: var(--neon-cyan);
             letter-spacing: 1px;
             text-transform: uppercase;
-            background: rgba(6, 10, 22, 0.88);
-            padding: 6px 14px;
+            background: rgba(6, 10, 22, 0.85);
+            padding: 5px 12px;
             border-radius: 6px;
             border: 1px solid rgba(0, 243, 255, 0.3);
-            box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
+            box-shadow: 0 0 8px rgba(0, 243, 255, 0.2);
         }
 
         .view-controls {
             display: flex;
             gap: 6px;
-            background: rgba(6, 10, 22, 0.88);
-            padding: 4px;
+            background: rgba(6, 10, 22, 0.85);
+            padding: 3px;
             border-radius: 6px;
             border: 1px solid rgba(255, 255, 255, 0.12);
         }
@@ -370,10 +370,10 @@
             background: transparent;
             border: 1px solid transparent;
             color: var(--text-muted);
-            padding: 6px 10px;
+            padding: 5px 9px;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             font-family: 'Orbitron', sans-serif;
             transition: all 0.2s ease;
             display: inline-flex;
@@ -382,49 +382,42 @@
         }
 
         .icon-btn:hover, .icon-btn.active {
-            color: var(--holo-cyan);
+            color: var(--neon-cyan);
             border-color: rgba(0, 243, 255, 0.4);
             background: rgba(0, 243, 255, 0.15);
             box-shadow: 0 0 8px rgba(0, 243, 255, 0.3);
         }
 
-        .icon-btn.fs-active {
-            border-color: var(--holo-purple);
-            color: #e580ff;
-            background: rgba(188, 19, 254, 0.2);
-            box-shadow: 0 0 10px var(--holo-purple-glow);
-        }
-
-        canvas#simCanvas {
+        canvas {
             display: block;
             width: 100%;
-            height: 100%;
-            flex-grow: 1;
+            height: auto;
+            aspect-ratio: 16 / 10;
         }
 
         .canvas-legend {
             position: absolute;
-            bottom: 10px;
-            left: 10px;
-            right: 10px;
+            bottom: 8px;
+            left: 8px;
+            right: 8px;
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
-            gap: 14px;
-            font-size: 0.8rem;
+            gap: 12px;
+            font-size: 0.78rem;
             color: var(--text-muted);
             background: rgba(6, 10, 22, 0.88);
-            padding: 6px 12px;
+            padding: 5px 10px;
             border-radius: 6px;
             border: 1px solid rgba(255, 255, 255, 0.08);
-            z-index: 5;
+            z-index: 6;
             pointer-events: none;
         }
 
         .legend-item {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
         }
 
         .indicator-dot {
@@ -433,656 +426,804 @@
             border-radius: 50%;
         }
 
-        /* Streamlined Controls Panel */
+        /* Controls Console */
         .controls-panel {
             display: flex;
             flex-direction: column;
-            gap: 16px;
-            background: rgba(10, 15, 28, 0.8);
+            gap: 14px;
+            background: linear-gradient(145deg, rgba(11, 17, 30, 0.9) 0%, rgba(6, 9, 16, 0.95) 100%);
             padding: 18px;
             border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.09);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
         }
 
         .panel-heading {
             font-family: 'Orbitron', sans-serif;
-            font-size: 0.95rem;
-            color: #cbd5e1;
+            font-size: 0.85rem;
+            color: var(--neon-cyan);
             text-transform: uppercase;
-            letter-spacing: 1px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            padding-bottom: 8px;
+            letter-spacing: 1.5px;
+            border-bottom: 1px solid rgba(0, 243, 255, 0.25);
+            padding-bottom: 6px;
             margin: 0;
         }
 
         .control-group {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 5px;
         }
 
         .control-group label {
             font-size: 0.95rem;
-            color: #e2e8f0;
+            font-weight: 600;
+            color: #cbd5e1;
             display: flex;
             justify-content: space-between;
-            font-weight: 500;
         }
 
         .control-group label span.value-display {
-            font-family: monospace;
-            color: var(--holo-cyan);
-            font-weight: 700;
-            font-size: 1rem;
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--neon-green);
+        }
+
+        select, input[type="range"] {
+            min-height: 44px;
         }
 
         input[type="range"] {
-            accent-color: var(--holo-cyan);
-            height: 28px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: #0c1527;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            height: 8px;
+            border-radius: 4px;
             cursor: pointer;
-            width: 100%;
-            background: transparent;
+            margin: 8px 0;
         }
 
-        .action-btns-row {
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #00f3ff 30%, #0088aa 100%);
+            border: 2px solid #fff;
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.8);
+            cursor: pointer;
+        }
+
+        .btn-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
-            margin-top: 4px;
+            margin-top: 5px;
         }
 
         .sim-btn {
-            background: transparent;
-            border: 1px solid var(--holo-cyan);
-            color: var(--holo-cyan);
+            background: linear-gradient(180deg, rgba(16, 28, 54, 0.9) 0%, rgba(8, 14, 28, 0.95) 100%);
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            color: var(--neon-cyan);
             font-family: 'Orbitron', sans-serif;
-            font-size: 0.85rem;
-            padding: 10px 12px;
-            min-height: 44px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            padding: 10px;
+            min-height: 48px;
             border-radius: 8px;
             cursor: pointer;
             text-transform: uppercase;
             letter-spacing: 1px;
-            transition: all 0.25s ease;
-            display: flex;
-            align-items: center;
+            transition: all 0.2s ease;
+            display: inline-flex;
             justify-content: center;
+            align-items: center;
             gap: 6px;
         }
 
         .sim-btn:hover {
-            background: rgba(0, 243, 255, 0.15);
-            box-shadow: 0 0 15px var(--holo-cyan-glow);
-            color: #ffffff;
+            border-color: var(--neon-cyan);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
+            transform: translateY(-2px);
         }
 
         .sim-btn:active {
-            transform: scale(0.97);
+            transform: translateY(0);
         }
 
-        .sim-btn.btn-magenta {
-            border-color: var(--holo-purple);
+        .sim-btn.secondary {
+            border-color: rgba(188, 19, 254, 0.5);
             color: #e580ff;
         }
 
-        .sim-btn.btn-magenta:hover {
-            background: rgba(188, 19, 254, 0.2);
-            box-shadow: 0 0 15px var(--holo-purple-glow);
-            color: #ffffff;
+        .sim-btn.secondary:hover {
+            border-color: var(--neon-magenta);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
         }
 
         .sim-btn.active-audio {
-            background: rgba(16, 185, 129, 0.25);
-            border-color: var(--holo-green);
-            color: #6ee7b7;
-            box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
+            background: rgba(0, 255, 136, 0.2);
+            border-color: var(--neon-green);
+            color: #a7f3d0;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
         }
 
-        /* Real-Time Math Readout */
+        /* Real-Time Mathematical Derivation Box */
         .math-hud-box {
-            background: #040711;
+            background: rgba(4, 9, 20, 0.85);
             border: 1px solid rgba(0, 243, 255, 0.2);
             border-radius: 8px;
             padding: 12px;
-            font-size: 0.9rem;
-        }
-
-        .hud-metrics-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-
-        .metric-cell {
-            background: rgba(13, 20, 36, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 6px;
-            padding: 8px;
-            text-align: center;
-        }
-
-        .metric-title {
-            font-size: 0.75rem;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            display: block;
-            margin-bottom: 3px;
-        }
-
-        .metric-val {
-            font-family: 'Orbitron', monospace;
-            font-weight: 700;
-            font-size: 1.1rem;
+            font-size: 0.88rem;
         }
 
         .derivation-path {
-            background: rgba(13, 20, 36, 0.6);
-            border-radius: 6px;
-            padding: 10px;
-            font-family: 'Rajdhani', monospace;
-            font-size: 0.88rem;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.86rem;
             color: #cbd5e1;
             line-height: 1.5;
-            border-left: 3px solid var(--holo-purple);
+            border-left: 3px solid var(--neon-magenta);
+            padding-left: 10px;
         }
 
-        /* 3. EDUCATIONAL CONTENT SECTION */
-        section.educational-content {
-            max-width: 1200px;
-            width: 100%;
+        /* 3. POLICY-COMPLIANT AD CONTAINER */
+        .ad-slot-wrapper {
+            margin: 30px auto;
+            text-align: center;
+            clear: both;
+        }
+
+        .ad-disclaimer {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            margin-bottom: 6px;
+        }
+
+        .ad-box-placeholder {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            min-height: 90px;
+            max-width: 970px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #475569;
+            font-size: 0.85rem;
+            border-radius: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* 4. EDUCATIONAL CONTENT SECTION */
+        .educational-content {
             line-height: 1.75;
             font-size: 1.05rem;
-            color: var(--text-muted);
+            color: #94a3b8;
             background: rgba(10, 14, 23, 0.85);
             padding: 30px;
             border-radius: 16px;
-            border-left: 4px solid var(--holo-cyan);
+            border-left: 4px solid var(--neon-cyan);
+            border-top: 1px solid rgba(0, 243, 255, 0.2);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            margin-top: 10px;
+            margin-bottom: 35px;
         }
 
-        h2, h3, h4 {
+        .educational-content h2 {
             font-family: 'Orbitron', sans-serif;
-            color: var(--holo-purple);
-            letter-spacing: 0.8px;
-        }
-
-        h2 {
+            color: var(--neon-magenta);
+            border-bottom: 1px solid rgba(188, 19, 254, 0.3);
+            padding-bottom: 8px;
+            margin-top: 1.8em;
+            margin-bottom: 0.6em;
             font-size: 1.45rem;
-            margin-top: 2rem;
-            border-bottom: 1px solid rgba(188, 19, 254, 0.25);
-            padding-bottom: 6px;
         }
 
-        h2:first-of-type {
-            margin-top: 0;
+        .educational-content h2:first-of-type {
+            margin-top: 0.2em;
         }
 
-        h3 {
+        .educational-content h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: #38bdf8;
+            margin-top: 1.4em;
+            margin-bottom: 0.4em;
             font-size: 1.15rem;
-            color: var(--holo-cyan);
-            margin-top: 1.5rem;
         }
 
         .educational-content strong {
             color: #ffffff;
-            background: rgba(0, 243, 255, 0.1);
-            padding: 2px 6px;
-            border-radius: 4px;
         }
 
-        .formula-callout {
-            background: #040711;
-            border: 1px solid rgba(0, 243, 255, 0.2);
-            padding: 16px 20px;
-            border-radius: 10px;
-            margin: 14px 0;
-            color: #e2e8f0;
-            line-height: 1.7;
-        }
-
-        .formula-highlight {
-            font-family: 'Orbitron', monospace;
-            color: var(--holo-cyan);
-            font-weight: 700;
-            font-size: 1.05rem;
-        }
-
-        ul, ol {
-            padding-left: 22px;
-            margin-bottom: 1.2rem;
-        }
-
-        li {
-            margin-bottom: 8px;
-        }
-
-        .practice-task-card {
-            background: rgba(13, 20, 36, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 10px;
-            padding: 18px 22px;
-            margin-bottom: 22px;
-        }
-
-        .task-badge {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.75rem;
-            padding: 3px 8px;
-            border-radius: 4px;
-            background: rgba(188, 19, 254, 0.25);
-            color: #e580ff;
-            border: 1px solid rgba(188, 19, 254, 0.4);
-            display: inline-block;
-            margin-bottom: 8px;
-        }
-
-        .solution-box {
-            margin-top: 12px;
-            border: 1px solid rgba(0, 243, 255, 0.2);
-            border-radius: 6px;
-            background: rgba(4, 7, 17, 0.8);
+        .formula-box {
+            background: rgba(4, 9, 20, 0.7);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-left: 3px solid var(--neon-green);
             padding: 14px 18px;
-            border-left: 3px solid var(--holo-green);
+            margin: 14px 0;
+            border-radius: 6px;
+            font-family: 'Share Tech Mono', monospace;
+            color: #a7f3d0;
+            font-size: 1.05rem;
+            line-height: 1.6;
         }
 
-        .solution-title {
+        .task-card {
+            background: rgba(15, 23, 42, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 18px;
+        }
+
+        .task-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            color: var(--neon-cyan);
+            margin-bottom: 8px;
+        }
+
+        details {
+            margin-top: 25px;
+            background: rgba(5, 10, 20, 0.8);
+            border: 1px solid rgba(188, 19, 254, 0.4);
+            border-radius: 10px;
+            padding: 15px 20px;
+        }
+
+        summary {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            color: #e580ff;
+            cursor: pointer;
+            padding: 6px 0;
+            user-select: none;
+        }
+
+        .solution-step {
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+            padding: 14px 0;
+            line-height: 1.6;
+        }
+
+        .solution-step:last-child {
+            border-bottom: none;
+        }
+
+        /* 5. FOOTER & ACCURATE ALIGNED LINKS */
+        footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px 20px 20px 20px;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-nav {
+            display: flex;
+            justify-content: center;
+            gap: 22px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .footer-nav a, .footer-modal-trigger {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.2s, text-shadow 0.2s;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .footer-nav a:hover, .footer-modal-trigger:hover {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
+        }
+
+        /* 6. SELF-CONTAINED POLICY MODALS */
+        .policy-modal {
+            position: fixed !important;
+            top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
+            width: 100vw !important; height: 100vh !important;
+            background: rgba(4, 7, 15, 0.92) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 99999 !important;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-body {
+            background: linear-gradient(145deg, #0b111e 0%, #060913 100%);
+            border: 2px solid var(--neon-cyan);
+            border-radius: 16px;
+            max-width: 820px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 35px 30px;
+            color: #cbd5e1;
+            box-shadow: 0 0 40px rgba(0, 243, 255, 0.25);
+            line-height: 1.75;
+            position: relative;
+            text-align: left;
+        }
+
+        .modal-body h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-cyan);
+            margin-top: 0;
+            font-size: 1.6rem;
+        }
+
+        .modal-body h3 {
+            color: var(--neon-magenta);
+            font-family: 'Orbitron', sans-serif;
+            margin-top: 24px;
+            margin-bottom: 8px;
+            font-size: 1.15rem;
+        }
+
+        .modal-date {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--neon-green);
+            font-size: 0.9rem;
+            margin-top: -6px;
+            margin-bottom: 16px;
+        }
+
+        .modal-close-btn {
+            background: linear-gradient(180deg, rgba(188, 19, 254, 0.4), rgba(188, 19, 254, 0.15));
+            border: 1px solid var(--neon-magenta);
+            color: #fff;
+            padding: 8px 18px;
             font-family: 'Orbitron', sans-serif;
             font-size: 0.85rem;
-            color: var(--holo-green);
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            margin-bottom: 6px;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            float: right;
+            margin-bottom: 15px;
+            transition: all 0.2s ease;
         }
 
-        footer.page-footer {
-            margin-top: 30px;
-            padding: 20px;
-            text-align: center;
-            font-size: 0.85rem;
-            color: #64748b;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-            width: 100%;
-            max-width: 1200px;
+        .modal-close-btn:hover {
+            background: var(--neon-magenta);
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.8);
         }
 
-        /* 4. RESPONSIVE BREAKPOINTS */
-        @media (max-width: 900px) {
-            .sim-layout {
-                grid-template-columns: 1fr;
-            }
-
-            .canvas-wrapper {
-                min-height: 380px;
-            }
-        }
-
-        @media (max-width: 640px) {
-            body {
-                padding: 10px;
-            }
-
-            main#simulator-container, section.educational-content {
-                padding: 15px;
-            }
-
-            .canvas-wrapper {
-                min-height: 330px;
-            }
-
-            .action-btns-row {
-                grid-template-columns: 1fr;
-            }
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            #simulator-container, .educational-content { padding: 14px; }
+            .sim-layout { grid-template-columns: 1fr; }
+            .btn-grid { grid-template-columns: 1fr; }
+            .hud-telemetry { flex-direction: column; align-items: flex-start; }
+            .modal-body { padding: 22px 18px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- 1. SEMANTIC HEADER & NAVIGATION -->
-    <header class="app-header">
-        <nav class="nav-bar" aria-label="Main Navigation">
+    <!-- 1. HEADER & TOP NAVIGATION -->
+    <header>
+        <nav class="top-nav">
             <a href="../index.html" class="back-btn">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="19" y1="12" x2="5" y2="12"></line>
                     <polyline points="12 19 5 12 12 5"></polyline>
                 </svg>
                 Back to LuyaliSims
             </a>
-
-            <div class="author-badge">
-                Designed by <span class="author-name">Ian Luyali</span> | Contact: <span class="contact">0727987669</span>
+            <div class="author-tag">
+                MODULE ID: <span>WAVE-STAT-3D</span> | DESIGNER: <span>IAN LUYALI</span>
             </div>
         </nav>
-
-        <h1 class="main-title">Stationary Waves Simulator Pro</h1>
-        <p class="title-subtext">Interactive 3D Holographic Standing Wave Resonance & Boundary Mechanics</p>
+        
+        <h1>Stationary Waves Simulator Pro</h1>
+        
+        <!-- Contextual Summary: 60-80 words guaranteed above the fold -->
+        <p class="lead-summary">
+            Investigate the physics of stationary waves formed by superimposing counter-propagating traveling waves in tensioned strings and resonant air columns. This interactive laboratory visualizes nodes, antinodes, and boundary-condition harmonics across symmetric and asymmetric conduits in real time. Adjust physical lengths, propagation wave velocities, and harmonic integer modes while observing continuous spatial envelopes, instantaneous displacement ribbons, live mathematical derivations, and calibrated audio tone synthesis.
+        </p>
     </header>
 
-    <!-- TOP SAFE AD PLACEMENT ZONE (AdSense Ready) -->
-    <aside class="ads-container" aria-label="Advertisement Banner">
-        <span>Google AdSense Responsive Unit - Top Leaderboard Placement Area</span>
-    </aside>
-
-    <!-- 2. THE MAIN INTERACTIVE SIMULATOR APPARATUS -->
-    <main id="simulator-container">
-        
-        <!-- System Mode & Instrument Preset Bar -->
-        <section class="system-presets-bar" aria-label="Acoustic Medium Selector">
-            <div class="mode-selection-group">
-                <button id="mode-string" class="tab-btn active" onclick="setSystemType('string')">Vibrating String</button>
-                <button id="mode-closed" class="tab-btn" onclick="setSystemType('closed')">Closed Air Column</button>
-                <button id="mode-open" class="tab-btn" onclick="setSystemType('open')">Open Air Column</button>
-            </div>
-
-            <div class="preset-instruments-group">
-                <button id="inst-guitar" class="inst-btn" onclick="loadInstrument('guitar')">🎸 Guitar (E2)</button>
-                <button id="inst-violin" class="inst-btn" onclick="loadInstrument('violin')">🎻 Violin (A4)</button>
-                <button id="inst-flute" class="inst-btn" onclick="loadInstrument('flute')">💨 Flute (C4)</button>
-                <button id="inst-clarinet" class="inst-btn" onclick="loadInstrument('clarinet')">📯 Clarinet (D3)</button>
-            </div>
-
-            <div id="instrument-desc" class="instrument-info-callout" role="status"></div>
-        </section>
-
-        <!-- Two-Column Interactive Simulation Layout -->
-        <div class="sim-layout">
+    <main>
+        <!-- 2. SIMULATOR APP WORKSPACE -->
+        <section id="simulator-container" aria-label="Interactive Simulator Workspace">
             
-            <!-- 3D Holographic Canvas Wrapper -->
-            <div class="canvas-wrapper">
-                <div class="canvas-toolbar">
-                    <span id="canvas-label" class="canvas-title-badge">Holographic Visualizer</span>
-                    <div class="view-controls">
-                        <button onclick="toggle3DView()" id="btn-3d-toggle" class="icon-btn active" title="Toggle 3D View">3D Ribbon</button>
-                        <button onclick="zoomCanvas(1.15)" class="icon-btn" title="Zoom In">+</button>
-                        <button onclick="zoomCanvas(0.85)" class="icon-btn" title="Zoom Out">&minus;</button>
-                        <button onclick="resetView()" class="icon-btn" title="Reset View">1:1</button>
-                        <button onclick="toggleFullscreen()" id="fs-btn" class="icon-btn" title="Toggle Fullscreen">
-                            <span id="fs-icon">⛶</span> <span id="fs-text">Fullscreen</span>
+            <!-- Telemetry Status Bar -->
+            <div class="hud-telemetry">
+                <div class="telemetry-item">
+                    <span class="tele-label">Medium:</span>
+                    <span id="tele-medium" class="tele-val">VIBRATING STRING</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Harmonic Mode (n):</span>
+                    <span id="tele-harmonic" class="tele-val pink">n = 1</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Wavelength (λ):</span>
+                    <span id="tele-wavelength" class="tele-val green">2.00 m</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Frequency (f):</span>
+                    <span id="tele-frequency" class="tele-val">170.0 Hz</span>
+                </div>
+            </div>
+
+            <!-- System Mode & Instrument Preset Bar -->
+            <div class="system-presets-bar">
+                <div class="mode-selection-group">
+                    <button id="mode-string" class="tab-btn active" onclick="setSystemType('string')">Vibrating String</button>
+                    <button id="mode-closed" class="tab-btn" onclick="setSystemType('closed')">Closed Air Column</button>
+                    <button id="mode-open" class="tab-btn" onclick="setSystemType('open')">Open Air Column</button>
+                </div>
+
+                <div class="preset-instruments-group">
+                    <button id="inst-guitar" class="inst-btn" onclick="loadInstrument('guitar')">🎸 Guitar (E2)</button>
+                    <button id="inst-violin" class="inst-btn" onclick="loadInstrument('violin')">🎻 Violin (A4)</button>
+                    <button id="inst-flute" class="inst-btn" onclick="loadInstrument('flute')">💨 Flute (C4)</button>
+                    <button id="inst-clarinet" class="inst-btn" onclick="loadInstrument('clarinet')">📯 Clarinet (D3)</button>
+                </div>
+
+                <div id="instrument-desc" class="instrument-info-callout" role="status"></div>
+            </div>
+
+            <div class="sim-layout">
+                <!-- 3D Holographic Canvas Display -->
+                <div class="canvas-wrapper" id="canvasFrame">
+                    <div class="canvas-toolbar">
+                        <span id="canvas-label" class="canvas-title-badge">Holographic Visualizer</span>
+                        <div class="view-controls">
+                            <button onclick="toggle3DView()" id="btn-3d-toggle" class="icon-btn active" title="Toggle 3D Ribbon Mode">3D Ribbon</button>
+                            <button onclick="zoomCanvas(1.15)" class="icon-btn" title="Zoom In">+</button>
+                            <button onclick="zoomCanvas(0.85)" class="icon-btn" title="Zoom Out">&minus;</button>
+                            <button onclick="resetView()" class="icon-btn" title="Reset View">1:1</button>
+                        </div>
+                    </div>
+
+                    <canvas id="simCanvas" width="800" height="500"></canvas>
+
+                    <div class="canvas-legend">
+                        <div class="legend-item"><span class="indicator-dot" style="background: var(--neon-cyan); box-shadow: 0 0 6px var(--neon-cyan);"></span> Instant Displacement</div>
+                        <div class="legend-item"><span class="indicator-dot" style="background: var(--neon-amber);"></span> Boundary Envelope</div>
+                        <div class="legend-item"><span class="indicator-dot" style="background: var(--neon-red);"></span> Node (N)</div>
+                        <div class="legend-item"><span class="indicator-dot" style="background: var(--neon-green);"></span> Antinode (A)</div>
+                    </div>
+                </div>
+
+                <!-- Controls & Real-Time Calculation HUD -->
+                <div class="controls-panel">
+                    <h3 class="panel-heading">Simulation Parameters</h3>
+
+                    <div class="control-group">
+                        <label for="harmonicSlider">Harmonic Mode (n): <span id="harmonicVal" class="value-display">1</span></label>
+                        <input type="range" id="harmonicSlider" min="1" max="5" step="1" value="1" oninput="updateHarmonic(this.value)">
+                    </div>
+
+                    <div class="control-group">
+                        <label for="lengthSlider">Length (L): <span id="lengthVal" class="value-display">1.00 m</span></label>
+                        <input type="range" id="lengthSlider" min="0.30" max="2.00" step="0.05" value="1.00" oninput="updateLength(this.value)">
+                    </div>
+
+                    <div class="control-group">
+                        <label for="speedSlider"><span id="speedLabel">Wave Speed (v):</span> <span id="speedVal" class="value-display">340 m/s</span></label>
+                        <input type="range" id="speedSlider" min="100" max="600" step="5" value="340" oninput="updateSpeed(this.value)">
+                    </div>
+
+                    <!-- Action Controls -->
+                    <div class="btn-grid">
+                        <button id="audioBtn" class="sim-btn" onclick="toggleAudio()">
+                            🔊 Play Tone
+                        </button>
+                        <button id="fullscreenBtn" class="sim-btn secondary" onclick="toggleFullscreen()">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                            </svg>
+                            <span id="fs-text">Fullscreen</span>
                         </button>
                     </div>
-                </div>
 
-                <canvas id="simCanvas" width="800" height="490"></canvas>
-
-                <div class="canvas-legend">
-                    <div class="legend-item"><span class="indicator-dot" style="background: var(--holo-cyan); box-shadow: 0 0 6px var(--holo-cyan);"></span> Instant Wave</div>
-                    <div class="legend-item"><span class="indicator-dot" style="background: var(--holo-amber);"></span> Boundary Envelope</div>
-                    <div class="legend-item"><span class="indicator-dot" style="background: var(--holo-red);"></span> Node (N)</div>
-                    <div class="legend-item"><span class="indicator-dot" style="background: var(--holo-green);"></span> Antinode (A)</div>
-                </div>
-            </div>
-
-            <!-- Controls & Real-Time Calculation HUD -->
-            <div class="controls-panel">
-                <h3 class="panel-heading">1. Variable Calibration</h3>
-
-                <div class="control-group">
-                    <label for="harmonicSlider">
-                        Harmonic Mode (<i>n</i>)
-                        <span id="harmonicVal" class="value-display">1</span>
-                    </label>
-                    <input type="range" id="harmonicSlider" min="1" max="5" step="1" value="1" oninput="updateHarmonic(this.value)">
-                </div>
-
-                <div class="control-group">
-                    <label for="lengthSlider">
-                        Length (<i>L</i>)
-                        <span id="lengthVal" class="value-display">1.00 m</span>
-                    </label>
-                    <input type="range" id="lengthSlider" min="0.30" max="2.00" step="0.05" value="1.00" oninput="updateLength(this.value)">
-                </div>
-
-                <div class="control-group">
-                    <label for="speedSlider">
-                        <span id="speedLabel">Wave Speed (<i>v</i>)</span>
-                        <span id="speedVal" class="value-display">340 m/s</span>
-                    </label>
-                    <input type="range" id="speedSlider" min="100" max="600" step="5" value="340" oninput="updateSpeed(this.value)">
-                </div>
-
-                <!-- Action Buttons: Audio and Reset -->
-                <div class="action-btns-row">
-                    <button id="audioBtn" class="sim-btn" onclick="toggleAudio()">
-                        🔊 Play Tone
+                    <button id="resetBtn" class="sim-btn secondary" style="width: 100%;" onclick="resetDefaults()">
+                        ⟲ Reset Defaults
                     </button>
-                    <button id="resetBtn" class="sim-btn btn-magenta" onclick="resetDefaults()">
-                        ⟲ Reset
-                    </button>
-                </div>
 
-                <!-- Live Mathematics HUD -->
-                <h3 class="panel-heading" style="margin-top: 4px;">2. Live Mathematics HUD</h3>
-                <div class="math-hud-box">
-                    <div class="hud-metrics-row">
-                        <div class="metric-cell">
-                            <span class="metric-title">Wavelength (&lambda;)</span>
-                            <span id="hud-wavelength" class="metric-val" style="color: var(--holo-cyan);">2.00 m</span>
-                        </div>
-                        <div class="metric-cell">
-                            <span class="metric-title">Frequency (<i>f</i>)</span>
-                            <span id="hud-frequency" class="metric-val" style="color: #e580ff;">170.0 Hz</span>
+                    <!-- Real-Time Math HUD -->
+                    <h3 class="panel-heading" style="margin-top: 4px;">Acoustic Derivation HUD</h3>
+                    <div class="math-hud-box">
+                        <div id="dynamic-derivation" class="derivation-path">
+                            <!-- Populated dynamically with clean unicode math (no dollar signs) -->
                         </div>
                     </div>
-                    <div id="dynamic-derivation" class="derivation-path">
-                        <!-- Dynamically filled with clean HTML equations (no dollar signs) -->
-                    </div>
                 </div>
-
             </div>
+        </section>
 
+        <!-- 3. SAFE AD PLACEMENT SLOT -->
+        <div class="ad-slot-wrapper">
+            <div class="ad-disclaimer">Advertisement</div>
+            <div class="ad-box-placeholder">
+                <span>Google AdSense Responsive Unit - Leaderboard Placement</span>
+            </div>
         </div>
+
+        <!-- 4. EDUCATIONAL REFERENCE ARTICLE -->
+        <article class="educational-content">
+            <section>
+                <h2>How to Operate the Simulator</h2>
+                <p>
+                    This virtual acoustics laboratory is designed to provide immediate mechanical and numerical feedback as boundary conditions and medium dimensions are altered. Follow this operational sequence to conduct experiments:
+                </p>
+                <ul>
+                    <li>
+                        <strong>Select Acoustic Medium or Preset:</strong> Use the top selector buttons to switch between a <strong>Vibrating String</strong> (fixed-fixed boundaries), a <strong>Closed Air Column</strong> (fixed-open boundaries), or an <strong>Open Air Column</strong> (open-open boundaries). Alternatively, choose an instrument preset (Guitar, Violin, Flute, Clarinet) to load real-world calibrated scale lengths and fundamental velocities.
+                    </li>
+                    <li>
+                        <strong>Harmonic Mode Adjustment (n):</strong> Move the harmonic slider to select integer overtone states. Notice how closed air columns restrict selections strictly to odd integer harmonics (n = 1, 3, 5, 7) due to physical boundary constraints.
+                    </li>
+                    <li>
+                        <strong>Dimensional and Medium Velocity Scaling:</strong> Adjust <strong>Length (L)</strong> from 0.30 m to 2.00 m and <strong>Wave Speed (v)</strong> from 100 m/s to 600 m/s. The Live Mathematics HUD and telemetry bar recalculate the resulting resonant wavelength and frequency instantaneously.
+                    </li>
+                    <li>
+                        <strong>Holographic Viewport Navigation:</strong> Toggle between the <strong>3D Ribbon</strong> view and 2D planar projection. Click or drag directly on the canvas using touch or mouse inputs to pan the visual field, and use the zoom controls to inspect nodal boundaries. Click <strong>Play Tone</strong> to synthesize the audible resonant frequency via the Web Audio API.
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Scientific Theory &amp; Working Principles</h2>
+                <p>
+                    A <strong>stationary (or standing) wave</strong> is formed when two identical continuous progressive waves traveling in opposite directions along the same medium undergo <strong>superposition</strong>. Rather than propagating energy forward through space, stationary waves store mechanical energy in localized spatial regions defined by static topological features:
+                </p>
+                <ul>
+                    <li>
+                        <strong>Displacement Nodes (N):</strong> Spatial coordinates where destructive interference is permanent and continuous. Here, particle displacement and particle kinetic energy remain strictly zero at all times. In air columns, a displacement node corresponds directly to a <strong>pressure antinode</strong>, where dynamic pressure fluctuations reach their peak amplitude.
+                    </li>
+                    <li>
+                        <strong>Displacement Antinodes (A):</strong> Coordinates midway between consecutive nodes where constructive interference creates maximum particle oscillation. In acoustic air pipes, an open boundary permits free particle motion, establishing a displacement antinode and a concurrent <strong>pressure node</strong> equal to ambient atmospheric pressure.
+                    </li>
+                    <li>
+                        <strong>Spatial Periodicity:</strong> The distance between two successive displacement nodes (or two successive antinodes) is always equal to <strong>half a wavelength (λ / 2)</strong>. The distance between an adjacent node and antinode is <strong>one quarter of a wavelength (λ / 4)</strong>.
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Mathematical Foundations &amp; Formulas</h2>
+                <p>
+                    The natural resonant frequencies of standing waves are governed by the medium length L, wave speed v, and boundary conditions:
+                </p>
+                <div class="formula-box">
+                    1. Vibrating Strings &amp; Open Pipes (Symmetric Boundaries):<br>
+                    Condition: L = n · (λ / 2), where n = 1, 2, 3, 4, ... (all integers)<br>
+                    Wavelength: λ_n = 2L / n<br>
+                    Resonant Frequency: f_n = (n · v) / (2L) = n · f_1<br><br>
+                    2. Closed Pipes (Asymmetric Boundaries: One Fixed, One Open):<br>
+                    Condition: L = n · (λ / 4), where n = 1, 3, 5, 7, ... (odd integers only)<br>
+                    Wavelength: λ_n = 4L / n<br>
+                    Resonant Frequency: f_n = (n · v) / (4L) = n · f_1<br><br>
+                    3. Mechanical Wave Speed in Strings (Mersenne's Law):<br>
+                    v = √(T / μ), where T is string tension in Newtons, and μ is linear mass density in kg/m.
+                </div>
+            </section>
+
+            <section>
+                <h2>Real-World Industrial &amp; Engineering Applications</h2>
+                <p>
+                    Stationary wave mechanics are fundamental across modern acoustics, telecommunications, and quantum engineering:
+                </p>
+                <ul>
+                    <li>
+                        <strong>Acoustic Instrument Design &amp; Luthiery:</strong> Modern piano, guitar, and orchestral instrument builders tailor vibrating string scale lengths, internal core tensions, and winding wire masses to establish precise fundamental frequencies. In woodwinds like clarinets and flutes, finger tone holes effectively vent the air column to the atmosphere, dynamically shifting the active boundary length L to alter pitch during performance.
+                    </li>
+                    <li>
+                        <strong>Microwave Ovens &amp; Resonant Cavities:</strong> A microwave oven generates 2.45 GHz electromagnetic waves inside a reflective metal chamber, forming three-dimensional standing waves. Because nodal regions experience zero oscillating electric field, food placed at nodes would remain unheated. Modern appliances utilize motorized rotating turntables to continuously move food items through high-energy antinodal hot spots.
+                    </li>
+                    <li>
+                        <strong>Radio Frequency (RF) Transmission Lines &amp; Waveguides:</strong> In broadcast transmission lines connecting transmitters to antenna masts, impedance mismatches cause reflected waves that set up standing waves. RF engineers evaluate the Standing Wave Ratio (SWR); excessive standing wave amplitudes lead to dielectric insulation breakdown, high resistive power losses, and dangerous heat accumulation.
+                    </li>
+                    <li>
+                        <strong>Architectural Acoustics &amp; Room Mode Control:</strong> In recording studios and auditoriums, low-frequency sound reflections between parallel walls form standing room modes. This creates acoustic dead zones where specific musical bass notes vanish entirely, and antinodal zones where bass frequencies resonate uncomfortably. Acoustic engineers install corner bass traps to damp standing wave reflections.
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Practice Problems &amp; Diagnostic Tasks</h2>
+                <p>Consolidate your quantitative standing wave comprehension using the five graded laboratory exercises below:</p>
+
+                <div class="task-card">
+                    <div class="task-title">Task 1: Fundamental Pitch on an Electric Guitar String</div>
+                    <p>
+                        An electric guitar string has an active vibrating length of L = 0.65 m between the nut and the bridge saddle. If the transverse wave propagation speed across the tensioned steel core is measured at v = 107.25 m/s, calculate the fundamental resonant wavelength λ_1 and determine the fundamental pitch frequency f_1.
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 2: Harmonic Analysis in a Closed Organ Pipe</div>
+                    <p>
+                        A stopped organ pipe (closed at one end, open at the mouth) has an effective internal acoustic length of L = 0.85 m. Assuming the ambient speed of sound in the air column is v = 340.0 m/s, determine the harmonic integer number n, resonant wavelength λ, and frequency f corresponding to the pipe's <strong>first overtone</strong>.
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 3: Nodal Topology of a Concert Flute</div>
+                    <p>
+                        A concert flute modeled as an open-ended cylindrical air column has an active acoustic length of L = 0.60 m. When sustained in its third harmonic mode (n = 3), how many displacement nodes and displacement antinodes are distributed along the column? Compute the exact spatial distance between two consecutive displacement nodes.
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 4: Reverse Calculation of String Velocity from Concert Pitch</div>
+                    <p>
+                        A master luthier tunes a concert violin string with a scale length of L = 0.33 m to concert standard pitch A4 (f_1 = 440.0 Hz) in its fundamental mode (n = 1). What is the required transverse mechanical wave propagation speed v along this string?
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 5: Comparative Fundamental Frequencies of Coupled Pipes</div>
+                    <p>
+                        Two test bench organ pipes, Pipe A (open at both ends) and Pipe B (closed at one end, open at the other), are manufactured to identical physical lengths of L = 1.20 m. If dry air at 20 degrees Celsius provides a uniform sound speed of v = 340.0 m/s, calculate the absolute frequency difference (f_1,open &minus; f_1,closed) between their fundamental frequencies.
+                    </p>
+                </div>
+
+                <!-- Collapsible Solutions Accordion -->
+                <details>
+                    <summary>Click to Reveal Solutions and Step-by-Step Proofs</summary>
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 1:</strong></p>
+                        <p>For a string fixed at both boundaries vibrating in its fundamental mode, n = 1.</p>
+                        <p>1. Resonant Wavelength: λ_1 = 2L / n = (2 × 0.65 m) / 1 = <strong>1.30 m</strong></p>
+                        <p>2. Fundamental Frequency: f_1 = v / λ_1 = 107.25 m/s / 1.30 m = <strong>82.5 Hz</strong> (Standard musical note E2).</p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 2:</strong></p>
+                        <p>A closed air column supports only odd harmonic integers: n = 1, 3, 5, 7, ... The fundamental mode corresponds to n = 1. Therefore, the <strong>first overtone</strong> corresponds to the next permitted harmonic, <strong>n = 3</strong>.</p>
+                        <p>1. Resonant Wavelength: λ_3 = 4L / n = (4 × 0.85 m) / 3 = 3.40 m / 3 = <strong>1.133 m</strong></p>
+                        <p>2. Resonant Frequency: f_3 = (n · v) / (4L) = (3 × 340.0 m/s) / (4 × 0.85 m) = 1020 / 3.40 = <strong>300.0 Hz</strong>.</p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 3:</strong></p>
+                        <p>For an open-ended column in harmonic mode n: Number of displacement nodes = n, and number of displacement antinodes = n + 1.</p>
+                        <p>1. Topology Counts: Mode n = 3 contains <strong>3 displacement nodes</strong> and <strong>4 displacement antinodes</strong>.</p>
+                        <p>2. Wavelength: λ_3 = 2L / n = (2 × 0.60 m) / 3 = 1.20 m / 3 = 0.40 m.</p>
+                        <p>3. Distance between consecutive nodes: d_NN = λ / 2 = 0.40 m / 2 = <strong>0.20 m</strong>.</p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 4:</strong></p>
+                        <p>For fundamental string vibration (n = 1), the active length satisfies L = λ / 2, meaning λ_1 = 2L.</p>
+                        <p>1. Wavelength: λ_1 = 2 × 0.33 m = 0.66 m.</p>
+                        <p>2. Wave Speed Calculation: v = f_1 · λ_1 = 440.0 Hz × 0.66 m = <strong>290.4 m/s</strong>.</p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 5:</strong></p>
+                        <p>1. Pipe A (Open Column Fundamental): f_1,open = v / (2L) = 340.0 m/s / (2 × 1.20 m) = 340.0 / 2.40 = 141.67 Hz.</p>
+                        <p>2. Pipe B (Closed Column Fundamental): f_1,closed = v / (4L) = 340.0 m/s / (4 × 1.20 m) = 340.0 / 4.80 = 70.83 Hz.</p>
+                        <p>3. Frequency Difference: Δf = 141.67 Hz &minus; 70.83 Hz = <strong>70.84 Hz</strong>. (An open pipe naturally resonates at twice the fundamental frequency of a closed pipe of equivalent length).</p>
+                    </div>
+                </details>
+            </section>
+        </article>
     </main>
 
-    <!-- IN-CONTENT AD PLACEMENT ZONE (AdSense Ready) -->
-    <aside class="ads-container" aria-label="In-Article Advertisement">
-        <span>Google AdSense In-Article Responsive Banner Placement</span>
-    </aside>
-
-    <!-- 3. COMPREHENSIVE EDUCATIONAL LESSON CONTENT -->
-    <section class="educational-content" id="physics-lesson">
-        <h2>How to Use This Simulator</h2>
-        <p>This virtual wave laboratory allows you to observe, manipulate, and analyze transverse and longitudinal standing waves in real time. Follow these steps to conduct experiments:</p>
-        <ol>
-            <li><strong>Select an Acoustic Medium or Instrument:</strong> Choose between a <strong>Vibrating String</strong>, a <strong>Closed Air Column</strong>, or an <strong>Open Air Column</strong> using the top mode selectors. Alternatively, load real-world musical instruments such as the acoustic guitar, violin, concert flute, or clarinet to explore how specific physical geometry determines natural resonance.</li>
-            <li><strong>Alter Resonant Variables:</strong> Adjust the sliders to see immediate physical responses:
-                <ul>
-                    <li><strong>Harmonic Mode (<i>n</i>):</strong> Selects the fundamental frequency or higher overtones. Notice how closed air columns only permit odd integers (1, 3, 5, 7).</li>
-                    <li><strong>Length (<i>L</i>):</strong> Scales the physical span of the string or air pipe in meters.</li>
-                    <li><strong>Wave Speed (<i>v</i>):</strong> Adjusts propagation velocity through the medium (e.g., tension-dependent velocity on strings or sound velocity in air).</li>
-                </ul>
-            </li>
-            <li><strong>Inspect the 3D Holographic Rendering:</strong> Toggle between the <strong>3D Ribbon</strong> and 2D planar modes. Click <strong>Fullscreen</strong> to expand the visualizer to your entire screen for optimal classroom and demonstration viewing.</li>
-            <li><strong>Listen to Real-Time Synthesized Audio:</strong> Toggle <strong>Play Tone</strong> to synthesize the precise standing-wave frequency using the Web Audio API.</li>
-        </ol>
-
-        <h2>The Physical Theory Behind Stationary Waves</h2>
-        <p>A <strong>stationary (or standing) wave</strong> is the resultant disturbance created when two progressive waves of identical frequency, wavelength, and amplitude travel in opposite directions along the same medium and undergo continuous <strong>wave superposition</strong>.</p>
-        
-        <p>Unlike traveling progressive waves, stationary waves <strong>do not transmit net energy</strong> across space. Instead, energy remains localized between fixed spatial positions:</p>
-        <ul>
-            <li><strong>Displacement Nodes (N):</strong> Points along the medium that undergo permanent destructive interference. The net displacement, particle velocity, and mechanical kinetic energy at an ideal node are always zero.</li>
-            <li><strong>Displacement Antinodes (A):</strong> Points situated midway between adjacent nodes where constructive interference creates maximum vibrational excursion.</li>
-            <li><strong>Spatial Relationships:</strong> The distance between two consecutive nodes or two consecutive antinodes is exactly equal to <strong>half a wavelength (&lambda; / 2)</strong>. The distance between an adjacent node and antinode is <strong>one quarter of a wavelength (&lambda; / 4)</strong>.</li>
-        </ul>
-
-        <h2>Mathematical Formulations and Boundary Mechanics</h2>
-        <p>The natural resonant frequencies of any medium are strictly governed by its physical boundary conditions:</p>
-
-        <article class="formula-callout">
-            <h3>1. Vibrating Strings and Open-Ended Air Columns</h3>
-            <p>A string clamped at both extremities forces a displacement node at each end. Similarly, an air pipe open at both ends permits free air particle movement, forcing a displacement antinode at each end. Because both configurations possess symmetric boundaries, their resonant lengths equal an integral number of half-wavelength loops:</p>
-            <p>Length Condition: <strong><i>L</i> = <i>n</i> &middot; (&lambda; / 2)</strong>, where <i>n</i> = 1, 2, 3, 4, ...</p>
-            <p>Resonant Wavelength: <span class="formula-highlight">&lambda;<sub>n</sub> = 2<i>L</i> / <i>n</i></span></p>
-            <p>Harmonic Frequency: <span class="formula-highlight"><i>f</i><sub>n</sub> = (<i>n</i> &middot; <i>v</i>) / 2<i>L</i> = <i>n</i> &middot; <i>f</i><sub>1</sub></span></p>
-            <p>These systems naturally support <strong>all integer harmonics</strong> (both odd and even multiples of the fundamental frequency <i>f</i><sub>1</sub>).</p>
-        </article>
-
-        <article class="formula-callout">
-            <h3>2. Closed-Ended Air Columns (One End Fixed, One End Open)</h3>
-            <p>An air column closed at one end and open at the other forces a displacement node at the rigid wall and an antinode at the open boundary. Therefore, the column must contain an odd number of quarter-wavelength segments:</p>
-            <p>Fundamental Mode (<i>n</i> = 1): <strong><i>L</i> = &lambda; / 4</strong> &rArr; <strong>&lambda;<sub>1</sub> = 4<i>L</i></strong></p>
-            <p>General Resonance: <span class="formula-highlight">&lambda;<sub>n</sub> = 4<i>L</i> / <i>n</i></span>, where <strong><i>n</i> = 1, 3, 5, 7, ... (odd integers only)</strong></p>
-            <p>Harmonic Frequency: <span class="formula-highlight"><i>f</i><sub>n</sub> = (<i>n</i> &middot; <i>v</i>) / 4<i>L</i> = <i>n</i> &middot; <i>f</i><sub>1</sub></span></p>
-            <p>Even harmonics (<i>n</i> = 2, 4, 6, ...) cannot exist because having an even number of quarter-wavelengths would require identical conditions at both ends (either both nodes or both antinodes), violating the physical closed-open boundary.</p>
-        </article>
-
-        <h2>Real-World Engineering &amp; Scientific Applications</h2>
-        <ul>
-            <li><strong>Acoustic Instrument Design:</strong> Guitars, violins, pianos, and harps adjust string length, tension, and linear mass density (&mu;) to establish specific fundamental frequencies according to Mersenne's laws: <i>v</i> = &radic;(<i>T</i> / &mu;). Woodwinds like the flute and clarinet rely on opened tone holes to shorten the effective column length <i>L</i>, raising the pitch.</li>
-            <li><strong>Microwave Ovens:</strong> A magnetron emits 2.45 GHz radio waves that reflect within the metallic cooking chamber to establish an electromagnetic standing wave. Because nodal points provide zero electric field oscillation, a motorized turntable rotates the food through antinodal "hot spots" to ensure uniform heating.</li>
-            <li><strong>Quantum Wave Mechanics:</strong> In quantum theory, bound electrons around an atomic nucleus are described by standing de Broglie matter waves. Only integer harmonic wavefunctions that fit constructively around the atom are stable, explaining the discrete, quantized energy levels of atoms.</li>
-            <li><strong>Architectural Acoustics and Room Modes:</strong> In auditoriums and recording studios, low-frequency sound reflections can establish room standing waves ("standing room modes"), creating dead zones where specific musical bass notes disappear or boomy zones where bass is unnaturally amplified.</li>
-        </ul>
-
-        <h2>Practice Sample Tasks &amp; Complete Solutions</h2>
-        <p>Work through the following five physics problems to consolidate your understanding of standing wave mechanics. Every problem includes a fully calculated solution:</p>
-
-        <!-- Problem 1 -->
-        <article class="practice-task-card">
-            <span class="task-badge">Task 1: Fundamental Guitar String Pitch</span>
-            <p><strong>Question:</strong> An acoustic guitar string has an active vibrating length of <i>L</i> = 0.65 m between its nut and bridge. When plucked, transverse mechanical waves travel along the string at <i>v</i> = 107.25 m/s. Calculate the fundamental resonant wavelength &lambda;<sub>1</sub> and the resulting fundamental frequency <i>f</i><sub>1</sub>.</p>
-            
-            <div class="solution-box">
-                <div class="solution-title">Fully Worked Solution:</div>
-                <p><strong>1. Calculate fundamental wavelength (&lambda;<sub>1</sub>):</strong></p>
-                <p>For a string fixed at both ends in its fundamental mode (<i>n</i> = 1):</p>
-                <p>&lambda;<sub>1</sub> = 2<i>L</i> / <i>n</i> = (2 &times; 0.65 m) / 1 = <strong>1.30 m</strong></p>
-                <p><strong>2. Calculate fundamental frequency (<i>f</i><sub>1</sub>):</strong></p>
-                <p>Using the wave equation <i>v</i> = <i>f</i> &lambda;:</p>
-                <p><i>f</i><sub>1</sub> = <i>v</i> / &lambda;<sub>1</sub> = 107.25 m/s / 1.30 m = <strong>82.5 Hz</strong> (Standard musical note E2)</p>
-            </div>
-        </article>
-
-        <!-- Problem 2 -->
-        <article class="practice-task-card">
-            <span class="task-badge">Task 2: Closed Organ Pipe First Overtone</span>
-            <p><strong>Question:</strong> A pipe closed at one end has an internal air column of length <i>L</i> = 0.85 m. Taking the speed of sound in air as <i>v</i> = 340 m/s, determine the harmonic number <i>n</i>, the resonant wavelength &lambda;, and the frequency <i>f</i> corresponding to the <strong>first overtone</strong> of this pipe.</p>
-            
-            <div class="solution-box">
-                <div class="solution-title">Fully Worked Solution:</div>
-                <p><strong>1. Identify the harmonic number for the first overtone:</strong></p>
-                <p>A closed pipe supports only odd harmonics (<i>n</i> = 1, 3, 5, ...). The fundamental is <i>n</i> = 1. Therefore, the first overtone corresponds to the third harmonic: <strong><i>n</i> = 3</strong>.</p>
-                <p><strong>2. Calculate the resonant wavelength (&lambda;<sub>3</sub>):</strong></p>
-                <p>&lambda;<sub>3</sub> = 4<i>L</i> / 3 = (4 &times; 0.85 m) / 3 = 3.40 m / 3 &asymp; <strong>1.13 m</strong></p>
-                <p><strong>3. Calculate the frequency (<i>f</i><sub>3</sub>):</strong></p>
-                <p><i>f</i><sub>3</sub> = (3 &times; <i>v</i>) / 4<i>L</i> = (3 &times; 340 m/s) / (4 &times; 0.85 m) = 1020 / 3.40 = <strong>300.0 Hz</strong></p>
-            </div>
-        </article>
-
-        <!-- Problem 3 -->
-        <article class="practice-task-card">
-            <span class="task-badge">Task 3: Open Flute Node and Antinode Topology</span>
-            <p><strong>Question:</strong> A concert flute acts as an open air column of length <i>L</i> = 0.60 m. When vibrating in its third harmonic mode (<i>n</i> = 3), how many displacement nodes and displacement antinodes are formed along the column, and what is the distance between two consecutive displacement nodes?</p>
-            
-            <div class="solution-box">
-                <div class="solution-title">Fully Worked Solution:</div>
-                <p><strong>1. Count nodes and antinodes:</strong></p>
-                <p>For an open column in mode <i>n</i>: Number of displacement nodes = <i>n</i> = <strong>3 nodes</strong>. Number of displacement antinodes = <i>n</i> + 1 = <strong>4 antinodes</strong>.</p>
-                <p><strong>2. Find the resonant wavelength (&lambda;<sub>3</sub>):</strong></p>
-                <p>&lambda;<sub>3</sub> = 2<i>L</i> / 3 = (2 &times; 0.60 m) / 3 = 1.20 m / 3 = <strong>0.40 m</strong></p>
-                <p><strong>3. Distance between consecutive nodes:</strong></p>
-                <p>The distance between adjacent nodes is always &lambda; / 2: <i>d</i><sub>N-N</sub> = 0.40 m / 2 = <strong>0.20 m</strong>.</p>
-            </div>
-        </article>
-
-        <!-- Problem 4 -->
-        <article class="practice-task-card">
-            <span class="task-badge">Task 4: Wave Speed on a Concert Violin String</span>
-            <p><strong>Question:</strong> A violin string of vibrating length <i>L</i> = 0.33 m resonates in its fundamental mode (<i>n</i> = 1) at concert pitch <i>f</i><sub>1</sub> = 440.0 Hz (Note A4). What is the transverse wave propagation speed <i>v</i> along this string?</p>
-            
-            <div class="solution-box">
-                <div class="solution-title">Fully Worked Solution:</div>
-                <p><strong>1. Calculate the fundamental wavelength:</strong></p>
-                <p>&lambda;<sub>1</sub> = 2<i>L</i> = 2 &times; 0.33 m = <strong>0.66 m</strong></p>
-                <p><strong>2. Compute the wave speed:</strong></p>
-                <p><i>v</i> = <i>f</i><sub>1</sub> &times; &lambda;<sub>1</sub> = 440.0 Hz &times; 0.66 m = <strong>290.4 m/s</strong></p>
-            </div>
-        </article>
-
-        <!-- Problem 5 -->
-        <article class="practice-task-card">
-            <span class="task-badge">Task 5: Comparative Open vs Closed Column Fundamental Frequencies</span>
-            <p><strong>Question:</strong> Two organ pipes, Pipe 1 (open at both ends) and Pipe 2 (closed at one end), have the exact same physical length of <i>L</i> = 1.20 m. If the speed of sound is <i>v</i> = 340 m/s in both pipes, what is the frequency difference between their fundamental tones (<i>f</i><sub>1,open</sub> &minus; <i>f</i><sub>1,closed</sub>)?</p>
-            
-            <div class="solution-box">
-                <div class="solution-title">Fully Worked Solution:</div>
-                <p><strong>1. Calculate the open pipe fundamental:</strong></p>
-                <p><i>f</i><sub>1,open</sub> = <i>v</i> / 2<i>L</i> = 340 m/s / (2 &times; 1.20 m) = 340 / 2.40 &asymp; <strong>141.67 Hz</strong></p>
-                <p><strong>2. Calculate the closed pipe fundamental:</strong></p>
-                <p><i>f</i><sub>1,closed</sub> = <i>v</i> / 4<i>L</i> = 340 m/s / (4 &times; 1.20 m) = 340 / 4.80 &asymp; <strong>70.83 Hz</strong></p>
-                <p><strong>3. Calculate the frequency difference:</strong></p>
-                <p>&Delta;<i>f</i> = 141.67 Hz &minus; 70.83 Hz = <strong>70.84 Hz</strong> (An open pipe resonates at twice the frequency of a closed pipe of identical length).</p>
-            </div>
-        </article>
-    </section>
-
-    <!-- FOOTER AD PLACEMENT ZONE (AdSense Ready) -->
-    <aside class="ads-container" aria-label="Footer Advertisement">
-        <span>Google AdSense Responsive Unit - Bottom Banner Placement Area</span>
-    </aside>
-
-    <footer class="page-footer">
-        &copy; 2026 LuyaliSims Pro Physics Suite. Interactive educational content engineered for high performance, standard accessibility, and cross-platform physics education.
+    <!-- 5. SYNCHRONIZED COMPLIANCE FOOTER (Zero 404s, Exact Alignment with Home) -->
+    <footer>
+        <nav class="footer-nav">
+            <a href="../index.html">Home</a>
+            <a href="../index.html#about-section">About Us</a>
+            <button type="button" class="footer-modal-trigger" onclick="openSimModal('simPrivacyModal')">Privacy Policy</button>
+            <button type="button" class="footer-modal-trigger" onclick="openSimModal('simTermsModal')">Terms of Service</button>
+            <a href="../index.html#contact-section">Contact Us</a>
+            <a href="https://forms.gle/fYxxaNKAh21dPUoBA" target="_blank" rel="noopener noreferrer">Simulator Suggestions</a>
+        </nav>
+        <p>&copy; 2026 LuyaliSims | Engineered by Click &amp; Draft | Dedicated to Open STEM Education</p>
     </footer>
 
-    <!-- 4. ENGINE SCRIPT -->
+    <!-- 6. IDENTICAL PRIVACY POLICY MODAL (Matches Home Exactly) -->
+    <div id="simPrivacyModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="privacyTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeSimModal('simPrivacyModal')">Close [✕]</button>
+            <h2 id="privacyTitle">Privacy Policy</h2>
+            <p class="modal-date">Last Updated: September 2026</p>
+            <p>Welcome to LuyaliSims. We respect your privacy and are committed to protecting your personal data. This privacy policy explains how we treat information when you interact with our educational simulators.</p>
+            
+            <h3>1. Educational Purpose &amp; Information Collection</h3>
+            <p>LuyaliSims is a free educational portal. We do not require account registration, passwords, or personal login information to run any simulation. All simulation calculations occur locally within your browser using client-side JavaScript.</p>
+
+            <h3>2. Google AdSense &amp; Third-Party Cookies</h3>
+            <p>We may display advertisements served by Google AdSense to fund our free educational tools. Google, as a third-party vendor, uses cookies to serve ads on our site based on users' visits to this and other sites on the Internet.</p>
+            <ul>
+                <li>Google's use of advertising cookies enables it and its partners to serve ads based on your visit to LuyaliSims and other sites.</li>
+                <li>Users may opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" style="color: var(--neon-cyan);">Google Ads Settings</a>.</li>
+            </ul>
+
+            <h3>3. Log Files &amp; Analytics</h3>
+            <p>Like standard websites, our hosting servers collect anonymous log records (including IP addresses, browser types, and timestamp references) to monitor server uptime, fix script errors, and optimize simulator performance.</p>
+
+            <h3>4. Children's Online Privacy (COPPA Compliance)</h3>
+            <p>Our educational simulators are built for students and educators of all ages. We do not knowingly solicit or collect personally identifiable information from children under 13.</p>
+
+            <h3>5. Contact Regarding Privacy</h3>
+            <p>If you have any questions regarding this policy, contact us at: <a href="mailto:luyashliz@gmail.com" style="color: var(--neon-cyan);">luyashliz@gmail.com</a>.</p>
+        </div>
+    </div>
+
+    <!-- 7. IDENTICAL TERMS OF SERVICE MODAL (Matches Home Exactly) -->
+    <div id="simTermsModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="termsTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeSimModal('simTermsModal')">Close [✕]</button>
+            <h2 id="termsTitle">Terms of Service</h2>
+            <p class="modal-date">Effective Date: September 2026</p>
+
+            <h3>1. Permitted Educational Use</h3>
+            <p>All interactive models, simulations, practice problems, and laboratory worksheets on LuyaliSims are made freely available for classroom demonstrations, academic study, tutoring, and self-paced individual learning.</p>
+
+            <h3>2. Intellectual Property</h3>
+            <p>The code architecture, layout designs, and custom interactive engines are the intellectual property of Ian Luyali and Click &amp; Draft. You may use our simulators online in academic settings, but mirroring or re-hosting our code for commercial resale without permission is prohibited.</p>
+
+            <h3>3. Disclaimer of Scientific Warranty</h3>
+            <p>While simulations are engineered to accurately replicate classical mechanics, thermodynamics, and electronics, they are provided as conceptual learning aids. LuyaliSims is not liable for outcomes in real-world high-voltage or hazardous laboratory environments constructed without professional teacher supervision.</p>
+
+            <h3>4. Updates to Terms</h3>
+            <p>We reserve the right to refine these terms as new laboratory modules and features are introduced.</p>
+        </div>
+    </div>
+
+    <!-- 8. SIMULATOR CORE SCRIPT & ENGINE -->
     <script>
-        // Physics Simulation State
-        let systemType = 'string'; // 'string', 'closed', 'open'
-        let activeInstrument = null;
-        let harmonic = 1;
-        let length = 1.0;
-        let speed = 340;
-
-        // Visual & 3D Holographic Rendering State
-        const canvas = document.getElementById('simCanvas');
-        const ctx = canvas.getContext('2d');
-        let t = 0;
-        let zoom = 1.0;
-        let is3DMode = true;
-
-        // Internal Balanced 3D Constants (Cleaned from UI to avoid clutter)
-        const tiltAngleDeg = 35;
-        const holoDepthPx = 30;
-
-        // Pointer / Touch Navigation State
-        let isDragging = false;
-        let panStartX = 0;
-        let panStartY = 0;
-        let offsetX = 0;
-        let offsetY = 0;
-
-        // Audio Context & Synthesizer State
-        let audioCtx = null;
-        let oscillator = null;
-        let gainNode = null;
-        let isAudioPlaying = false;
-
-        // Instrument Presets with Scientifically Accurate Acoustical Constants
-        const instruments = {
-            guitar: { type: 'string', n: 1, L: 0.65, v: 107.25, desc: "Acoustic Guitar (E2): Tensioned steel string fixed between bridge saddle and bone nut; vibrating length 0.65 m yields fundamental frequency 82.5 Hz." },
-            violin: { type: 'string', n: 1, L: 0.33, v: 290.4, desc: "Concert Violin (A4): Short fingerboard scale length of 0.33 m with high string tension produces concert standard A pitch (440.0 Hz)." },
-            flute: { type: 'open', n: 1, L: 0.65, v: 340.0, desc: "Concert Flute (C4): Transverse embouchure hole and foot joint both act as pressure nodes / displacement antinodes, producing middle C (261.6 Hz)." },
-            clarinet: { type: 'closed', n: 1, L: 0.58, v: 340.0, desc: "Clarinet (D3): Cylindrical bore with reed acts as a displacement node, open flared bell acts as an antinode, generating only odd harmonics (146.5 Hz)." }
-        };
-
-        window.addEventListener('load', () => {
-            fitCanvasToScreen();
-            setSystemType('string');
-            requestAnimationFrame(renderLoop);
-        });
-
-        window.addEventListener('resize', fitCanvasToScreen);
-
-        function fitCanvasToScreen() {
-            const rect = canvas.parentElement.getBoundingClientRect();
-            canvas.width = Math.floor(rect.width);
-            canvas.height = Math.floor(rect.height);
+        // Modal Event Handlers
+        function openSimModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
         }
 
-        // --- FULLSCREEN LOGIC ---
+        function closeSimModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('policy-modal')) {
+                closeSimModal(e.target.id);
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' || e.key === 'Esc') {
+                document.querySelectorAll('.policy-modal').forEach(m => {
+                    m.style.display = 'none';
+                });
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // Fullscreen Implementation
         function toggleFullscreen() {
             const container = document.getElementById("simulator-container");
             const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
@@ -1112,22 +1253,15 @@
 
         function handleFsChange() {
             const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
-            const fsBtn = document.getElementById('fs-btn');
-            const fsIcon = document.getElementById('fs-icon');
             const fsText = document.getElementById('fs-text');
+            const fsBtn = document.getElementById('fullscreenBtn');
 
             if (isFs) {
-                fsBtn.classList.add('fs-active');
-                fsIcon.innerHTML = "🗗";
-                fsText.innerText = "Exit";
+                fsText.innerText = "Exit Screen";
+                fsBtn.classList.add('secondary');
             } else {
-                fsBtn.classList.remove('fs-active');
-                fsIcon.innerHTML = "⛶";
                 fsText.innerText = "Fullscreen";
             }
-
-            // Smooth high-DPI canvas realignment
-            setTimeout(fitCanvasToScreen, 120);
         }
 
         document.addEventListener('fullscreenchange', handleFsChange);
@@ -1135,7 +1269,50 @@
         document.addEventListener('mozfullscreenchange', handleFsChange);
         document.addEventListener('MSFullscreenChange', handleFsChange);
 
-        // --- 3D VIEW & TOUCH NAVIGATION ---
+        // Physics State Variables
+        let systemType = 'string'; // 'string', 'closed', 'open'
+        let activeInstrument = null;
+        let harmonic = 1;
+        let length = 1.0;
+        let speed = 340;
+
+        // Visual & 3D Projection State
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        let t = 0;
+        let zoom = 1.0;
+        let is3DMode = true;
+        const tiltAngleDeg = 35;
+        const holoDepthPx = 30;
+
+        // Pointer / Touch Navigation State
+        let isDragging = false;
+        let panStartX = 0;
+        let panStartY = 0;
+        let offsetX = 0;
+        let offsetY = 0;
+
+        // Web Audio Synthesizer State
+        let audioCtx = null;
+        let oscillator = null;
+        let gainNode = null;
+        let isAudioPlaying = false;
+
+        // Instrument Presets
+        const instruments = {
+            guitar: { type: 'string', n: 1, L: 0.65, v: 107.25, desc: "Acoustic Guitar (E2): Tensioned steel string clamped between saddle bridge and nut; scale length 0.65 m produces fundamental 82.5 Hz." },
+            violin: { type: 'string', n: 1, L: 0.33, v: 290.4, desc: "Concert Violin (A4): Short string scale length of 0.33 m with high tension generates concert standard A pitch (440.0 Hz)." },
+            flute: { type: 'open', n: 1, L: 0.65, v: 340.0, desc: "Concert Flute (C4): Transverse embouchure hole and foot joint act as pressure nodes / displacement antinodes, yielding middle C (261.6 Hz)." },
+            clarinet: { type: 'closed', n: 1, L: 0.58, v: 340.0, desc: "Clarinet (D3): Cylindrical bore with vibrating reed forces a displacement node; flared open bell acts as an antinode, producing only odd harmonics (146.5 Hz)." }
+        };
+
+        // Initialize Application
+        window.addEventListener('load', () => {
+            setSystemType('string');
+            requestAnimationFrame(renderLoop);
+        });
+
+        // View Controls
         function toggle3DView() {
             is3DMode = !is3DMode;
             const btn = document.getElementById('btn-3d-toggle');
@@ -1149,7 +1326,7 @@
         }
 
         function zoomCanvas(factor) {
-            zoom = Math.min(Math.max(zoom * factor, 0.6), 3.0);
+            zoom = Math.min(Math.max(zoom * factor, 0.6), 2.8);
         }
 
         function resetView() {
@@ -1158,7 +1335,7 @@
             offsetY = 0;
         }
 
-        // Pointer Handling (Unified Touch + Mouse)
+        // Pointer Drag & Pan Support (Touch-Action: None Protected)
         canvas.addEventListener('pointerdown', (e) => {
             isDragging = true;
             panStartX = e.clientX - offsetX;
@@ -1185,7 +1362,7 @@
             zoomCanvas(factor);
         }, { passive: false });
 
-        // --- SYSTEM TYPE & PRESET LOGIC ---
+        // Medium & Instrument Selection Handlers
         function setSystemType(type, fromPreset = false) {
             systemType = type;
             if (!fromPreset) {
@@ -1211,7 +1388,7 @@
                 if (harmonic % 2 === 0) harmonic = Math.max(1, harmonic - 1);
                 hSlider.value = harmonic;
 
-                speedLabel.innerHTML = "Speed of Sound (<i>v</i>)";
+                speedLabel.innerHTML = "Speed of Sound (v):";
                 if (!fromPreset && (speed < 300 || speed > 380)) speed = 340;
                 speedSlider.value = speed;
             } else if (type === 'open') {
@@ -1220,7 +1397,7 @@
                 hSlider.step = 1;
                 hSlider.value = harmonic;
 
-                speedLabel.innerHTML = "Speed of Sound (<i>v</i>)";
+                speedLabel.innerHTML = "Speed of Sound (v):";
                 if (!fromPreset && (speed < 300 || speed > 380)) speed = 340;
                 speedSlider.value = speed;
             } else {
@@ -1229,7 +1406,7 @@
                 hSlider.step = 1;
                 hSlider.value = harmonic;
 
-                speedLabel.innerHTML = "Wave Speed (<i>v</i>)";
+                speedLabel.innerHTML = "Wave Speed (v):";
                 if (!fromPreset && (speed < 100 || speed > 600)) speed = 250;
                 speedSlider.value = speed;
             }
@@ -1256,7 +1433,7 @@
             setSystemType(inst.type, true);
 
             const descBox = document.getElementById('instrument-desc');
-            descBox.innerHTML = `<strong>${key.toUpperCase()} RESONANCE:</strong> ${inst.desc}`;
+            descBox.innerHTML = `<strong>${key.toUpperCase()} PROFILE:</strong> ${inst.desc}`;
             descBox.style.display = 'block';
             resetView();
         }
@@ -1295,7 +1472,7 @@
             updateMathHUD();
         }
 
-        // --- MATH HUD UPDATE (STRICTLY NO DOLLAR SIGNS) ---
+        // Live Mathematics Calculation HUD (Strictly Plaintext Unicode Math - No Dollar Signs)
         function updateMathHUD() {
             document.getElementById('harmonicVal').innerText = harmonic;
             document.getElementById('lengthVal').innerText = `${length.toFixed(2)} m`;
@@ -1305,8 +1482,11 @@
             const wl = (divisor * length) / harmonic;
             const freq = speed / wl;
 
-            document.getElementById('hud-wavelength').innerText = `${wl.toFixed(2)} m`;
-            document.getElementById('hud-frequency').innerText = `${freq.toFixed(1)} Hz`;
+            // Telemetry Bar updates
+            document.getElementById('tele-medium').innerText = systemType === 'string' ? 'VIBRATING STRING' : (systemType === 'closed' ? 'CLOSED AIR PIPE' : 'OPEN AIR PIPE');
+            document.getElementById('tele-harmonic').innerText = `n = ${harmonic}`;
+            document.getElementById('tele-wavelength').innerText = `${wl.toFixed(2)} m`;
+            document.getElementById('tele-frequency').innerText = `${freq.toFixed(1)} Hz`;
 
             let modeName = "Fundamental Mode (n = 1)";
             if (harmonic > 1) {
@@ -1321,18 +1501,19 @@
 
             const derivationBox = document.getElementById('dynamic-derivation');
             derivationBox.innerHTML = `
-                <div style="color: #67e8f9; font-weight: 700; margin-bottom: 4px;">Boundary Condition: ${systemType === 'closed' ? 'Quarter-Wavelength Modes' : 'Half-Wavelength Modes'}</div>
-                <div>Formula: <i>f</i><sub>n</sub> = (<i>n</i> &middot; <i>v</i>) / (${divisor} &middot; <i>L</i>)</div>
-                <div>Calculation: <i>f</i> = (${harmonic} &middot; ${Math.round(speed)} m/s) / (${divisor} &middot; ${length.toFixed(2)} m)</div>
-                <div style="color: #e580ff; font-weight: 700; margin-top: 4px;">Output Frequency: <i>f</i> = ${freq.toFixed(1)} Hz</div>
+                <div style="color: var(--neon-cyan); font-weight: 700; margin-bottom: 4px;">Boundary: ${systemType === 'closed' ? 'Quarter-Wavelength System' : 'Half-Wavelength System'}</div>
+                <div>Formula: f_n = (n · v) / (${divisor} · L)</div>
+                <div>Step 1: λ = (${divisor} · ${length.toFixed(2)} m) / ${harmonic} = ${wl.toFixed(2)} m</div>
+                <div>Step 2: f = ${Math.round(speed)} m/s / ${wl.toFixed(2)} m</div>
+                <div style="color: #ff55bb; font-weight: 700; margin-top: 4px;">Resolved Frequency: f = ${freq.toFixed(1)} Hz</div>
             `;
 
             if (isAudioPlaying && oscillator && gainNode) {
-                oscillator.frequency.setTargetAtTime(freq, audioCtx.currentTime, 0.05);
+                oscillator.frequency.setTargetAtTime(freq, audioCtx.currentTime, 0.04);
             }
         }
 
-        // --- AUDIO SYNTHESIS ---
+        // Web Audio Synthesizer
         function initAudioContext() {
             if (!audioCtx) {
                 const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
@@ -1385,7 +1566,7 @@
             }
         }
 
-        // --- 3D CANVAS RENDERING ENGINE WITH INSTRUMENTS ---
+        // Main Simulation Render Loop
         function renderLoop() {
             const divisor = (systemType === 'closed') ? 4 : 2;
             const wl = (divisor * length) / harmonic;
@@ -1409,7 +1590,6 @@
             ctx.translate(w / 2 + offsetX, midY + offsetY);
             ctx.scale(zoom, zoom);
 
-            // Active vibrating width
             const maxL = 2.0;
             const totalSimWidth = Math.min(w * 0.78, 620);
             const activeWidth = totalSimWidth * (length / maxL);
@@ -1422,7 +1602,7 @@
 
             drawHoloFloorGrid(sx, ex, activeWidth, depthX, depthY);
             
-            // Draw Selected Instrument or Generic Hardware
+            // Draw Specific Instrument Preset or General Hardware Testbench
             if (activeInstrument === 'guitar') {
                 drawHoloAcousticGuitar(sx, ex, activeWidth, depthX, depthY);
             } else if (activeInstrument === 'violin') {
@@ -1435,13 +1615,13 @@
                 drawGenericHardware(sx, ex, activeWidth, depthX, depthY);
             }
 
-            // Draw the Standing Wave Oscillating on the Instrument
+            // Draw Standing Wave Holographic Ribbon
             drawHolographicWaveRibbon(sx, ex, activeWidth, depthX, depthY);
 
             ctx.restore();
         }
 
-        // Isometric Holographic Depth Grid
+        // Isometric Holographic Floor Grid
         function drawHoloFloorGrid(sx, ex, activeW, dx, dy) {
             ctx.save();
             ctx.strokeStyle = 'rgba(0, 243, 255, 0.08)';
@@ -1461,7 +1641,7 @@
             ctx.restore();
         }
 
-        // --- AESTHETIC HOLOGRAPHIC GUITAR ---
+        // Instrument Visualizer: Acoustic Guitar
         function drawHoloAcousticGuitar(sx, ex, w, dx, dy) {
             ctx.save();
             const neckLen = w * 0.65;
@@ -1507,11 +1687,12 @@
             ctx.stroke();
             ctx.setLineDash([]);
 
+            // Bridge and Saddle
             ctx.fillStyle = '#1e1b4b';
             ctx.strokeStyle = '#00f3ff';
             ctx.lineWidth = 1.5;
             ctx.beginPath();
-            ctx.roundRect(ex - 6, -26, 16, 52, 4);
+            ctx.rect(ex - 6, -26, 16, 52);
             ctx.fill();
             ctx.stroke();
 
@@ -1522,6 +1703,7 @@
                 ctx.fill();
             }
 
+            // Guitar Neck
             const neckW = 20;
             ctx.fillStyle = 'rgba(15, 23, 42, 0.7)';
             ctx.strokeStyle = 'rgba(0, 243, 255, 0.4)';
@@ -1542,9 +1724,11 @@
                 ctx.stroke();
             }
 
+            // Nut
             ctx.fillStyle = '#f8fafc';
             ctx.fillRect(sx - 4, -14, 5, 28);
 
+            // Headstock
             ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
             ctx.strokeStyle = 'rgba(188, 19, 254, 0.6)';
             ctx.lineWidth = 1.5;
@@ -1556,21 +1740,6 @@
             ctx.closePath();
             ctx.fill();
             ctx.stroke();
-
-            ctx.fillStyle = '#00f3ff';
-            [-1, 1].forEach(side => {
-                for (let p = 0; p < 3; p++) {
-                    const px = sx - 16 - p * 12;
-                    const py = side * 22;
-                    ctx.beginPath();
-                    ctx.arc(px, py, 3.5, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.beginPath();
-                    ctx.moveTo(px, side * 12);
-                    ctx.lineTo(px, py);
-                    ctx.stroke();
-                }
-            });
 
             ctx.restore();
         }
@@ -1589,7 +1758,7 @@
             ctx.closePath();
         }
 
-        // --- AESTHETIC HOLOGRAPHIC VIOLIN ---
+        // Instrument Visualizer: Violin
         function drawHoloViolin(sx, ex, w, dx, dy) {
             ctx.save();
             const bodyLen = w * 0.75;
@@ -1604,6 +1773,7 @@
             ctx.fill();
             ctx.stroke();
 
+            // F-holes
             ctx.strokeStyle = 'rgba(0, 243, 255, 0.85)';
             ctx.lineWidth = 2;
             [-1, 1].forEach(side => {
@@ -1612,11 +1782,9 @@
                 ctx.moveTo(waistX - 15, fy - side * 6);
                 ctx.bezierCurveTo(waistX - 5, fy + side * 10, waistX + 5, fy - side * 10, waistX + 18, fy + side * 6);
                 ctx.stroke();
-                ctx.fillStyle = '#00f3ff';
-                ctx.beginPath(); ctx.arc(waistX - 15, fy - side * 6, 2.5, 0, Math.PI * 2); ctx.fill();
-                ctx.beginPath(); ctx.arc(waistX + 18, fy + side * 6, 2.5, 0, Math.PI * 2); ctx.fill();
             });
 
+            // Bridge
             ctx.fillStyle = '#fde68a';
             ctx.strokeStyle = '#d97706';
             ctx.lineWidth = 1.5;
@@ -1625,17 +1793,7 @@
             ctx.fill();
             ctx.stroke();
 
-            ctx.fillStyle = '#0f172a';
-            ctx.strokeStyle = 'rgba(0, 243, 255, 0.5)';
-            ctx.beginPath();
-            ctx.moveTo(ex + 8, -12);
-            ctx.lineTo(ex + 35, -7);
-            ctx.lineTo(ex + 35, 7);
-            ctx.lineTo(ex + 8, 12);
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
-
+            // Fingerboard
             const fbW = 16;
             ctx.fillStyle = '#090d1a';
             ctx.strokeStyle = 'rgba(0, 243, 255, 0.4)';
@@ -1645,26 +1803,15 @@
             ctx.fill();
             ctx.stroke();
 
+            // Nut
             ctx.fillStyle = '#e2e8f0';
             ctx.fillRect(sx - 3, -10, 4, 20);
 
+            // Pegbox
             ctx.strokeStyle = 'rgba(188, 19, 254, 0.8)';
             ctx.lineWidth = 2;
             ctx.beginPath();
             ctx.rect(sx - 32, -8, 29, 16);
-            ctx.stroke();
-
-            ctx.fillStyle = '#bc13fe';
-            [-1, 1].forEach(side => {
-                [-22, -10].forEach(px => {
-                    ctx.beginPath();
-                    ctx.arc(sx + px, side * 14, 3, 0, Math.PI * 2);
-                    ctx.fill();
-                });
-            });
-
-            ctx.beginPath();
-            ctx.arc(sx - 40, -2, 7, 0, Math.PI * 1.5);
             ctx.stroke();
 
             ctx.restore();
@@ -1689,7 +1836,7 @@
             ctx.closePath();
         }
 
-        // --- AESTHETIC HOLOGRAPHIC CONCERT FLUTE ---
+        // Instrument Visualizer: Concert Flute
         function drawHoloFlute(sx, ex, w, dx, dy) {
             ctx.save();
             const radius = 18;
@@ -1705,18 +1852,11 @@
             ctx.strokeStyle = 'rgba(0, 243, 255, 0.7)';
             ctx.lineWidth = 1.5;
             ctx.beginPath();
-            ctx.roundRect(headX, -radius, (footX - headX), radius * 2, 4);
+            ctx.rect(headX, -radius, (footX - headX), radius * 2);
             ctx.fill();
             ctx.stroke();
 
-            ctx.fillStyle = '#bc13fe';
-            ctx.fillRect(headX - 6, -radius - 2, 6, (radius * 2) + 4);
-
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-            ctx.beginPath();
-            ctx.roundRect(sx - 12, -radius - 5, 24, 6, 2);
-            ctx.fill();
-
+            // Lip plate and embouchure
             ctx.fillStyle = '#020617';
             ctx.strokeStyle = '#00f3ff';
             ctx.lineWidth = 1.5;
@@ -1725,13 +1865,7 @@
             ctx.fill();
             ctx.stroke();
 
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.moveTo(sx + 35, -radius - 8);
-            ctx.lineTo(ex, -radius - 8);
-            ctx.stroke();
-
+            // Tone key indicators
             const numKeys = 8;
             for (let k = 1; k <= numKeys; k++) {
                 const kx = sx + (w * 0.12) * k;
@@ -1743,30 +1877,19 @@
                     ctx.arc(kx, -radius - 4, 6, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.stroke();
-
-                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
-                    ctx.beginPath();
-                    ctx.moveTo(kx, -radius);
-                    ctx.lineTo(kx, -radius - 8);
-                    ctx.stroke();
                 }
             }
-
-            ctx.strokeStyle = '#00f3ff';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.ellipse(footX, 0, 4, radius, 0, 0, Math.PI * 2);
-            ctx.stroke();
 
             ctx.restore();
         }
 
-        // --- AESTHETIC HOLOGRAPHIC CLARINET ---
+        // Instrument Visualizer: Clarinet
         function drawHoloClarinet(sx, ex, w, dx, dy) {
             ctx.save();
             const radius = 17;
-
             const mpX = sx - 35;
+
+            // Mouthpiece
             ctx.fillStyle = '#020617';
             ctx.strokeStyle = 'rgba(188, 19, 254, 0.8)';
             ctx.lineWidth = 1.5;
@@ -1779,11 +1902,7 @@
             ctx.fill();
             ctx.stroke();
 
-            ctx.fillStyle = '#f59e0b';
-            ctx.fillRect(sx - 24, -radius - 1, 10, (radius * 2) + 2);
-            ctx.fillStyle = '#fde68a';
-            ctx.fillRect(mpX + 4, 3, 24, 3);
-
+            // Main Bore
             const grad = ctx.createLinearGradient(0, -radius, 0, radius);
             grad.addColorStop(0, 'rgba(15, 23, 42, 0.9)');
             grad.addColorStop(0.5, 'rgba(30, 41, 59, 0.7)');
@@ -1796,25 +1915,7 @@
             ctx.fill();
             ctx.stroke();
 
-            ctx.fillStyle = '#94a3b8';
-            ctx.fillRect(sx + w * 0.45, -radius - 2, 5, (radius * 2) + 4);
-            ctx.fillRect(sx + w * 0.88, -radius - 2, 5, (radius * 2) + 4);
-
-            const keys = 7;
-            for (let k = 1; k <= keys; k++) {
-                const kx = sx + (w * 0.13) * k;
-                ctx.strokeStyle = '#e2e8f0';
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.arc(kx, 0, 5, 0, Math.PI * 2);
-                ctx.stroke();
-
-                ctx.beginPath();
-                ctx.moveTo(kx, -radius);
-                ctx.lineTo(kx + 6, -radius - 5);
-                ctx.stroke();
-            }
-
+            // Bell
             const bellLen = 42;
             const bellR = 40;
             ctx.fillStyle = 'rgba(15, 23, 42, 0.95)';
@@ -1829,15 +1930,10 @@
             ctx.fill();
             ctx.stroke();
 
-            ctx.strokeStyle = '#bc13fe';
-            ctx.beginPath();
-            ctx.ellipse(ex + bellLen, 0, 8, bellR, 0, 0, Math.PI * 2);
-            ctx.stroke();
-
             ctx.restore();
         }
 
-        // --- GENERIC TESTBENCH HARMONIC HARDWARE ---
+        // Generic Hardware Visualizer for Abstract Mode
         function drawGenericHardware(sx, ex, w, dx, dy) {
             ctx.save();
             const radius = 48;
@@ -1849,7 +1945,7 @@
                     ctx.strokeStyle = 'rgba(0, 243, 255, 0.6)';
                     ctx.lineWidth = 2;
                     ctx.beginPath();
-                    ctx.roundRect(px - 7, -50, 14, 100, 4);
+                    ctx.rect(px - 7, -50, 14, 100);
                     ctx.fill();
                     ctx.stroke();
 
@@ -1900,7 +1996,7 @@
             ctx.restore();
         }
 
-        // --- HOLOGRAPHIC WAVE RIBBON ENGINE ---
+        // Holographic Standing Wave Ribbon Engine
         function drawHolographicWaveRibbon(sx, ex, w, dx, dy) {
             const maxAmp = (systemType === 'string') ? 38 : 46;
             const osc = Math.sin(t);
@@ -2036,8 +2132,8 @@
                 const px = sx + frac * w;
                 const py = getDisplacement(frac, maxAmp) * osc;
 
-                ctx.fillStyle = '#10b981';
-                ctx.shadowColor = '#10b981';
+                ctx.fillStyle = '#00ff88';
+                ctx.shadowColor = '#00ff88';
                 ctx.shadowBlur = 8;
                 ctx.beginPath();
                 ctx.arc(px, py, 5, 0, Math.PI * 2);
