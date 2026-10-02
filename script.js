@@ -15,7 +15,7 @@ const simulatorsData = [
     title: "Stationary Waves Simulator Pro",
     category: "Sciences",
     description: "Explore the physics of standing waves. Manipulate harmonic frequencies.",
-    image: "images/stationarywaves.jpg",
+    image: "images/stationarywaves.jpeg",
     url: "sims/simulator2.html"
   },
   {
@@ -23,7 +23,7 @@ const simulatorsData = [
     title: "Cathode Ray Oscilloscope (CRO) Simulator",
     category: "Sciences",
     description: "Master the operation of an analog Cathode Ray Oscilloscope.",
-    image: "images/cathoderayoscilloscope.jpg",
+    image: "images/cathoderayoscilloscope.jpeg",
     url: "sims/simulator3.html"
   },
   {
@@ -31,7 +31,7 @@ const simulatorsData = [
     title: "Advanced X-Ray Tube Physics Simulator",
     category: "Sciences",
     description: "Experiment with the internal mechanisms of a functional X-ray tube.",
-    image: "images/xraytube.jpg",
+    image: "images/xraytube.jpeg",
     url: "sims/simulator4.html"
   },
   {
@@ -39,7 +39,7 @@ const simulatorsData = [
     title: "3D Radiation Detectors Simulator",
     category: "Sciences",
     description: "Explore the mechanics of nuclear physics by simulating alpha, beta, and gamma particle interactions.",
-    image: "images/radiationdetectors.jpg",
+    image: "images/radiationdetectors.jpeg",
     url: "sims/simulator5.html"
   },
   {
@@ -47,7 +47,7 @@ const simulatorsData = [
     title: "MagicBlockBuilder",
     category: "Exploration & Others",
     description: "A fun and interactive digital sandbox designed for young children.",
-    image: "images/blockbuilder.jpg",
+    image: "images/blockbuilder.jpeg",
     url: "sims/simulator6.html"
   }
 ];
