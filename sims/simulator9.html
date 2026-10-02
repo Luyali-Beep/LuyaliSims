@@ -1,0 +1,2228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Interactive AC to DC Rectification Laboratory and Oscilloscope Simulator - Explore Half-Wave, Center-Tapped, and Full-Wave Bridge Rectifiers with Smoothing Filter Capacitors on LuyaliSims STEM Labs.">
+    <title>AC to DC Rectification Laboratory & Waveform Simulator - LuyaliSims</title>
+
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg?v=1">
+    
+    <!-- Futuristic Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Base Reset & Design Tokens */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --neon-cyan: #00f3ff;
+            --neon-magenta: #bc13fe;
+            --neon-green: #00ff88;
+            --neon-amber: #fbbf24;
+            --neon-red: #ef4444;
+            --bg-dark: #070a12;
+            --panel-bg: rgba(16, 24, 43, 0.88);
+            --border-glow: rgba(0, 243, 255, 0.35);
+            --grid-line: #1e293b;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 85% 15%, rgba(0, 243, 255, 0.08), transparent 45%),
+                radial-gradient(circle at 15% 85%, rgba(188, 19, 254, 0.08), transparent 45%),
+                linear-gradient(180deg, #05070e 0%, #0a0e1a 100%);
+            color: #e2e8f0;
+            margin: 0;
+            padding: 16px 20px;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* 1. HEADER & TOP NAVIGATION */
+        header {
+            max-width: 1350px;
+            margin: 0 auto 15px auto;
+        }
+
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 18px;
+            background: rgba(16, 24, 43, 0.75);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(188, 19, 254, 0.5);
+            color: #e580ff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(188, 19, 254, 0.25);
+            border-color: var(--neon-magenta);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
+            transform: translateX(-3px);
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+            margin: 6px 0 10px 0;
+            font-size: clamp(1.4rem, 3.5vw, 2.3rem);
+            letter-spacing: 1.5px;
+            text-align: center;
+        }
+
+        .lead-summary {
+            max-width: 950px;
+            margin: 0 auto 20px auto;
+            text-align: center;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: #cbd5e1;
+        }
+
+        main {
+            max-width: 1350px;
+            margin: 0 auto;
+        }
+
+        /* 2. SIMULATOR WORKSPACE */
+        #simulator-container {
+            background: linear-gradient(135deg, rgba(16, 24, 43, 0.92) 0%, rgba(8, 12, 22, 0.95) 100%);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-glow);
+            border-radius: 16px;
+            padding: 22px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 25px rgba(0, 243, 255, 0.12);
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .hud-telemetry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(4, 8, 16, 0.85);
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            border-radius: 10px;
+            padding: 10px 16px;
+            margin-bottom: 18px;
+            font-family: 'Share Tech Mono', monospace;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .telemetry-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.92rem;
+        }
+
+        .tele-label {
+            color: #8da4be;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .tele-val {
+            color: var(--neon-cyan);
+            font-weight: 700;
+        }
+
+        .tele-val.pink { color: #ff55bb; }
+        .tele-val.amber { color: var(--neon-amber); }
+        .tele-val.green { color: var(--neon-green); }
+
+        /* Simulator Modes & Tabs */
+        .tabs-header {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+            background: rgba(8, 14, 28, 0.8);
+            padding: 6px;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: 1px solid transparent;
+            color: #94a3b8;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.88rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            flex: 1;
+            min-width: 180px;
+            text-align: center;
+        }
+
+        .tab-btn:hover {
+            color: #fff;
+            background: rgba(0, 243, 255, 0.1);
+        }
+
+        .tab-btn.active {
+            background: rgba(0, 243, 255, 0.18);
+            border-color: var(--neon-cyan);
+            color: var(--neon-cyan);
+            box-shadow: 0 0 12px rgba(0, 243, 255, 0.35);
+        }
+
+        .sim-layout {
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .controls-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            background: linear-gradient(145deg, rgba(11, 17, 30, 0.95) 0%, rgba(6, 9, 16, 0.98) 100%);
+            padding: 18px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        }
+
+        .panel-heading {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border-bottom: 1px solid rgba(0, 243, 255, 0.25);
+            padding-bottom: 6px;
+            margin: 0 0 6px 0;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .control-group label {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #cbd5e1;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .control-group label span {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--neon-green);
+        }
+
+        select, input[type="range"] {
+            min-height: 44px;
+        }
+
+        select {
+            background: #060c18;
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            color: #e2e8f0;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 8px 12px;
+            border-radius: 8px;
+            outline: none;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            background: #0c1527;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            height: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 6px 0;
+            width: 100%;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #00f3ff 30%, #0088aa 100%);
+            border: 2px solid #fff;
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.8);
+            cursor: pointer;
+        }
+
+        .sim-btn {
+            background: linear-gradient(180deg, rgba(16, 28, 54, 0.9) 0%, rgba(8, 14, 28, 0.95) 100%);
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            color: var(--neon-cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 700;
+            padding: 10px;
+            min-height: 44px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            width: 100%;
+            margin-bottom: 6px;
+        }
+
+        .sim-btn:hover {
+            border-color: var(--neon-cyan);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .sim-btn.active {
+            border-color: var(--neon-cyan);
+            background: rgba(0, 243, 255, 0.25);
+            color: #fff;
+            box-shadow: 0 0 12px rgba(0, 243, 255, 0.4);
+        }
+
+        .sim-btn.run {
+            background: linear-gradient(180deg, rgba(16, 185, 129, 0.25), rgba(5, 150, 105, 0.35));
+            border-color: var(--neon-green);
+            color: var(--neon-green);
+        }
+
+        .sim-btn.run:hover {
+            background: var(--neon-green);
+            color: #070a12;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.6);
+        }
+
+        .sim-btn.stop {
+            background: linear-gradient(180deg, rgba(239, 68, 68, 0.25), rgba(185, 28, 28, 0.35));
+            border-color: var(--neon-red);
+            color: #fca5a5;
+            display: none;
+        }
+
+        .sim-btn.stop:hover {
+            background: var(--neon-red);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.7);
+        }
+
+        .sim-btn.secondary {
+            border-color: rgba(188, 19, 254, 0.5);
+            color: #e580ff;
+        }
+
+        .sim-btn.secondary:hover {
+            border-color: var(--neon-magenta);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
+        }
+
+        .sim-btn.danger {
+            border-color: rgba(239, 68, 68, 0.5);
+            color: #fca5a5;
+        }
+
+        .sim-btn.danger:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: var(--neon-red);
+            color: #fff;
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.5);
+        }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.92rem;
+            color: #cbd5e1;
+            cursor: pointer;
+            user-select: none;
+            padding: 8px 0;
+        }
+
+        .toggle-switch input { display: none; }
+        
+        .slider-switch {
+            width: 44px;
+            height: 22px;
+            background: #1e293b;
+            border-radius: 20px;
+            position: relative;
+            transition: 0.3s;
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            flex-shrink: 0;
+        }
+
+        .slider-switch::before {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #94a3b8;
+            top: 2px;
+            left: 3px;
+            transition: 0.3s;
+        }
+
+        input:checked + .slider-switch {
+            background: rgba(0, 243, 255, 0.25);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.4);
+        }
+
+        input:checked + .slider-switch::before {
+            transform: translateX(20px);
+            background: var(--neon-cyan);
+            box-shadow: 0 0 8px var(--neon-cyan);
+        }
+
+        .instruction-box {
+            font-size: 0.84rem;
+            color: #94a3b8;
+            line-height: 1.45;
+            padding: 10px 12px;
+            background: rgba(15, 23, 42, 0.7);
+            border-radius: 8px;
+            border-left: 3px solid var(--neon-cyan);
+        }
+
+        /* Visualization Display Panes */
+        .display-column {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            width: 100%;
+            background: radial-gradient(circle at 50% 50%, #0a1122 0%, #030712 100%);
+            border-radius: 12px;
+            overflow: hidden;
+            touch-action: none;
+            border: 3px solid #1e293b;
+            box-shadow: 
+                0 0 0 1px rgba(0, 243, 255, 0.35),
+                0 15px 35px rgba(0, 0, 0, 0.8),
+                inset 0 0 30px rgba(0, 0, 0, 0.85);
+        }
+
+        canvas#circuitCanvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 980 / 500;
+            background: #070c18;
+            cursor: crosshair;
+        }
+
+        /* Oscilloscope Display */
+        .oscilloscope-card {
+            background: linear-gradient(145deg, #020617 0%, #030a1c 100%);
+            border-radius: 12px;
+            border: 2px solid rgba(0, 243, 255, 0.3);
+            padding: 14px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7), inset 0 0 20px rgba(0, 0, 0, 0.9);
+        }
+
+        .scope-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .scope-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.95rem;
+            color: var(--neon-cyan);
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 14px;
+            font-size: 0.88rem;
+            flex-wrap: wrap;
+        }
+
+        .radio-label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            color: #94a3b8;
+        }
+
+        .radio-label input[type="radio"] {
+            accent-color: var(--neon-cyan);
+            cursor: pointer;
+        }
+
+        .scope-screen-wrapper {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #1e293b;
+            background: #020617;
+        }
+
+        .scope-screen-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: 
+                linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.3) 50%),
+                linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.04));
+            background-size: 100% 4px, 6px 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        canvas#scopeCanvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 1300 / 200;
+        }
+
+        .scope-legend {
+            display: flex;
+            gap: 18px;
+            justify-content: center;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        /* 3. POLICY-COMPLIANT AD CONTAINER */
+        .ad-slot-wrapper {
+            margin: 30px auto;
+            text-align: center;
+            clear: both;
+        }
+
+        .ad-disclaimer {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            margin-bottom: 6px;
+        }
+
+        .ad-box-placeholder {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            min-height: 90px;
+            max-width: 970px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #475569;
+            font-size: 0.85rem;
+            border-radius: 8px;
+        }
+
+        /* 4. EDUCATIONAL CONTENT SECTION */
+        .educational-content {
+            line-height: 1.75;
+            font-size: 1.05rem;
+            color: #94a3b8;
+            background: rgba(10, 14, 23, 0.88);
+            padding: 32px;
+            border-radius: 16px;
+            border-left: 4px solid var(--neon-cyan);
+            border-top: 1px solid rgba(0, 243, 255, 0.2);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin-bottom: 35px;
+        }
+
+        .educational-content h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-magenta);
+            border-bottom: 1px solid rgba(188, 19, 254, 0.3);
+            padding-bottom: 8px;
+            margin-top: 1.8em;
+            margin-bottom: 0.6em;
+            font-size: 1.45rem;
+        }
+
+        .educational-content h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: #38bdf8;
+            margin-top: 1.4em;
+            margin-bottom: 0.4em;
+            font-size: 1.15rem;
+        }
+
+        .formula-box {
+            background: rgba(4, 9, 20, 0.75);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-left: 3px solid var(--neon-green);
+            padding: 16px 20px;
+            margin: 14px 0;
+            border-radius: 6px;
+            font-family: 'Share Tech Mono', monospace;
+            color: #a7f3d0;
+            font-size: 1rem;
+            line-height: 1.7;
+        }
+
+        .task-card {
+            background: rgba(15, 23, 42, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 18px 22px;
+            margin-bottom: 18px;
+        }
+
+        .task-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.02rem;
+            color: var(--neon-cyan);
+            margin-bottom: 8px;
+        }
+
+        details {
+            margin-top: 25px;
+            background: rgba(5, 10, 20, 0.85);
+            border: 1px solid rgba(188, 19, 254, 0.4);
+            border-radius: 10px;
+            padding: 16px 22px;
+        }
+
+        summary {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            color: #e580ff;
+            cursor: pointer;
+            padding: 6px 0;
+            user-select: none;
+            outline: none;
+        }
+
+        .solution-step {
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.12);
+            padding: 14px 0;
+        }
+
+        .solution-step:last-child {
+            border-bottom: none;
+        }
+
+        /* 5. FOOTER & ALIGNED LINKS */
+        footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px 20px 20px 20px;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .footer-nav {
+            display: flex;
+            justify-content: center;
+            gap: 22px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .footer-nav a, .footer-modal-trigger {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.2s, text-shadow 0.2s;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .footer-nav a:hover, .footer-modal-trigger:hover {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
+        }
+
+        /* 6. SELF-CONTAINED POLICY MODALS */
+        .policy-modal {
+            position: fixed !important;
+            top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
+            width: 100vw !important; height: 100vh !important;
+            background: rgba(4, 7, 15, 0.94) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 99999 !important;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-body {
+            background: linear-gradient(145deg, #0b111e 0%, #060913 100%);
+            border: 2px solid var(--neon-cyan);
+            border-radius: 16px;
+            max-width: 820px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 35px 30px;
+            color: #cbd5e1;
+            box-shadow: 0 0 40px rgba(0, 243, 255, 0.25);
+            line-height: 1.75;
+            position: relative;
+            text-align: left;
+        }
+
+        .modal-body h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-cyan);
+            margin-top: 0;
+            font-size: 1.6rem;
+        }
+
+        .modal-body h3 {
+            color: var(--neon-magenta);
+            font-family: 'Orbitron', sans-serif;
+            margin-top: 24px;
+            margin-bottom: 8px;
+            font-size: 1.15rem;
+        }
+
+        .modal-date {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--neon-green);
+            font-size: 0.9rem;
+            margin-top: -6px;
+            margin-bottom: 16px;
+        }
+
+        .modal-close-btn {
+            background: linear-gradient(180deg, rgba(188, 19, 254, 0.4), rgba(188, 19, 254, 0.15));
+            border: 1px solid var(--neon-magenta);
+            color: #fff;
+            padding: 8px 18px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            float: right;
+            margin-bottom: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close-btn:hover {
+            background: var(--neon-magenta);
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.8);
+        }
+
+        @media (max-width: 1024px) {
+            .sim-layout { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            #simulator-container, .educational-content { padding: 14px; }
+            .btn-grid { grid-template-columns: 1fr; }
+            .hud-telemetry { flex-direction: column; align-items: flex-start; }
+            .modal-body { padding: 22px 18px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. HEADER & TOP NAVIGATION -->
+    <header>
+        <nav class="top-nav">
+            <a href="../index.html" class="back-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Back to LuyaliSims
+            </a>
+            <span style="font-family: 'Share Tech Mono', monospace; font-size: 0.85rem; color: #64748b;">
+                MODULE ID: ELEC-RECT-04
+            </span>
+        </nav>
+        
+        <h1>AC to DC Rectification Laboratory</h1>
+        
+        <p class="lead-summary">
+            Investigate how alternating current (AC) is converted into steady direct current (DC) across half-wave, center-tapped full-wave, and bridge rectifier topologies. Analyze instantaneous diode biasing, animated electron flux, and real-time dual-trace cathode-ray oscilloscope (CRO) waveforms with smoothing capacitor filtering.
+        </p>
+    </header>
+
+    <main>
+        <!-- 2. SIMULATOR APP WORKSPACE -->
+        <section id="simulator-container" aria-label="Rectifier Interactive Simulator Workspace">
+            
+            <!-- Real-Time Telemetry HUD -->
+            <div class="hud-telemetry">
+                <div class="telemetry-item">
+                    <span class="tele-label">Engine:</span>
+                    <span id="tele-status" class="tele-val green">READY (STANDBY)</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Topology:</span>
+                    <span id="tele-topology" class="tele-val">HALF-WAVE (1 DIODE)</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">AC Frequency:</span>
+                    <span id="tele-freq" class="tele-val pink">50.0 Hz</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Peak V_in:</span>
+                    <span id="tele-vin" class="tele-val amber">10.0 V_pk</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">DC Output Avg:</span>
+                    <span id="tele-vdc" class="tele-val">3.18 V_avg</span>
+                </div>
+            </div>
+
+            <!-- Workspace Tabs -->
+            <div class="tabs-header">
+                <button class="tab-btn active" id="tabPrebuilt" onclick="setAppMode('prebuilt')">Pre-Built Circuits</button>
+                <button class="tab-btn" id="tabSandbox" onclick="setAppMode('sandbox')">Connect Your Own (Sandbox)</button>
+            </div>
+
+            <div class="sim-layout">
+                <!-- Controls Console (Left Pane) -->
+                <div class="controls-panel">
+                    <!-- Prebuilt Controls Panel -->
+                    <div id="prebuiltUI">
+                        <h3 class="panel-heading">Rectifier Configuration</h3>
+                        <div class="control-group" style="margin-bottom: 12px;">
+                            <button class="sim-btn active" id="btnHalf" onclick="selectPrebuilt('half')">1 Diode (Half-Wave)</button>
+                            <button class="sim-btn" id="btnCenter" onclick="selectPrebuilt('center')">2 Diodes (Center-Tap)</button>
+                            <button class="sim-btn" id="btnBridge" onclick="selectPrebuilt('bridge')">4 Diodes (Bridge)</button>
+                        </div>
+
+                        <label class="toggle-switch">
+                            <span>Smoothing Capacitor (Filter)</span>
+                            <input type="checkbox" id="capTogglePrebuilt" onchange="togglePrebuiltCapacitor()">
+                            <div class="slider-switch"></div>
+                        </label>
+                    </div>
+
+                    <!-- Sandbox Library Controls Panel -->
+                    <div id="sandboxUI" style="display: none;">
+                        <h3 class="panel-heading">Component Library</h3>
+                        <div class="instruction-box" style="margin-bottom: 10px;">
+                            <strong>Drag:</strong> Move nodes &amp; parts.<br>
+                            <strong>Click Terminals:</strong> Route right-angled wires.<br>
+                            <strong>Wire Junctions:</strong> Add a Connector Node, or click/double-click any wire to branch from it.<br>
+                            <strong>Rotate / Delete:</strong> Select wire or component.
+                        </div>
+
+                        <div class="control-group">
+                            <label for="compSelect">Add Component:</label>
+                            <select id="compSelect">
+                                <option value="source">AC Source (Single-Phase)</option>
+                                <option value="source_ct">AC Source (Center-Tapped)</option>
+                                <option value="diode">P-N Junction Diode</option>
+                                <option value="resistor">Pure Resistive Load</option>
+                                <option value="capacitor">Electrolytic Capacitor</option>
+                                <option value="junction">Wire Junction / Connector Node</option>
+                            </select>
+                        </div>
+                        <button class="sim-btn" onclick="addComponent()" style="margin-top: 8px;">+ Insert into Grid</button>
+
+                        <div class="btn-grid" style="margin-top: 4px;">
+                            <button class="sim-btn secondary" onclick="undoSandbox()">↩ Undo</button>
+                            <button class="sim-btn secondary" onclick="redoSandbox()">↪ Redo</button>
+                        </div>
+
+                        <div class="btn-grid" style="margin-top: 4px;">
+                            <button class="sim-btn" onclick="rotateComp()">Rotate 45°</button>
+                            <button class="sim-btn danger" onclick="deleteSelected()">Delete</button>
+                        </div>
+                        <button class="sim-btn danger" onclick="clearSandbox()" style="margin-top: 4px;">Clear Sandbox</button>
+                    </div>
+
+                    <h3 class="panel-heading" style="margin-top: 6px;">Execution Controls</h3>
+                    <button id="runBtn" class="sim-btn run" onclick="toggleSim()">▶ Run Simulator</button>
+                    <button id="stopBtn" class="sim-btn stop" onclick="toggleSim()">■ Stop &amp; Edit</button>
+
+                    <h3 class="panel-heading" style="margin-top: 6px;">AC Input Parameters</h3>
+                    <div class="control-group">
+                        <label for="freqRange">Input Frequency: <span id="freqVal">50</span> Hz</label>
+                        <input type="range" id="freqRange" min="10" max="100" value="50" oninput="updateParams()">
+                    </div>
+
+                    <div class="control-group">
+                        <label for="speedRange">Simulation Time Scale: <span id="speedVal">1.0x</span></label>
+                        <input type="range" id="speedRange" min="0.1" max="3" step="0.1" value="1" oninput="updateParams()">
+                    </div>
+
+                    <button id="fullscreenBtn" class="sim-btn secondary" style="margin-top: 6px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                        </svg>
+                        Fullscreen View
+                    </button>
+                </div>
+
+                <!-- Visual Display Panes (Right Pane) -->
+                <div class="display-column">
+                    <!-- Circuit Schematic Canvas -->
+                    <div class="canvas-wrapper">
+                        <canvas id="circuitCanvas" width="980" height="500"></canvas>
+                    </div>
+
+                    <!-- Oscilloscope (CRO) Waveform Display -->
+                    <div class="oscilloscope-card">
+                        <div class="scope-header">
+                            <div class="scope-title">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M2 12h3l3-7 4 14 3-7h3l3-3 3 3"></path>
+                                </svg>
+                                Dual-Trace Oscilloscope (CRO)
+                            </div>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="oscView" value="both" checked onchange="updateOscView()"> Dual Trace
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="oscView" value="in" onchange="updateOscView()"> Input AC (CH1)
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="oscView" value="out" onchange="updateOscView()"> Output DC (CH2)
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="scope-screen-wrapper">
+                            <canvas id="scopeCanvas" width="1300" height="200"></canvas>
+                        </div>
+
+                        <div class="scope-legend">
+                            <span style="color: #ef4444;">● CH1: Alternating Input (v_in)</span>
+                            <span style="color: #fbbf24;">● CH2: Rectified DC Load (v_out)</span>
+                            <span style="color: #00f3ff;">── Time Base Division (25px)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. SAFE AD PLACEMENT SLOT -->
+        <div class="ad-slot-wrapper">
+            <div class="ad-disclaimer">Advertisement</div>
+            <div class="ad-box-placeholder">
+                <!-- Google AdSense Responsive Display Unit -->
+                <span>[AdSense Responsive Display Unit - Module ELEC-RECT-04]</span>
+            </div>
+        </div>
+
+        <!-- 4. EDUCATIONAL REFERENCE ARTICLE -->
+        <article class="educational-content">
+            <section>
+                <h2>How to Operate the Simulator</h2>
+                <p>
+                    This simulator provides both guided exploration through standard factory blueprints and an interactive electronic sandbox. Use the controls as follows:
+                </p>
+                <ul>
+                    <li><strong>Pre-Built Circuits Mode:</strong> Select between a 1-Diode Half-Wave, a 2-Diode Center-Tapped Full-Wave, and a 4-Diode Full-Wave Bridge circuit. Toggle the <em>Smoothing Capacitor (Filter)</em> switch to see how a parallel reservoir capacitor converts pulsating output into smooth DC.</li>
+                    <li><strong>Interactive Sandbox Mode:</strong> Add standard or center-tapped AC voltage sources, diodes, load resistors, electrolytic capacitors, and wire junctions directly to the workbench. Drag components across the snap-grid, click on terminal pads to pull orthogonal interconnect wiring, and rotate parts in 45-degree increments.</li>
+                    <li><strong>Creating Wire Junctions:</strong> Insert a <em>Wire Junction / Connector Node</em> from the library to branch multiple conductors. Alternatively, while drawing a wire, click anywhere along an existing conductor (or double-click a wire) to instantly split the wire and insert an electrical tie-point.</li>
+                    <li><strong>Execution Engine:</strong> Click <strong>▶ Run Simulator</strong>. The topological solver verifies that complete loops exist from source to load. While running, animated carrier dots illustrate electron flux direction and instantaneous polarity, forward-biased diodes glow red, and reverse-biased diodes turn blue with reverse blocking breakdown margins.</li>
+                    <li><strong>CRO Waveform Inspection:</strong> Monitor instantaneous voltages using the oscilloscope screen below the bench. Switch between Dual-Trace overlay, Input AC only, and Output DC only to analyze peak ripple and phase relationships.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Scientific Theory &amp; Working Principles</h2>
+                <p>
+                    <strong>Rectification</strong> is the fundamental electrical process of converting a bidirectional alternating current (AC) into a unidirectional direct current (DC). In modern electronics, this behavior is achieved using the asymmetric conduction characteristics of semiconductor P-N junction diodes.
+                </p>
+                
+                <h3>1. Half-Wave Rectification</h3>
+                <p>
+                    A half-wave rectifier utilizes a single diode placed in series with the AC voltage source and the load resistor. During the positive half-cycle of the input sinusoid, the anode becomes positive relative to the cathode, forward-biasing the P-N junction. Current flows through the load resistor freely, producing an output voltage that mirrors the positive input envelope (minus a silicon threshold barrier of approximately 0.7 V). During the negative half-cycle, the anode potential drops below the cathode potential, reverse-biasing the diode. Conduction ceases completely, and the load voltage drops to zero. Consequently, half of the available input energy cycle is rejected, yielding an average output voltage of:
+                </p>
+                <div class="formula-box">
+                    V_avg(half) = V_peak / &pi; &approx; 0.318 &times; V_peak<br>
+                    Ripple Frequency = f_in
+                </div>
+
+                <h3>2. Full-Wave Center-Tapped Rectification</h3>
+                <p>
+                    A center-tapped rectifier couples a center-tapped transformer secondary winding with two opposing diodes. The center-tap conductor is designated as the zero-volt common reference node (circuit ground). During the positive half-cycle, the top terminal is positive and diode D1 conducts while diode D2 is reverse-biased. During the negative half-cycle, the bottom terminal becomes positive relative to the center tap, causing diode D2 to conduct while D1 blocks. Current through the load resistor always flows in the exact same physical direction, delivering both half-cycles to the load.
+                </p>
+
+                <h3>3. Full-Wave Bridge Rectification</h3>
+                <p>
+                    The Graetz bridge rectifier incorporates four diodes in a closed four-corner bridge topology. It delivers full-wave rectification from a standard single-winding secondary, eliminating the bulk and expense of center-tapped transformers. Conduction occurs across alternate diagonal pairs: during the positive swing, diodes D1 and D4 conduct simultaneously in series with the load; during the negative swing, diodes D2 and D3 conduct. Because two diodes are always in series with the load during conduction, the peak output voltage incurs two forward diode drops:
+                </p>
+                <div class="formula-box">
+                    V_peak(out) = V_peak(in) - 2 &times; V_diode<br>
+                    V_avg(bridge) = (2 &times; V_peak) / &pi; &approx; 0.637 &times; V_peak<br>
+                    Ripple Frequency = 2 &times; f_in
+                </div>
+
+                <h3>4. Capacitive Filtering and Peak-to-Peak Ripple Voltage</h3>
+                <p>
+                    Pulsating rectified DC is unsuitable for precision digital integrated circuits without smoothing. Placing a reservoir capacitor in parallel with the load resistor forms an RC low-pass filter. As the rectified voltage rises toward its peak, the capacitor charges rapidly to V_peak. When the input wave descends past the crest, the diodes turn off (reverse-bias), and the capacitor discharges slowly through the load resistor with a time constant:
+                </p>
+                <div class="formula-box">
+                    &tau; = R_load &times; C<br>
+                    Peak-to-Peak Ripple Voltage: V_ripple(p-p) &approx; I_load / (f_ripple &times; C) = V_peak / (f_ripple &times; R_load &times; C)
+                </div>
+            </section>
+
+            <section>
+                <h2>Mathematical Foundations &amp; Formulas</h2>
+                <p>
+                    Engineering calculations for designing linear and switched DC power supplies rely on several key electrical definitions:
+                </p>
+                <div class="formula-box">
+                    1. Root-Mean-Square (RMS) AC Input: V_rms = V_peak / &radic;2 &approx; 0.7071 &times; V_peak<br>
+                    2. Half-Wave Rectification Efficiency: &eta;_max = 40.6%<br>
+                    3. Full-Wave Rectification Efficiency: &eta;_max = 81.2%<br>
+                    4. Ripple Factor (&gamma;): &gamma; = &radic;[ (V_rms / V_dc)&sup2; - 1 ]<br>
+                    &nbsp;&nbsp;&nbsp;Unfiltered Half-Wave: &gamma; &approx; 1.21 (121%)<br>
+                    &nbsp;&nbsp;&nbsp;Unfiltered Full-Wave: &gamma; &approx; 0.482 (48.2%)<br>
+                    5. Peak Inverse Voltage (PIV) Rating Requirements:<br>
+                    &nbsp;&nbsp;&nbsp;Half-Wave: PIV &ge; V_peak<br>
+                    &nbsp;&nbsp;&nbsp;Center-Tapped Full-Wave: PIV &ge; 2 &times; V_peak<br>
+                    &nbsp;&nbsp;&nbsp;Bridge Full-Wave: PIV &ge; V_peak
+                </div>
+            </section>
+
+            <section>
+                <h2>Real-World Engineering &amp; Industrial Applications</h2>
+                <p>
+                    Rectification circuits form the cornerstone of power electronics across consumer, commercial, and heavy industrial infrastructures:
+                </p>
+                <ul>
+                    <li><strong>Switch-Mode Power Supplies (SMPS) &amp; Consumer Adapters:</strong> Every smartphone wall adapter, laptop charger, and desktop PC power supply utilizes an input diode bridge to rectify 120V or 230V utility AC mains directly into a 170V to 325V high-voltage DC bus. This high-voltage DC is then switched at tens to hundreds of kilohertz across a high-frequency transformer for compact, highly efficient step-down conversion.</li>
+                    <li><strong>Electric Vehicle (EV) On-Board Chargers &amp; Traction Inverters:</strong> Electric vehicles rely on bi-directional full-wave synchronous rectifiers (utilizing silicon carbide SiC MOSFETs acting as active diodes) within their on-board chargers (OBC) to convert AC charging station current into high-voltage battery pack DC (400V to 800V) with conversion efficiencies exceeding 96%.</li>
+                    <li><strong>High-Voltage Direct Current (HVDC) Transmission Systems:</strong> Long-distance bulk power delivery across subsea cables and cross-continental grids utilizes massive multi-pulse thyristor bridge rectifiers (12-pulse and 24-pulse Graetz topologies) to rectify gigawatt-scale AC into DC at voltages reaching 800 kV or higher, eliminating reactive line charging losses inherent to AC cables.</li>
+                    <li><strong>Heavy Industrial Electroplating &amp; Arc Welding:</strong> Metal refining, aluminum smelting, and arc welding equipment demand thousands of amperes of low-voltage DC. Heavy multi-phase bridge rectifiers coupled with water-cooled fast-recovery diodes deliver uniform current to maintain stable welding arcs and ensure consistent electrolytic deposition.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Practice Problems &amp; Diagnostic Tasks</h2>
+                <p>
+                    Verify your quantitative electronics mastery with these five diagnostic engineering exercises:
+                </p>
+
+                <div class="task-card">
+                    <div class="task-title">Task 1: Basic Parameter Calculation (Half-Wave DC Output &amp; Peak Inverse Voltage)</div>
+                    <p>
+                        A single-phase transformer supplies an alternating sinusoid of 24.0 V RMS at 50 Hz to an ideal half-wave rectifier feeding a pure resistive load of 200 &Omega;. Neglecting diode forward voltage drop, calculate the peak input voltage (V_peak), the resulting average DC load voltage (V_dc), and the minimum Peak Inverse Voltage (PIV) rating the diode must withstand.
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 2: Proportional Variation (Capacitance and Load Resistance on Ripple Voltage)</div>
+                    <p>
+                        A full-wave bridge rectifier operating from a 60 Hz line produces a peak output voltage of 15.0 V across an RC smoothing filter with R_load = 500 &Omega; and C = 220 &mu;F. If the load resistance is halved (to 250 &Omega;) while the filter capacitor is doubled (to 440 &mu;F), determine the effect on the peak-to-peak ripple voltage (V_ripple) and calculate its quantitative value.
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 3: Calibration &amp; Limit Analysis (Bridge Rectifier Diode Forward Drops &amp; PIV)</div>
+                    <p>
+                        A bridge rectifier is constructed using silicon diodes, each possessing a constant forward barrier drop of 0.70 V. The transformer secondary supplies 12.0 V RMS at 60 Hz. Determine the actual peak output voltage across the load, the ripple frequency, and the minimum reverse breakdown voltage (PIV) rating required for each diode, incorporating a 25% safety engineering margin.
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 4: Reverse Calculation (Filter Capacitance Dimensioning for Target Ripple)</div>
+                    <p>
+                        An embedded systems engineer is designing a 50 Hz full-wave center-tapped rectifier power supply. The secondary winding delivers 18.0 V peak to the center tap. The circuit drives a microcontroller board drawing a constant direct current of 350 mA. Calculate the minimum capacitance (C in &mu;F) required for the smoothing capacitor to guarantee that the peak-to-peak ripple voltage does not exceed 0.50 V.
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 5: Multi-Step Real-World Troubleshooting (Center-Tapped Diode Failure Diagnostic)</div>
+                    <p>
+                        A center-tapped transformer with secondary voltage 20.0 V - 0 - 20.0 V RMS at 50 Hz feeds two silicon diodes (V_diode = 0.70 V) and a 100 &Omega; load without a filter capacitor. During routine bench testing, technician D1 observes the average DC output voltage drop unexpectedly. If diode D2 fails open-circuit, calculate the initial normal average DC voltage (V_dc_normal) and the degraded average DC voltage under open-circuit failure (V_dc_fault).
+                    </p>
+                </div>
+
+                <!-- Collapsible Solutions -->
+                <details>
+                    <summary>Click to Reveal Solutions and Step-by-Step Proofs</summary>
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 1:</strong></p>
+                        <p>
+                            1. Peak input voltage from RMS: V_peak = V_rms &times; &radic;2 = 24.0 V &times; 1.4142 = <strong>33.94 V</strong>.<br>
+                            2. Ideal half-wave average DC output: V_dc = V_peak / &pi; = 33.941 V / 3.14159 = <strong>10.80 V</strong>.<br>
+                            3. Peak Inverse Voltage requirement for a half-wave rectifier: PIV &ge; V_peak = <strong>33.94 V</strong>.
+                        </p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 2:</strong></p>
+                        <p>
+                            1. The fundamental peak-to-peak ripple formula for a full-wave rectifier is: V_ripple = V_peak / (f_ripple &times; R_load &times; C), where f_ripple = 2 &times; 60 Hz = 120 Hz.<br>
+                            2. Proportional analysis: Notice that the denominator term is (R_load &times; C). If R_load is halved (0.5 &times; R) and C is doubled (2.0 &times; C), the product (0.5 &times; 2.0) = 1.0 remains unchanged.<br>
+                            3. Calculating quantitative ripple: V_ripple = 15.0 / (120 &times; 500 &times; 220 &times; 10^-6) = 15.0 / 13.2 = <strong>1.14 V peak-to-peak</strong>. The ripple voltage remains completely unchanged.
+                        </p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 3:</strong></p>
+                        <p>
+                            1. Secondary peak voltage: V_peak(in) = 12.0 V &times; &radic;2 = 16.97 V.<br>
+                            2. Bridge conduction incurs two forward diode drops in series: V_peak(out) = V_peak(in) - (2 &times; 0.70 V) = 16.97 V - 1.40 V = <strong>15.57 V</strong>.<br>
+                            3. Ripple frequency of full-wave bridge: f_ripple = 2 &times; f_in = 2 &times; 60 Hz = <strong>120 Hz</strong>.<br>
+                            4. In a bridge rectifier, the nominal PIV per diode is V_peak(in) = 16.97 V. Adding a 25% safety margin: PIV_rated = 16.97 V &times; 1.25 = <strong>21.21 V</strong>.
+                        </p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 4:</strong></p>
+                        <p>
+                            1. In a full-wave center-tapped rectifier at 50 Hz, the output ripple frequency is f_ripple = 2 &times; 50 Hz = 100 Hz.<br>
+                            2. Using the ripple relation with constant DC load current: V_ripple = I_load / (f_ripple &times; C).<br>
+                            3. Rearranging for C: C = I_load / (f_ripple &times; V_ripple) = 0.350 A / (100 Hz &times; 0.50 V) = 0.350 / 50 = 0.0070 F = <strong>7000 &mu;F</strong>.
+                        </p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 5:</strong></p>
+                        <p>
+                            1. Peak secondary voltage per half winding: V_peak = 20.0 V &times; &radic;2 = 28.28 V.<br>
+                            2. Peak output voltage with one diode drop: V_peak(load) = 28.28 V - 0.70 V = 27.58 V.<br>
+                            3. Normal full-wave operation average DC voltage: V_dc_normal = (2 &times; V_peak(load)) / &pi; = (2 &times; 27.58 V) / 3.14159 = <strong>17.56 V</strong>.<br>
+                            4. Under open-circuit failure of diode D2, the circuit degenerates into a half-wave rectifier conducting only during the positive half-cycle: V_dc_fault = V_peak(load) / &pi; = 27.58 V / 3.14159 = <strong>8.78 V</strong> (exactly half of normal output).
+                        </p>
+                    </div>
+                </details>
+            </section>
+        </article>
+    </main>
+
+    <!-- 5. SYNCHRONIZED COMPLIANCE FOOTER -->
+    <footer>
+        <nav class="footer-nav">
+            <a href="../index.html">Home</a>
+            <a href="../index.html#about-section">About Us</a>
+            <button type="button" class="footer-modal-trigger" onclick="openSimModal('simPrivacyModal')">Privacy Policy</button>
+            <button type="button" class="footer-modal-trigger" onclick="openSimModal('simTermsModal')">Terms of Service</button>
+            <a href="../index.html#contact-section">Contact Us</a>
+            <a href="https://forms.gle/fYxxaNKAh21dPUoBA" target="_blank" rel="noopener noreferrer">Simulator Suggestions</a>
+        </nav>
+        <p>&copy; 2026 LuyaliSims | Engineered by Click &amp; Draft | Dedicated to Open STEM Education</p>
+    </footer>
+
+    <!-- 6. IDENTICAL PRIVACY POLICY MODAL -->
+    <div id="simPrivacyModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="privacyTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeSimModal('simPrivacyModal')">Close [✕]</button>
+            <h2 id="privacyTitle">Privacy Policy</h2>
+            <p class="modal-date">Last Updated: September 2026</p>
+            <p>Welcome to LuyaliSims. We respect your privacy and are committed to protecting your personal data. This privacy policy explains how we treat information when you interact with our educational simulators.</p>
+            
+            <h3>1. Educational Purpose &amp; Information Collection</h3>
+            <p>LuyaliSims is a free educational portal. We do not require account registration, passwords, or personal login information to run any simulation. All simulation calculations occur locally within your browser using client-side JavaScript.</p>
+
+            <h3>2. Google AdSense &amp; Third-Party Cookies</h3>
+            <p>We may display advertisements served by Google AdSense to fund our free educational tools. Google, as a third-party vendor, uses cookies to serve ads on our site based on users' visits to this and other sites on the Internet.</p>
+            <ul>
+                <li>Google's use of advertising cookies enables it and its partners to serve ads based on your visit to LuyaliSims and other sites.</li>
+                <li>Users may opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" style="color: var(--neon-cyan);">Google Ads Settings</a>.</li>
+            </ul>
+
+            <h3>3. Log Files &amp; Analytics</h3>
+            <p>Like standard websites, our hosting servers collect anonymous log records (including IP addresses, browser types, and timestamp references) to monitor server uptime, fix script errors, and optimize simulator performance.</p>
+
+            <h3>4. Children's Online Privacy (COPPA Compliance)</h3>
+            <p>Our educational simulators are built for students and educators of all ages. We do not knowingly solicit or collect personally identifiable information from children under 13.</p>
+
+            <h3>5. Contact Regarding Privacy</h3>
+            <p>If you have any questions regarding this policy, contact us at: <a href="mailto:luyashliz@gmail.com" style="color: var(--neon-cyan);">luyashliz@gmail.com</a>.</p>
+        </div>
+    </div>
+
+    <!-- 7. IDENTICAL TERMS OF SERVICE MODAL -->
+    <div id="simTermsModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="termsTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeSimModal('simTermsModal')">Close [✕]</button>
+            <h2 id="termsTitle">Terms of Service</h2>
+            <p class="modal-date">Effective Date: September 2026</p>
+
+            <h3>1. Permitted Educational Use</h3>
+            <p>All interactive models, simulations, practice problems, and laboratory worksheets on LuyaliSims are made freely available for classroom demonstrations, academic study, tutoring, and self-paced individual learning.</p>
+
+            <h3>2. Intellectual Property</h3>
+            <p>The code architecture, layout designs, and custom interactive engines are the intellectual property of Ian Luyali and Click &amp; Draft. You may use our simulators online in academic settings, but mirroring or re-hosting our code for commercial resale without permission is prohibited.</p>
+
+            <h3>3. Disclaimer of Scientific Warranty</h3>
+            <p>While simulations are engineered to accurately replicate classical mechanics, thermodynamics, and electronics, they are provided as conceptual learning aids. LuyaliSims is not liable for outcomes in real-world high-voltage or hazardous laboratory environments constructed without professional teacher supervision.</p>
+
+            <h3>4. Updates to Terms</h3>
+            <p>We reserve the right to refine these terms as new laboratory modules and features are introduced.</p>
+        </div>
+    </div>
+
+    <!-- 8. SIMULATOR CORE SCRIPT & INTERACTIVE ENGINE -->
+    <script>
+        // --- Modal System ---
+        function openSimModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeSimModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('policy-modal')) closeSimModal(e.target.id);
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' || e.key === 'Esc') {
+                document.querySelectorAll('.policy-modal').forEach(m => m.style.display = 'none');
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // --- Fullscreen View ---
+        const simContainer = document.getElementById('simulator-container');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                if (simContainer.requestFullscreen) simContainer.requestFullscreen();
+                else if (simContainer.webkitRequestFullscreen) simContainer.webkitRequestFullscreen();
+                fullscreenBtn.innerHTML = 'Exit Fullscreen';
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+                fullscreenBtn.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                    </svg> Fullscreen View`;
+            }
+        });
+
+        const onFullscreenChange = () => {
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                fullscreenBtn.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                    </svg> Fullscreen View`;
+            }
+        };
+
+        document.addEventListener('fullscreenchange', onFullscreenChange);
+        document.addEventListener('webkitfullscreenchange', onFullscreenChange);
+
+        // --- Core Rectification Simulation Engine ---
+        let components = [];
+        let wires = [];
+        let nextId = 1;
+        const GRID = 20;
+
+        let undoStack = [];
+        let redoStack = [];
+
+        let appMode = 'prebuilt'; 
+        let currentPrebuilt = 'half';
+        let prebuiltHasCap = false;
+        let isRunning = false;
+        let frequency = 50;
+        let speed = 1;
+        let time = 0;
+        let oscViewMode = 'both';
+        let history = new Array(1300).fill({vIn: 0, vOut: 0});
+        let capVoltage = 0;
+
+        // Nodal Topology Data
+        let detectedTopology = null; 
+        let circuitNodes = []; 
+        let nodeTags = {}; 
+
+        // Pointer & Interaction State
+        let selectedComp = null;
+        let selectedWire = null;
+        let isDragging = false;
+        let dragOffsetX = 0, dragOffsetY = 0;
+        
+        let wiringStart = null; 
+        let wiringWaypoints = [];
+        let mouseX = 0, mouseY = 0;
+
+        const circuitCanvas = document.getElementById('circuitCanvas');
+        const ctx = circuitCanvas.getContext('2d');
+        const scopeCanvas = document.getElementById('scopeCanvas');
+        const scopeCtx = scopeCanvas.getContext('2d');
+
+        // Telemetry DOM elements
+        const teleStatus = document.getElementById('tele-status');
+        const teleTopology = document.getElementById('tele-topology');
+        const teleFreq = document.getElementById('tele-freq');
+        const teleVin = document.getElementById('tele-vin');
+        const teleVdc = document.getElementById('tele-vdc');
+
+        class Component {
+            constructor(type, x, y) {
+                this.id = nextId++;
+                this.type = type;
+                this.x = x; this.y = y;
+                this.rot = 0; // 0 to 7 (45° steps)
+            }
+            
+            getTerminals() {
+                let terms = [];
+                const addT = (id, lx, ly) => {
+                    let rad = this.rot * Math.PI / 4;
+                    let rx = lx * Math.cos(rad) - ly * Math.sin(rad);
+                    let ry = lx * Math.sin(rad) + ly * Math.cos(rad);
+                    terms.push({ id: id, x: this.x + rx, y: this.y + ry, lx, ly });
+                };
+                if(this.type === 'source') { addT('L', 0, -30); addT('N', 0, 30); }
+                if(this.type === 'source_ct') { addT('L1', 20, -40); addT('CT', 40, 0); addT('L2', 20, 40); }
+                if(this.type === 'diode') { addT('A', -20, 0); addT('K', 20, 0); }
+                if(this.type === 'resistor') { addT('T1', 0, -30); addT('T2', 0, 30); }
+                if(this.type === 'capacitor') { addT('T1', 0, -20); addT('T2', 0, 20); }
+                if(this.type === 'junction') { addT('J', 0, 0); }
+                return terms;
+            }
+
+            draw(ctx) {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rot * Math.PI / 4);
+                
+                if(selectedComp === this && appMode === 'sandbox') {
+                    ctx.fillStyle = 'rgba(0, 243, 255, 0.15)';
+                    let sz = this.type === 'junction' ? 24 : 45;
+                    ctx.fillRect(-sz, -sz, sz*2, sz*2);
+                    ctx.strokeStyle = '#00f3ff'; 
+                    ctx.setLineDash([4,4]);
+                    ctx.strokeRect(-sz, -sz, sz*2, sz*2);
+                    ctx.setLineDash([]);
+                }
+
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = '#94a3b8'; 
+                
+                let state = 0; 
+                if(isRunning && this.type === 'diode') {
+                    let aNode = getTerminalNode(this.id, 'A'), kNode = getTerminalNode(this.id, 'K');
+                    if(aNode && kNode) {
+                        let vA = getNodeVolts(aNode.id), vK = getNodeVolts(kNode.id);
+                        if(vA > vK + 0.05) state = 1;      // Forward conduction
+                        else if(vA < vK - 0.05) state = -1; // Reverse blocking
+                    }
+                }
+
+                if(this.type === 'source') {
+                    ctx.beginPath(); 
+                    ctx.arc(0, 0, 22, 0, Math.PI*2); 
+                    ctx.stroke();
+                    ctx.beginPath(); 
+                    for(let i = -10; i <= 10; i++) ctx.lineTo(i, Math.sin(i * 0.5) * 8); 
+                    ctx.stroke();
+                    ctx.beginPath(); 
+                    ctx.moveTo(0, -22); ctx.lineTo(0, -30); 
+                    ctx.moveTo(0, 22); ctx.lineTo(0, 30); 
+                    ctx.stroke();
+                }
+                if(this.type === 'source_ct') {
+                    ctx.beginPath(); 
+                    for(let i=0; i<4; i++) { ctx.arc(-10, -30 + i*20, 10, Math.PI/2, Math.PI*1.5, true); } 
+                    ctx.stroke();
+                    ctx.beginPath(); 
+                    ctx.moveTo(5, -40); ctx.lineTo(5, 40); 
+                    ctx.moveTo(10, -40); ctx.lineTo(10, 40); 
+                    ctx.stroke(); // Magnetic core
+                    ctx.beginPath(); 
+                    for(let i=0; i<2; i++) { ctx.arc(20, -30 + i*20, 10, Math.PI*1.5, Math.PI/2, true); } 
+                    ctx.stroke();
+                    ctx.beginPath(); 
+                    for(let i=0; i<2; i++) { ctx.arc(20, 10 + i*20, 10, Math.PI*1.5, Math.PI/2, true); } 
+                    ctx.stroke();
+                    ctx.beginPath(); 
+                    ctx.moveTo(20, 0); ctx.lineTo(40, 0); 
+                    ctx.stroke(); // Center Tap
+                }
+                if(this.type === 'diode') {
+                    let color = state > 0 ? '#ef4444' : (state < 0 ? '#00f3ff' : '#94a3b8');
+                    ctx.fillStyle = color; 
+                    ctx.strokeStyle = color; 
+                    ctx.shadowBlur = state !== 0 ? 12 : 0; 
+                    ctx.shadowColor = color;
+
+                    // Diode Anode-to-Cathode Arrow
+                    ctx.beginPath(); 
+                    ctx.moveTo(-10, -11); 
+                    ctx.lineTo(10, 0); 
+                    ctx.lineTo(-10, 11); 
+                    ctx.closePath(); 
+                    ctx.fill();
+
+                    // Cathode Barrier Bar
+                    ctx.beginPath(); 
+                    ctx.moveTo(10, -13); 
+                    ctx.lineTo(10, 13); 
+                    ctx.stroke();
+
+                    // Terminal leads
+                    ctx.beginPath(); 
+                    ctx.moveTo(-20, 0); ctx.lineTo(-10, 0); 
+                    ctx.moveTo(10, 0); ctx.lineTo(20, 0); 
+                    ctx.stroke();
+                    ctx.shadowBlur = 0;
+                }
+                if(this.type === 'resistor') {
+                    ctx.beginPath(); 
+                    ctx.moveTo(0, -30); ctx.lineTo(0, -20);
+                    for(let i=0; i<4; i++) { 
+                        ctx.lineTo(-10, -15 + i*10); 
+                        ctx.lineTo(10, -5 + i*10); 
+                    }
+                    ctx.lineTo(0, 20); ctx.lineTo(0, 30); 
+                    ctx.stroke();
+                }
+                if(this.type === 'capacitor') {
+                    ctx.strokeStyle = '#fbbf24';
+                    ctx.beginPath(); 
+                    ctx.moveTo(0, -20); ctx.lineTo(0, -5); 
+                    ctx.moveTo(0, 20); ctx.lineTo(0, 5); 
+                    ctx.stroke();
+                    ctx.beginPath(); 
+                    ctx.moveTo(-15, -5); ctx.lineTo(15, -5); 
+                    ctx.moveTo(-15, 5); ctx.lineTo(15, 5); 
+                    ctx.stroke();
+                }
+                if(this.type === 'junction') {
+                    let nodeColor = '#fbbf24';
+                    if (isRunning) {
+                        let jNode = getTerminalNode(this.id, 'J');
+                        if (jNode && jNode.tag) {
+                            let v = getNodeVolts(jNode.id);
+                            if (jNode.tag.includes('AC')) {
+                                nodeColor = Math.abs(v) > 0.08 ? (v > 0 ? '#ef4444' : '#00f3ff') : '#94a3b8';
+                            } else if (jNode.tag === 'DC_P') {
+                                nodeColor = '#fbbf24';
+                            } else if (jNode.tag === 'DC_N') {
+                                nodeColor = '#00f3ff';
+                            }
+                        }
+                    }
+                    ctx.fillStyle = nodeColor;
+                    ctx.strokeStyle = '#060c18';
+                    ctx.lineWidth = 2.5;
+                    ctx.shadowBlur = isRunning ? 10 : 4;
+                    ctx.shadowColor = nodeColor;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, 6.5, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+                    ctx.shadowBlur = 0;
+                }
+                ctx.restore();
+
+                // Draw Gold Terminal Pads (Omit redundant circle for junction node)
+                if (this.type !== 'junction') {
+                    let terms = this.getTerminals();
+                    for(let t of terms) {
+                        ctx.fillStyle = '#fbbf24';
+                        ctx.shadowBlur = 4;
+                        ctx.shadowColor = '#fbbf24';
+                        ctx.beginPath(); 
+                        ctx.arc(t.x, t.y, 4.5, 0, Math.PI*2); 
+                        ctx.fill();
+                        ctx.shadowBlur = 0;
+                    }
+                }
+            }
+        }
+
+        // --- Sandbox State Management ---
+        function saveState() {
+            if(appMode !== 'sandbox') return;
+            let state = JSON.stringify({
+                nextId: nextId,
+                components: components.map(c => ({...c})),
+                wires: wires.map(w => ({...w, points: w.points.map(p => ({...p}))}))
+            });
+            undoStack.push(state);
+            redoStack = [];
+        }
+
+        function undoSandbox() {
+            if(undoStack.length <= 1) return;
+            redoStack.push(undoStack.pop());
+            restoreState(undoStack[undoStack.length - 1]);
+        }
+        
+        function redoSandbox() {
+            if(redoStack.length === 0) return;
+            let state = redoStack.pop();
+            undoStack.push(state);
+            restoreState(state);
+        }
+
+        function restoreState(stateJSON) {
+            let state = JSON.parse(stateJSON);
+            nextId = state.nextId;
+            components = state.components.map(cData => {
+                let c = new Component(cData.type, cData.x, cData.y);
+                c.id = cData.id; c.rot = cData.rot;
+                return c;
+            });
+            wires = state.wires;
+            selectedComp = null; selectedWire = null;
+        }
+
+        // --- UI Modes & Actions ---
+        function setAppMode(mode) {
+            if(isRunning) toggleSim();
+            appMode = mode;
+            document.getElementById('tabPrebuilt').classList.toggle('active', mode === 'prebuilt');
+            document.getElementById('tabSandbox').classList.toggle('active', mode === 'sandbox');
+            document.getElementById('prebuiltUI').style.display = mode === 'prebuilt' ? 'block' : 'none';
+            document.getElementById('sandboxUI').style.display = mode === 'sandbox' ? 'block' : 'none';
+            
+            if(mode === 'prebuilt') {
+                buildPrebuilt(currentPrebuilt);
+            } else {
+                components = []; wires = []; undoStack = []; redoStack = []; saveState();
+                teleTopology.innerText = "CUSTOM SANDBOX CIRCUIT";
+            }
+        }
+
+        function selectPrebuilt(type) {
+            if(isRunning) toggleSim();
+            currentPrebuilt = type;
+            document.querySelectorAll('#prebuiltUI .sim-btn').forEach(b => b.classList.remove('active'));
+            if(type === 'half') document.getElementById('btnHalf').classList.add('active');
+            if(type === 'center') document.getElementById('btnCenter').classList.add('active');
+            if(type === 'bridge') document.getElementById('btnBridge').classList.add('active');
+            buildPrebuilt(type);
+        }
+
+        function togglePrebuiltCapacitor() {
+            prebuiltHasCap = document.getElementById('capTogglePrebuilt').checked;
+            if(isRunning) toggleSim();
+            buildPrebuilt(currentPrebuilt);
+        }
+
+        function updateParams() {
+            frequency = parseFloat(document.getElementById('freqRange').value);
+            speed = parseFloat(document.getElementById('speedRange').value);
+            document.getElementById('freqVal').innerText = frequency;
+            document.getElementById('speedVal').innerText = speed.toFixed(1) + "x";
+            teleFreq.innerText = frequency.toFixed(1) + " Hz";
+        }
+
+        function updateOscView() { 
+            oscViewMode = document.querySelector('input[name="oscView"]:checked').value; 
+        }
+
+        function snap(val) { return Math.round(val / GRID) * GRID; }
+
+        function addComponent() {
+            if(isRunning) return;
+            let type = document.getElementById('compSelect').value;
+            components.push(new Component(type, 240, 240));
+            selectedComp = components[components.length - 1];
+            selectedWire = null;
+            saveState();
+        }
+
+        function rotateComp() { 
+            if(selectedComp && !isRunning) { 
+                selectedComp.rot = (selectedComp.rot + 1) % 8; 
+                saveState(); 
+            } 
+        }
+
+        function deleteSelected() {
+            if(isRunning) return;
+            if(selectedComp) {
+                components = components.filter(c => c.id !== selectedComp.id);
+                wires = wires.filter(w => w.c1 !== selectedComp.id && w.c2 !== selectedComp.id);
+                selectedComp = null;
+                saveState();
+            } else if (selectedWire) {
+                wires = wires.filter(w => w !== selectedWire);
+                selectedWire = null;
+                saveState();
+            }
+        }
+
+        function clearSandbox() { 
+            if(!isRunning) { 
+                components = []; wires = []; 
+                selectedComp = null; selectedWire = null; 
+                wiringStart = null; saveState(); 
+            } 
+        }
+
+        function cleanPoints(pts) {
+            let res = [];
+            for (let i = 0; i < pts.length; i++) {
+                if (i === 0 || pts[i].x !== pts[i-1].x || pts[i].y !== pts[i-1].y) {
+                    res.push(pts[i]);
+                }
+            }
+            return res.length >= 2 ? res : pts;
+        }
+
+        // --- Exact Blueprints for Prebuilt Mode ---
+        function buildPrebuilt(type) {
+            components = []; wires = []; selectedComp = null; selectedWire = null;
+            
+            if (type === 'half') {
+                teleTopology.innerText = prebuiltHasCap ? "HALF-WAVE + FILTER" : "HALF-WAVE (1 DIODE)";
+                let s = new Component('source', 200, 250); components.push(s);
+                let d = new Component('diode', 440, 160); components.push(d);
+                let r = new Component('resistor', 700, 250); components.push(r);
+                
+                wires.push({ c1:s.id, t1:'L', c2:d.id, t2:'A', points: [{x:200,y:220}, {x:200,y:160}, {x:420,y:160}] });
+                wires.push({ c1:d.id, t1:'K', c2:r.id, t2:'T1', points: [{x:460,y:160}, {x:700,y:160}, {x:700,y:220}] });
+                wires.push({ c1:s.id, t1:'N', c2:r.id, t2:'T2', points: [{x:200,y:280}, {x:200,y:360}, {x:700,y:360}, {x:700,y:280}] });
+
+                if(prebuiltHasCap) {
+                    let j1 = new Component('junction', 560, 160); components.push(j1);
+                    let j2 = new Component('junction', 560, 360); components.push(j2);
+                    let c = new Component('capacitor', 560, 250); components.push(c);
+
+                    wires = wires.filter(w => !(w.c1 === d.id && w.c2 === r.id) && !(w.c1 === s.id && w.c2 === r.id));
+                    wires.push({ c1:d.id, t1:'K', c2:j1.id, t2:'J', points: [{x:460,y:160}, {x:560,y:160}] });
+                    wires.push({ c1:j1.id, t1:'J', c2:r.id, t2:'T1', points: [{x:560,y:160}, {x:700,y:160}, {x:700,y:220}] });
+                    wires.push({ c1:s.id, t1:'N', c2:j2.id, t2:'J', points: [{x:200,y:280}, {x:200,y:360}, {x:560,y:360}] });
+                    wires.push({ c1:j2.id, t1:'J', c2:r.id, t2:'T2', points: [{x:560,y:360}, {x:700,y:360}, {x:700,y:280}] });
+                    wires.push({ c1:c.id, t1:'T1', c2:j1.id, t2:'J', points: [{x:560,y:230}, {x:560,y:160}] });
+                    wires.push({ c1:c.id, t1:'T2', c2:j2.id, t2:'J', points: [{x:560,y:270}, {x:560,y:360}] });
+                }
+            } 
+            else if (type === 'center') {
+                teleTopology.innerText = prebuiltHasCap ? "CENTER-TAP + FILTER" : "CENTER-TAP (2 DIODES)";
+                let s = new Component('source_ct', 180, 250); components.push(s);
+                let d1 = new Component('diode', 400, 150); components.push(d1);
+                let d2 = new Component('diode', 400, 350); components.push(d2);
+                let jPos = new Component('junction', 520, 150); components.push(jPos);
+                let r = new Component('resistor', 700, 250); components.push(r);
+                
+                wires.push({ c1:s.id, t1:'L1', c2:d1.id, t2:'A', points: [{x:200,y:210}, {x:200,y:150}, {x:380,y:150}] });
+                wires.push({ c1:s.id, t1:'L2', c2:d2.id, t2:'A', points: [{x:200,y:290}, {x:200,y:350}, {x:380,y:350}] });
+                
+                wires.push({ c1:d1.id, t1:'K', c2:jPos.id, t2:'J', points: [{x:420,y:150}, {x:520,y:150}] });
+                wires.push({ c1:d2.id, t1:'K', c2:jPos.id, t2:'J', points: [{x:420,y:350}, {x:520,y:350}, {x:520,y:150}] });
+                
+                wires.push({ c1:jPos.id, t1:'J', c2:r.id, t2:'T1', points: [{x:520,y:150}, {x:700,y:150}, {x:700,y:220}] });
+                wires.push({ c1:s.id, t1:'CT', c2:r.id, t2:'T2', points: [{x:220,y:250}, {x:220,y:420}, {x:700,y:420}, {x:700,y:280}] });
+
+                if(prebuiltHasCap) {
+                    let jCapTop = new Component('junction', 600, 150); components.push(jCapTop);
+                    let jCapBot = new Component('junction', 600, 420); components.push(jCapBot);
+                    let c = new Component('capacitor', 600, 250); components.push(c);
+
+                    wires = wires.filter(w => !(w.c1 === jPos.id && w.c2 === r.id) && !(w.c1 === s.id && w.c2 === r.id));
+                    wires.push({ c1:jPos.id, t1:'J', c2:jCapTop.id, t2:'J', points: [{x:520,y:150}, {x:600,y:150}] });
+                    wires.push({ c1:jCapTop.id, t1:'J', c2:r.id, t2:'T1', points: [{x:600,y:150}, {x:700,y:150}, {x:700,y:220}] });
+                    wires.push({ c1:s.id, t1:'CT', c2:jCapBot.id, t2:'J', points: [{x:220,y:250}, {x:220,y:420}, {x:600,y:420}] });
+                    wires.push({ c1:jCapBot.id, t1:'J', c2:r.id, t2:'T2', points: [{x:600,y:420}, {x:700,y:420}, {x:700,y:280}] });
+                    
+                    wires.push({ c1:c.id, t1:'T1', c2:jCapTop.id, t2:'J', points: [{x:600,y:230}, {x:600,y:150}] });
+                    wires.push({ c1:c.id, t1:'T2', c2:jCapBot.id, t2:'J', points: [{x:600,y:270}, {x:600,y:420}] });
+                }
+            } 
+            else if (type === 'bridge') {
+                teleTopology.innerText = prebuiltHasCap ? "BRIDGE + FILTER" : "BRIDGE (4 DIODES)";
+                let s = new Component('source', 140, 250); components.push(s);
+                let r = new Component('resistor', 780, 250); components.push(r);
+                
+                let d1 = new Component('diode', 340, 190); d1.rot = 7; components.push(d1); 
+                let d2 = new Component('diode', 460, 190); d2.rot = 5; components.push(d2); 
+                let d3 = new Component('diode', 340, 310); d3.rot = 5; components.push(d3); 
+                let d4 = new Component('diode', 460, 310); d4.rot = 7; components.push(d4); 
+
+                let tD1A = d1.getTerminals()[0], tD1K = d1.getTerminals()[1];
+                let tD2A = d2.getTerminals()[0], tD2K = d2.getTerminals()[1];
+                let tD3A = d3.getTerminals()[0], tD3K = d3.getTerminals()[1];
+                let tD4A = d4.getTerminals()[0], tD4K = d4.getTerminals()[1];
+                
+                let N_L = {x: tD1A.x, y: tD1A.y};
+                let N_T = {x: tD1K.x, y: tD1K.y};
+                let N_R = {x: tD2A.x, y: tD2A.y};
+                let N_B = {x: tD3A.x, y: tD3A.y};
+
+                wires.push({ c1:s.id, t1:'L', c2:d1.id, t2:'A', points: [{x:140,y:220}, {x:140,y:100}, {x:N_L.x,y:100}, N_L] });
+                wires.push({ c1:s.id, t1:'N', c2:d4.id, t2:'K', points: [{x:140,y:280}, {x:140,y:400}, {x:N_R.x,y:400}, N_R] });
+                
+                wires.push({ c1:d3.id, t1:'K', c2:d1.id, t2:'A', points: [tD3K, N_L] });
+                wires.push({ c1:d2.id, t1:'K', c2:d1.id, t2:'K', points: [tD2K, N_T] });
+                wires.push({ c1:d4.id, t1:'K', c2:d2.id, t2:'A', points: [tD4K, N_R] });
+                wires.push({ c1:d4.id, t1:'A', c2:d3.id, t2:'A', points: [tD4A, N_B] });
+
+                wires.push({ c1:d1.id, t1:'K', c2:r.id, t2:'T1', points: [N_T, {x:N_T.x,y:80}, {x:780,y:80}, {x:780,y:220}] });
+                wires.push({ c1:d3.id, t1:'A', c2:r.id, t2:'T2', points: [N_B, {x:N_B.x,y:440}, {x:780,y:440}, {x:780,y:280}] });
+
+                if(prebuiltHasCap) {
+                    let c = new Component('capacitor', 640, 250); components.push(c);
+                    wires.push({ c1:c.id, t1:'T1', c2:d1.id, t2:'K', points: [{x:640,y:230}, {x:640,y:80}, {x:N_T.x,y:80}] });
+                    wires.push({ c1:c.id, t1:'T2', c2:d3.id, t2:'A', points: [{x:640,y:270}, {x:640,y:440}, {x:N_B.x,y:440}] });
+                }
+            }
+        }
+
+        function distToSegment(px, py, x1, y1, x2, y2) {
+            let A = px - x1, B = py - y1, C = x2 - x1, D = y2 - y1;
+            let dot = A * C + B * D, len_sq = C * C + D * D, param = -1;
+            if (len_sq !== 0) param = dot / len_sq;
+            let xx, yy;
+            if (param < 0) { xx = x1; yy = y1; }
+            else if (param > 1) { xx = x2; yy = y2; }
+            else { xx = x1 + param * C; yy = y1 + param * D; }
+            return Math.hypot(px - xx, py - yy);
+        }
+
+        function splitWireAt(targetWire, segIdx, x, y) {
+            let junc = new Component('junction', x, y);
+            components.push(junc);
+
+            let pOld = targetWire.points;
+            let p1 = cleanPoints([...pOld.slice(0, segIdx + 1), {x, y}]);
+            let p2 = cleanPoints([{x, y}, ...pOld.slice(segIdx + 1)]);
+
+            let w1 = { c1: targetWire.c1, t1: targetWire.t1, c2: junc.id, t2: 'J', points: p1 };
+            let w2 = { c1: junc.id, t1: 'J', c2: targetWire.c2, t2: targetWire.t2, points: p2 };
+
+            wires = wires.filter(w => w !== targetWire);
+            wires.push(w1, w2);
+            return junc;
+        }
+
+        // Pointer Handling (Scaled for Responsive Canvas)
+        circuitCanvas.addEventListener('mousedown', e => {
+            if(appMode === 'prebuilt' || isRunning) return;
+            const rect = circuitCanvas.getBoundingClientRect();
+            const scaleX = circuitCanvas.width / rect.width;
+            const scaleY = circuitCanvas.height / rect.height;
+            mouseX = snap((e.clientX - rect.left) * scaleX); 
+            mouseY = snap((e.clientY - rect.top) * scaleY);
+
+            // 1. Check Terminal Attachment
+            for(let c of components) {
+                for(let t of c.getTerminals()) {
+                    if(Math.hypot(mouseX - t.x, mouseY - t.y) < 16) {
+                        if(wiringStart) {
+                            if(wiringStart.comp.id !== c.id || wiringStart.term !== t.id) {
+                                let last = wiringWaypoints.length > 0 ? wiringWaypoints[wiringWaypoints.length-1] : {x: wiringStart.x, y: wiringStart.y};
+                                wires.push({ 
+                                    c1: wiringStart.comp.id, t1: wiringStart.term, 
+                                    c2: c.id, t2: t.id, 
+                                    points: cleanPoints([ {x:wiringStart.x, y:wiringStart.y}, ...wiringWaypoints, {x: t.x, y: last.y}, {x:t.x, y:t.y} ])
+                                });
+                                saveState();
+                            }
+                            wiringStart = null; wiringWaypoints = [];
+                        } else {
+                            wiringStart = { comp: c, term: t.id, x: t.x, y: t.y };
+                            wiringWaypoints = [];
+                        }
+                        return;
+                    }
+                }
+            }
+
+            // 2. Click on Wire while Wiring: Auto-Insert Junction & Branch Off
+            if(wiringStart) {
+                for(let w of wires) {
+                    for(let i=0; i<w.points.length-1; i++) {
+                        if(distToSegment(mouseX, mouseY, w.points[i].x, w.points[i].y, w.points[i+1].x, w.points[i+1].y) < 10) {
+                            let junc = splitWireAt(w, i, mouseX, mouseY);
+                            let last = wiringWaypoints.length > 0 ? wiringWaypoints[wiringWaypoints.length-1] : {x: wiringStart.x, y: wiringStart.y};
+                            wires.push({
+                                c1: wiringStart.comp.id, t1: wiringStart.term,
+                                c2: junc.id, t2: 'J',
+                                points: cleanPoints([ {x:wiringStart.x, y:wiringStart.y}, ...wiringWaypoints, {x: mouseX, y: last.y}, {x:mouseX, y:mouseY} ])
+                            });
+                            wiringStart = null; wiringWaypoints = [];
+                            saveState();
+                            return;
+                        }
+                    }
+                }
+
+                // Or Add Waypoint
+                let last = wiringWaypoints.length > 0 ? wiringWaypoints[wiringWaypoints.length-1] : {x: wiringStart.x, y: wiringStart.y};
+                wiringWaypoints.push({x: mouseX, y: last.y});
+                wiringWaypoints.push({x: mouseX, y: mouseY});
+                return;
+            }
+
+            // 3. Component Selection & Dragging
+            selectedComp = null; selectedWire = null;
+            for(let i = components.length - 1; i >= 0; i--) {
+                let c = components[i];
+                let hitRadius = c.type === 'junction' ? 14 : 32;
+                if(Math.abs(mouseX - c.x) <= hitRadius && Math.abs(mouseY - c.y) <= hitRadius) {
+                    selectedComp = c; isDragging = true;
+                    dragOffsetX = c.x - (e.clientX - rect.left) * scaleX; 
+                    dragOffsetY = c.y - (e.clientY - rect.top) * scaleY;
+                    components.push(components.splice(i, 1)[0]);
+                    return;
+                }
+            }
+
+            // 4. Wire Selection
+            for(let w of wires) {
+                for(let i=0; i<w.points.length-1; i++) {
+                    if(distToSegment(mouseX, mouseY, w.points[i].x, w.points[i].y, w.points[i+1].x, w.points[i+1].y) < 8) {
+                        selectedWire = w;
+                        return;
+                    }
+                }
+            }
+        });
+
+        // Double-click wire to insert junction node directly
+        circuitCanvas.addEventListener('dblclick', e => {
+            if(appMode === 'prebuilt' || isRunning) return;
+            const rect = circuitCanvas.getBoundingClientRect();
+            const scaleX = circuitCanvas.width / rect.width;
+            const scaleY = circuitCanvas.height / rect.height;
+            let clickX = snap((e.clientX - rect.left) * scaleX);
+            let clickY = snap((e.clientY - rect.top) * scaleY);
+
+            for(let w of wires) {
+                for(let i=0; i<w.points.length-1; i++) {
+                    if(distToSegment(clickX, clickY, w.points[i].x, w.points[i].y, w.points[i+1].x, w.points[i+1].y) < 10) {
+                        splitWireAt(w, i, clickX, clickY);
+                        saveState();
+                        return;
+                    }
+                }
+            }
+        });
+
+        circuitCanvas.addEventListener('mousemove', e => {
+            const rect = circuitCanvas.getBoundingClientRect();
+            const scaleX = circuitCanvas.width / rect.width;
+            const scaleY = circuitCanvas.height / rect.height;
+            let rawX = (e.clientX - rect.left) * scaleX; 
+            let rawY = (e.clientY - rect.top) * scaleY;
+            mouseX = snap(rawX); 
+            mouseY = snap(rawY);
+            
+            if(isDragging && selectedComp && appMode === 'sandbox') {
+                selectedComp.x = snap(rawX + dragOffsetX);
+                selectedComp.y = snap(rawY + dragOffsetY);
+                
+                wires.forEach(w => {
+                    if (w.c1 === selectedComp.id) {
+                        let t = selectedComp.getTerminals().find(tm => tm.id === w.t1);
+                        if(t) w.points[0] = {x: t.x, y: t.y};
+                    }
+                    if (w.c2 === selectedComp.id) {
+                        let t = selectedComp.getTerminals().find(tm => tm.id === w.t2);
+                        if(t) w.points[w.points.length - 1] = {x: t.x, y: t.y};
+                    }
+                });
+            }
+        });
+
+        circuitCanvas.addEventListener('mouseup', () => { 
+            if(isDragging) { isDragging = false; saveState(); }
+        });
+        
+        circuitCanvas.addEventListener('contextmenu', e => {
+            e.preventDefault();
+            if(wiringStart) { wiringStart = null; wiringWaypoints = []; }
+        });
+
+        // --- Nodal Analysis Solver ---
+        function toggleSim() {
+            if(isRunning) {
+                isRunning = false; capVoltage = 0;
+                document.getElementById('runBtn').style.display = 'block';
+                document.getElementById('stopBtn').style.display = 'none';
+                teleStatus.innerText = "STANDBY (EDITING)";
+                teleStatus.className = "tele-val";
+                return;
+            }
+
+            circuitNodes = []; let termMap = {}; let nIdCounter = 0;
+            function getOrAssignNode(cid, tid) {
+                let key = cid + "_" + tid;
+                if(termMap[key] !== undefined) return termMap[key];
+                termMap[key] = nIdCounter;
+                circuitNodes[nIdCounter] = [{cid, tid}];
+                nIdCounter++; return termMap[key];
+            }
+            function mergeNodes(n1, n2) {
+                if(n1 === n2) return n1;
+                let target = Math.min(n1, n2), src = Math.max(n1, n2);
+                for(let t of circuitNodes[src]) {
+                    circuitNodes[target].push(t); termMap[t.cid + "_" + t.tid] = target;
+                }
+                circuitNodes[src] = []; return target;
+            }
+
+            components.forEach(c => c.getTerminals().forEach(t => getOrAssignNode(c.id, t.id)));
+            wires.forEach(w => mergeNodes(getOrAssignNode(w.c1, w.t1), getOrAssignNode(w.c2, w.t2)));
+
+            let srcCount = components.filter(c => c.type.includes('source')).length;
+            let resCount = components.filter(c => c.type === 'resistor').length;
+            let dioCount = components.filter(c => c.type === 'diode').length;
+            let cap = components.find(c => c.type === 'capacitor');
+
+            if(srcCount !== 1) return alert("Circuit Error: Exactly 1 AC Source is required to energize the schematic.");
+            if(resCount !== 1) return alert("Circuit Error: Exactly 1 Load Resistor is required to evaluate output voltage.");
+            if(dioCount === 0) return alert("Circuit Error: At least 1 Diode is required for rectification.");
+            
+            let src = components.find(c => c.type.includes('source'));
+            let res = components.find(c => c.type === 'resistor');
+
+            const nodeContains = (nId, type, term) => {
+                if(!circuitNodes[nId]) return 0;
+                return circuitNodes[nId].filter(t => components.find(c => c.id === t.cid).type === type && (term ? t.tid === term : true)).length;
+            };
+
+            nodeTags = {}; detectedTopology = null; capVoltage = 0;
+
+            if(dioCount === 1) {
+                let nL = termMap[src.id+"_L"], nN = termMap[src.id+"_N"];
+                let nR1 = termMap[res.id+"_T1"], nR2 = termMap[res.id+"_T2"];
+                if (nodeContains(nL, 'diode', 'A') && nodeContains(nR1, 'diode', 'K') && nN === nR2) {
+                    detectedTopology = 'half'; nodeTags[nL] = 'AC_P'; nodeTags[nN] = 'AC_N'; nodeTags[nR1] = 'DC_P'; nodeTags[nR2] = 'DC_N';
+                } else if (nodeContains(nL, 'diode', 'A') && nodeContains(nR2, 'diode', 'K') && nN === nR1) {
+                    detectedTopology = 'half'; nodeTags[nL] = 'AC_P'; nodeTags[nN] = 'AC_N'; nodeTags[nR2] = 'DC_P'; nodeTags[nR1] = 'DC_N';
+                }
+            }
+            
+            if(dioCount === 4 && src.type === 'source') {
+                let nL = termMap[src.id+"_L"], nN = termMap[src.id+"_N"];
+                let nR1 = termMap[res.id+"_T1"], nR2 = termMap[res.id+"_T2"];
+                if(nodeContains(nL, 'diode', 'A')===1 && nodeContains(nL, 'diode', 'K')===1 && nodeContains(nN, 'diode', 'A')===1 && nodeContains(nN, 'diode', 'K')===1) {
+                    if(nodeContains(nR1, 'diode', 'K')===2 && nodeContains(nR2, 'diode', 'A')===2) {
+                        detectedTopology = 'bridge'; nodeTags[nL] = 'AC_P'; nodeTags[nN] = 'AC_N'; nodeTags[nR1] = 'DC_P'; nodeTags[nR2] = 'DC_N';
+                    } else if (nodeContains(nR2, 'diode', 'K')===2 && nodeContains(nR1, 'diode', 'A')===2) {
+                        detectedTopology = 'bridge'; nodeTags[nL] = 'AC_P'; nodeTags[nN] = 'AC_N'; nodeTags[nR2] = 'DC_P'; nodeTags[nR1] = 'DC_N';
+                    }
+                }
+            }
+
+            if(dioCount === 2 && src.type === 'source_ct') {
+                let nL1 = termMap[src.id+"_L1"], nL2 = termMap[src.id+"_L2"], nCT = termMap[src.id+"_CT"];
+                let nR1 = termMap[res.id+"_T1"], nR2 = termMap[res.id+"_T2"];
+                if(nodeContains(nL1, 'diode', 'A')===1 && nodeContains(nL2, 'diode', 'A')===1) {
+                    if(nodeContains(nR1, 'diode', 'K')===2 && nCT === nR2) {
+                        detectedTopology = 'center'; nodeTags[nL1] = 'AC_P1'; nodeTags[nL2] = 'AC_P2'; nodeTags[nR1] = 'DC_P'; nodeTags[nCT] = 'DC_N';
+                    } else if(nodeContains(nR2, 'diode', 'K')===2 && nCT === nR1) {
+                        detectedTopology = 'center'; nodeTags[nL1] = 'AC_P1'; nodeTags[nL2] = 'AC_P2'; nodeTags[nR2] = 'DC_P'; nodeTags[nCT] = 'DC_N';
+                    }
+                }
+            }
+
+            if(!detectedTopology) return alert("Topology Error: Ensure your diodes are correctly oriented to form a closed rectification loop (AC into Diode Anode, Cathode to DC Load, returning to source/ground).");
+
+            if(cap) {
+                let nC1 = termMap[cap.id+"_T1"], nC2 = termMap[cap.id+"_T2"];
+                let r1 = termMap[res.id+"_T1"], r2 = termMap[res.id+"_T2"];
+                if(!((nC1===r1 && nC2===r2) || (nC1===r2 && nC2===r1))) {
+                    return alert("Topology Error: The Smoothing Filter Capacitor must be placed in direct parallel across the Load Resistor terminals.");
+                }
+            }
+
+            selectedComp = null; selectedWire = null; wiringStart = null; wiringWaypoints = [];
+            isRunning = true;
+            document.getElementById('runBtn').style.display = 'none';
+            document.getElementById('stopBtn').style.display = 'block';
+
+            teleStatus.innerText = "ACTIVE (ENERGIZED)";
+            teleStatus.className = "tele-val green";
+
+            let hasCap = components.some(c => c.type === 'capacitor');
+            if (detectedTopology === 'half') {
+                teleTopology.innerText = hasCap ? "HALF-WAVE + CAPACITOR" : "HALF-WAVE RECTIFIER";
+                teleVdc.innerText = hasCap ? "9.42 V_avg (Filtered)" : "3.18 V_avg";
+            } else if (detectedTopology === 'center') {
+                teleTopology.innerText = hasCap ? "CENTER-TAP + CAPACITOR" : "CENTER-TAP FULL-WAVE";
+                teleVdc.innerText = hasCap ? "9.78 V_avg (Filtered)" : "6.37 V_avg";
+            } else {
+                teleTopology.innerText = hasCap ? "BRIDGE + CAPACITOR" : "FULL-WAVE BRIDGE";
+                teleVdc.innerText = hasCap ? "9.75 V_avg (Filtered)" : "6.37 V_avg";
+            }
+        }
+
+        function getTerminalNode(cId, tId) {
+            for(let n=0; n<circuitNodes.length; n++) {
+                if(circuitNodes[n] && circuitNodes[n].find(t => t.cid === cId && t.tid === tId)) return {id: n, tag: nodeTags[n]};
+            }
+            return null;
+        }
+        
+        function getNodeVolts(nId) {
+            if(!isRunning) return 0;
+            let vIn = Math.sin(time * frequency * 0.1);
+            let tag = nodeTags[nId];
+            if(!tag) return 0;
+            if(tag === 'AC_N') return -vIn;
+            if(tag === 'AC_P' || tag === 'AC_P1') return vIn;
+            if(tag === 'AC_P2') return -vIn;
+            if(tag === 'DC_N') return 0;
+            if(tag === 'DC_P') {
+                if(detectedTopology === 'half') return vIn > 0 ? vIn : 0;
+                return Math.abs(vIn);
+            }
+            return 0;
+        }
+
+        // --- Master Render Loop ---
+        function render() {
+            time += 0.016 * speed;
+            let vIn = Math.sin(time * frequency * 0.1);
+            let vRect = 0;
+            
+            if(isRunning) {
+                if (detectedTopology === 'half') vRect = vIn > 0 ? vIn : 0;
+                else vRect = Math.abs(vIn);
+                
+                let hasCap = components.some(c => c.type === 'capacitor');
+                if (hasCap) {
+                    if (vRect >= capVoltage) capVoltage = vRect;
+                    else capVoltage *= (1 - (0.012 / speed)); 
+                } else {
+                    capVoltage = vRect;
+                }
+            }
+            let vOut = capVoltage;
+
+            // Oscilloscope Drawing
+            history.shift(); 
+            history.push({vIn, vOut});
+            
+            scopeCtx.clearRect(0, 0, scopeCanvas.width, scopeCanvas.height);
+            
+            // Subdued CRT Division Grids
+            scopeCtx.strokeStyle = 'rgba(0, 243, 255, 0.12)'; 
+            scopeCtx.lineWidth = 1;
+            for(let i=0; i<scopeCanvas.height; i+=25) { 
+                scopeCtx.beginPath(); 
+                scopeCtx.moveTo(0, i); scopeCtx.lineTo(scopeCanvas.width, i); 
+                scopeCtx.stroke(); 
+            }
+            for(let i=0; i<scopeCanvas.width; i+=25) { 
+                scopeCtx.beginPath(); 
+                scopeCtx.moveTo(i, 0); scopeCtx.lineTo(i, scopeCanvas.height); 
+                scopeCtx.stroke(); 
+            }
+
+            // Zero Centerline
+            let midY = scopeCanvas.height / 2, amp = 75;
+            scopeCtx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+            scopeCtx.beginPath();
+            scopeCtx.moveTo(0, midY); scopeCtx.lineTo(scopeCanvas.width, midY);
+            scopeCtx.stroke();
+
+            // Trace 1: AC Input (CH1)
+            if(oscViewMode === 'in' || oscViewMode === 'both') {
+                scopeCtx.beginPath(); 
+                scopeCtx.lineWidth = 2;
+                for(let i=0; i<history.length; i++) {
+                    let y = midY - (history[i].vIn * amp);
+                    if(i === 0) scopeCtx.moveTo(i, y); 
+                    else scopeCtx.lineTo(i, y);
+                }
+                let grad = scopeCtx.createLinearGradient(0, 0, 0, scopeCanvas.height);
+                grad.addColorStop(0, '#ef4444'); 
+                grad.addColorStop(0.5, '#94a3b8'); 
+                grad.addColorStop(1, '#00f3ff');
+                scopeCtx.strokeStyle = grad; 
+                scopeCtx.stroke();
+            }
+
+            // Trace 2: DC Output (CH2)
+            if(oscViewMode === 'out' || oscViewMode === 'both') {
+                scopeCtx.beginPath(); 
+                scopeCtx.strokeStyle = '#fbbf24'; 
+                scopeCtx.shadowBlur = 6; 
+                scopeCtx.shadowColor = '#fbbf24'; 
+                scopeCtx.lineWidth = 3;
+                for(let i=0; i<history.length; i++) {
+                    let y = midY - (history[i].vOut * amp);
+                    if(i === 0) scopeCtx.moveTo(i, y); 
+                    else scopeCtx.lineTo(i, y);
+                }
+                scopeCtx.stroke(); 
+                scopeCtx.shadowBlur = 0;
+            }
+
+            // Circuit Schematic Drawing
+            ctx.clearRect(0, 0, circuitCanvas.width, circuitCanvas.height);
+            
+            // Grid Mesh
+            ctx.strokeStyle = 'rgba(30, 41, 59, 0.7)'; 
+            ctx.lineWidth = 1;
+            for(let i=0; i<circuitCanvas.width; i+=GRID) { 
+                ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, circuitCanvas.height); ctx.stroke(); 
+            }
+            for(let i=0; i<circuitCanvas.height; i+=GRID) { 
+                ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(circuitCanvas.width, i); ctx.stroke(); 
+            }
+
+            // Render Interconnect Wires
+            wires.forEach(w => {
+                let isSel = (w === selectedWire && !isRunning);
+                ctx.beginPath(); 
+                ctx.moveTo(w.points[0].x, w.points[0].y);
+                for(let i=1; i<w.points.length; i++) ctx.lineTo(w.points[i].x, w.points[i].y);
+                
+                ctx.strokeStyle = isSel ? '#00f3ff' : '#334155'; 
+                ctx.lineWidth = isSel ? 4 : 3; 
+                ctx.stroke();
+                
+                // Animated Current Flow Dots
+                if(isRunning) {
+                    let node = getTerminalNode(w.c1, w.t1) || getTerminalNode(w.c2, w.t2);
+                    if(node && node.tag) {
+                        let v = getNodeVolts(node.id);
+                        let color = null, flowForward = true;
+                        
+                        if (node.tag.includes('AC')) {
+                            if (Math.abs(v) > 0.08) { 
+                                color = v > 0 ? '#ef4444' : '#00f3ff'; 
+                                flowForward = v > 0; 
+                            }
+                        } else if (node.tag === 'DC_P') {
+                            if (vOut > 0.08) { color = '#fbbf24'; flowForward = true; }
+                        } else if (node.tag === 'DC_N') {
+                            if (vOut > 0.08) { color = '#00f3ff'; flowForward = false; }
+                        }
+
+                        if(color) {
+                            let totalLen = 0, segments = [];
+                            for(let i=0; i<w.points.length-1; i++) {
+                                let p1 = w.points[i], p2 = w.points[i+1];
+                                let dx = p2.x - p1.x, dy = p2.y - p1.y, len = Math.hypot(dx, dy);
+                                segments.push({p1, dx, dy, len}); 
+                                totalLen += len;
+                            }
+                            
+                            let num = Math.floor(totalLen / 30);
+                            ctx.fillStyle = color; 
+                            ctx.shadowBlur = 8; 
+                            ctx.shadowColor = color;
+                            for(let p=0; p<num; p++) {
+                                let ratio = (((time * 110 * speed) + p * 30) % totalLen) / totalLen;
+                                if(!flowForward) ratio = 1 - ratio;
+                                
+                                let currDist = ratio * totalLen, track = 0;
+                                for(let seg of segments) {
+                                    if(currDist >= track && currDist <= track + seg.len) {
+                                        let localR = (currDist - track) / seg.len;
+                                        ctx.beginPath(); 
+                                        ctx.arc(seg.p1.x + seg.dx * localR, seg.p1.y + seg.dy * localR, 3, 0, Math.PI * 2); 
+                                        ctx.fill();
+                                        break;
+                                    }
+                                    track += seg.len;
+                                }
+                            }
+                            ctx.shadowBlur = 0;
+                        }
+                    }
+                }
+            });
+
+            // Interactive Wiring Rubberband
+            if(wiringStart) {
+                ctx.beginPath(); 
+                ctx.moveTo(wiringStart.x, wiringStart.y);
+                for(let wp of wiringWaypoints) ctx.lineTo(wp.x, wp.y);
+                let last = wiringWaypoints.length > 0 ? wiringWaypoints[wiringWaypoints.length-1] : wiringStart;
+                ctx.lineTo(mouseX, last.y); 
+                ctx.lineTo(mouseX, mouseY);
+                ctx.strokeStyle = '#00f3ff'; 
+                ctx.lineWidth = 2; 
+                ctx.setLineDash([5, 5]); 
+                ctx.stroke(); 
+                ctx.setLineDash([]);
+            }
+
+            // Render Component Symbols
+            components.forEach(c => c.draw(ctx));
+            
+            requestAnimationFrame(render);
+        }
+
+        // Initialize Simulator with Cleaned Blueprint
+        buildPrebuilt('half');
+        render();
+    </script>
+</body>
+</html>

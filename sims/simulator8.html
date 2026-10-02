@@ -1,0 +1,2108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Interactive English Language Parts of Speech & Sentence Building Laboratory Simulator - LuyaliSims STEM & Humanities Labs.">
+    <title>English Language: Grammar Dash & Sentence Builder Simulator & Laboratory - LuyaliSims</title>
+
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg?v=1">
+    
+    <!-- Import Futuristic Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Base Reset & Variables */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --neon-cyan: #00f3ff;
+            --neon-magenta: #bc13fe;
+            --neon-green: #00ff88;
+            --neon-amber: #ffb703;
+            --neon-rose: #ff0055;
+            --bg-dark: #070a12;
+            --panel-bg: rgba(16, 24, 43, 0.9);
+            --border-glow: rgba(0, 243, 255, 0.35);
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 85% 15%, rgba(0, 243, 255, 0.08), transparent 45%),
+                radial-gradient(circle at 15% 85%, rgba(188, 19, 254, 0.08), transparent 45%),
+                linear-gradient(180deg, #05070e 0%, #0a0e1a 100%);
+            color: #e2e8f0;
+            margin: 0;
+            padding: 16px 20px;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* 1. HEADER & TOP NAVIGATION */
+        header {
+            max-width: 1200px;
+            margin: 0 auto 15px auto;
+        }
+
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 18px;
+            background: rgba(16, 24, 43, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(188, 19, 254, 0.5);
+            color: #e580ff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(188, 19, 254, 0.2);
+            border-color: var(--neon-magenta);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
+            transform: translateX(-3px);
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+            margin: 6px 0 10px 0;
+            font-size: clamp(1.4rem, 3.8vw, 2.3rem);
+            letter-spacing: 1.5px;
+            text-align: center;
+        }
+
+        .lead-summary {
+            max-width: 920px;
+            margin: 0 auto 20px auto;
+            text-align: center;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: #cbd5e1;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* 2. SIMULATOR WORKSPACE - EXPANDED CANVAS WITH BOTTOM CONTROLS */
+        #simulator-container {
+            background: linear-gradient(135deg, rgba(16, 24, 43, 0.88) 0%, rgba(8, 12, 22, 0.94) 100%);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-glow);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 25px rgba(0, 243, 255, 0.12);
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .hud-telemetry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(4, 8, 16, 0.85);
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            border-radius: 10px;
+            padding: 10px 16px;
+            margin-bottom: 16px;
+            font-family: 'Share Tech Mono', monospace;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .telemetry-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.92rem;
+        }
+
+        .tele-label {
+            color: #8da4be;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .tele-val {
+            color: var(--neon-cyan);
+            font-weight: 700;
+        }
+
+        .tele-val.pink {
+            color: #ff55bb;
+        }
+
+        .tele-val.green {
+            color: var(--neon-green);
+        }
+
+        .tele-val.amber {
+            color: var(--neon-amber);
+        }
+
+        /* Glowing Hint / Codex Button */
+        .hint-glow-btn {
+            min-height: 36px;
+            padding: 0 14px;
+            font-size: 0.82rem;
+            font-weight: 800;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            border: 1px solid var(--neon-amber);
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(255, 183, 3, 0.25) 0%, rgba(13, 22, 41, 0.92) 100%);
+            color: #ffe6a6;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 0 12px rgba(255, 183, 3, 0.45), inset 0 0 8px rgba(255, 183, 3, 0.25);
+            animation: hintPulsing 2.6s infinite ease-in-out;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        @keyframes hintPulsing {
+            0%, 100% {
+                box-shadow: 0 0 8px rgba(255, 183, 3, 0.35);
+                border-color: rgba(255, 183, 3, 0.6);
+            }
+            50% {
+                box-shadow: 0 0 18px rgba(255, 183, 3, 0.8), 0 0 8px rgba(0, 243, 255, 0.5);
+                border-color: #ffd166;
+            }
+        }
+
+        .hint-glow-btn:hover {
+            background: linear-gradient(135deg, rgba(255, 183, 3, 0.38) 0%, rgba(20, 35, 65, 0.95) 100%);
+            transform: translateY(-1px) scale(1.02);
+        }
+
+        .hint-glow-btn.locked {
+            background: #121824;
+            border-color: #4b586d;
+            color: #6a7c93;
+            box-shadow: none;
+            animation: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Full Width Canvas Stage */
+        .canvas-stage {
+            width: 100%;
+            margin-bottom: 16px;
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            width: 100%;
+            background: radial-gradient(circle at 50% 50%, #091724 0%, #030811 100%);
+            border-radius: 12px;
+            overflow: hidden;
+            touch-action: none;
+            border: 3px solid #1e293b;
+            box-shadow: 
+                0 0 0 2px rgba(0, 243, 255, 0.35),
+                0 15px 40px rgba(0, 0, 0, 0.85),
+                inset 0 0 35px rgba(0, 0, 0, 0.95);
+        }
+
+        .canvas-wrapper::before {
+            content: " ";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: 
+                linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, transparent 50%),
+                repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.2) 0px, rgba(0, 0, 0, 0.2) 1px, transparent 1px, transparent 3px);
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16 / 9;
+            cursor: pointer;
+        }
+
+        /* Bottom Controls Console */
+        .bottom-controls-panel {
+            background: linear-gradient(145deg, rgba(11, 17, 30, 0.95) 0%, rgba(6, 9, 16, 0.98) 100%);
+            padding: 16px 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .controls-top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .mode-selection-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .mode-selection-group label {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #cbd5e1;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            white-space: nowrap;
+        }
+
+        select {
+            min-height: 44px;
+            background: #060c18;
+            border: 1px solid rgba(0, 243, 255, 0.45);
+            color: #e2e8f0;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            padding: 8px 14px;
+            border-radius: 8px;
+            outline: none;
+            cursor: pointer;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.6);
+            flex: 1;
+        }
+
+        select:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 12px rgba(0, 243, 255, 0.4);
+        }
+
+        .buttons-action-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .btn-cluster-main {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .btn-cluster-utility {
+            display: flex;
+            gap: 10px;
+        }
+
+        .sim-btn {
+            background: linear-gradient(180deg, rgba(16, 28, 54, 0.92) 0%, rgba(8, 14, 28, 0.98) 100%);
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            color: var(--neon-cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 10px 16px;
+            min-height: 44px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            user-select: none;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+        }
+
+        .sim-btn:hover {
+            border-color: var(--neon-cyan);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .sim-btn:active {
+            transform: translateY(1px);
+        }
+
+        .sim-btn.secondary {
+            border-color: rgba(188, 19, 254, 0.5);
+            color: #e580ff;
+        }
+
+        .sim-btn.secondary:hover {
+            border-color: var(--neon-magenta);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
+        }
+
+        .sim-btn.accent-green {
+            border-color: rgba(0, 255, 136, 0.5);
+            color: #8affc4;
+            background: linear-gradient(180deg, rgba(12, 40, 28, 0.9) 0%, rgba(6, 20, 14, 0.95) 100%);
+        }
+
+        .sim-btn.accent-green:hover {
+            border-color: var(--neon-green);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.6);
+        }
+
+        .sim-btn.accent-amber {
+            border-color: rgba(255, 183, 3, 0.5);
+            color: #ffe08a;
+            background: linear-gradient(180deg, rgba(46, 32, 6, 0.9) 0%, rgba(22, 15, 3, 0.95) 100%);
+        }
+
+        .sim-btn.accent-amber:hover {
+            border-color: var(--neon-amber);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(255, 183, 3, 0.6);
+        }
+
+        .sim-btn.accent-rose {
+            border-color: rgba(255, 0, 85, 0.5);
+            color: #ff94b8;
+            background: linear-gradient(180deg, rgba(46, 10, 22, 0.9) 0%, rgba(24, 5, 11, 0.95) 100%);
+        }
+
+        .sim-btn.accent-rose:hover {
+            border-color: var(--neon-rose);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(255, 0, 85, 0.6);
+        }
+
+        /* 3. POLICY-COMPLIANT AD CONTAINER */
+        .ad-slot-wrapper {
+            margin: 30px auto;
+            text-align: center;
+            clear: both;
+        }
+
+        .ad-disclaimer {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            margin-bottom: 6px;
+        }
+
+        .ad-box-placeholder {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            min-height: 90px;
+            max-width: 970px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #475569;
+            font-size: 0.85rem;
+            border-radius: 8px;
+        }
+
+        /* 4. EDUCATIONAL CONTENT SECTION */
+        .educational-content {
+            line-height: 1.75;
+            font-size: 1.05rem;
+            color: #94a3b8;
+            background: rgba(10, 14, 23, 0.85);
+            padding: 30px;
+            border-radius: 16px;
+            border-left: 4px solid var(--neon-cyan);
+            border-top: 1px solid rgba(0, 243, 255, 0.2);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin-bottom: 35px;
+        }
+
+        .educational-content h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-magenta);
+            border-bottom: 1px solid rgba(188, 19, 254, 0.3);
+            padding-bottom: 8px;
+            margin-top: 1.8em;
+            margin-bottom: 0.6em;
+            font-size: 1.45rem;
+        }
+
+        .educational-content h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: #38bdf8;
+            margin-top: 1.4em;
+            margin-bottom: 0.4em;
+            font-size: 1.15rem;
+        }
+
+        .formula-box {
+            background: rgba(4, 9, 20, 0.7);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-left: 3px solid var(--neon-green);
+            padding: 14px 18px;
+            margin: 14px 0;
+            border-radius: 6px;
+            font-family: 'Share Tech Mono', monospace;
+            color: #a7f3d0;
+            font-size: 1.02rem;
+            line-height: 1.6;
+        }
+
+        .task-card {
+            background: rgba(15, 23, 42, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 18px;
+        }
+
+        .task-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            color: var(--neon-cyan);
+            margin-bottom: 8px;
+        }
+
+        details {
+            margin-top: 25px;
+            background: rgba(5, 10, 20, 0.8);
+            border: 1px solid rgba(188, 19, 254, 0.4);
+            border-radius: 10px;
+            padding: 15px 20px;
+        }
+
+        summary {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            color: #e580ff;
+            cursor: pointer;
+            padding: 6px 0;
+            user-select: none;
+        }
+
+        .solution-step {
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+            padding: 12px 0;
+        }
+
+        .solution-step:last-child {
+            border-bottom: none;
+        }
+
+        /* 5. FOOTER & ACCURATE ALIGNED LINKS */
+        footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px 20px 20px 20px;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .footer-nav {
+            display: flex;
+            justify-content: center;
+            gap: 22px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .footer-nav a, .footer-modal-trigger {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.2s, text-shadow 0.2s;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .footer-nav a:hover, .footer-modal-trigger:hover {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
+        }
+
+        /* 6. SELF-CONTAINED POLICY & INTERACTIVE MODALS */
+        .policy-modal {
+            position: fixed !important;
+            top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
+            width: 100vw !important; height: 100vh !important;
+            background: rgba(4, 7, 15, 0.92) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 99999 !important;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-body {
+            background: linear-gradient(145deg, #0b111e 0%, #060913 100%);
+            border: 2px solid var(--neon-cyan);
+            border-radius: 16px;
+            max-width: 840px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 35px 30px;
+            color: #cbd5e1;
+            box-shadow: 0 0 40px rgba(0, 243, 255, 0.25);
+            line-height: 1.75;
+            position: relative;
+            text-align: left;
+        }
+
+        .modal-body h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-cyan);
+            margin-top: 0;
+            font-size: 1.6rem;
+        }
+
+        .modal-body h3 {
+            color: var(--neon-magenta);
+            font-family: 'Orbitron', sans-serif;
+            margin-top: 24px;
+            margin-bottom: 8px;
+            font-size: 1.15rem;
+        }
+
+        .modal-date {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--neon-green);
+            font-size: 0.9rem;
+            margin-top: -6px;
+            margin-bottom: 16px;
+        }
+
+        .modal-close-btn {
+            background: linear-gradient(180deg, rgba(188, 19, 254, 0.4), rgba(188, 19, 254, 0.15));
+            border: 1px solid var(--neon-magenta);
+            color: #fff;
+            padding: 8px 18px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            float: right;
+            margin-bottom: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close-btn:hover {
+            background: var(--neon-magenta);
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.8);
+        }
+
+        /* Discard Chamber Grid */
+        .swap-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 12px;
+            margin-top: 1rem;
+            max-height: 50vh;
+            overflow-y: auto;
+            padding: 6px;
+        }
+
+        .swap-card-item {
+            background: #111a2d;
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            border-radius: 8px;
+            padding: 10px 8px;
+            text-align: center;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s;
+        }
+
+        .swap-card-item:hover {
+            border-color: var(--neon-cyan);
+            transform: translateY(-3px);
+            box-shadow: 0 0 12px rgba(0, 243, 255, 0.4);
+        }
+
+        .swap-card-item .sc-top {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.72rem;
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--neon-cyan);
+            margin-bottom: 4px;
+        }
+
+        .swap-card-item .sc-word {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #ffffff;
+            line-height: 1.2;
+            word-break: break-word;
+        }
+
+        .swap-card-item .sc-pos {
+            font-size: 0.8rem;
+            color: var(--neon-green);
+            margin-top: 4px;
+            font-family: 'Share Tech Mono', monospace;
+            text-transform: uppercase;
+        }
+
+        /* Grammar Codex Table */
+        .codex-search-bar {
+            width: 100%;
+            min-height: 42px;
+            padding: 0 12px;
+            background: #090e1a;
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-radius: 6px;
+            color: #ffffff;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            outline: none;
+        }
+
+        .codex-search-bar:focus {
+            border-color: var(--neon-amber);
+            box-shadow: 0 0 10px rgba(255, 183, 3, 0.4);
+        }
+
+        .codex-table-wrap {
+            max-height: 52vh;
+            overflow-y: auto;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            border-radius: 8px;
+        }
+
+        .codex-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.92rem;
+            text-align: left;
+        }
+
+        .codex-table th {
+            background: rgba(13, 22, 41, 0.95);
+            color: var(--neon-amber);
+            font-family: 'Orbitron', sans-serif;
+            padding: 10px 8px;
+            position: sticky;
+            top: 0;
+            border-bottom: 2px solid rgba(255, 183, 3, 0.3);
+            font-size: 0.78rem;
+            letter-spacing: 0.5px;
+        }
+
+        .codex-table td {
+            padding: 9px 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            color: #cfe1f5;
+        }
+
+        .codex-table tr:hover {
+            background: rgba(0, 243, 255, 0.06);
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            #simulator-container, .educational-content { padding: 14px; }
+            .hud-telemetry { flex-direction: column; align-items: flex-start; }
+            .modal-body { padding: 22px 18px; }
+            .btn-cluster-main, .btn-cluster-utility { width: 100%; }
+            .sim-btn { flex: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. HEADER & TOP NAVIGATION -->
+    <header>
+        <nav class="top-nav">
+            <a href="../index.html" class="back-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Back to LuyaliSims
+            </a>
+            <span style="font-family: 'Share Tech Mono', monospace; font-size: 0.85rem; color: #64748b;">
+                MODULE ID: ENG-SYNTAX-2026
+            </span>
+        </nav>
+        
+        <h1>English Language: Grammar Dash &amp; Sentence Builder</h1>
+        
+        <!-- Contextual Summary: 60-80 words above the fold -->
+        <p class="lead-summary">
+            Master English grammar and sentence construction with Grammar Dash, an interactive single-player laboratory simulator engineered for classroom instruction and independent student practice. Rapidly identify parts of speech, build complete sentences using nouns, verbs, and modifiers, and explore grammatical constituent rules across varied challenge levels. Featuring a generous canvas workspace, tactical discard graveyard swaps, and a limited-use grammar codex, this simulator makes sentence building clear, visual, and highly rewarding for language learners.
+        </p>
+    </header>
+
+    <main>
+        <!-- 2. SIMULATOR APP WORKSPACE (FULL WIDTH CANVAS + BOTTOM CONTROLS) -->
+        <section id="simulator-container" aria-label="Interactive Simulator Workspace">
+            
+            <!-- Telemetry Status Bar -->
+            <div class="hud-telemetry">
+                <div class="telemetry-item">
+                    <span class="tele-label">Status:</span>
+                    <span id="tele-status" class="tele-val green">ACTIVE</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Score:</span>
+                    <span id="readout-score" class="tele-val green">0</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Hand Limit:</span>
+                    <span id="readout-hand" class="tele-val">7/8</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Swap Tokens:</span>
+                    <span id="readout-swaps" class="tele-val amber">0</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Codex Uses:</span>
+                    <span id="readout-codex" class="tele-val pink">3/3</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">High Score:</span>
+                    <span id="readout-hiscore" class="tele-val">0</span>
+                </div>
+                <!-- Glowing Hint / Reference Button -->
+                <button type="button" id="btnGrammarRef" class="hint-glow-btn" title="Open Grammar Codex Reference (Limited to 3 uses per game)">
+                    💡 Grammar Codex (3/3)
+                </button>
+            </div>
+
+            <!-- Full-Width 3D Canvas Stage -->
+            <div class="canvas-stage">
+                <div class="canvas-wrapper" id="canvasFrame">
+                    <canvas id="simCanvas" width="960" height="540"></canvas>
+                </div>
+            </div>
+
+            <!-- Bottom Controls Console -->
+            <div class="bottom-controls-panel">
+                <div class="controls-top-row">
+                    <div class="mode-selection-group">
+                        <label for="challengeModeSelect">Challenge Rule:</label>
+                        <select id="challengeModeSelect">
+                            <option value="sentence" selected>Simple Sentence ([Article] + [Noun] + [Verb] + [Adverb])</option>
+                            <option value="pos_match">Category Match (3+ Words of Same Part of Speech)</option>
+                            <option value="noun_phrase">Noun Phrase ([Article] + [Adjective] + [Noun])</option>
+                            <option value="prep_phrase">Preposition Phrase ([Preposition] + [Article] + [Noun])</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Action Buttons Grid -->
+                <div class="buttons-action-bar">
+                    <div class="btn-cluster-main">
+                        <button id="btnDraw" class="sim-btn">Draw Word</button>
+                        <button id="btnBuildMeld" class="sim-btn accent-green">Meld / Validate</button>
+                        <button id="btnDiscard" class="sim-btn accent-rose">Discard 1 Card</button>
+                        <button id="btnSwapChamber" class="sim-btn accent-amber">Grammar Swap</button>
+                        <button id="btnSyntaxBonus" class="sim-btn secondary">Syntax Bonus (+5)</button>
+                    </div>
+                    <div class="btn-cluster-utility">
+                        <button id="btnReset" class="sim-btn">New Deal / Reset</button>
+                        <button id="fullscreenBtn" class="sim-btn secondary">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                            </svg>
+                            Fullscreen
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. SAFE AD PLACEMENT SLOT -->
+        <div class="ad-slot-wrapper">
+            <div class="ad-disclaimer">Advertisement</div>
+            <div class="ad-box-placeholder">
+                <!-- Google AdSense Responsive Display Unit -->
+                <span>[AdSense Responsive Display Unit Safe Zone]</span>
+            </div>
+        </div>
+
+        <!-- 4. EDUCATIONAL REFERENCE ARTICLE (SIMPLIFIED HIGH SCHOOL LEVEL) -->
+        <article class="educational-content">
+            <section>
+                <h2>How to Operate the Simulator</h2>
+                <p>
+                    Grammar Dash &amp; Sentence Builder is designed for classroom whiteboard demonstrations and individual grammar practice. Players select word cards from their hand to form meaningful English phrases and complete sentences.
+                </p>
+                <ul>
+                    <li><strong>Card Layout:</strong> Each word card clearly displays the word in large bold print, its <strong>Part of Speech</strong> (such as Noun, Verb, or Adjective), and its syllable count. Special wildcard cards can substitute for any needed word.</li>
+                    <li><strong>Challenge Options:</strong> Use the dropdown menu at the bottom to choose your target challenge:
+                        <ul>
+                            <li><strong>Simple Sentence:</strong> Form a complete sentence with a Subject and Predicate (e.g., <em>"The dog ran quickly"</em>).</li>
+                            <li><strong>Category Match:</strong> Group 3 or more words belonging to the exact same category (e.g., 3 Nouns: <em>Cat, Tree, River</em>).</li>
+                            <li><strong>Noun Phrase:</strong> Assemble an Article, Adjective, and Noun (e.g., <em>"The happy child"</em>).</li>
+                            <li><strong>Preposition Phrase:</strong> Combine a Preposition with an Article and Noun (e.g., <em>"Under the tree"</em>).</li>
+                        </ul>
+                    </li>
+                    <li><strong>Hand Limit (8 Cards):</strong> You can hold at most 8 cards in your hand. If your hand is full, you must meld or discard before drawing a new card.</li>
+                    <li><strong>Grammar Swap:</strong> Every 6 draws from the word deck awards you 1 Grammar Swap card. Click <strong>Grammar Swap</strong> (or tap the Graveyard on the canvas) to retrieve any previously discarded word in a 1-to-1 trade.</li>
+                    <li><strong>Grammar Codex Hint (3 Uses):</strong> Click the glowing <strong>Grammar Codex</strong> button in the top bar to inspect words, parts of speech, and sample sentences. You have 3 uses per game. Clicking <strong>New Deal / Reset</strong> clears your score back to 0 and restores all 3 codex hints.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Scientific Theory &amp; Working Principles</h2>
+                <p>
+                    In English grammar, words are categorized into distinct lexical classes (parts of speech) according to how they function inside a sentence.
+                </p>
+
+                <h3>Core Parts of Speech</h3>
+                <ul>
+                    <li><strong>Nouns (N):</strong> Words that name people, places, animals, or things (e.g., <em>Teacher, Dog, School, Water</em>).</li>
+                    <li><strong>Verbs (V):</strong> Action words that describe what someone or something does (e.g., <em>Run, Jump, Play, Eat</em>).</li>
+                    <li><strong>Adjectives (Adj):</strong> Describing words that tell us more about nouns (e.g., <em>Happy, Fast, Bright, Cold</em>).</li>
+                    <li><strong>Adverbs (Adv):</strong> Modifying words that tell us how, when, or where an action happens (e.g., <em>Quickly, Loudly, Softly, Daily</em>).</li>
+                    <li><strong>Prepositions (Prep):</strong> Words that show location, direction, or time relationships (e.g., <em>In, On, Under, Through</em>).</li>
+                    <li><strong>Determiners / Articles (Det):</strong> Small words that introduce nouns (e.g., <em>The, A, An, This</em>).</li>
+                    <li><strong>Conjunctions (Conj):</strong> Connecting words that join words or clauses together (e.g., <em>And, But, Because</em>).</li>
+                </ul>
+
+                <h3>Building a Simple Sentence</h3>
+                <p>
+                    Every basic sentence in English requires at least two fundamental parts:
+                </p>
+                <div class="formula-box">
+                    Basic Sentence = Subject (Noun Phrase) + Predicate (Verb Phrase)<br>
+                    Example: [The smart student] + [read quietly].
+                </div>
+            </section>
+
+            <section>
+                <h2>Mathematical Foundations &amp; Formulas</h2>
+                <p>In computational grammar analysis, sentence structure and complexity are scored quantitatively:</p>
+                <div class="formula-box">
+                    Formula 1: Sentence Complexity Score = (Number of Words x 2) + (Number of Modifiers x 3)<br>
+                    Formula 2: Grammatical Accuracy Index (GAI) = (Correct Word Links / Total Word Links) x 100%<br>
+                    Formula 3: Meld Score = (Cards in Set x Base Points) + Bonus Points
+                </div>
+            </section>
+
+            <section>
+                <h2>Real-World Engineering &amp; Industrial Applications</h2>
+                <ul>
+                    <li><strong>Voice Search &amp; Virtual Assistants:</strong> Voice interfaces like Google Assistant and Siri use part-of-speech taggers to distinguish command verbs (<em>"call"</em>, <em>"play"</em>) from subject nouns (<em>"mom"</em>, <em>"music"</em>).</li>
+                    <li><strong>Automated Grammar Checkers:</strong> Classroom word processing software analyzes sentence grammar to help students catch missing articles, subject-verb disagreements, and misplaced adverbs.</li>
+                    <li><strong>Language Learning Apps:</strong> Educational platforms organize vocabulary into color-coded parts of speech, using sentence builder algorithms to teach English to beginners worldwide.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Practice Problems &amp; Diagnostic Tasks</h2>
+                <p>Test your understanding using the five secondary school grammar questions below:</p>
+
+                <div class="task-card">
+                    <div class="task-title">Task 1: Parts of Speech Identification</div>
+                    <p>Read the sentence: <em>"The brave dog ran quickly into the garden."</em><br>
+                    Identify the part of speech for each of the following words: <strong>dog</strong>, <strong>ran</strong>, <strong>brave</strong>, <strong>quickly</strong>, and <strong>into</strong>.</p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 2: Sentence Complexity Score</div>
+                    <p>Using Formula 1: <em>Score = (Number of Words x 2) + (Number of Modifiers x 3)</em>:<br>
+                    Calculate the score for: <em>"The happy cat slept peacefully on the warm rug."</em><br>
+                    (Note: Modifiers in this sentence are the adjectives <em>happy</em>, <em>warm</em> and the adverb <em>peacefully</em>).</p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 3: Category Match Probability</div>
+                    <p>A practice deck has 50 cards: 15 Nouns, 15 Verbs, 10 Adjectives, and 10 Adverbs.<br>
+                    If a student draws 1 card at random, what is the probability (as a fraction and percentage) of drawing a <strong>Verb</strong>?</p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 4: Phrase Construction</div>
+                    <p>Given the words: <em>under</em>, <em>blue</em>, <em>tree</em>, <em>the</em>, <em>tall</em>.<br>
+                    (a) Arrange three words to form a correct <strong>Noun Phrase</strong>.<br>
+                    (b) Arrange three words to form a correct <strong>Preposition Phrase</strong>.</p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 5: Sentence Accuracy &amp; Correction</div>
+                    <p>A learner writes: <em>"A girl played happy in school."</em><br>
+                    (a) Identify the grammatical error in this sentence and explain how to fix it.<br>
+                    (b) If 3 out of 4 word transitions are correct, calculate the Grammatical Accuracy Index (GAI).</p>
+                </div>
+
+                <!-- Collapsible Solutions -->
+                <details>
+                    <summary>Click to Reveal Solutions and Step-by-Step Proofs</summary>
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 1:</strong><br>
+                        - <strong>dog</strong>: Noun (names an animal)<br>
+                        - <strong>ran</strong>: Verb (describes an action)<br>
+                        - <strong>brave</strong>: Adjective (describes the noun dog)<br>
+                        - <strong>quickly</strong>: Adverb (describes how the dog ran)<br>
+                        - <strong>into</strong>: Preposition (shows direction/location)</p>
+                    </div>
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 2:</strong><br>
+                        - Total number of words = 9 (The, happy, cat, slept, peacefully, on, the, warm, rug).<br>
+                        - Number of modifiers = 3 (happy, warm, peacefully).<br>
+                        - Calculation: (9 x 2) + (3 x 3) = 18 + 9 = <strong>27 Points</strong>.</p>
+                    </div>
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 3:</strong><br>
+                        - Number of favorable outcomes (Verbs) = 15.<br>
+                        - Total cards = 50.<br>
+                        - Probability = 15 / 50 = <strong>3 / 10</strong> or <strong>30%</strong>.</p>
+                    </div>
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 4:</strong><br>
+                        (a) Valid Noun Phrase: <strong>"The tall tree"</strong> (Article + Adjective + Noun).<br>
+                        (b) Valid Preposition Phrase: <strong>"Under the tree"</strong> (Preposition + Article + Noun).</p>
+                    </div>
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 5:</strong><br>
+                        (a) Error: The adjective <em>"happy"</em> is modifying the verb <em>"played"</em>. It must be replaced with the adverb <strong>"happily"</strong>: <em>"A girl played happily in school."</em><br>
+                        (b) GAI Calculation: (3 / 4) x 100% = <strong>75.0%</strong>.</p>
+                    </div>
+                </details>
+            </section>
+        </article>
+    </main>
+
+    <!-- 5. SYNCHRONIZED COMPLIANCE FOOTER -->
+    <footer>
+        <nav class="footer-nav">
+            <a href="../index.html">Home</a>
+            <a href="../index.html#about-section">About Us</a>
+            <button type="button" class="footer-modal-trigger" onclick="openSimModal('simPrivacyModal')">Privacy Policy</button>
+            <button type="button" class="footer-modal-trigger" onclick="openSimModal('simTermsModal')">Terms of Service</button>
+            <a href="../index.html#contact-section">Contact Us</a>
+            <a href="https://forms.gle/fYxxaNKAh21dPUoBA" target="_blank" rel="noopener noreferrer">Simulator Suggestions</a>
+        </nav>
+        <p>&copy; 2026 LuyaliSims | Engineered by Click &amp; Draft | Dedicated to Open STEM &amp; Humanities Education</p>
+    </footer>
+
+    <!-- 6. IDENTICAL PRIVACY POLICY MODAL -->
+    <div id="simPrivacyModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="privacyTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeSimModal('simPrivacyModal')">Close [✕]</button>
+            <h2 id="privacyTitle">Privacy Policy</h2>
+            <p class="modal-date">Last Updated: September 2026</p>
+            <p>Welcome to LuyaliSims. We respect your privacy and are committed to protecting your personal data. This privacy policy explains how we treat information when you interact with our educational simulators.</p>
+            
+            <h3>1. Educational Purpose &amp; Information Collection</h3>
+            <p>LuyaliSims is a free educational portal. We do not require account registration, passwords, or personal login information to run any simulation. All simulation calculations occur locally within your browser using client-side JavaScript.</p>
+
+            <h3>2. Google AdSense &amp; Third-Party Cookies</h3>
+            <p>We may display advertisements served by Google AdSense to fund our free educational tools. Google, as a third-party vendor, uses cookies to serve ads on our site based on users' visits to this and other sites on the Internet.</p>
+            <ul>
+                <li>Google's use of advertising cookies enables it and its partners to serve ads based on your visit to LuyaliSims and other sites.</li>
+                <li>Users may opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" style="color: var(--neon-cyan);">Google Ads Settings</a>.</li>
+            </ul>
+
+            <h3>3. Log Files &amp; Analytics</h3>
+            <p>Like standard websites, our hosting servers collect anonymous log records (including IP addresses, browser types, and timestamp references) to monitor server uptime, fix script errors, and optimize simulator performance.</p>
+
+            <h3>4. Children's Online Privacy (COPPA Compliance)</h3>
+            <p>Our educational simulators are built for students and educators of all ages. We do not knowingly solicit or collect personally identifiable information from children under 13.</p>
+
+            <h3>5. Contact Regarding Privacy</h3>
+            <p>If you have any questions regarding this policy, contact us at: <a href="mailto:luyashliz@gmail.com" style="color: var(--neon-cyan);">luyashliz@gmail.com</a>.</p>
+        </div>
+    </div>
+
+    <!-- 7. IDENTICAL TERMS OF SERVICE MODAL -->
+    <div id="simTermsModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="termsTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeSimModal('simTermsModal')">Close [✕]</button>
+            <h2 id="termsTitle">Terms of Service</h2>
+            <p class="modal-date">Effective Date: September 2026</p>
+
+            <h3>1. Permitted Educational Use</h3>
+            <p>All interactive models, simulations, practice problems, and laboratory worksheets on LuyaliSims are made freely available for classroom demonstrations, academic study, tutoring, and self-paced individual learning.</p>
+
+            <h3>2. Intellectual Property</h3>
+            <p>The code architecture, layout designs, and custom interactive engines are the intellectual property of Ian Luyali and Click &amp; Draft. You may use our simulators online in academic settings, but mirroring or re-hosting our code for commercial resale without permission is prohibited.</p>
+
+            <h3>3. Disclaimer of Scientific Warranty</h3>
+            <p>While simulations are engineered to accurately replicate classical mechanics, thermodynamics, and electronics, they are provided as conceptual learning aids. LuyaliSims is not liable for outcomes in real-world high-voltage or hazardous laboratory environments constructed without professional teacher supervision.</p>
+
+            <h3>4. Updates to Terms</h3>
+            <p>We reserve the right to refine these terms as new laboratory modules and features are introduced.</p>
+        </div>
+    </div>
+
+    <!-- 8. GRAMMAR CODEX REFERENCE MODAL -->
+    <div id="grammarCodexModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="codexTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeSimModal('grammarCodexModal')">Close [✕]</button>
+            <h2 id="codexTitle">Grammar Codex // Word Reference Directory</h2>
+            <p class="modal-date">
+                Parts of Speech Definitions &amp; Example Usage
+                <span id="modalCodexRemainingText" style="color: var(--neon-amber); margin-left: 10px;">(Uses Remaining: 3/3)</span>
+            </p>
+            <input type="text" id="codexSearchInput" class="codex-search-bar" placeholder="Search by word or category (noun, verb, adjective, adverb)...">
+            
+            <div class="codex-table-wrap">
+                <table class="codex-table">
+                    <thead>
+                        <tr>
+                            <th>Word</th>
+                            <th>Part of Speech</th>
+                            <th>Function in Sentence</th>
+                            <th>Syllables</th>
+                            <th>Example Sentence</th>
+                        </tr>
+                    </thead>
+                    <tbody id="codexTableBody">
+                        <!-- Populated dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 9. GRAMMAR SWAP CHAMBER MODAL -->
+    <div id="swapChamberModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="swapChamberTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeSimModal('swapChamberModal')">Close [✕]</button>
+            <h2 id="swapChamberTitle">Grammar Swap Chamber // Discard Graveyard</h2>
+            <p class="modal-date">
+                Trade 1 Swap Token for 1 Word | Tokens Available: 
+                <strong id="modalSwapCountDisplay" style="color: var(--neon-amber);">0</strong>
+            </p>
+            <p style="font-size: 0.95rem; margin-bottom: 10px;">Click any word card below to take it into your hand using 1 Swap Token.</p>
+            <div class="swap-grid" id="swapCardsContainer">
+                <!-- Dynamically populated graveyard -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 10. SIMULATOR CORE SCRIPT & GAME ENGINE -->
+    <script>
+        // Modal Controls
+        function openSimModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeSimModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('policy-modal')) {
+                closeSimModal(e.target.id);
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' || e.key === 'Esc') {
+                document.querySelectorAll('.policy-modal').forEach(m => {
+                    m.style.display = 'none';
+                });
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // Fullscreen Implementation
+        const simContainer = document.getElementById('simulator-container');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                if (simContainer.requestFullscreen) simContainer.requestFullscreen();
+                else if (simContainer.webkitRequestFullscreen) simContainer.webkitRequestFullscreen();
+                fullscreenBtn.innerHTML = 'Exit Screen';
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+                fullscreenBtn.innerHTML = 'Fullscreen';
+            }
+        });
+
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                fullscreenBtn.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                    </svg> Fullscreen`;
+            }
+        });
+
+        // =====================================================================
+        // GRAMMAR DASH & SENTENCE BUILDER ENGINE (SIMPLIFIED 100+ VOCABULARY)
+        // =====================================================================
+
+        const MAX_HAND_LIMIT = 8;
+        const DRAWS_PER_SWAP_REWARD = 6;
+        const MAX_CODEX_USES = 3;
+
+        // Clear, accessible high school vocabulary across 8 Parts of Speech
+        const WORD_DATA = [
+            // NOUNS (25 common words)
+            { word: 'Cat', pos: 'noun', syl: 1, role: 'Animal Noun', example: 'The cat slept on the rug.' },
+            { word: 'Dog', pos: 'noun', syl: 1, role: 'Animal Noun', example: 'The friendly dog barked.' },
+            { word: 'Bird', pos: 'noun', syl: 1, role: 'Animal Noun', example: 'A blue bird sang sweetly.' },
+            { word: 'Lion', pos: 'noun', syl: 2, role: 'Animal Noun', example: 'The lion roamed the park.' },
+            { word: 'Tree', pos: 'noun', syl: 1, role: 'Plant Noun', example: 'Green leaves fell from the tree.' },
+            { word: 'Book', pos: 'noun', syl: 1, role: 'Object Noun', example: 'She opened an exciting book.' },
+            { word: 'Star', pos: 'noun', syl: 1, role: 'Cosmic Noun', example: 'A bright star shone in the night.' },
+            { word: 'Sun', pos: 'noun', syl: 1, role: 'Cosmic Noun', example: 'The warm sun rose early.' },
+            { word: 'Moon', pos: 'noun', syl: 1, role: 'Cosmic Noun', example: 'The silver moon lit the sky.' },
+            { word: 'Water', pos: 'noun', syl: 2, role: 'Liquid Noun', example: 'Fresh water filled the bowl.' },
+            { word: 'River', pos: 'noun', syl: 2, role: 'Place Noun', example: 'The river flowed smoothly.' },
+            { word: 'School', pos: 'noun', syl: 1, role: 'Place Noun', example: 'Students walked to school.' },
+            { word: 'Teacher', pos: 'noun', syl: 2, role: 'Person Noun', example: 'The kind teacher explained the lesson.' },
+            { word: 'Friend', pos: 'noun', syl: 1, role: 'Person Noun', example: 'My best friend smiled.' },
+            { word: 'Child', pos: 'noun', syl: 1, role: 'Person Noun', example: 'The happy child laughed.' },
+            { word: 'House', pos: 'noun', syl: 1, role: 'Place Noun', example: 'They built a wooden house.' },
+            { word: 'City', pos: 'noun', syl: 2, role: 'Place Noun', example: 'The big city was busy.' },
+            { word: 'Road', pos: 'noun', syl: 1, role: 'Place Noun', example: 'Cars drove down the long road.' },
+            { word: 'Car', pos: 'noun', syl: 1, role: 'Object Noun', example: 'The red car stopped at the light.' },
+            { word: 'Ship', pos: 'noun', syl: 1, role: 'Object Noun', example: 'A white ship sailed the sea.' },
+            { word: 'Food', pos: 'noun', syl: 1, role: 'Object Noun', example: 'Hot food was served.' },
+            { word: 'Garden', pos: 'noun', syl: 2, role: 'Place Noun', example: 'Flowers bloomed in the garden.' },
+            { word: 'Music', pos: 'noun', syl: 2, role: 'Abstract Noun', example: 'Gentle music played on the radio.' },
+            { word: 'Earth', pos: 'noun', syl: 1, role: 'Planet Noun', example: 'Trees grow on planet Earth.' },
+            { word: 'Game', pos: 'noun', syl: 1, role: 'Activity Noun', example: 'We won the afternoon game.' },
+
+            // VERBS (25 common words)
+            { word: 'Run', pos: 'verb', syl: 1, role: 'Action Verb', example: 'Children run across the field.' },
+            { word: 'Jump', pos: 'verb', syl: 1, role: 'Action Verb', example: 'Frogs jump into the pond.' },
+            { word: 'Walk', pos: 'verb', syl: 1, role: 'Action Verb', example: 'We walk to the library daily.' },
+            { word: 'Read', pos: 'verb', syl: 1, role: 'Action Verb', example: 'Pupils read good stories.' },
+            { word: 'Write', pos: 'verb', syl: 1, role: 'Action Verb', example: 'Writers write new poems.' },
+            { word: 'Sing', pos: 'verb', syl: 1, role: 'Action Verb', example: 'Choir members sing happily.' },
+            { word: 'Play', pos: 'verb', syl: 1, role: 'Action Verb', example: 'Friends play games together.' },
+            { word: 'Eat', pos: 'verb', syl: 1, role: 'Action Verb', example: 'Birds eat seeds from the dish.' },
+            { word: 'Sleep', pos: 'verb', syl: 1, role: 'State Verb', example: 'Kittens sleep on warm pillows.' },
+            { word: 'See', pos: 'verb', syl: 1, role: 'Perception Verb', example: 'I see bright stars above.' },
+            { word: 'Make', pos: 'verb', syl: 1, role: 'Action Verb', example: 'Bakers make delicious bread.' },
+            { word: 'Open', pos: 'verb', syl: 2, role: 'Action Verb', example: 'Please open the wooden door.' },
+            { word: 'Close', pos: 'verb', syl: 1, role: 'Action Verb', example: 'They close the shop at dusk.' },
+            { word: 'Speak', pos: 'verb', syl: 1, role: 'Communication Verb', example: 'Speakers speak with clarity.' },
+            { word: 'Listen', pos: 'verb', syl: 2, role: 'Perception Verb', example: 'Students listen attentively.' },
+            { word: 'Fly', pos: 'verb', syl: 1, role: 'Action Verb', example: 'Airplanes fly above the clouds.' },
+            { word: 'Swim', pos: 'verb', syl: 1, role: 'Action Verb', example: 'Fish swim in the clear lake.' },
+            { word: 'Build', pos: 'verb', syl: 1, role: 'Action Verb', example: 'Workers build tall towers.' },
+            { word: 'Drive', pos: 'verb', syl: 1, role: 'Action Verb', example: 'Drivers drive safely on highways.' },
+            { word: 'Help', pos: 'verb', syl: 1, role: 'Action Verb', example: 'Good friends help each other.' },
+            { word: 'Learn', pos: 'verb', syl: 1, role: 'Cognitive Verb', example: 'Curious minds learn quickly.' },
+            { word: 'Grow', pos: 'verb', syl: 1, role: 'Process Verb', example: 'Plants grow toward sunlight.' },
+            { word: 'Shine', pos: 'verb', syl: 1, role: 'Action Verb', example: 'Golden rays shine through windows.' },
+            { word: 'Watch', pos: 'verb', syl: 1, role: 'Action Verb', example: 'Sailors watch the calm sea.' },
+            { word: 'Think', pos: 'verb', syl: 1, role: 'Cognitive Verb', example: 'Scientists think about solutions.' },
+
+            // ADJECTIVES (20 simple words)
+            { word: 'Happy', pos: 'adj', syl: 2, role: 'Descriptive Adjective', example: 'The happy child smiled.' },
+            { word: 'Fast', pos: 'adj', syl: 1, role: 'Descriptive Adjective', example: 'A fast train passed by.' },
+            { word: 'Slow', pos: 'adj', syl: 1, role: 'Descriptive Adjective', example: 'The slow turtle crossed the lawn.' },
+            { word: 'Big', pos: 'adj', syl: 1, role: 'Size Adjective', example: 'A big elephant stood near.' },
+            { word: 'Small', pos: 'adj', syl: 1, role: 'Size Adjective', example: 'A small bird pecked at bread.' },
+            { word: 'Bright', pos: 'adj', syl: 1, role: 'Descriptive Adjective', example: 'Bright lamps lit the hall.' },
+            { word: 'Cold', pos: 'adj', syl: 1, role: 'Descriptive Adjective', example: 'Cold water refreshed us.' },
+            { word: 'Warm', pos: 'adj', syl: 1, role: 'Descriptive Adjective', example: 'A warm breeze blew in.' },
+            { word: 'Blue', pos: 'adj', syl: 1, role: 'Color Adjective', example: 'The blue sky looked clear.' },
+            { word: 'Green', pos: 'adj', syl: 1, role: 'Color Adjective', example: 'Green grass covered the hill.' },
+            { word: 'Red', pos: 'adj', syl: 1, role: 'Color Adjective', example: 'She held a red apple.' },
+            { word: 'Tall', pos: 'adj', syl: 1, role: 'Dimension Adjective', example: 'The tall pine reached the sky.' },
+            { word: 'Short', pos: 'adj', syl: 1, role: 'Dimension Adjective', example: 'He read a short poem.' },
+            { word: 'Brave', pos: 'adj', syl: 1, role: 'Descriptive Adjective', example: 'A brave sailor steered onward.' },
+            { word: 'Kind', pos: 'adj', syl: 1, role: 'Descriptive Adjective', example: 'A kind neighbor helped us.' },
+            { word: 'Sweet', pos: 'adj', syl: 1, role: 'Taste Adjective', example: 'Ripe oranges taste sweet.' },
+            { word: 'Loud', pos: 'adj', syl: 1, role: 'Sound Adjective', example: 'A loud bell rang out.' },
+            { word: 'Quiet', pos: 'adj', syl: 2, role: 'Sound Adjective', example: 'The quiet library was restful.' },
+            { word: 'Strong', pos: 'adj', syl: 1, role: 'Descriptive Adjective', example: 'Strong bridges carry trains.' },
+            { word: 'Young', pos: 'adj', syl: 1, role: 'Age Adjective', example: 'A young puppy wagged its tail.' },
+
+            // ADVERBS (16 simple words)
+            { word: 'Quickly', pos: 'adv', syl: 2, role: 'Manner Adverb', example: 'She solved the puzzle quickly.' },
+            { word: 'Slowly', pos: 'adv', syl: 2, role: 'Manner Adverb', example: 'The old wagon rolled slowly.' },
+            { word: 'Loudly', pos: 'adv', syl: 2, role: 'Manner Adverb', example: 'Thunder echoed loudly.' },
+            { word: 'Softly', pos: 'adv', syl: 2, role: 'Manner Adverb', example: 'She whispered softly.' },
+            { word: 'Happily', pos: 'adv', syl: 3, role: 'Manner Adverb', example: 'Children played happily.' },
+            { word: 'Daily', pos: 'adv', syl: 2, role: 'Time Adverb', example: 'We read books daily.' },
+            { word: 'Well', pos: 'adv', syl: 1, role: 'Manner Adverb', example: 'The choir sang very well.' },
+            { word: 'Neatly', pos: 'adv', syl: 2, role: 'Manner Adverb', example: 'He wrote the notes neatly.' },
+            { word: 'Early', pos: 'adv', syl: 2, role: 'Time Adverb', example: 'The farmer woke up early.' },
+            { word: 'Late', pos: 'adv', syl: 1, role: 'Time Adverb', example: 'The train arrived late.' },
+            { word: 'Gently', pos: 'adv', syl: 2, role: 'Manner Adverb', example: 'The wind blew gently.' },
+            { word: 'Boldly', pos: 'adv', syl: 2, role: 'Manner Adverb', example: 'She answered boldly.' },
+            { word: 'Calmly', pos: 'adv', syl: 2, role: 'Manner Adverb', example: 'The nurse spoke calmly.' },
+            { word: 'Safely', pos: 'adv', syl: 2, role: 'Manner Adverb', example: 'They reached home safely.' },
+            { word: 'Brightly', pos: 'adv', syl: 2, role: 'Manner Adverb', example: 'The lantern glowed brightly.' },
+            { word: 'Truly', pos: 'adv', syl: 2, role: 'Degree Adverb', example: 'It was truly wonderful.' },
+
+            // PREPOSITIONS (12 simple words)
+            { word: 'In', pos: 'prep', syl: 1, role: 'Place Preposition', example: 'Fish live in water.' },
+            { word: 'On', pos: 'prep', syl: 1, role: 'Place Preposition', example: 'The cup sits on the desk.' },
+            { word: 'Under', pos: 'prep', syl: 2, role: 'Place Preposition', example: 'Cats hide under the bed.' },
+            { word: 'Over', pos: 'prep', syl: 2, role: 'Place Preposition', example: 'Birds flew over the fence.' },
+            { word: 'Near', pos: 'prep', syl: 1, role: 'Place Preposition', example: 'We live near the school.' },
+            { word: 'Behind', pos: 'prep', syl: 2, role: 'Place Preposition', example: 'The sun set behind the hill.' },
+            { word: 'Across', pos: 'prep', syl: 2, role: 'Direction Preposition', example: 'He walked across the street.' },
+            { word: 'Through', pos: 'prep', syl: 1, role: 'Direction Preposition', example: 'Light passes through glass.' },
+            { word: 'Into', pos: 'prep', syl: 2, role: 'Direction Preposition', example: 'She stepped into the room.' },
+            { word: 'With', pos: 'prep', syl: 1, role: 'Association Preposition', example: 'He wrote with a sharp pen.' },
+            { word: 'From', pos: 'prep', syl: 1, role: 'Origin Preposition', example: 'They came from the village.' },
+            { word: 'To', pos: 'prep', syl: 1, role: 'Direction Preposition', example: 'We walked to the park.' },
+
+            // DETERMINERS / ARTICLES (10 words)
+            { word: 'The', pos: 'det', syl: 1, role: 'Definite Article', example: 'The moon looked bright.' },
+            { word: 'A', pos: 'det', syl: 1, role: 'Indefinite Article', example: 'A bird made a nest.' },
+            { word: 'An', pos: 'det', syl: 1, role: 'Indefinite Article', example: 'She ate an orange.' },
+            { word: 'This', pos: 'det', syl: 1, role: 'Demonstrative', example: 'This game is fun.' },
+            { word: 'That', pos: 'det', syl: 1, role: 'Demonstrative', example: 'That tree is old.' },
+            { word: 'Every', pos: 'det', syl: 2, role: 'Quantifier', example: 'Every child received a book.' },
+            { word: 'Some', pos: 'det', syl: 1, role: 'Quantifier', example: 'Some flowers smell sweet.' },
+            { word: 'Many', pos: 'det', syl: 2, role: 'Quantifier', example: 'Many stars fill the sky.' },
+            { word: 'Our', pos: 'det', syl: 1, role: 'Possessive Determiner', example: 'Our teacher arrived early.' },
+            { word: 'My', pos: 'det', syl: 1, role: 'Possessive Determiner', example: 'My friend gave me a gift.' },
+
+            // CONJUNCTIONS (8 words)
+            { word: 'And', pos: 'conj', syl: 1, role: 'Coordinating Conjunction', example: 'Cats and dogs are pets.' },
+            { word: 'But', pos: 'conj', syl: 1, role: 'Coordinating Conjunction', example: 'He ran fast, but missed the bus.' },
+            { word: 'Because', pos: 'conj', syl: 2, role: 'Subordinating Conjunction', example: 'We smiled because we were glad.' },
+            { word: 'Or', pos: 'conj', syl: 1, role: 'Coordinating Conjunction', example: 'Would you like tea or water?' },
+            { word: 'So', pos: 'conj', syl: 1, role: 'Coordinating Conjunction', example: 'It rained, so we stayed home.' },
+            { word: 'If', pos: 'conj', syl: 1, role: 'Conditional Conjunction', example: 'If you work hard, you succeed.' },
+            { word: 'While', pos: 'conj', syl: 1, role: 'Time Conjunction', example: 'He read while it was quiet.' },
+            { word: 'When', pos: 'conj', syl: 1, role: 'Time Conjunction', example: 'We cheer when goals are scored.' },
+
+            // TACTICAL SPECIAL ACTION CARDS (6 cards)
+            { word: 'WILD', pos: 'special-wild', syl: 1, role: 'Wildcard Substitute', example: 'Acts as any Part of Speech.' },
+            { word: 'WILD', pos: 'special-wild', syl: 1, role: 'Wildcard Substitute', example: 'Acts as any Part of Speech.' },
+            { word: 'SHIELD', pos: 'special-shield', syl: 1, role: 'Grammar Shield', example: 'Locks your current score combo.' },
+            { word: 'SHIELD', pos: 'special-shield', syl: 1, role: 'Grammar Shield', example: 'Locks your current score combo.' },
+            { word: 'SWAP', pos: 'special-swap', syl: 1, role: 'Word Swap Token', example: 'Retrieve any word from the graveyard.' },
+            { word: 'SWAP', pos: 'special-swap', syl: 1, role: 'Word Swap Token', example: 'Retrieve any word from the graveyard.' }
+        ];
+
+        // Part of Speech Color System
+        const POS_COLORS = {
+            'noun': '#00f3ff',       // Cyan
+            'verb': '#00ff88',       // Green
+            'adj': '#ffd166',        // Amber
+            'adv': '#ff477e',        // Rose
+            'prep': '#bc13fe',       // Magenta
+            'det': '#38bdf8',        // Sky Blue
+            'conj': '#ff9e00',       // Orange
+            'special-wild': '#bc13fe',
+            'special-shield': '#00ff88',
+            'special-swap': '#ffb703'
+        };
+
+        // State variables
+        let deck = [];
+        let discardPile = [];
+        let hand = [];
+        let meldedSets = [];
+        let score = 0;
+        let drawCounter = 0;
+        let codexUsesRemaining = MAX_CODEX_USES;
+        let highScore = parseInt(localStorage.getItem('eng_grammar_simple_v1') || '0', 10);
+        let selectedIndices = new Set();
+        let hoveredIndex = -1;
+
+        let bannerMsg = 'Welcome! Tap word cards to select. Choose a challenge rule below.';
+        let bannerColor = '#00f3ff';
+
+        // DOM Elements
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        const readoutScore = document.getElementById('readout-score');
+        const readoutHand = document.getElementById('readout-hand');
+        const readoutSwaps = document.getElementById('readout-swaps');
+        const readoutCodex = document.getElementById('readout-codex');
+        const readoutHiScore = document.getElementById('readout-hiscore');
+        const challengeModeSelect = document.getElementById('challengeModeSelect');
+        const btnGrammarRef = document.getElementById('btnGrammarRef');
+        const modalCodexRemainingText = document.getElementById('modalCodexRemainingText');
+        const codexTableBody = document.getElementById('codexTableBody');
+        const codexSearchInput = document.getElementById('codexSearchInput');
+        const modalSwapCountDisplay = document.getElementById('modalSwapCountDisplay');
+        const swapCardsContainer = document.getElementById('swapCardsContainer');
+
+        readoutHiScore.textContent = highScore;
+
+        function createSwapCardObject() {
+            return {
+                word: 'SWAP',
+                pos: 'special-swap',
+                syl: 1,
+                role: 'Word Swap Token',
+                example: 'Retrieve any word from the graveyard.',
+                id: 'swap_token_' + Math.random().toString(36).substr(2, 5)
+            };
+        }
+
+        function countSwapCardsInHand() {
+            return hand.filter(c => c.pos === 'special-swap').length;
+        }
+
+        function shuffle(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        // Initialize / Reset Match
+        function initGame() {
+            deck = WORD_DATA.map((card, idx) => ({
+                ...card,
+                id: 'card_' + idx + '_' + Math.random().toString(36).substr(2, 4)
+            }));
+            shuffle(deck);
+
+            discardPile = [];
+            hand = [];
+            meldedSets = [];
+            selectedIndices.clear();
+            hoveredIndex = -1;
+
+            score = 0;
+            drawCounter = 0;
+            codexUsesRemaining = MAX_CODEX_USES;
+
+            // Deal 7 initial cards
+            for (let i = 0; i < 7; i++) {
+                if (deck.length > 0) hand.push(deck.pop());
+            }
+
+            // 1 card into graveyard
+            if (deck.length > 0) discardPile.push(deck.pop());
+
+            setBanner('New deal started! Score reset to 0. 3 Codex hints restored.', '#00f3ff');
+            updateHUD();
+            populateCodexTable();
+        }
+
+        function updateHUD() {
+            readoutScore.textContent = score;
+            readoutHand.textContent = `${hand.length}/${MAX_HAND_LIMIT}`;
+            readoutHand.className = hand.length >= MAX_HAND_LIMIT ? 'tele-val amber' : 'tele-val';
+
+            const swapCount = countSwapCardsInHand();
+            readoutSwaps.textContent = swapCount;
+            modalSwapCountDisplay.textContent = swapCount;
+
+            readoutCodex.textContent = `${codexUsesRemaining}/${MAX_CODEX_USES}`;
+            modalCodexRemainingText.textContent = `(Uses Remaining: ${codexUsesRemaining}/${MAX_CODEX_USES})`;
+
+            if (codexUsesRemaining > 0) {
+                btnGrammarRef.innerHTML = `💡 Grammar Codex (${codexUsesRemaining}/${MAX_CODEX_USES})`;
+                btnGrammarRef.classList.remove('locked');
+            } else {
+                btnGrammarRef.innerHTML = `🔒 Grammar Codex (0/3 Locked)`;
+                btnGrammarRef.classList.add('locked');
+            }
+
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('eng_grammar_simple_v1', highScore);
+                readoutHiScore.textContent = highScore;
+            }
+        }
+
+        function setBanner(msg, color) {
+            bannerMsg = msg;
+            bannerColor = color || '#00f3ff';
+        }
+
+        // --- GRAMMAR CODEX REFERENCE MODAL ---
+
+        function populateCodexTable(filterText = '') {
+            codexTableBody.innerHTML = '';
+            const search = filterText.trim().toLowerCase();
+
+            const uniqueWordsMap = new Map();
+            WORD_DATA.forEach(w => {
+                if (!w.pos.startsWith('special') && !uniqueWordsMap.has(w.word.toLowerCase())) {
+                    uniqueWordsMap.set(w.word.toLowerCase(), w);
+                }
+            });
+
+            const wordsList = Array.from(uniqueWordsMap.values()).sort((a, b) => a.word.localeCompare(b.word));
+
+            wordsList.forEach(w => {
+                if (
+                    search &&
+                    !w.word.toLowerCase().includes(search) &&
+                    !w.pos.toLowerCase().includes(search) &&
+                    !w.role.toLowerCase().includes(search)
+                ) {
+                    return;
+                }
+
+                const tr = document.createElement('tr');
+                const posColor = POS_COLORS[w.pos] || '#00f3ff';
+                tr.innerHTML = `
+                    <td><strong style="color: #ffffff; font-size: 1.1rem;">${w.word}</strong></td>
+                    <td><span style="color: ${posColor}; font-weight:700; text-transform:uppercase;">${w.pos}</span></td>
+                    <td style="color: #829db9;">${w.role}</td>
+                    <td style="font-family: 'Share Tech Mono', monospace; color: var(--neon-cyan);">${w.syl}</td>
+                    <td style="font-style: italic; color: #bcd5ea;">"${w.example}"</td>
+                `;
+                codexTableBody.appendChild(tr);
+            });
+        }
+
+        function triggerGrammarCodex() {
+            if (codexUsesRemaining <= 0) {
+                setBanner('Codex Locked! All 3 references used. Click "New Deal / Reset" to restore.', '#ff0055');
+                return;
+            }
+
+            codexUsesRemaining--;
+            updateHUD();
+
+            setBanner(`Grammar Codex opened. Remaining hints: ${codexUsesRemaining}/${MAX_CODEX_USES}.`, '#ffb703');
+            codexSearchInput.value = '';
+            populateCodexTable();
+            openSimModal('grammarCodexModal');
+        }
+
+        codexSearchInput.addEventListener('input', (e) => {
+            populateCodexTable(e.target.value);
+        });
+
+        btnGrammarRef.addEventListener('click', triggerGrammarCodex);
+
+        // --- DRAW ACTION & SWAP TOKEN REWARD ---
+
+        function drawCard() {
+            if (hand.length >= MAX_HAND_LIMIT) {
+                setBanner(`Hand full (${MAX_HAND_LIMIT}/${MAX_HAND_LIMIT})! Discard or meld cards before drawing.`, '#ff0055');
+                return;
+            }
+
+            if (deck.length === 0) {
+                if (discardPile.length > 1) {
+                    const top = discardPile.pop();
+                    deck = discardPile;
+                    discardPile = [top];
+                    shuffle(deck);
+                    setBanner('Word deck reshuffled from graveyard!', '#ffb703');
+                } else {
+                    setBanner('Word deck exhausted! Meld or discard existing cards.', '#ff0055');
+                    return;
+                }
+            }
+
+            const drawn = deck.pop();
+            hand.push(drawn);
+            drawCounter++;
+
+            let swapMsg = '';
+            if (drawCounter % DRAWS_PER_SWAP_REWARD === 0) {
+                if (hand.length < MAX_HAND_LIMIT) {
+                    hand.push(createSwapCardObject());
+                    swapMsg = ' + BONUS: Earned 1 Swap Token!';
+                } else {
+                    swapMsg = ' (Swap token stored: free space to claim!)';
+                }
+            }
+
+            setBanner(`Drew "${drawn.word}" (${drawn.pos.toUpperCase()}). Hand: ${hand.length}/${MAX_HAND_LIMIT}.${swapMsg}`, '#00ff88');
+            updateHUD();
+        }
+
+        // --- GRAMMAR SWAP CHAMBER ---
+
+        function openSwapChamber() {
+            renderSwapGrid();
+            openSimModal('swapChamberModal');
+        }
+
+        function renderSwapGrid() {
+            swapCardsContainer.innerHTML = '';
+            const swapCardsAvail = countSwapCardsInHand();
+            modalSwapCountDisplay.textContent = swapCardsAvail;
+
+            if (discardPile.length === 0) {
+                swapCardsContainer.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding: 2rem; color: #7f99b5;">Discard graveyard is currently empty!</div>';
+                return;
+            }
+
+            for (let i = discardPile.length - 1; i >= 0; i--) {
+                const c = discardPile[i];
+                const cardEl = document.createElement('div');
+                cardEl.className = 'swap-card-item';
+                cardEl.style.borderColor = POS_COLORS[c.pos] || '#00f3ff';
+                cardEl.innerHTML = `
+                    <div class="sc-top">
+                        <span>${c.syl} syl</span>
+                        <span>${c.pos.toUpperCase()}</span>
+                    </div>
+                    <div class="sc-word">${c.word}</div>
+                    <div class="sc-pos">${c.pos.toUpperCase()}</div>
+                `;
+
+                cardEl.addEventListener('click', () => executeGrammarSwap(i));
+                swapCardsContainer.appendChild(cardEl);
+            }
+        }
+
+        function executeGrammarSwap(discardIndex) {
+            const swapCardsAvail = countSwapCardsInHand();
+
+            if (swapCardsAvail < 1) {
+                alert('You need at least 1 "SWAP" card in your hand to trade from the graveyard! You earn 1 after every 6 card draws.');
+                return;
+            }
+
+            const swapHandIdx = hand.findIndex(c => c.pos === 'special-swap');
+            if (swapHandIdx === -1) return;
+
+            const spentSwapCard = hand.splice(swapHandIdx, 1)[0];
+            const retrievedCard = discardPile.splice(discardIndex, 1)[0];
+            hand.push(retrievedCard);
+            discardPile.push(spentSwapCard);
+
+            setBanner(`Trade Complete! Retrieved "${retrievedCard.word}" (${retrievedCard.pos.toUpperCase()}) using 1 Swap Token.`, '#00ff88');
+            updateHUD();
+            renderSwapGrid();
+        }
+
+        // --- VALIDATION ENGINES ---
+
+        // 1. Simple Sentence
+        function validateSentenceBuilder(cards) {
+            if (cards.length < 3) return { valid: false, reason: 'A simple sentence needs at least 3 cards (e.g. Noun + Verb + Adverb)!' };
+
+            const posSeq = cards.map(c => c.pos);
+            const wildCount = cards.filter(c => c.pos === 'special-wild').length;
+
+            const hasVerb = posSeq.includes('verb') || wildCount > 0;
+            const hasNoun = posSeq.includes('noun') || wildCount > 0;
+
+            if (!hasVerb) return { valid: false, reason: 'Every valid sentence requires at least one Action Verb!' };
+            if (!hasNoun) return { valid: false, reason: 'Every valid sentence requires at least one Subject/Object Noun!' };
+
+            const sentenceString = cards.map(c => c.word).join(' ');
+            const pts = cards.length * 15;
+
+            return {
+                valid: true,
+                pts: pts,
+                msg: `Sentence Complete: "${sentenceString}." +${pts} pts earned!`
+            };
+        }
+
+        // 2. Category Match
+        function validatePosMatch(cards) {
+            if (cards.length < 3) return { valid: false, reason: 'Category match requires at least 3 cards of the same part of speech!' };
+
+            const realWords = cards.filter(c => !c.pos.startsWith('special'));
+            if (realWords.length === 0) return { valid: false, reason: 'Must include real words along with wildcards.' };
+
+            const targetPos = realWords[0].pos;
+            const allMatch = realWords.every(c => c.pos === targetPos);
+
+            if (allMatch) {
+                const pts = cards.length * 12;
+                return {
+                    valid: true,
+                    pts: pts,
+                    msg: `Category Match Validated! Melded ${cards.length} ${targetPos.toUpperCase()}S! +${pts} pts!`
+                };
+            }
+
+            return { valid: false, reason: `Words do not match! All cards must be ${targetPos.toUpperCase()}S.` };
+        }
+
+        // 3. Noun Phrase
+        function validateNounPhrase(cards) {
+            if (cards.length < 2 || cards.length > 4) {
+                return { valid: false, reason: 'Noun Phrase needs 2 to 4 cards (e.g. [Article] + [Adjective] + [Noun])!' };
+            }
+
+            const posSeq = cards.map(c => c.pos);
+            const hasDet = posSeq.includes('det') || posSeq.includes('special-wild');
+            const hasNoun = posSeq.includes('noun') || posSeq.includes('special-wild');
+
+            if (hasDet && hasNoun) {
+                const pts = cards.length * 14;
+                const phraseString = cards.map(c => c.word).join(' ');
+                return {
+                    valid: true,
+                    pts: pts,
+                    msg: `Noun Phrase Built: "${phraseString}". +${pts} pts earned!`
+                };
+            }
+
+            return { valid: false, reason: 'A Noun Phrase must have at least an Article/Determiner and a Noun!' };
+        }
+
+        // 4. Preposition Phrase
+        function validatePrepPhrase(cards) {
+            if (cards.length < 2 || cards.length > 4) {
+                return { valid: false, reason: 'Preposition Phrase needs 2 to 4 cards (e.g. [Preposition] + [Article] + [Noun])!' };
+            }
+
+            const posSeq = cards.map(c => c.pos);
+            const hasPrep = posSeq.includes('prep') || posSeq.includes('special-wild');
+            const hasNoun = posSeq.includes('noun') || posSeq.includes('special-wild');
+
+            if (hasPrep && hasNoun) {
+                const pts = cards.length * 14;
+                const phraseString = cards.map(c => c.word).join(' ');
+                return {
+                    valid: true,
+                    pts: pts,
+                    msg: `Preposition Phrase Built: "${phraseString}". +${pts} pts earned!`
+                };
+            }
+
+            return { valid: false, reason: 'A Preposition Phrase needs a Preposition followed by a Noun!' };
+        }
+
+        function meldSelected() {
+            if (selectedIndices.size === 0) {
+                setBanner('Select cards in your hand first by clicking them.', '#ffb703');
+                return;
+            }
+
+            const selectedCards = Array.from(selectedIndices).map(i => hand[i]);
+            const mode = challengeModeSelect.value;
+            let result = { valid: false, reason: 'Unknown challenge mode' };
+
+            if (mode === 'sentence') {
+                result = validateSentenceBuilder(selectedCards);
+            } else if (mode === 'pos_match') {
+                result = validatePosMatch(selectedCards);
+            } else if (mode === 'noun_phrase') {
+                result = validateNounPhrase(selectedCards);
+            } else if (mode === 'prep_phrase') {
+                result = validatePrepPhrase(selectedCards);
+            }
+
+            if (result.valid) {
+                score += result.pts;
+                meldedSets.push({
+                    label: challengeModeSelect.options[challengeModeSelect.selectedIndex].text.split('(')[0].trim(),
+                    cards: selectedCards
+                });
+
+                hand = hand.filter((_, idx) => !selectedIndices.has(idx));
+                selectedIndices.clear();
+
+                setBanner(result.msg, '#00ff88');
+                updateHUD();
+
+                if (hand.length === 0) {
+                    score += 50;
+                    setBanner('HAND CLEARED! Mastery Bonus: +50 pts awarded!', '#00ff88');
+                    updateHUD();
+                }
+            } else {
+                setBanner(result.reason, '#ff0055');
+            }
+        }
+
+        function discardCard() {
+            if (selectedIndices.size !== 1) {
+                setBanner('Select exactly ONE card from your hand to discard.', '#ffb703');
+                return;
+            }
+
+            const idx = Array.from(selectedIndices)[0];
+            const discarded = hand.splice(idx, 1)[0];
+            selectedIndices.clear();
+            discardPile.push(discarded);
+
+            setBanner(`Discarded "${discarded.word}" (${discarded.pos.toUpperCase()}). Hand: ${hand.length}/${MAX_HAND_LIMIT}.`, '#00f3ff');
+            updateHUD();
+        }
+
+        function claimSyntaxBonus() {
+            if (meldedSets.length === 0) {
+                setBanner('Form a phrase or sentence first before claiming bonus points!', '#ffb703');
+                return;
+            }
+            score += 5;
+            setBanner('Syntax Bonus Claimed! +5 extra points added.', '#00ff88');
+            updateHUD();
+        }
+
+        // --- CANVAS RENDERING (BIGGER FONTS, CLEAN VISUALS) ---
+
+        function drawCardVisual(c, x, y, w, h, isSelected, isHovered) {
+            ctx.save();
+            ctx.translate(x, y);
+
+            if (isSelected) {
+                ctx.translate(0, -14);
+                ctx.shadowColor = '#00f3ff';
+                ctx.shadowBlur = 18;
+            } else if (isHovered) {
+                ctx.translate(0, -6);
+                ctx.shadowColor = 'rgba(0, 243, 255, 0.45)';
+                ctx.shadowBlur = 12;
+            } else {
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.65)';
+                ctx.shadowBlur = 10;
+                ctx.shadowOffsetY = 4;
+            }
+
+            const baseColor = POS_COLORS[c.pos] || '#00f3ff';
+
+            // Card Body
+            const grad = ctx.createLinearGradient(0, 0, 0, h);
+            grad.addColorStop(0, '#162238');
+            grad.addColorStop(1, '#0b111e');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.roundRect(0, 0, w, h, 10);
+            ctx.fill();
+
+            // Card Border
+            ctx.lineWidth = isSelected ? 3 : 1.5;
+            ctx.strokeStyle = isSelected ? '#ffffff' : baseColor;
+            ctx.stroke();
+
+            // Top Header Strip
+            ctx.fillStyle = baseColor;
+            ctx.beginPath();
+            ctx.roundRect(2, 2, w - 4, 22, [8, 8, 0, 0]);
+            ctx.fill();
+
+            // Top Category Tag
+            ctx.fillStyle = '#060a12';
+            ctx.font = 'bold 11px Orbitron, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText(c.pos.toUpperCase(), 8, 16);
+
+            // Syllable Count
+            ctx.textAlign = 'right';
+            ctx.fillText(c.syl ? `${c.syl} syl` : 'TOKEN', w - 8, 16);
+
+            if (c.pos.startsWith('special')) {
+                // Special Card
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 20px Orbitron, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(c.word, w / 2, h / 2);
+
+                ctx.fillStyle = baseColor;
+                ctx.font = 'bold 12px Rajdhani, sans-serif';
+                ctx.fillText('SPECIAL CARD', w / 2, h / 2 + 20);
+
+                ctx.fillStyle = '#829db9';
+                ctx.font = '10px Share Tech Mono, monospace';
+                ctx.fillText('TACTICAL', w / 2, h - 14);
+            } else {
+                // Big Clear Word Display
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 22px Rajdhani, sans-serif';
+                ctx.textAlign = 'center';
+
+                if (c.word.length > 7) {
+                    ctx.font = 'bold 18px Rajdhani, sans-serif';
+                }
+                ctx.fillText(c.word, w / 2, h / 2 + 2);
+
+                // Lower Part of Speech Bar
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+                ctx.fillRect(4, h - 30, w - 8, 24);
+
+                ctx.fillStyle = baseColor;
+                ctx.font = 'bold 12px Orbitron, sans-serif';
+                ctx.fillText(c.pos.toUpperCase(), w / 2, h - 14);
+            }
+
+            ctx.restore();
+        }
+
+        function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Radial Stage Background
+            const bgGrad = ctx.createRadialGradient(canvas.width / 2, canvas.height / 2, 60, canvas.width / 2, canvas.height / 2, 550);
+            bgGrad.addColorStop(0, '#0c1626');
+            bgGrad.addColorStop(1, '#050912');
+            ctx.fillStyle = bgGrad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Grid Lines
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.04)';
+            ctx.lineWidth = 1;
+            for (let x = 0; x < canvas.width; x += 45) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+            for (let y = 0; y < canvas.height; y += 45) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+
+            // Top Area: Word Deck, Graveyard, Active Sentence Workbench
+            const topY = 20;
+
+            // Word Deck
+            ctx.fillStyle = '#829db9';
+            ctx.font = '11px Orbitron, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(`WORD DECK [${deck.length}]`, 85, topY + 12);
+
+            if (deck.length > 0) {
+                ctx.fillStyle = '#0f1728';
+                ctx.strokeStyle = hand.length >= MAX_HAND_LIMIT ? '#ff0055' : '#00f3ff';
+                ctx.lineWidth = 1.4;
+                ctx.beginPath();
+                ctx.roundRect(42, topY + 22, 85, 110, 8);
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.fillStyle = hand.length >= MAX_HAND_LIMIT ? '#ff0055' : '#00f3ff';
+                ctx.font = 'bold 12px Orbitron, sans-serif';
+                ctx.fillText(hand.length >= MAX_HAND_LIMIT ? 'HAND' : 'DRAW', 85, topY + 70);
+                ctx.fillText(hand.length >= MAX_HAND_LIMIT ? 'FULL' : 'WORD', 85, topY + 86);
+            } else {
+                ctx.strokeStyle = 'rgba(0, 243, 255, 0.2)';
+                ctx.strokeRect(42, topY + 22, 85, 110);
+                ctx.fillText('EMPTY', 85, topY + 80);
+            }
+
+            // Discard Graveyard
+            ctx.fillStyle = '#ffb703';
+            ctx.fillText(`GRAVEYARD [${discardPile.length}]`, 205, topY + 12);
+
+            if (discardPile.length > 0) {
+                const topDiscard = discardPile[discardPile.length - 1];
+                drawCardVisual(topDiscard, 162, topY + 22, 85, 110, false, false);
+
+                ctx.fillStyle = 'rgba(7, 10, 18, 0.9)';
+                ctx.strokeStyle = '#ffb703';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.roundRect(165, topY + 104, 80, 20, 4);
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.fillStyle = '#ffb703';
+                ctx.font = 'bold 9px Orbitron, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('SWAP CARD', 205, topY + 118);
+            } else {
+                ctx.strokeStyle = 'rgba(255, 183, 3, 0.3)';
+                ctx.strokeRect(162, topY + 22, 85, 110);
+                ctx.fillText('EMPTY', 205, topY + 80);
+            }
+
+            // Active Sentence Melds Table
+            ctx.fillStyle = '#00f3ff';
+            ctx.textAlign = 'left';
+            ctx.fillText(`SENTENCE WORKBENCH MELDS (${meldedSets.length})`, 280, topY + 12);
+
+            let meldX = 280;
+            let meldY = topY + 24;
+            const meldW = 62;
+            const meldH = 84;
+
+            if (meldedSets.length === 0) {
+                ctx.fillStyle = 'rgba(130, 157, 185, 0.5)';
+                ctx.font = '13px Rajdhani, sans-serif';
+                ctx.fillText('No completed sentences on the table yet. Select cards below and click "Meld / Validate".', 280, topY + 68);
+            } else {
+                meldedSets.forEach((m) => {
+                    ctx.fillStyle = '#00ff88';
+                    ctx.font = 'bold 9px Orbitron, sans-serif';
+                    ctx.fillText(m.label, meldX, meldY - 4);
+                    m.cards.forEach((mc, i) => {
+                        drawCardVisual(mc, meldX + i * 22, meldY, meldW, meldH, false, false);
+                    });
+                    meldX += m.cards.length * 22 + 65;
+                });
+            }
+
+            // Status Banner in Canvas
+            ctx.fillStyle = 'rgba(6, 11, 22, 0.92)';
+            ctx.strokeStyle = bannerColor;
+            ctx.lineWidth = 1.4;
+            ctx.beginPath();
+            ctx.roundRect(30, 156, canvas.width - 60, 40, 6);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = bannerColor;
+            ctx.font = 'bold 13px Share Tech Mono, monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText(bannerMsg, canvas.width / 2, 181);
+
+            // Player Hand Area (Bottom Canvas Stage)
+            ctx.fillStyle = hand.length >= MAX_HAND_LIMIT ? '#ffb703' : '#00ff88';
+            ctx.font = '12px Orbitron, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText(`YOUR WORD HAND (${hand.length}/${MAX_HAND_LIMIT}) - Tap word cards to select`, 35, 230);
+
+            // Large, easy-to-read cards
+            const cardW = 100;
+            const cardH = 148;
+            const maxCards = Math.max(1, hand.length);
+            const cardSpacing = Math.min(115, (canvas.width - 70) / maxCards);
+
+            hand.forEach((card, idx) => {
+                const cx = 35 + idx * cardSpacing;
+                const cy = 250;
+                const isSelected = selectedIndices.has(idx);
+                const isHovered = hoveredIndex === idx;
+                drawCardVisual(card, cx, cy, cardW, cardH, isSelected, isHovered);
+            });
+
+            requestAnimationFrame(render);
+        }
+
+        // Pointer Controls
+        function getCoords(e) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            return {
+                x: (e.clientX - rect.left) * scaleX,
+                y: (e.clientY - rect.top) * scaleY
+            };
+        }
+
+        canvas.addEventListener('pointerdown', (e) => {
+            const pt = getCoords(e);
+
+            // Hand Card Tapping
+            const cardW = 100;
+            const cardH = 148;
+            const maxCards = Math.max(1, hand.length);
+            const cardSpacing = Math.min(115, (canvas.width - 70) / maxCards);
+
+            for (let i = hand.length - 1; i >= 0; i--) {
+                const cx = 35 + i * cardSpacing;
+                const cy = 250;
+                if (pt.x >= cx && pt.x <= cx + cardW && pt.y >= cy && pt.y <= cy + cardH) {
+                    if (selectedIndices.has(i)) {
+                        selectedIndices.delete(i);
+                    } else {
+                        selectedIndices.add(i);
+                    }
+                    return;
+                }
+            }
+
+            // Word Deck Click
+            if (pt.x >= 42 && pt.x <= 127 && pt.y >= 42 && pt.y <= 152) {
+                drawCard();
+                return;
+            }
+
+            // Discard Graveyard Click
+            if (pt.x >= 162 && pt.x <= 247 && pt.y >= 42 && pt.y <= 152) {
+                openSwapChamber();
+                return;
+            }
+        });
+
+        canvas.addEventListener('pointermove', (e) => {
+            const pt = getCoords(e);
+            const cardW = 100;
+            const cardH = 148;
+            const maxCards = Math.max(1, hand.length);
+            const cardSpacing = Math.min(115, (canvas.width - 70) / maxCards);
+
+            let found = -1;
+            for (let i = hand.length - 1; i >= 0; i--) {
+                const cx = 35 + i * cardSpacing;
+                const cy = 250;
+                if (pt.x >= cx && pt.x <= cx + cardW && pt.y >= cy && pt.y <= cy + cardH) {
+                    found = i;
+                    break;
+                }
+            }
+            hoveredIndex = found;
+        });
+
+        canvas.addEventListener('pointerleave', () => { hoveredIndex = -1; });
+
+        // Button Event Binds
+        document.getElementById('btnDraw').addEventListener('click', drawCard);
+        document.getElementById('btnBuildMeld').addEventListener('click', meldSelected);
+        document.getElementById('btnDiscard').addEventListener('click', discardCard);
+        document.getElementById('btnSwapChamber').addEventListener('click', openSwapChamber);
+        document.getElementById('btnSyntaxBonus').addEventListener('click', claimSyntaxBonus);
+        document.getElementById('btnReset').addEventListener('click', initGame);
+
+        // Direct Download Trigger implementation
+        const directDownloadBtn = document.getElementById('directDownloadBtn');
+        if (directDownloadBtn) {
+            directDownloadBtn.addEventListener('click', () => {
+                const source = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+                const blob = new Blob([source], { type: 'text/html;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const tempLink = document.createElement('a');
+                tempLink.href = url;
+                tempLink.download = 'english-cards.html';
+                document.body.appendChild(tempLink);
+                tempLink.click();
+                document.body.removeChild(tempLink);
+                URL.revokeObjectURL(url);
+            });
+        }
+
+        // Boot Simulator Engine
+        initGame();
+        requestAnimationFrame(render);
+    </script>
+</body>
+</html>

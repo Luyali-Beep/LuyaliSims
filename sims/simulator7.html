@@ -1,0 +1,2023 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Interactive Periodic Table Card Game and Laboratory Simulator - LuyaliSims STEM Labs.">
+    <title>The Periodic Table: Elemental Rummy Simulator & Laboratory - LuyaliSims</title>
+
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg?v=1">
+    
+    <!-- Import Futuristic Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Base Reset & Variables */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --neon-cyan: #00f3ff;
+            --neon-magenta: #bc13fe;
+            --neon-green: #00ff88;
+            --neon-amber: #ffb703;
+            --neon-rose: #ff0055;
+            --bg-dark: #070a12;
+            --panel-bg: rgba(16, 24, 43, 0.85);
+            --border-glow: rgba(0, 243, 255, 0.35);
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 85% 15%, rgba(0, 243, 255, 0.08), transparent 45%),
+                radial-gradient(circle at 15% 85%, rgba(188, 19, 254, 0.08), transparent 45%),
+                linear-gradient(180deg, #05070e 0%, #0a0e1a 100%);
+            color: #e2e8f0;
+            margin: 0;
+            padding: 16px 20px;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* 1. HEADER & TOP NAVIGATION */
+        header {
+            max-width: 1200px;
+            margin: 0 auto 15px auto;
+        }
+
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 18px;
+            background: rgba(16, 24, 43, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(188, 19, 254, 0.5);
+            color: #e580ff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(188, 19, 254, 0.2);
+            border-color: var(--neon-magenta);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
+            transform: translateX(-3px);
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+            margin: 6px 0 10px 0;
+            font-size: clamp(1.4rem, 3.8vw, 2.3rem);
+            letter-spacing: 1.5px;
+            text-align: center;
+        }
+
+        .lead-summary {
+            max-width: 900px;
+            margin: 0 auto 20px auto;
+            text-align: center;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: #cbd5e1;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* 2. SIMULATOR WORKSPACE */
+        #simulator-container {
+            background: linear-gradient(135deg, rgba(16, 24, 43, 0.85) 0%, rgba(8, 12, 22, 0.9) 100%);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-glow);
+            border-radius: 16px;
+            padding: 22px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 25px rgba(0, 243, 255, 0.12);
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .hud-telemetry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(4, 8, 16, 0.8);
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            border-radius: 10px;
+            padding: 10px 16px;
+            margin-bottom: 18px;
+            font-family: 'Share Tech Mono', monospace;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .telemetry-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.92rem;
+        }
+
+        .tele-label {
+            color: #8da4be;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .tele-val {
+            color: var(--neon-cyan);
+            font-weight: 700;
+        }
+
+        .tele-val.pink {
+            color: #ff55bb;
+        }
+
+        .tele-val.green {
+            color: var(--neon-green);
+        }
+
+        .tele-val.amber {
+            color: var(--neon-amber);
+        }
+
+        /* Glowing Codex Reference Button */
+        .hint-glow-btn {
+            min-height: 36px;
+            padding: 0 14px;
+            font-size: 0.82rem;
+            font-weight: 800;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            border: 1px solid var(--neon-amber);
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(255, 183, 3, 0.22) 0%, rgba(13, 22, 41, 0.9) 100%);
+            color: #ffe6a6;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 0 12px rgba(255, 183, 3, 0.45), inset 0 0 8px rgba(255, 183, 3, 0.25);
+            animation: hintPulsing 2.6s infinite ease-in-out;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        @keyframes hintPulsing {
+            0%, 100% {
+                box-shadow: 0 0 8px rgba(255, 183, 3, 0.35);
+                border-color: rgba(255, 183, 3, 0.6);
+            }
+            50% {
+                box-shadow: 0 0 18px rgba(255, 183, 3, 0.8), 0 0 8px rgba(0, 243, 255, 0.5);
+                border-color: #ffd166;
+            }
+        }
+
+        .hint-glow-btn:hover {
+            background: linear-gradient(135deg, rgba(255, 183, 3, 0.35) 0%, rgba(20, 35, 65, 0.95) 100%);
+            transform: translateY(-1px) scale(1.02);
+        }
+
+        .hint-glow-btn.locked {
+            background: #121824;
+            border-color: #4b586d;
+            color: #6a7c93;
+            box-shadow: none;
+            animation: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .sim-layout {
+            display: grid;
+            grid-template-columns: 1.7fr 1fr;
+            gap: 20px;
+            align-items: stretch;
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            width: 100%;
+            background: radial-gradient(circle at 50% 50%, #08171a 0%, #02070a 100%);
+            border-radius: 12px;
+            overflow: hidden;
+            touch-action: none;
+            border: 4px solid #1e293b;
+            box-shadow: 
+                0 0 0 2px rgba(0, 243, 255, 0.4),
+                0 15px 35px rgba(0, 0, 0, 0.8),
+                inset 0 0 35px rgba(0, 0, 0, 0.95);
+        }
+
+        .canvas-wrapper::before {
+            content: " ";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: 
+                linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+                repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.22) 0px, rgba(0, 0, 0, 0.22) 1px, transparent 1px, transparent 3px);
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16 / 10;
+            cursor: pointer;
+        }
+
+        .controls-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: linear-gradient(145deg, rgba(11, 17, 30, 0.9) 0%, rgba(6, 9, 16, 0.95) 100%);
+            padding: 18px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            justify-content: space-between;
+        }
+
+        .panel-heading {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border-bottom: 1px solid rgba(0, 243, 255, 0.25);
+            padding-bottom: 6px;
+            margin: 0;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .control-group label {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #cbd5e1;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .control-group label span {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--neon-green);
+        }
+
+        select {
+            min-height: 44px;
+            background: #060c18;
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            color: #e2e8f0;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 600;
+            font-size: 0.98rem;
+            padding: 8px 12px;
+            border-radius: 8px;
+            outline: none;
+            cursor: pointer;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.6);
+        }
+
+        select:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.4);
+        }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 4px;
+        }
+
+        .sim-btn {
+            background: linear-gradient(180deg, rgba(16, 28, 54, 0.9) 0%, rgba(8, 14, 28, 0.95) 100%);
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            color: var(--neon-cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 10px 8px;
+            min-height: 44px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            user-select: none;
+        }
+
+        .sim-btn:hover {
+            border-color: var(--neon-cyan);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .sim-btn.secondary {
+            border-color: rgba(188, 19, 254, 0.5);
+            color: #e580ff;
+        }
+
+        .sim-btn.secondary:hover {
+            border-color: var(--neon-magenta);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
+        }
+
+        .sim-btn.accent-green {
+            border-color: rgba(0, 255, 136, 0.5);
+            color: #8affc4;
+            background: linear-gradient(180deg, rgba(12, 40, 28, 0.9) 0%, rgba(6, 20, 14, 0.95) 100%);
+        }
+
+        .sim-btn.accent-green:hover {
+            border-color: var(--neon-green);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.6);
+        }
+
+        .sim-btn.accent-amber {
+            border-color: rgba(255, 183, 3, 0.5);
+            color: #ffe08a;
+            background: linear-gradient(180deg, rgba(46, 32, 6, 0.9) 0%, rgba(22, 15, 3, 0.95) 100%);
+        }
+
+        .sim-btn.accent-amber:hover {
+            border-color: var(--neon-amber);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(255, 183, 3, 0.6);
+        }
+
+        .sim-btn.accent-rose {
+            border-color: rgba(255, 0, 85, 0.5);
+            color: #ff94b8;
+            background: linear-gradient(180deg, rgba(46, 10, 22, 0.9) 0%, rgba(24, 5, 11, 0.95) 100%);
+        }
+
+        .sim-btn.accent-rose:hover {
+            border-color: var(--neon-rose);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(255, 0, 85, 0.6);
+        }
+
+        /* 3. POLICY-COMPLIANT AD CONTAINER */
+        .ad-slot-wrapper {
+            margin: 30px auto;
+            text-align: center;
+            clear: both;
+        }
+
+        .ad-disclaimer {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            margin-bottom: 6px;
+        }
+
+        .ad-box-placeholder {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            min-height: 90px;
+            max-width: 970px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #475569;
+            font-size: 0.85rem;
+            border-radius: 8px;
+        }
+
+        /* 4. EDUCATIONAL CONTENT SECTION */
+        .educational-content {
+            line-height: 1.75;
+            font-size: 1.05rem;
+            color: #94a3b8;
+            background: rgba(10, 14, 23, 0.85);
+            padding: 30px;
+            border-radius: 16px;
+            border-left: 4px solid var(--neon-cyan);
+            border-top: 1px solid rgba(0, 243, 255, 0.2);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin-bottom: 35px;
+        }
+
+        .educational-content h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-magenta);
+            border-bottom: 1px solid rgba(188, 19, 254, 0.3);
+            padding-bottom: 8px;
+            margin-top: 1.8em;
+            margin-bottom: 0.6em;
+            font-size: 1.45rem;
+        }
+
+        .educational-content h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: #38bdf8;
+            margin-top: 1.4em;
+            margin-bottom: 0.4em;
+            font-size: 1.15rem;
+        }
+
+        .formula-box {
+            background: rgba(4, 9, 20, 0.7);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-left: 3px solid var(--neon-green);
+            padding: 14px 18px;
+            margin: 14px 0;
+            border-radius: 6px;
+            font-family: 'Share Tech Mono', monospace;
+            color: #a7f3d0;
+            font-size: 1.02rem;
+            line-height: 1.6;
+        }
+
+        .task-card {
+            background: rgba(15, 23, 42, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 18px;
+        }
+
+        .task-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            color: var(--neon-cyan);
+            margin-bottom: 8px;
+        }
+
+        details {
+            margin-top: 25px;
+            background: rgba(5, 10, 20, 0.8);
+            border: 1px solid rgba(188, 19, 254, 0.4);
+            border-radius: 10px;
+            padding: 15px 20px;
+        }
+
+        summary {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            color: #e580ff;
+            cursor: pointer;
+            padding: 6px 0;
+            user-select: none;
+        }
+
+        .solution-step {
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+            padding: 12px 0;
+        }
+
+        .solution-step:last-child {
+            border-bottom: none;
+        }
+
+        /* 5. FOOTER & ACCURATE ALIGNED LINKS */
+        footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px 20px 20px 20px;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .footer-nav {
+            display: flex;
+            justify-content: center;
+            gap: 22px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .footer-nav a, .footer-modal-trigger {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.2s, text-shadow 0.2s;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .footer-nav a:hover, .footer-modal-trigger:hover {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
+        }
+
+        /* 6. SELF-CONTAINED POLICY & INTERACTIVE MODALS */
+        .policy-modal {
+            position: fixed !important;
+            top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
+            width: 100vw !important; height: 100vh !important;
+            background: rgba(4, 7, 15, 0.92) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 99999 !important;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-body {
+            background: linear-gradient(145deg, #0b111e 0%, #060913 100%);
+            border: 2px solid var(--neon-cyan);
+            border-radius: 16px;
+            max-width: 820px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 35px 30px;
+            color: #cbd5e1;
+            box-shadow: 0 0 40px rgba(0, 243, 255, 0.25);
+            line-height: 1.75;
+            position: relative;
+            text-align: left;
+        }
+
+        .modal-body h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-cyan);
+            margin-top: 0;
+            font-size: 1.6rem;
+        }
+
+        .modal-body h3 {
+            color: var(--neon-magenta);
+            font-family: 'Orbitron', sans-serif;
+            margin-top: 24px;
+            margin-bottom: 8px;
+            font-size: 1.15rem;
+        }
+
+        .modal-date {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--neon-green);
+            font-size: 0.9rem;
+            margin-top: -6px;
+            margin-bottom: 16px;
+        }
+
+        .modal-close-btn {
+            background: linear-gradient(180deg, rgba(188, 19, 254, 0.4), rgba(188, 19, 254, 0.15));
+            border: 1px solid var(--neon-magenta);
+            color: #fff;
+            padding: 8px 18px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            float: right;
+            margin-bottom: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close-btn:hover {
+            background: var(--neon-magenta);
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.8);
+        }
+
+        /* Interactive Discard Chamber Grid */
+        .swap-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 12px;
+            margin-top: 1rem;
+            max-height: 50vh;
+            overflow-y: auto;
+            padding: 6px;
+        }
+
+        .swap-card-item {
+            background: #111a2d;
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            border-radius: 8px;
+            padding: 10px 8px;
+            text-align: center;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s;
+        }
+
+        .swap-card-item:hover {
+            border-color: var(--neon-cyan);
+            transform: translateY(-3px);
+            box-shadow: 0 0 12px rgba(0, 243, 255, 0.4);
+        }
+
+        .swap-card-item .sc-top {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--neon-cyan);
+            margin-bottom: 4px;
+        }
+
+        .swap-card-item .sc-symbol {
+            font-size: 1.7rem;
+            font-weight: 900;
+            color: #ffffff;
+            line-height: 1.1;
+        }
+
+        .swap-card-item .sc-name {
+            font-size: 0.82rem;
+            color: #9dbbd8;
+            margin-bottom: 4px;
+        }
+
+        .swap-card-item .sc-meta {
+            font-size: 0.75rem;
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--neon-green);
+        }
+
+        /* Periodic Codex Table */
+        .codex-search-bar {
+            width: 100%;
+            min-height: 42px;
+            padding: 0 12px;
+            background: #090e1a;
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-radius: 6px;
+            color: #ffffff;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            outline: none;
+        }
+
+        .codex-search-bar:focus {
+            border-color: var(--neon-amber);
+            box-shadow: 0 0 10px rgba(255, 183, 3, 0.4);
+        }
+
+        .codex-table-wrap {
+            max-height: 52vh;
+            overflow-y: auto;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            border-radius: 8px;
+        }
+
+        .codex-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+            text-align: left;
+        }
+
+        .codex-table th {
+            background: rgba(13, 22, 41, 0.95);
+            color: var(--neon-amber);
+            font-family: 'Orbitron', sans-serif;
+            padding: 10px 8px;
+            position: sticky;
+            top: 0;
+            border-bottom: 2px solid rgba(255, 183, 3, 0.3);
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+        }
+
+        .codex-table td {
+            padding: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            color: #cfe1f5;
+        }
+
+        .codex-table tr:hover {
+            background: rgba(0, 243, 255, 0.06);
+        }
+
+        @media (max-width: 900px) {
+            .sim-layout { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            #simulator-container, .educational-content { padding: 14px; }
+            .btn-grid { grid-template-columns: 1fr; }
+            .hud-telemetry { flex-direction: column; align-items: flex-start; }
+            .modal-body { padding: 22px 18px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. HEADER & TOP NAVIGATION -->
+    <header>
+        <nav class="top-nav">
+            <a href="../index.html" class="back-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Back to LuyaliSims
+            </a>
+            <span style="font-family: 'Share Tech Mono', monospace; font-size: 0.85rem; color: #64748b;">
+                MODULE ID: CHEM-RUMMY-404
+            </span>
+        </nav>
+        
+        <h1>The Periodic Table: Elemental Rummy Simulator</h1>
+        
+        <!-- Contextual Summary: 60-80 words above the fold -->
+        <p class="lead-summary">
+            Master chemical periodicity and bonding principles with Elemental Rummy, an interactive laboratory simulator engineered for high school chemistry instruction and classroom demonstration. Assemble valid chemical melds by grouping elements with identical valence counts, building horizontal period runs across consecutive atomic numbers, or crafting ionic pairs. Featuring strict hand limits, tactical isotope swaps from the discard pile, and a limited-use periodic codex reference, this simulator makes fundamental atomic theory intuitive and engaging.
+        </p>
+    </header>
+
+    <main>
+        <!-- 2. SIMULATOR APP WORKSPACE -->
+        <section id="simulator-container" aria-label="Interactive Simulator Workspace">
+            
+            <!-- Telemetry Status Bar -->
+            <div class="hud-telemetry">
+                <div class="telemetry-item">
+                    <span class="tele-label">Status:</span>
+                    <span id="tele-status" class="tele-val green">ACTIVE</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Score:</span>
+                    <span id="readout-score" class="tele-val green">0</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Hand Limit:</span>
+                    <span id="readout-hand" class="tele-val">7/8</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Swap Cards:</span>
+                    <span id="readout-swaps" class="tele-val amber">0</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Codex Uses:</span>
+                    <span id="readout-codex" class="tele-val pink">3/3</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">High Score:</span>
+                    <span id="readout-hiscore" class="tele-val">0</span>
+                </div>
+                <!-- Unique Glowing Hint / Reference Button -->
+                <button type="button" id="btnPeriodicRef" class="hint-glow-btn" title="Open Periodic Codex Reference (Limited to 3 uses per game)">
+                    💡 Periodic Codex (3/3)
+                </button>
+            </div>
+
+            <div class="sim-layout">
+                <!-- 3D Holographic Canvas Display -->
+                <div class="canvas-wrapper" id="canvasFrame">
+                    <canvas id="simCanvas" width="800" height="500"></canvas>
+                </div>
+
+                <!-- 3D Controls Console -->
+                <div class="controls-panel">
+                    <h3 class="panel-heading">Laboratory Console</h3>
+
+                    <div class="control-group">
+                        <label for="matchTypeSelect">Match Rule Configuration: <span id="val-match-mode">GROUP</span></label>
+                        <select id="matchTypeSelect">
+                            <option value="group" selected>Group Set (Same Group / Valence)</option>
+                            <option value="period">Period Run (Consecutive Z in Period)</option>
+                            <option value="family">Family Match (Alkali, Halogen, Noble)</option>
+                            <option value="compound">Ionic Pair (Metal + Non-Metal Bond)</option>
+                        </select>
+                    </div>
+
+                    <!-- Tactical Action Controls -->
+                    <div class="btn-grid">
+                        <button id="btnDraw" class="sim-btn">Draw Card</button>
+                        <button id="btnMeld" class="sim-btn accent-green">Meld Selected</button>
+                        <button id="btnDiscard" class="sim-btn accent-rose">Discard 1 Card</button>
+                        <button id="btnSwapChamber" class="sim-btn accent-amber">Isotope Swap</button>
+                        <button id="btnTrendBonus" class="sim-btn secondary">Trend Bonus (+5)</button>
+                        <button id="btnReset" class="sim-btn">New Deal / Reset</button>
+                    </div>
+
+                    <!-- Fullscreen Toggle -->
+                    <button id="fullscreenBtn" class="sim-btn secondary" style="width: 100%; margin-top: 4px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                        </svg>
+                        Fullscreen
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. SAFE AD PLACEMENT SLOT -->
+        <div class="ad-slot-wrapper">
+            <div class="ad-disclaimer">Advertisement</div>
+            <div class="ad-box-placeholder">
+                <!-- Google AdSense Responsive Display Unit -->
+                <span>[AdSense Responsive Display Unit Safe Zone]</span>
+            </div>
+        </div>
+
+        <!-- 4. EDUCATIONAL REFERENCE ARTICLE -->
+        <article class="educational-content">
+            <section>
+                <h2>How to Operate the Simulator</h2>
+                <p>
+                    Elemental Rummy is an authentic, solo laboratory learning tool and classroom instructional demonstration platform. Players manipulate element cards displayed in standard nuclide notation to assemble valid chemical melds, track valence configurations, and achieve chemical mastery scores.
+                </p>
+                <ul>
+                    <li><strong>Nuclide Card Format:</strong> Cards display strictly the <strong>Chemical Symbol</strong>, with the <strong>Mass Number (A)</strong> in the upper position and the <strong>Atomic Number (Z)</strong> in the lower position alongside the element name. Electronic configurations are omitted from card faces to encourage active cognitive recall.</li>
+                    <li><strong>Periodic Codex Reference (3-Use Limit):</strong> To check electron shell ratios (e.g., 2.8.1) or full orbital configurations (e.g., 1s² 2s² 2p⁶ 3s¹), click the glowing <strong>Periodic Codex</strong> button in the telemetry bar. Learners are permitted at most <strong>3 reference uses per game</strong>. Once exhausted, the codex locks until the game is reset. Clicking <strong>New Deal / Reset</strong> resets the score to 0 and restores all 3 codex reference uses.</li>
+                    <li><strong>Strict Hand Limit (8 Cards Maximum):</strong> You can hold at most 8 cards in your active hand. If your hand reaches 8 cards, you must either meld a valid set or discard an unwanted card before drawing from the deck.</li>
+                    <li><strong>Drawing &amp; Earning Swap Cards:</strong> Click <strong>Draw Card</strong> (or click the Stock Deck directly on the canvas). For every 6 successful deck draws, you are awarded 1 tactical <em>Isotope Swap</em> card.</li>
+                    <li><strong>Isotope Swap Chamber:</strong> Click <strong>Isotope Swap</strong> or click directly on the canvas Discard Pile to open the <em>Isotope Swap Chamber</em>. Inspect all cards in the discard graveyard and retrieve any element in exchange for 1 Isotope Swap card from your hand (1:1 ratio).</li>
+                    <li><strong>Melding via Dropdown:</strong> Select cards in your hand, choose the match type from the dropdown (Group Set, Period Run, Family Match, or Ionic Pair), and click <strong>Meld Selected</strong>.</li>
+                    <li><strong>Trend Bonus (+5 Pts):</strong> Click <strong>Trend Bonus</strong> whenever your meld illustrates a periodic law (e.g., atomic radius decreasing across Period 3, or reactivity increasing down Group 1).</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Scientific Theory &amp; Working Principles</h2>
+                <p>
+                    In secondary chemistry, the Periodic Table is organized strictly in order of <strong>increasing Atomic Number (Z)</strong>, representing the number of positive protons inside the atomic nucleus.
+                </p>
+
+                <h3>Nuclide Notation and Electronic Architecture</h3>
+                <p>
+                    In standard nuclide notation, an atom is represented as:
+                </p>
+                <div class="formula-box">
+                    Standard Nuclide Symbolism: ^A_Z X<br>
+                    Where X = chemical symbol, Z = atomic number (protons), A = mass number (protons + neutrons).
+                </div>
+                <p>
+                    Electrons occupy concentric energy levels according to shell capacities (2 in the first energy level, 8 in the second, and 8 in the third for the first twenty elements):
+                </p>
+                <ul>
+                    <li><strong>Periods (Horizontal Rows):</strong> The Period number corresponds directly to the <em>number of occupied energy levels</em>. For example, Sodium (2.8.1) occupies 3 energy levels, placing it in Period 3. Calcium (2.8.8.2) occupies 4 energy levels, placing it in Period 4.</li>
+                    <li><strong>Groups (Vertical Columns):</strong> The Group number corresponds to the <em>number of electrons in the outermost energy level (valence electrons)</em>. Group 1 elements possess 1 valence electron, Group 2 elements possess 2, Group 7 (Halogens) possess 7, and Group 8/0 (Noble Gases) have complete, stable duplets or octets.</li>
+                    <li><strong>Orbital Subshell Configurations:</strong> At advanced secondary levels, energy levels are subdivided into s, p, d, and f subshells. The electron configuration reflects orbital filling according to the Aufbau principle (e.g., Sodium: 1s² 2s² 2p⁶ 3s¹; Chlorine: 1s² 2s² 2p⁶ 3s² 3p⁵).</li>
+                </ul>
+
+                <h3>Periodic Trends Across Periods and Down Groups</h3>
+                <ul>
+                    <li><strong>Atomic Radius Across a Period:</strong> Decreases from left to right. Across Period 3 (from Na to Cl), protons are added to the nucleus, steadily increasing positive nuclear charge. However, electrons enter the <em>same</em> energy level, meaning screening/shielding remains roughly constant. The stronger electrostatic attraction pulls the electron energy levels closer to the nucleus, shrinking atomic size.</li>
+                    <li><strong>Atomic Radius Down a Group:</strong> Increases down any group. Moving down Group 1 (Li to Na to K), an additional occupied energy level is added each step. The outer electron is placed farther from the nucleus, and inner electrons provide strong shielding, increasing atomic size.</li>
+                    <li><strong>Chemical Reactivity Trends:</strong>
+                        <ul>
+                            <li><em>Group 1 (Alkali Metals):</em> React by losing their single outermost electron. As atomic size increases down the group, the valence electron is farther from the nucleus and held less tightly. Hence, reactivity increases down Group 1: K &gt; Na &gt; Li.</li>
+                            <li><em>Group 7 (Halogens):</em> React by gaining 1 electron. As atomic size increases down the group, the incoming electron is less strongly attracted by the nucleus due to increased distance and shielding. Hence, reactivity decreases down Group 7: F &gt; Cl &gt; Br &gt; I.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Mathematical Foundations &amp; Formulas</h2>
+                <p>Key quantitative relationships at the secondary school chemistry level include:</p>
+                <div class="formula-box">
+                    Formula 1: Number of Neutrons (n) = Mass Number (A) - Atomic Number (Z)<br>
+                    Formula 2: For Neutral Atoms: Protons = Electrons = Z<br>
+                    Formula 3: Relative Atomic Mass (R.A.M.) = [(Mass 1 x % Abundance 1) + (Mass 2 x % Abundance 2)] / 100<br>
+                    Formula 4: Chemical Formula Cross Method: Element X (valency v1) + Element Y (valency v2) = X_(v2) Y_(v1)
+                </div>
+            </section>
+
+            <section>
+                <h2>Real-World Engineering &amp; Industrial Applications</h2>
+                <p>Periodic trends and valence electrons govern major real-world industrial and metallurgical processes:</p>
+                <ul>
+                    <li><strong>Industrial Chlorine Extraction &amp; Water Purification:</strong> Group 7 element Chlorine (Cl, Z=17) is manufactured commercially through the electrolysis of concentrated brine (NaCl solution) in membrane cells. Because of its high electronegativity and oxidizing power, chlorine gas is dosed into municipal piped water supplies globally to eliminate water-borne bacterial pathogens.</li>
+                    <li><strong>Downs Cell Production of Metallic Sodium:</strong> Sodium (Na, Z=11) is extracted industrially by the electrolysis of molten sodium chloride in a Downs Cell with calcium chloride added to lower the melting point from 801 °C to approximately 600 °C. Pure sodium is critical in the manufacture of sodium cyanide for gold extraction and high-efficiency sodium vapor lamps.</li>
+                    <li><strong>Structural Metallurgy &amp; Electrical Grid Cables:</strong> Aluminum (Al, Z=13) in Period 3 possesses low density (2.70 g/cm³) and good electrical conductivity. Alloyed with magnesium or silicon, it is used to fabricate lightweight overhead high-voltage transmission cables (ACSR) and aircraft fuselages, resisting corrosion by forming an impervious, self-healing oxide skin (Al₂O₃).</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Practice Problems &amp; Diagnostic Tasks</h2>
+                <p>Test your quantitative comprehension using the five laboratory exercises below:</p>
+
+                <div class="task-card">
+                    <div class="task-title">Task 1: Deducing Group, Period, and Valency</div>
+                    <p>An element Q has an atomic number of 16 and a mass number of 32.<br>
+                    (a) State the electron arrangement of atom Q.<br>
+                    (b) Deduce the Period and Group to which element Q belongs, giving reasons.<br>
+                    (c) State the valency of element Q and write the formula of its ion.</p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 2: Relative Atomic Mass (R.A.M.) Calculation</div>
+                    <p>Naturally occurring chlorine consists of two isotopes: Chlorine-35 (mass = 35) with a relative abundance of 75.0%, and Chlorine-37 (mass = 37) with a relative abundance of 25.0%. Calculate the Relative Atomic Mass of chlorine to one decimal place.</p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 3: Subatomic Particles in Ions</div>
+                    <p>A magnesium ion is represented as ²⁴₁₂Mg²⁺.<br>
+                    State the number of:<br>
+                    (i) Protons<br>
+                    (ii) Neutrons<br>
+                    (iii) Electrons present in this ion.</p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 4: Valency &amp; Formula Formation</div>
+                    <p>Element M has electron arrangement 2.8.2 and element X has electron arrangement 2.7.<br>
+                    (a) State the valency of element M and element X.<br>
+                    (b) Determine the formula of the compound formed between M and X.<br>
+                    (c) State the type of bond formed between M and X, giving a reason.</p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 5: Comparative Periodic Trends</div>
+                    <p>Sodium (atomic number 11) and Chlorine (atomic number 17) are both in Period 3.<br>
+                    The atomic radius of Sodium is 0.186 nm, whereas that of Chlorine is 0.099 nm.<br>
+                    Explain why the atomic radius of Chlorine is smaller than that of Sodium, despite Chlorine having more electrons.</p>
+                </div>
+
+                <!-- Collapsible Solutions -->
+                <details>
+                    <summary>Click to Reveal Solutions and Step-by-Step Proofs</summary>
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 1:</strong><br>
+                        (a) Electron Arrangement: <strong>2.8.6</strong> (First shell: 2, Second shell: 8, Third shell: 6).<br>
+                        (b) Period and Group: <strong>Period 3</strong> (3 occupied energy levels); <strong>Group 6 or Group 16</strong> (6 valence electrons).<br>
+                        (c) Valency: <strong>2</strong> (requires 2 electrons to complete stable octet). Ion formula: <strong>Q²⁻</strong>.</p>
+                    </div>
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 2:</strong><br>
+                        R.A.M. = [(Mass 1 x % 1) + (Mass 2 x % 2)] / 100<br>
+                        = [(35 x 75.0) + (37 x 25.0)] / 100 = [2625 + 925] / 100 = 3550 / 100 = <strong>35.5</strong>.</p>
+                    </div>
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 3:</strong><br>
+                        (i) Protons = <strong>12</strong> (atomic number Z = 12).<br>
+                        (ii) Neutrons = A - Z = 24 - 12 = <strong>12</strong>.<br>
+                        (iii) Electrons = 12 - 2 = <strong>10</strong> (cation formed by losing 2 valence electrons).</p>
+                    </div>
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 4:</strong><br>
+                        (a) Valency of M = <strong>2</strong>; Valency of X = 8 - 7 = <strong>1</strong>.<br>
+                        (b) Formula = <strong>MX₂</strong>.<br>
+                        (c) Bond Type = <strong>Ionic bond</strong>, formed by complete transfer of 2 electrons from metal M to two non-metal X atoms.</p>
+                    </div>
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 5:</strong><br>
+                        Both atoms possess 3 occupied energy levels. However, chlorine possesses <strong>17 protons</strong> in its nucleus compared to <strong>11 protons</strong> in sodium, yielding a significantly higher nuclear charge (+17 vs +11). Because inner electron shielding remains roughly equal, the greater electrostatic attraction pulls the electron energy levels closer inward, making the atomic radius of Chlorine (0.099 nm) smaller than Sodium (0.186 nm).</p>
+                    </div>
+                </details>
+            </section>
+        </article>
+    </main>
+
+    <!-- 5. SYNCHRONIZED COMPLIANCE FOOTER (Zero 404s, Exact Alignment with Home) -->
+    <footer>
+        <nav class="footer-nav">
+            <a href="../index.html">Home</a>
+            <a href="../index.html#about-section">About Us</a>
+            <button type="button" class="footer-modal-trigger" onclick="openSimModal('simPrivacyModal')">Privacy Policy</button>
+            <button type="button" class="footer-modal-trigger" onclick="openSimModal('simTermsModal')">Terms of Service</button>
+            <a href="../index.html#contact-section">Contact Us</a>
+            <a href="https://forms.gle/fYxxaNKAh21dPUoBA" target="_blank" rel="noopener noreferrer">Simulator Suggestions</a>
+        </nav>
+        <p>&copy; 2026 LuyaliSims | Engineered by Click & Draft | Dedicated to Open STEM Education</p>
+    </footer>
+
+    <!-- 6. IDENTICAL PRIVACY POLICY MODAL (Matches Home Exactly) -->
+    <div id="simPrivacyModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="privacyTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeSimModal('simPrivacyModal')">Close [✕]</button>
+            <h2 id="privacyTitle">Privacy Policy</h2>
+            <p class="modal-date">Last Updated: September 2026</p>
+            <p>Welcome to LuyaliSims. We respect your privacy and are committed to protecting your personal data. This privacy policy explains how we treat information when you interact with our educational simulators.</p>
+            
+            <h3>1. Educational Purpose &amp; Information Collection</h3>
+            <p>LuyaliSims is a free educational portal. We do not require account registration, passwords, or personal login information to run any simulation. All simulation calculations occur locally within your browser using client-side JavaScript.</p>
+
+            <h3>2. Google AdSense &amp; Third-Party Cookies</h3>
+            <p>We may display advertisements served by Google AdSense to fund our free educational tools. Google, as a third-party vendor, uses cookies to serve ads on our site based on users' visits to this and other sites on the Internet.</p>
+            <ul>
+                <li>Google's use of advertising cookies enables it and its partners to serve ads based on your visit to LuyaliSims and other sites.</li>
+                <li>Users may opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" style="color: var(--neon-cyan);">Google Ads Settings</a>.</li>
+            </ul>
+
+            <h3>3. Log Files &amp; Analytics</h3>
+            <p>Like standard websites, our hosting servers collect anonymous log records (including IP addresses, browser types, and timestamp references) to monitor server uptime, fix script errors, and optimize simulator performance.</p>
+
+            <h3>4. Children's Online Privacy (COPPA Compliance)</h3>
+            <p>Our educational simulators are built for students and educators of all ages. We do not knowingly solicit or collect personally identifiable information from children under 13.</p>
+
+            <h3>5. Contact Regarding Privacy</h3>
+            <p>If you have any questions regarding this policy, contact us at: <a href="mailto:luyashliz@gmail.com" style="color: var(--neon-cyan);">luyashliz@gmail.com</a>.</p>
+        </div>
+    </div>
+
+    <!-- 7. IDENTICAL TERMS OF SERVICE MODAL (Matches Home Exactly) -->
+    <div id="simTermsModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="termsTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeSimModal('simTermsModal')">Close [✕]</button>
+            <h2 id="termsTitle">Terms of Service</h2>
+            <p class="modal-date">Effective Date: September 2026</p>
+
+            <h3>1. Permitted Educational Use</h3>
+            <p>All interactive models, simulations, practice problems, and laboratory worksheets on LuyaliSims are made freely available for classroom demonstrations, academic study, tutoring, and self-paced individual learning.</p>
+
+            <h3>2. Intellectual Property</h3>
+            <p>The code architecture, layout designs, and custom interactive engines are the intellectual property of Ian Luyali and Click & Draft. You may use our simulators online in academic settings, but mirroring or re-hosting our code for commercial resale without permission is prohibited.</p>
+
+            <h3>3. Disclaimer of Scientific Warranty</h3>
+            <p>While simulations are engineered to accurately replicate classical mechanics, thermodynamics, and electronics, they are provided as conceptual learning aids. LuyaliSims is not liable for outcomes in real-world high-voltage or hazardous laboratory environments constructed without professional teacher supervision.</p>
+
+            <h3>4. Updates to Terms</h3>
+            <p>We reserve the right to refine these terms as new laboratory modules and features are introduced.</p>
+        </div>
+    </div>
+
+    <!-- 8. PERIODIC CODEX REFERENCE MODAL -->
+    <div id="periodicCodexModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="codexTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeSimModal('periodicCodexModal')">Close [✕]</button>
+            <h2 id="codexTitle">Periodic Codex // Reference Directory</h2>
+            <p class="modal-date">
+                Electronic Shell Configurations &amp; Subshells 
+                <span id="modalCodexRemainingText" style="color: var(--neon-amber); margin-left: 10px;">(Uses Remaining: 3/3)</span>
+            </p>
+            <input type="text" id="codexSearchInput" class="codex-search-bar" placeholder="Filter by element name, symbol, or atomic number (Z)...">
+            
+            <div class="codex-table-wrap">
+                <table class="codex-table">
+                    <thead>
+                        <tr>
+                            <th>Z</th>
+                            <th>Symbol</th>
+                            <th>Name</th>
+                            <th>Shell Ratio</th>
+                            <th>Orbital Subshell Config</th>
+                            <th>Group</th>
+                            <th>Period</th>
+                        </tr>
+                    </thead>
+                    <tbody id="codexTableBody">
+                        <!-- Populated by script -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 9. ISOTOPE SWAP CHAMBER MODAL -->
+    <div id="swapChamberModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="swapChamberTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeSimModal('swapChamberModal')">Close [✕]</button>
+            <h2 id="swapChamberTitle">Isotope Swap Chamber // Discard Graveyard</h2>
+            <p class="modal-date">
+                Tactical 1:1 Exchange | Available Swap Cards in Hand: 
+                <strong id="modalSwapCountDisplay" style="color: var(--neon-amber);">0</strong>
+            </p>
+            <p style="font-size: 0.95rem; margin-bottom: 10px;">Click any discarded element below to retrieve it into your hand using 1 Isotope Swap card.</p>
+            <div class="swap-grid" id="swapCardsContainer">
+                <!-- Dynamically rendered graveyard cards -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 10. SIMULATOR CORE SCRIPT & GAME ENGINE -->
+    <script>
+        // Modal Controls (Synchronized with Template Standard)
+        function openSimModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeSimModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('policy-modal')) {
+                closeSimModal(e.target.id);
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' || e.key === 'Esc') {
+                document.querySelectorAll('.policy-modal').forEach(m => {
+                    m.style.display = 'none';
+                });
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // Fullscreen Implementation
+        const simContainer = document.getElementById('simulator-container');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                if (simContainer.requestFullscreen) simContainer.requestFullscreen();
+                else if (simContainer.webkitRequestFullscreen) simContainer.webkitRequestFullscreen();
+                fullscreenBtn.innerHTML = 'Exit Screen';
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+                fullscreenBtn.innerHTML = 'Fullscreen';
+            }
+        });
+
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                fullscreenBtn.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                    </svg> Fullscreen`;
+            }
+        });
+
+        // =====================================================================
+        // ELEMENTAL RUMMY ENGINE - PERIODIC CODEX & NUCLIDE CARD STANDARD
+        // =====================================================================
+
+        const MAX_HAND_LIMIT = 8;
+        const DRAWS_PER_SWAP_REWARD = 6;
+        const MAX_CODEX_USES = 3;
+
+        // Complete Element Database: First 20 Elements + Transition Metals + Specials
+        const ELEMENT_DATA = [
+            // Period 1
+            { z: 1, s: 'H', n: 'Hydrogen', m: 1.0, g: 1, p: 1, v: 1, ecRatio: '1', orbital: '1s¹', type: 'nonmetal' },
+            { z: 2, s: 'He', n: 'Helium', m: 4.0, g: 8, p: 1, v: 2, ecRatio: '2', orbital: '1s²', type: 'noble' },
+            // Period 2
+            { z: 3, s: 'Li', n: 'Lithium', m: 7.0, g: 1, p: 2, v: 1, ecRatio: '2.1', orbital: '1s² 2s¹', type: 'alkali' },
+            { z: 4, s: 'Be', n: 'Beryllium', m: 9.0, g: 2, p: 2, v: 2, ecRatio: '2.2', orbital: '1s² 2s²', type: 'alkaline' },
+            { z: 5, s: 'B', n: 'Boron', m: 11.0, g: 3, p: 2, v: 3, ecRatio: '2.3', orbital: '1s² 2s² 2p¹', type: 'metalloid' },
+            { z: 6, s: 'C', n: 'Carbon', m: 12.0, g: 4, p: 2, v: 4, ecRatio: '2.4', orbital: '1s² 2s² 2p²', type: 'nonmetal' },
+            { z: 7, s: 'N', n: 'Nitrogen', m: 14.0, g: 5, p: 2, v: 5, ecRatio: '2.5', orbital: '1s² 2s² 2p³', type: 'nonmetal' },
+            { z: 8, s: 'O', n: 'Oxygen', m: 16.0, g: 6, p: 2, v: 6, ecRatio: '2.6', orbital: '1s² 2s² 2p⁴', type: 'nonmetal' },
+            { z: 9, s: 'F', n: 'Fluorine', m: 19.0, g: 7, p: 2, v: 7, ecRatio: '2.7', orbital: '1s² 2s² 2p⁵', type: 'halogen' },
+            { z: 10, s: 'Ne', n: 'Neon', m: 20.0, g: 8, p: 2, v: 8, ecRatio: '2.8', orbital: '1s² 2s² 2p⁶', type: 'noble' },
+            // Period 3
+            { z: 11, s: 'Na', n: 'Sodium', m: 23.0, g: 1, p: 3, v: 1, ecRatio: '2.8.1', orbital: '[Ne] 3s¹', type: 'alkali' },
+            { z: 12, s: 'Mg', n: 'Magnesium', m: 24.0, g: 2, p: 3, v: 2, ecRatio: '2.8.2', orbital: '[Ne] 3s²', type: 'alkaline' },
+            { z: 13, s: 'Al', n: 'Aluminum', m: 27.0, g: 3, p: 3, v: 3, ecRatio: '2.8.3', orbital: '[Ne] 3s² 3p¹', type: 'metal' },
+            { z: 14, s: 'Si', n: 'Silicon', m: 28.0, g: 4, p: 3, v: 4, ecRatio: '2.8.4', orbital: '[Ne] 3s² 3p²', type: 'metalloid' },
+            { z: 15, s: 'P', n: 'Phosphorus', m: 31.0, g: 5, p: 3, v: 5, ecRatio: '2.8.5', orbital: '[Ne] 3s² 3p³', type: 'nonmetal' },
+            { z: 16, s: 'S', n: 'Sulfur', m: 32.0, g: 6, p: 3, v: 6, ecRatio: '2.8.6', orbital: '[Ne] 3s² 3p⁴', type: 'nonmetal' },
+            { z: 17, s: 'Cl', n: 'Chlorine', m: 35.5, g: 7, p: 3, v: 7, ecRatio: '2.8.7', orbital: '[Ne] 3s² 3p⁵', type: 'halogen' },
+            { z: 18, s: 'Ar', n: 'Argon', m: 40.0, g: 8, p: 3, v: 8, ecRatio: '2.8.8', orbital: '[Ne] 3s² 3p⁶', type: 'noble' },
+            // Period 4
+            { z: 19, s: 'K', n: 'Potassium', m: 39.0, g: 1, p: 4, v: 1, ecRatio: '2.8.8.1', orbital: '[Ar] 4s¹', type: 'alkali' },
+            { z: 20, s: 'Ca', n: 'Calcium', m: 40.0, g: 2, p: 4, v: 2, ecRatio: '2.8.8.2', orbital: '[Ar] 4s²', type: 'alkaline' },
+            // Common High School Transition Metals & Heavy Halogens
+            { z: 26, s: 'Fe', n: 'Iron', m: 56.0, g: 0, p: 4, v: 2, ecRatio: '2.8.14.2', orbital: '[Ar] 3d⁶ 4s²', type: 'transition' },
+            { z: 29, s: 'Cu', n: 'Copper', m: 63.5, g: 0, p: 4, v: 1, ecRatio: '2.8.18.1', orbital: '[Ar] 3d¹⁰ 4s¹', type: 'transition' },
+            { z: 30, s: 'Zn', n: 'Zinc', m: 65.0, g: 0, p: 4, v: 2, ecRatio: '2.8.18.2', orbital: '[Ar] 3d¹⁰ 4s²', type: 'transition' },
+            { z: 35, s: 'Br', n: 'Bromine', m: 80.0, g: 7, p: 4, v: 7, ecRatio: '2.8.18.7', orbital: '[Ar] 3d¹⁰ 4s² 4p⁵', type: 'halogen' },
+            { z: 47, s: 'Ag', n: 'Silver', m: 108.0, g: 0, p: 5, v: 1, ecRatio: '2.8.18.18.1', orbital: '[Kr] 4d¹⁰ 5s¹', type: 'transition' },
+            { z: 53, s: 'I', n: 'Iodine', m: 127.0, g: 7, p: 5, v: 7, ecRatio: '2.8.18.18.7', orbital: '[Kr] 4d¹⁰ 5s² 5p⁵', type: 'halogen' },
+            // Secondary pool duplicates for rich set matching
+            { z: 1, s: 'H', n: 'Hydrogen', m: 1.0, g: 1, p: 1, v: 1, ecRatio: '1', orbital: '1s¹', type: 'nonmetal' },
+            { z: 3, s: 'Li', n: 'Lithium', m: 7.0, g: 1, p: 2, v: 1, ecRatio: '2.1', orbital: '1s² 2s¹', type: 'alkali' },
+            { z: 6, s: 'C', n: 'Carbon', m: 12.0, g: 4, p: 2, v: 4, ecRatio: '2.4', orbital: '1s² 2s² 2p²', type: 'nonmetal' },
+            { z: 7, s: 'N', n: 'Nitrogen', m: 14.0, g: 5, p: 2, v: 5, ecRatio: '2.5', orbital: '1s² 2s² 2p³', type: 'nonmetal' },
+            { z: 8, s: 'O', n: 'Oxygen', m: 16.0, g: 6, p: 2, v: 6, ecRatio: '2.6', orbital: '1s² 2s² 2p⁴', type: 'nonmetal' },
+            { z: 9, s: 'F', n: 'Fluorine', m: 19.0, g: 7, p: 2, v: 7, ecRatio: '2.7', orbital: '1s² 2s² 2p⁵', type: 'halogen' },
+            { z: 10, s: 'Ne', n: 'Neon', m: 20.0, g: 8, p: 2, v: 8, ecRatio: '2.8', orbital: '1s² 2s² 2p⁶', type: 'noble' },
+            { z: 11, s: 'Na', n: 'Sodium', m: 23.0, g: 1, p: 3, v: 1, ecRatio: '2.8.1', orbital: '[Ne] 3s¹', type: 'alkali' },
+            { z: 12, s: 'Mg', n: 'Magnesium', m: 24.0, g: 2, p: 3, v: 2, ecRatio: '2.8.2', orbital: '[Ne] 3s²', type: 'alkaline' },
+            { z: 13, s: 'Al', n: 'Aluminum', m: 27.0, g: 3, p: 3, v: 3, ecRatio: '2.8.3', orbital: '[Ne] 3s² 3p¹', type: 'metal' },
+            { z: 14, s: 'Si', n: 'Silicon', m: 28.0, g: 4, p: 3, v: 4, ecRatio: '2.8.4', orbital: '[Ne] 3s² 3p²', type: 'metalloid' },
+            { z: 16, s: 'S', n: 'Sulfur', m: 32.0, g: 6, p: 3, v: 6, ecRatio: '2.8.6', orbital: '[Ne] 3s² 3p⁴', type: 'nonmetal' },
+            { z: 17, s: 'Cl', n: 'Chlorine', m: 35.5, g: 7, p: 3, v: 7, ecRatio: '2.8.7', orbital: '[Ne] 3s² 3p⁵', type: 'halogen' },
+            { z: 18, s: 'Ar', n: 'Argon', m: 40.0, g: 8, p: 3, v: 8, ecRatio: '2.8.8', orbital: '[Ne] 3s² 3p⁶', type: 'noble' },
+            { z: 19, s: 'K', n: 'Potassium', m: 39.0, g: 1, p: 4, v: 1, ecRatio: '2.8.8.1', orbital: '[Ar] 4s¹', type: 'alkali' },
+            { z: 20, s: 'Ca', n: 'Calcium', m: 40.0, g: 2, p: 4, v: 2, ecRatio: '2.8.8.2', orbital: '[Ar] 4s²', type: 'alkaline' },
+            // SPECIAL ACTION CARDS
+            { z: 0, s: 'WILD', n: 'Transition Wild', m: 0, g: 0, p: 0, v: 0, ecRatio: 'Any', orbital: 'Variable d-block', type: 'special-wild' },
+            { z: 0, s: 'WILD', n: 'Transition Wild', m: 0, g: 0, p: 0, v: 0, ecRatio: 'Any', orbital: 'Variable d-block', type: 'special-wild' },
+            { z: 0, s: 'SHIELD', n: 'Noble Shield', m: 0, g: 8, p: 0, v: 8, ecRatio: 'Octet [8]', orbital: 'Stable Shell', type: 'special-shield' },
+            { z: 0, s: 'SHIELD', n: 'Noble Shield', m: 0, g: 8, p: 0, v: 8, ecRatio: 'Octet [8]', orbital: 'Stable Shell', type: 'special-shield' },
+            { z: 0, s: 'SWAP', n: 'Isotope Swap', m: 0, g: 0, p: 0, v: 0, ecRatio: '1:1', orbital: 'Graveyard Recovery', type: 'special-swap' },
+            { z: 0, s: 'SWAP', n: 'Isotope Swap', m: 0, g: 0, p: 0, v: 0, ecRatio: '1:1', orbital: 'Graveyard Recovery', type: 'special-swap' }
+        ];
+
+        const FAMILY_COLORS = {
+            'alkali': '#ff477e',
+            'alkaline': '#ff9e00',
+            'metal': '#00f3ff',
+            'transition': '#00b4d8',
+            'metalloid': '#b5179e',
+            'nonmetal': '#00ff88',
+            'halogen': '#ffd166',
+            'noble': '#c77dff',
+            'special-wild': '#bc13fe',
+            'special-shield': '#00ff88',
+            'special-swap': '#ffb703'
+        };
+
+        // State variables
+        let deck = [];
+        let discardPile = [];
+        let hand = [];
+        let meldedSets = [];
+        let score = 0;
+        let drawCounter = 0;
+        let codexUsesRemaining = MAX_CODEX_USES;
+        let highScore = parseInt(localStorage.getItem('elem_rummy_score_v5') || '0', 10);
+        let selectedIndices = new Set();
+        let hoveredIndex = -1;
+
+        let bannerMsg = 'Welcome to Elemental Rummy! Tap cards to select. Refer to Codex hint if needed.';
+        let bannerColor = '#00f3ff';
+
+        // DOM elements
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        const readoutScore = document.getElementById('readout-score');
+        const readoutHand = document.getElementById('readout-hand');
+        const readoutSwaps = document.getElementById('readout-swaps');
+        const readoutCodex = document.getElementById('readout-codex');
+        const readoutHiScore = document.getElementById('readout-hiscore');
+        const valMatchMode = document.getElementById('val-match-mode');
+        const matchTypeSelect = document.getElementById('matchTypeSelect');
+        const btnPeriodicRef = document.getElementById('btnPeriodicRef');
+        const modalCodexRemainingText = document.getElementById('modalCodexRemainingText');
+        const codexTableBody = document.getElementById('codexTableBody');
+        const codexSearchInput = document.getElementById('codexSearchInput');
+        const modalSwapCountDisplay = document.getElementById('modalSwapCountDisplay');
+        const swapCardsContainer = document.getElementById('swapCardsContainer');
+
+        readoutHiScore.textContent = highScore;
+
+        function createSwapCardObject() {
+            return {
+                z: 0,
+                s: 'SWAP',
+                n: 'Isotope Swap',
+                m: 0,
+                g: 0,
+                p: 0,
+                v: 0,
+                ecRatio: '1:1',
+                orbital: 'Graveyard Recovery',
+                type: 'special-swap',
+                id: 'swap_reward_' + Math.random().toString(36).substr(2, 5)
+            };
+        }
+
+        function countSwapCardsInHand() {
+            return hand.filter(c => c.type === 'special-swap').length;
+        }
+
+        function shuffle(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        // Initialize New Game (Score resets to zero & Codex restored to 3 uses)
+        function initGame() {
+            deck = ELEMENT_DATA.map((card, idx) => ({
+                ...card,
+                id: 'card_' + idx + '_' + Math.random().toString(36).substr(2, 4)
+            }));
+            shuffle(deck);
+
+            discardPile = [];
+            hand = [];
+            meldedSets = [];
+            selectedIndices.clear();
+            hoveredIndex = -1;
+
+            // Strict Reset Requirements: Score resets to 0 and Codex restored to 3
+            score = 0;
+            drawCounter = 0;
+            codexUsesRemaining = MAX_CODEX_USES;
+
+            // Deal 7 initial cards
+            for (let i = 0; i < 7; i++) {
+                if (deck.length > 0) hand.push(deck.pop());
+            }
+
+            // 1 card to discard
+            if (deck.length > 0) discardPile.push(deck.pop());
+
+            setBanner('Match started! Score reset to 0. 3 Periodic Codex hints available.', '#00f3ff');
+            updateHUD();
+            populateCodexTable();
+        }
+
+        function updateHUD() {
+            readoutScore.textContent = score;
+            readoutHand.textContent = `${hand.length}/${MAX_HAND_LIMIT}`;
+            readoutHand.className = hand.length >= MAX_HAND_LIMIT ? 'tele-val amber' : 'tele-val';
+
+            const swapCount = countSwapCardsInHand();
+            readoutSwaps.textContent = swapCount;
+            modalSwapCountDisplay.textContent = swapCount;
+
+            readoutCodex.textContent = `${codexUsesRemaining}/${MAX_CODEX_USES}`;
+            modalCodexRemainingText.textContent = `(Uses Remaining: ${codexUsesRemaining}/${MAX_CODEX_USES})`;
+
+            if (codexUsesRemaining > 0) {
+                btnPeriodicRef.innerHTML = `💡 Periodic Codex (${codexUsesRemaining}/${MAX_CODEX_USES})`;
+                btnPeriodicRef.classList.remove('locked');
+            } else {
+                btnPeriodicRef.innerHTML = `🔒 Periodic Codex (0/3 Locked)`;
+                btnPeriodicRef.classList.add('locked');
+            }
+
+            valMatchMode.textContent = matchTypeSelect.value.toUpperCase();
+
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('elem_rummy_score_v5', highScore);
+                readoutHiScore.textContent = highScore;
+            }
+        }
+
+        function setBanner(msg, color) {
+            bannerMsg = msg;
+            bannerColor = color || '#00f3ff';
+        }
+
+        // --- PERIODIC CODEX REFERENCE ---
+
+        function populateCodexTable(filterText = '') {
+            codexTableBody.innerHTML = '';
+            const search = filterText.trim().toLowerCase();
+
+            const uniqueElementsMap = new Map();
+            ELEMENT_DATA.forEach(el => {
+                if (el.z > 0 && !uniqueElementsMap.has(el.z)) {
+                    uniqueElementsMap.set(el.z, el);
+                }
+            });
+
+            const elementsList = Array.from(uniqueElementsMap.values()).sort((a, b) => a.z - b.z);
+
+            elementsList.forEach(el => {
+                if (
+                    search &&
+                    !el.n.toLowerCase().includes(search) &&
+                    !el.s.toLowerCase().includes(search) &&
+                    !el.z.toString().includes(search)
+                ) {
+                    return;
+                }
+
+                const tr = document.createElement('tr');
+                const famColor = FAMILY_COLORS[el.type] || '#00f3ff';
+                tr.innerHTML = `
+                    <td style="font-family: 'Share Tech Mono', monospace; font-weight: 700; color: #ffffff;">${el.z}</td>
+                    <td><strong style="color: ${famColor}; font-size: 1.05rem;">${el.s}</strong></td>
+                    <td>${el.n} <span style="font-size:0.75rem; color:#829db9;">(${el.m.toFixed(1)}u)</span></td>
+                    <td style="color: var(--neon-cyan); font-family: 'Share Tech Mono', monospace;">${el.ecRatio}</td>
+                    <td style="font-family: 'Share Tech Mono', monospace; color: #b7ffd8;">${el.orbital}</td>
+                    <td>${el.g > 0 ? 'Group ' + el.g : 'd-block'}</td>
+                    <td>Period ${el.p}</td>
+                `;
+                codexTableBody.appendChild(tr);
+            });
+        }
+
+        function triggerPeriodicCodex() {
+            if (codexUsesRemaining <= 0) {
+                setBanner('Codex Locked! All 3 references used. Click "New Deal / Reset" to restore.', '#ff0055');
+                return;
+            }
+
+            codexUsesRemaining--;
+            updateHUD();
+
+            setBanner(`Periodic Codex opened. Remaining references: ${codexUsesRemaining}/${MAX_CODEX_USES}.`, '#ffb703');
+            codexSearchInput.value = '';
+            populateCodexTable();
+            openSimModal('periodicCodexModal');
+        }
+
+        codexSearchInput.addEventListener('input', (e) => {
+            populateCodexTable(e.target.value);
+        });
+
+        btnPeriodicRef.addEventListener('click', triggerPeriodicCodex);
+
+        // --- DRAW ACTION WITH HAND LIMIT & 6-DRAW SWAP BONUS ---
+
+        function drawCard() {
+            if (hand.length >= MAX_HAND_LIMIT) {
+                setBanner(`Hand limit reached (${MAX_HAND_LIMIT}/${MAX_HAND_LIMIT})! Discard or meld before drawing.`, '#ff0055');
+                return;
+            }
+
+            if (deck.length === 0) {
+                if (discardPile.length > 1) {
+                    const top = discardPile.pop();
+                    deck = discardPile;
+                    discardPile = [top];
+                    shuffle(deck);
+                    setBanner('Stock deck replenished from discard pile!', '#ffb703');
+                } else {
+                    setBanner('Deck exhausted! Meld or discard existing cards.', '#ff0055');
+                    return;
+                }
+            }
+
+            const drawn = deck.pop();
+            hand.push(drawn);
+            drawCounter++;
+
+            let swapMsg = '';
+            if (drawCounter % DRAWS_PER_SWAP_REWARD === 0) {
+                if (hand.length < MAX_HAND_LIMIT) {
+                    hand.push(createSwapCardObject());
+                    swapMsg = ' + REWARD: Earned 1 Isotope Swap Card!';
+                } else {
+                    swapMsg = ' (Swap reward stored: free hand space to claim next turn!)';
+                }
+            }
+
+            setBanner(`Drew ${drawn.s} (${drawn.n}, Z=${drawn.z || 'Special'}). Hand: ${hand.length}/${MAX_HAND_LIMIT}.${swapMsg}`, '#00ff88');
+            updateHUD();
+        }
+
+        // --- ISOTOPE SWAP CHAMBER (GRAVEYARD RETRIEVAL) ---
+
+        function openSwapChamber() {
+            renderSwapGrid();
+            openSimModal('swapChamberModal');
+        }
+
+        function renderSwapGrid() {
+            swapCardsContainer.innerHTML = '';
+            const swapCardsAvail = countSwapCardsInHand();
+            modalSwapCountDisplay.textContent = swapCardsAvail;
+
+            if (discardPile.length === 0) {
+                swapCardsContainer.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding: 2rem; color: #7f99b5;">Discard pile is currently empty!</div>';
+                return;
+            }
+
+            for (let i = discardPile.length - 1; i >= 0; i--) {
+                const c = discardPile[i];
+                const cardEl = document.createElement('div');
+                cardEl.className = 'swap-card-item';
+                cardEl.style.borderColor = FAMILY_COLORS[c.type] || '#00f3ff';
+                cardEl.innerHTML = `
+                    <div class="sc-top">
+                        <span>${c.z > 0 ? 'A=' + Math.round(c.m) : ''}</span>
+                        <span>${c.z > 0 ? 'Z=' + c.z : 'SPEC'}</span>
+                    </div>
+                    <div class="sc-symbol">${c.s}</div>
+                    <div class="sc-name">${c.n}</div>
+                    <div class="sc-meta">${c.g > 0 ? 'Group ' + c.g : c.type}</div>
+                `;
+
+                cardEl.addEventListener('click', () => executeIsotopeSwap(i));
+                swapCardsContainer.appendChild(cardEl);
+            }
+        }
+
+        function executeIsotopeSwap(discardIndex) {
+            const swapCardsAvail = countSwapCardsInHand();
+
+            if (swapCardsAvail < 1) {
+                alert('You need at least 1 "Isotope Swap" card in your hand to retrieve elements from the discard pile! Earn them every 6 deck draws.');
+                return;
+            }
+
+            const swapHandIdx = hand.findIndex(c => c.type === 'special-swap');
+            if (swapHandIdx === -1) return;
+
+            const spentSwapCard = hand.splice(swapHandIdx, 1)[0];
+            const retrievedCard = discardPile.splice(discardIndex, 1)[0];
+            hand.push(retrievedCard);
+            discardPile.push(spentSwapCard);
+
+            setBanner(`Isotope Swap Complete! Retrieved ${retrievedCard.s} (${retrievedCard.n}) using 1 Swap Card.`, '#00ff88');
+            updateHUD();
+            renderSwapGrid();
+        }
+
+        // --- MELDING & VALIDATION ---
+
+        function validateGroupMatch(cards) {
+            if (cards.length < 3) return { valid: false, reason: 'Group match requires at least 3 cards!' };
+            const elements = cards.filter(c => !c.type.startsWith('special'));
+            if (elements.length === 0) return { valid: false, reason: 'Must include real element cards.' };
+
+            const targetGroup = elements[0].g;
+            const targetValence = elements[0].v;
+
+            const sameGroup = elements.every(c => c.g === targetGroup && c.g > 0);
+            const sameValence = elements.every(c => c.v === targetValence && c.v > 0);
+
+            if (sameGroup || sameValence) {
+                const pts = cards.length * 10;
+                return {
+                    valid: true,
+                    pts: pts,
+                    msg: `Valid Group Set! Elements share Group ${targetGroup || 'analogous'} / ${targetValence} valence electron(s). +${pts} pts!`
+                };
+            }
+            return { valid: false, reason: 'Elements must share the same valence electron count / Group.' };
+        }
+
+        function validatePeriodRun(cards) {
+            if (cards.length < 3) return { valid: false, reason: 'Period Run requires at least 3 cards!' };
+            const elements = cards.filter(c => !c.type.startsWith('special'));
+            const wilds = cards.filter(c => c.type === 'special-wild').length;
+
+            if (elements.length === 0) return { valid: false, reason: 'Run must include actual chemical elements.' };
+
+            const targetPeriod = elements[0].p;
+            if (!elements.every(c => c.p === targetPeriod && c.p > 0)) {
+                return { valid: false, reason: 'All elements in a Period Run must belong to the exact SAME Period!' };
+            }
+
+            elements.sort((a, b) => a.z - b.z);
+
+            for (let i = 0; i < elements.length - 1; i++) {
+                if (elements[i].z === elements[i + 1].z) {
+                    return { valid: false, reason: 'Duplicate elements detected! A run requires consecutive atomic numbers.' };
+                }
+            }
+
+            let missingCount = 0;
+            for (let i = 0; i < elements.length - 1; i++) {
+                const diff = elements[i + 1].z - elements[i].z;
+                missingCount += (diff - 1);
+            }
+
+            if (wilds >= missingCount) {
+                const pts = cards.length * 12;
+                return {
+                    valid: true,
+                    pts: pts,
+                    msg: `Valid Period ${targetPeriod} Run! Consecutive atomic numbers. +${pts} pts!`
+                };
+            }
+
+            return { valid: false, reason: `Gap in sequence: Atomic numbers are not consecutive (needed ${missingCount} wilds).` };
+        }
+
+        function validateFamilyMatch(cards) {
+            if (cards.length < 3) return { valid: false, reason: 'Family match requires at least 3 cards!' };
+
+            const shields = cards.filter(c => c.type === 'special-shield').length;
+            const nobles = cards.filter(c => c.type === 'noble').length;
+            if (shields + nobles === cards.length) {
+                const pts = cards.length * 15;
+                return { valid: true, pts: pts, msg: `Stable Octet / Noble Shield cluster formed! +${pts} pts!` };
+            }
+
+            const firstType = cards[0].type;
+            if (!firstType.startsWith('special') && cards.every(c => c.type === firstType)) {
+                const pts = cards.length * 10;
+                return { valid: true, pts: pts, msg: `Chemical Family set confirmed: All ${firstType.toUpperCase()}! +${pts} pts!` };
+            }
+
+            return { valid: false, reason: 'Elements do not belong to the same recognized family (e.g. Halogens, Alkalis, Nobles).' };
+        }
+
+        function validateCompoundMatch(cards) {
+            if (cards.length !== 2) return { valid: false, reason: 'Compound Ionic Pair requires exactly 2 cards (1 Metal + 1 Non-Metal)!' };
+
+            const metals = cards.filter(c => ['alkali', 'alkaline', 'metal', 'transition'].includes(c.type));
+            const nonmetals = cards.filter(c => ['nonmetal', 'halogen'].includes(c.type));
+
+            if (metals.length === 1 && nonmetals.length === 1) {
+                return {
+                    valid: true,
+                    pts: 20,
+                    msg: `Ionic Bond Formed: ${metals[0].s} (Metal) reacts with ${nonmetals[0].s} (Non-metal)! +20 pts!`
+                };
+            }
+
+            return { valid: false, reason: 'Select exactly 1 Metal and 1 Non-Metal to form an ionic pair!' };
+        }
+
+        function meldSelected() {
+            if (selectedIndices.size === 0) {
+                setBanner('Select cards in your hand first by clicking them.', '#ffb703');
+                return;
+            }
+
+            const selectedCards = Array.from(selectedIndices).map(i => hand[i]);
+            const matchMode = matchTypeSelect.value;
+            let result = { valid: false, reason: 'Unknown match type' };
+
+            if (matchMode === 'group') {
+                result = validateGroupMatch(selectedCards);
+            } else if (matchMode === 'period') {
+                result = validatePeriodRun(selectedCards);
+            } else if (matchMode === 'family') {
+                result = validateFamilyMatch(selectedCards);
+            } else if (matchMode === 'compound') {
+                result = validateCompoundMatch(selectedCards);
+            }
+
+            if (result.valid) {
+                score += result.pts;
+                meldedSets.push({
+                    label: matchTypeSelect.options[matchTypeSelect.selectedIndex].text.split('(')[0].trim(),
+                    cards: selectedCards
+                });
+
+                hand = hand.filter((_, idx) => !selectedIndices.has(idx));
+                selectedIndices.clear();
+
+                setBanner(result.msg, '#00ff88');
+                updateHUD();
+
+                if (hand.length === 0) {
+                    score += 50;
+                    setBanner('CLEARED HAND! Secondary Laboratory Mastery Bonus: +50 pts!', '#00ff88');
+                    updateHUD();
+                }
+            } else {
+                setBanner(result.reason, '#ff0055');
+            }
+        }
+
+        function discardCard() {
+            if (selectedIndices.size !== 1) {
+                setBanner('Select exactly ONE card from your hand to discard.', '#ffb703');
+                return;
+            }
+
+            const idx = Array.from(selectedIndices)[0];
+            const discarded = hand.splice(idx, 1)[0];
+            selectedIndices.clear();
+            discardPile.push(discarded);
+
+            setBanner(`Discarded ${discarded.s} (${discarded.n}). Hand: ${hand.length}/${MAX_HAND_LIMIT}.`, '#00f3ff');
+            updateHUD();
+        }
+
+        function claimTrendBonus() {
+            if (meldedSets.length === 0) {
+                setBanner('No melds on table! Meld a Group or Period set first to claim trend bonus.', '#ffb703');
+                return;
+            }
+            score += 5;
+            setBanner('Periodic Trend Bonus Claimed! +5 extra points added for verified trend demonstration.', '#00ff88');
+            updateHUD();
+        }
+
+        // --- CANVAS RENDERING (Clean Standard Nuclide Notation) ---
+
+        function drawCardVisual(c, x, y, w, h, isSelected, isHovered) {
+            ctx.save();
+            ctx.translate(x, y);
+
+            if (isSelected) {
+                ctx.translate(0, -12);
+                ctx.shadowColor = '#00f3ff';
+                ctx.shadowBlur = 16;
+            } else if (isHovered) {
+                ctx.translate(0, -5);
+                ctx.shadowColor = 'rgba(0, 243, 255, 0.4)';
+                ctx.shadowBlur = 10;
+            } else {
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+                ctx.shadowBlur = 8;
+                ctx.shadowOffsetY = 4;
+            }
+
+            const baseColor = FAMILY_COLORS[c.type] || '#00f3ff';
+
+            // Card Base
+            const grad = ctx.createLinearGradient(0, 0, 0, h);
+            grad.addColorStop(0, '#131c2e');
+            grad.addColorStop(1, '#090e18');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.roundRect(0, 0, w, h, 8);
+            ctx.fill();
+
+            // Border
+            ctx.lineWidth = isSelected ? 2.5 : 1.2;
+            ctx.strokeStyle = isSelected ? '#ffffff' : baseColor;
+            ctx.stroke();
+
+            // Top Accent Strip
+            ctx.fillStyle = baseColor;
+            ctx.beginPath();
+            ctx.roundRect(2, 2, w - 4, 10, [6, 6, 0, 0]);
+            ctx.fill();
+
+            if (c.type.startsWith('special')) {
+                // Special Card
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 13px Orbitron, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(c.s, w / 2, h / 2 - 2);
+
+                ctx.fillStyle = baseColor;
+                ctx.font = 'bold 9px Rajdhani, sans-serif';
+                ctx.fillText(c.n, w / 2, h / 2 + 15);
+
+                ctx.fillStyle = '#829db9';
+                ctx.font = '8px Share Tech Mono, monospace';
+                ctx.fillText('SPECIAL', w / 2, h - 10);
+            } else {
+                // Standard Element Card: Nuclide Notation layout
+                // Mass number (A) top-left
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 11px Share Tech Mono, monospace';
+                ctx.textAlign = 'left';
+                ctx.fillText(Math.round(c.m).toString(), 7, 26);
+
+                // Atomic number (Z) bottom-left
+                ctx.fillStyle = baseColor;
+                ctx.font = 'bold 12px Share Tech Mono, monospace';
+                ctx.textAlign = 'left';
+                ctx.fillText(c.z.toString(), 7, h - 26);
+
+                // Central Chemical Symbol
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 28px Rajdhani, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(c.s, w / 2 + 6, h / 2 + 4);
+
+                // Element Name beneath symbol
+                ctx.fillStyle = '#a9c7e8';
+                ctx.font = '9px Rajdhani, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(c.n, w / 2, h - 10);
+            }
+
+            ctx.restore();
+        }
+
+        function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Lab Radial Background
+            const bgGrad = ctx.createRadialGradient(canvas.width / 2, canvas.height / 2, 40, canvas.width / 2, canvas.height / 2, 500);
+            bgGrad.addColorStop(0, '#0c1527');
+            bgGrad.addColorStop(1, '#05070e');
+            ctx.fillStyle = bgGrad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Grid lines
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.04)';
+            ctx.lineWidth = 1;
+            for (let x = 0; x < canvas.width; x += 40) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+            for (let y = 0; y < canvas.height; y += 40) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+
+            // Top Area: Stock Deck, Discard Pile, and Table Melds
+            const topY = 18;
+
+            // Stock Deck
+            ctx.fillStyle = '#829db9';
+            ctx.font = '10px Orbitron, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(`STOCK [${deck.length}]`, 75, topY + 12);
+
+            if (deck.length > 0) {
+                ctx.fillStyle = '#0f1728';
+                ctx.strokeStyle = hand.length >= MAX_HAND_LIMIT ? '#ff0055' : '#00f3ff';
+                ctx.lineWidth = 1.2;
+                ctx.beginPath();
+                ctx.roundRect(40, topY + 20, 70, 96, 6);
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.fillStyle = hand.length >= MAX_HAND_LIMIT ? '#ff0055' : '#00f3ff';
+                ctx.font = 'bold 10px Orbitron, sans-serif';
+                ctx.fillText(hand.length >= MAX_HAND_LIMIT ? 'HAND' : 'DRAW', 75, topY + 62);
+                ctx.fillText(hand.length >= MAX_HAND_LIMIT ? 'FULL' : 'CARD', 75, topY + 76);
+            } else {
+                ctx.strokeStyle = 'rgba(0, 243, 255, 0.2)';
+                ctx.strokeRect(40, topY + 20, 70, 96);
+                ctx.fillText('EMPTY', 75, topY + 68);
+            }
+
+            // Discard Pile (Clickable to trigger Swap Chamber)
+            ctx.fillStyle = '#ffb703';
+            ctx.fillText(`GRAVEYARD [${discardPile.length}]`, 180, topY + 12);
+
+            if (discardPile.length > 0) {
+                const topDiscard = discardPile[discardPile.length - 1];
+                drawCardVisual(topDiscard, 145, topY + 20, 70, 96, false, false);
+
+                ctx.fillStyle = 'rgba(7, 10, 18, 0.85)';
+                ctx.strokeStyle = '#ffb703';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.roundRect(148, topY + 95, 64, 16, 3);
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.fillStyle = '#ffb703';
+                ctx.font = 'bold 8px Orbitron, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('SWAP', 180, topY + 106);
+            } else {
+                ctx.strokeStyle = 'rgba(255, 183, 3, 0.3)';
+                ctx.strokeRect(145, topY + 20, 70, 96);
+                ctx.fillText('EMPTY', 180, topY + 68);
+            }
+
+            // Active Table Melds
+            ctx.fillStyle = '#00f3ff';
+            ctx.textAlign = 'left';
+            ctx.fillText(`ACTIVE TABLE MELDS (${meldedSets.length})`, 245, topY + 12);
+
+            let meldX = 245;
+            let meldY = topY + 20;
+            const meldW = 50;
+            const meldH = 74;
+
+            if (meldedSets.length === 0) {
+                ctx.fillStyle = 'rgba(130, 157, 185, 0.4)';
+                ctx.font = '11px Rajdhani, sans-serif';
+                ctx.fillText('No completed sets on table. Select cards below and click "Meld Selected".', 245, topY + 55);
+            } else {
+                meldedSets.forEach((m) => {
+                    ctx.fillStyle = '#00ff88';
+                    ctx.font = 'bold 8px Orbitron, sans-serif';
+                    ctx.fillText(m.label, meldX, meldY - 4);
+                    m.cards.forEach((mc, i) => {
+                        drawCardVisual(mc, meldX + i * 18, meldY, meldW, meldH, false, false);
+                    });
+                    meldX += m.cards.length * 18 + 48;
+                });
+            }
+
+            // Status Banner in Canvas
+            ctx.fillStyle = 'rgba(6, 11, 22, 0.9)';
+            ctx.strokeStyle = bannerColor;
+            ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            ctx.roundRect(25, 138, canvas.width - 50, 36, 6);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = bannerColor;
+            ctx.font = 'bold 11px Share Tech Mono, monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText(bannerMsg, canvas.width / 2, 160);
+
+            // Player Hand Area
+            ctx.fillStyle = hand.length >= MAX_HAND_LIMIT ? '#ffb703' : '#00ff88';
+            ctx.font = '11px Orbitron, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText(`LABORATORY HAND (${hand.length}/${MAX_HAND_LIMIT}) - Nuclide Format: ^A_Z X`, 30, 205);
+
+            const cardW = 86;
+            const cardH = 132;
+            const maxCards = Math.max(1, hand.length);
+            const cardSpacing = Math.min(100, (canvas.width - 70) / maxCards);
+
+            hand.forEach((card, idx) => {
+                const cx = 30 + idx * cardSpacing;
+                const cy = 225;
+                const isSelected = selectedIndices.has(idx);
+                const isHovered = hoveredIndex === idx;
+                drawCardVisual(card, cx, cy, cardW, cardH, isSelected, isHovered);
+            });
+
+            requestAnimationFrame(render);
+        }
+
+        // Pointer Controls
+        function getCoords(e) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            return {
+                x: (e.clientX - rect.left) * scaleX,
+                y: (e.clientY - rect.top) * scaleY
+            };
+        }
+
+        canvas.addEventListener('pointerdown', (e) => {
+            const pt = getCoords(e);
+
+            // Hand Card Tapping
+            const cardW = 86;
+            const cardH = 132;
+            const maxCards = Math.max(1, hand.length);
+            const cardSpacing = Math.min(100, (canvas.width - 70) / maxCards);
+
+            for (let i = hand.length - 1; i >= 0; i--) {
+                const cx = 30 + i * cardSpacing;
+                const cy = 225;
+                if (pt.x >= cx && pt.x <= cx + cardW && pt.y >= cy && pt.y <= cy + cardH) {
+                    if (selectedIndices.has(i)) {
+                        selectedIndices.delete(i);
+                    } else {
+                        selectedIndices.add(i);
+                    }
+                    return;
+                }
+            }
+
+            // Stock Deck Click
+            if (pt.x >= 40 && pt.x <= 110 && pt.y >= 38 && pt.y <= 134) {
+                drawCard();
+                return;
+            }
+
+            // Discard Pile Click (Open Swap Chamber)
+            if (pt.x >= 145 && pt.x <= 215 && pt.y >= 38 && pt.y <= 134) {
+                openSwapChamber();
+                return;
+            }
+        });
+
+        canvas.addEventListener('pointermove', (e) => {
+            const pt = getCoords(e);
+            const cardW = 86;
+            const cardH = 132;
+            const maxCards = Math.max(1, hand.length);
+            const cardSpacing = Math.min(100, (canvas.width - 70) / maxCards);
+
+            let found = -1;
+            for (let i = hand.length - 1; i >= 0; i--) {
+                const cx = 30 + i * cardSpacing;
+                const cy = 225;
+                if (pt.x >= cx && pt.x <= cx + cardW && pt.y >= cy && pt.y <= cy + cardH) {
+                    found = i;
+                    break;
+                }
+            }
+            hoveredIndex = found;
+        });
+
+        canvas.addEventListener('pointerleave', () => { hoveredIndex = -1; });
+
+        // Button Event Binds
+        document.getElementById('btnDraw').addEventListener('click', drawCard);
+        document.getElementById('btnMeld').addEventListener('click', meldSelected);
+        document.getElementById('btnDiscard').addEventListener('click', discardCard);
+        document.getElementById('btnSwapChamber').addEventListener('click', openSwapChamber);
+        document.getElementById('btnTrendBonus').addEventListener('click', claimTrendBonus);
+        document.getElementById('btnReset').addEventListener('click', initGame);
+        matchTypeSelect.addEventListener('change', updateHUD);
+
+        // Boot Simulation
+        initGame();
+        requestAnimationFrame(render);
+    </script>
+</body>
+</html>

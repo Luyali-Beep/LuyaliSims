@@ -1,0 +1,3360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Interactive 3D laboratory simulator for gas preparation and inorganic synthesis - LuyaliSims STEM Labs.">
+    <title>Gas Preparation & Inorganic Synthesis Simulator - LuyaliSims</title>
+    
+<link rel="icon" type="image/svg+xml" href="../favicon.svg?v=1">
+
+    <!-- Import Futuristic Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Base Reset & Variables */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --neon-cyan: #00f3ff;
+            --neon-magenta: #bc13fe;
+            --neon-green: #00ff88;
+            --neon-amber: #ffb700;
+            --neon-red: #ff3366;
+            --bg-dark: #070a12;
+            --panel-bg: rgba(16, 24, 43, 0.85);
+            --border-glow: rgba(0, 243, 255, 0.35);
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 85% 15%, rgba(0, 243, 255, 0.08), transparent 45%),
+                radial-gradient(circle at 15% 85%, rgba(188, 19, 254, 0.08), transparent 45%),
+                linear-gradient(180deg, #05070e 0%, #0a0e1a 100%);
+            color: var(--text-main);
+            padding: 16px 20px;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* 1. HEADER & TOP NAVIGATION */
+        header {
+            max-width: 1400px;
+            margin: 0 auto 15px auto;
+        }
+
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 18px;
+            background: rgba(16, 24, 43, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(188, 19, 254, 0.5);
+            color: #e580ff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(188, 19, 254, 0.2);
+            border-color: var(--neon-magenta);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
+            transform: translateX(-3px);
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+            margin: 6px 0 10px 0;
+            font-size: clamp(1.4rem, 3.4vw, 2.3rem);
+            letter-spacing: 1.5px;
+            text-align: center;
+        }
+
+        .lead-summary {
+            max-width: 980px;
+            margin: 0 auto 20px auto;
+            text-align: center;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: #cbd5e1;
+        }
+
+        main {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* 2. SIMULATOR WORKSPACE */
+        #simulator-container {
+            background: linear-gradient(135deg, rgba(16, 24, 43, 0.88) 0%, rgba(8, 12, 22, 0.92) 100%);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-glow);
+            border-radius: 16px;
+            padding: 22px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 25px rgba(0, 243, 255, 0.12);
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        #simulator-container:fullscreen {
+            padding: 16px;
+            border-radius: 0;
+            overflow-y: auto;
+            width: 100vw;
+            height: 100vh;
+            background: var(--bg-dark);
+        }
+
+        .hud-telemetry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(4, 8, 16, 0.8);
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            border-radius: 10px;
+            padding: 10px 16px;
+            margin-bottom: 18px;
+            font-family: 'Share Tech Mono', monospace;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .telemetry-item {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            font-size: 0.92rem;
+        }
+
+        .tele-label {
+            color: #8da4be;
+            font-size: 0.74rem;
+            text-transform: uppercase;
+        }
+
+        .tele-val {
+            color: var(--neon-cyan);
+            font-weight: 700;
+            font-size: 0.88rem;
+        }
+
+        .stat-ok { color: var(--neon-green) !important; font-weight: 700; }
+        .stat-warn { color: var(--neon-amber) !important; font-weight: 700; }
+        .stat-danger { color: var(--neon-red) !important; font-weight: 700; }
+
+        .sim-layout {
+            display: grid;
+            grid-template-columns: 1.8fr 1.2fr;
+            gap: 20px;
+            align-items: stretch;
+            min-height: 640px;
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            min-height: 620px;
+            background: radial-gradient(circle at 50% 50%, #08171a 0%, #02070a 100%);
+            border-radius: 12px;
+            overflow: hidden;
+            touch-action: none;
+            border: 3px solid #1e293b;
+            box-shadow: 
+                0 0 0 2px rgba(0, 243, 255, 0.3),
+                0 15px 35px rgba(0, 0, 0, 0.8),
+                inset 0 0 35px rgba(0, 0, 0, 0.95);
+        }
+
+        .canvas-wrapper::before {
+            content: " ";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: 
+                linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, transparent 50%),
+                repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.15) 0px, rgba(0, 0, 0, 0.15) 1px, transparent 1px, transparent 3px);
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: default;
+        }
+
+        /* Overlays and Toolbar */
+        .canvas-controls-toolbar {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            display: flex;
+            gap: 6px;
+            background: rgba(5, 7, 12, 0.88);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            padding: 6px;
+            border-radius: 8px;
+            z-index: 10;
+        }
+
+        .tool-btn {
+            background: transparent;
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.72rem;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: 700;
+            min-height: 32px;
+        }
+
+        .tool-btn.active, .tool-btn:hover {
+            background: var(--neon-cyan);
+            color: var(--bg-dark);
+        }
+
+        .instruction-overlay {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(5, 7, 12, 0.92);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.76rem;
+            color: #94a3b8;
+            text-align: center;
+            pointer-events: none;
+            z-index: 10;
+            white-space: nowrap;
+        }
+
+        /* Controls Panel */
+        .controls-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: linear-gradient(145deg, rgba(11, 17, 30, 0.9) 0%, rgba(6, 9, 16, 0.95) 100%);
+            padding: 18px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            overflow-y: auto;
+            max-height: 720px;
+        }
+
+        .panel-heading {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.82rem;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border-bottom: 1px solid rgba(0, 243, 255, 0.25);
+            padding-bottom: 6px;
+            margin: 0;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .control-group label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #cbd5e1;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        select, input[type="text"] {
+            min-height: 40px;
+            background: #060c18;
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            color: #e2e8f0;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding: 6px 10px;
+            border-radius: 8px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        select:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 8px rgba(0, 243, 255, 0.4);
+        }
+
+        /* Specific Chemistry Protocol Logic */
+        .protocol-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .btn-toggle-protocol {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px dashed var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-transform: uppercase;
+            transition: all 0.2s;
+        }
+
+        .btn-toggle-protocol:hover {
+            background: rgba(0, 243, 255, 0.15);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+        }
+
+        .protocol-card {
+            background: rgba(14, 22, 38, 0.95);
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 0.85rem;
+            line-height: 1.45;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .protocol-card span.highlight { color: var(--neon-green); font-weight: 700; }
+        .protocol-card span.req-chem { color: var(--neon-cyan); font-weight: 700; }
+
+        .caution-box {
+            background: rgba(255, 183, 0, 0.08);
+            border-left: 3px solid var(--neon-amber);
+            padding: 8px 10px;
+            border-radius: 4px;
+            font-size: 0.82rem;
+            color: #ffe58f;
+            line-height: 1.4;
+        }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 5px;
+        }
+
+        .btn-grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 6px;
+        }
+
+        .sim-btn {
+            background: linear-gradient(180deg, rgba(16, 28, 54, 0.9) 0%, rgba(8, 14, 28, 0.95) 100%);
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            color: var(--neon-cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.74rem;
+            font-weight: 700;
+            padding: 8px 10px;
+            min-height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            text-align: center;
+        }
+
+        .sim-btn:hover {
+            border-color: var(--neon-cyan);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .sim-btn.active {
+            background: var(--neon-cyan) !important;
+            color: #070a12 !important;
+            border-color: #fff !important;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.8) !important;
+        }
+
+        .sim-btn.secondary { border-color: rgba(188, 19, 254, 0.5); color: #e580ff; }
+        .sim-btn.secondary:hover { border-color: var(--neon-magenta); color: #fff; box-shadow: 0 0 15px rgba(188, 19, 254, 0.6); }
+        .sim-btn.success { border-color: rgba(0, 255, 136, 0.6); color: var(--neon-green); }
+        .sim-btn.success:hover, .sim-btn.success.active { background: var(--neon-green) !important; color: var(--bg-dark) !important; box-shadow: 0 0 15px rgba(0, 255, 136, 0.5) !important; }
+        .sim-btn.warning { border-color: rgba(255, 183, 0, 0.6); color: var(--neon-amber); }
+        .sim-btn.warning:hover, .sim-btn.warning.active { background: var(--neon-amber) !important; color: #000 !important; box-shadow: 0 0 15px rgba(255, 183, 0, 0.5) !important; }
+        .sim-btn.danger { border-color: rgba(255, 51, 102, 0.6); color: var(--neon-red); }
+        .sim-btn.danger:hover, .sim-btn.danger.active { background: var(--neon-red) !important; color: #fff !important; }
+
+        .inspector-panel {
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(0, 243, 255, 0.35);
+            border-radius: 10px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: inset 0 0 15px rgba(0, 243, 255, 0.05);
+        }
+
+        .inspector-title {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.78rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.15);
+            padding-bottom: 5px;
+        }
+
+        /* Custom Modals within Simulator */
+        .hazard-modal, .end-notification {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(14, 22, 38, 0.98);
+            border-radius: 12px;
+            max-width: 600px;
+            width: 94%;
+            text-align: center;
+            backdrop-filter: blur(14px);
+            display: none;
+            z-index: 500;
+            flex-direction: column;
+            gap: 12px;
+            padding: 22px;
+        }
+
+        .hazard-modal {
+            border: 2px solid var(--neon-red);
+            box-shadow: 0 0 45px rgba(255, 51, 102, 0.45);
+        }
+
+        .hazard-modal h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.15rem;
+            color: var(--neon-red);
+        }
+
+        .hazard-modal p {
+            font-size: 0.92rem;
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+
+        .hazard-modal .details-box {
+            background: rgba(5, 7, 12, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 12px 16px;
+            border-radius: 6px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.82rem;
+            text-align: left;
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        .end-notification {
+            border: 2px solid var(--neon-green);
+            box-shadow: 0 0 40px rgba(0, 255, 136, 0.4);
+        }
+
+        .end-notification h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-green);
+            font-size: 1.25rem;
+        }
+
+        /* 3. POLICY-COMPLIANT AD CONTAINER */
+        .ad-slot-wrapper {
+            margin: 30px auto;
+            text-align: center;
+            clear: both;
+            max-width: 1400px;
+        }
+
+        .ad-disclaimer {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            margin-bottom: 6px;
+        }
+
+        .ad-box-placeholder {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            min-height: 90px;
+            max-width: 970px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #475569;
+            font-size: 0.85rem;
+            border-radius: 8px;
+        }
+
+        /* 4. EDUCATIONAL CONTENT SECTION */
+        .educational-content {
+            line-height: 1.75;
+            font-size: 1.05rem;
+            color: #94a3b8;
+            background: rgba(10, 14, 23, 0.85);
+            padding: 30px;
+            border-radius: 16px;
+            border-left: 4px solid var(--neon-cyan);
+            border-top: 1px solid rgba(0, 243, 255, 0.2);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin-bottom: 35px;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .educational-content h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-magenta);
+            border-bottom: 1px solid rgba(188, 19, 254, 0.3);
+            padding-bottom: 8px;
+            margin-top: 1.8em;
+            margin-bottom: 0.6em;
+            font-size: 1.45rem;
+        }
+
+        .educational-content h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: #38bdf8;
+            margin-top: 1.4em;
+            margin-bottom: 0.4em;
+            font-size: 1.15rem;
+        }
+
+        .chem-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 0.95rem;
+        }
+
+        .chem-table th, .chem-table td {
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            padding: 10px 14px;
+            text-align: left;
+        }
+
+        .chem-table th {
+            background: rgba(0, 243, 255, 0.15);
+            color: var(--neon-cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.82rem;
+            text-transform: uppercase;
+        }
+
+        .chem-table tr:nth-child(even) {
+            background: rgba(15, 23, 42, 0.5);
+        }
+
+        .formula-box {
+            background: rgba(4, 9, 20, 0.7);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-left: 3px solid var(--neon-green);
+            padding: 14px 18px;
+            margin: 14px 0;
+            border-radius: 6px;
+            font-family: 'Share Tech Mono', monospace;
+            color: #a7f3d0;
+            font-size: 1.05rem;
+        }
+
+        .task-card {
+            background: rgba(15, 23, 42, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 18px;
+        }
+
+        .task-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            color: var(--neon-cyan);
+            margin-bottom: 8px;
+        }
+
+        details {
+            margin-top: 25px;
+            background: rgba(5, 10, 20, 0.8);
+            border: 1px solid rgba(188, 19, 254, 0.4);
+            border-radius: 10px;
+            padding: 15px 20px;
+        }
+
+        summary {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            color: #e580ff;
+            cursor: pointer;
+            padding: 6px 0;
+            user-select: none;
+        }
+
+        .solution-step {
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+            padding: 12px 0;
+        }
+
+        .solution-step:last-child {
+            border-bottom: none;
+        }
+
+        /* 5. FOOTER & ALIGNED LINKS */
+        footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px 20px 20px 20px;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .footer-nav {
+            display: flex;
+            justify-content: center;
+            gap: 22px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .footer-nav a, .footer-modal-trigger {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.2s, text-shadow 0.2s;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .footer-nav a:hover, .footer-modal-trigger:hover {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
+        }
+
+        /* 6. POLICY MODALS */
+        .policy-modal {
+            position: fixed !important;
+            top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
+            width: 100vw !important; height: 100vh !important;
+            background: rgba(4, 7, 15, 0.92) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 99999 !important;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-body {
+            background: linear-gradient(145deg, #0b111e 0%, #060913 100%);
+            border: 2px solid var(--neon-cyan);
+            border-radius: 16px;
+            max-width: 820px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 35px 30px;
+            color: #cbd5e1;
+            box-shadow: 0 0 40px rgba(0, 243, 255, 0.25);
+            line-height: 1.75;
+            position: relative;
+            text-align: left;
+        }
+
+        .modal-body h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-cyan);
+            margin-top: 0;
+            font-size: 1.6rem;
+        }
+
+        .modal-body h3 {
+            color: var(--neon-magenta);
+            font-family: 'Orbitron', sans-serif;
+            margin-top: 24px;
+            margin-bottom: 8px;
+            font-size: 1.15rem;
+        }
+
+        .modal-date {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--neon-green);
+            font-size: 0.9rem;
+            margin-top: -6px;
+            margin-bottom: 16px;
+        }
+
+        .modal-close-btn {
+            background: linear-gradient(180deg, rgba(188, 19, 254, 0.4), rgba(188, 19, 254, 0.15));
+            border: 1px solid var(--neon-magenta);
+            color: #fff;
+            padding: 8px 18px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            float: right;
+            margin-bottom: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close-btn:hover {
+            background: var(--neon-magenta);
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.8);
+        }
+
+        @media (max-width: 1024px) {
+            .sim-layout { grid-template-columns: 1fr; }
+            .canvas-wrapper { min-height: 480px; }
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            #simulator-container, .educational-content { padding: 14px; }
+            .hud-telemetry { grid-template-columns: 1fr 1fr; }
+            .instruction-overlay { font-size: 0.7rem; white-space: normal; width: 90%; }
+            .btn-grid { grid-template-columns: 1fr; }
+            .modal-body { padding: 22px 18px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. HEADER & TOP NAVIGATION -->
+    <header>
+        <nav class="top-nav">
+            <a href="../index.html" class="back-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Back to LuyaliSims
+            </a>
+            <span style="font-family: 'Share Tech Mono', monospace; font-size: 0.85rem; color: #64748b;">
+                MODULE ID: CHEM-GAS-SYNTH-09
+            </span>
+        </nav>
+        
+        <h1>Gas Preparation & Inorganic Synthesis Simulator</h1>
+        
+        <p class="lead-summary">
+            Virtual inorganic chemistry workstation featuring continuous runtime safety validation, multi-vessel train graph tracing, density/solubility compliance logic, and precision thermodynamic requirements.
+        </p>
+    </header>
+
+    <main>
+        <!-- 2. SIMULATOR APP WORKSPACE -->
+        <section id="simulator-container" aria-label="Interactive Gas Synthesis Workspace">
+            
+            <div class="hud-telemetry">
+                <div class="telemetry-item">
+                    <span class="tele-label">Active Target Gas:</span>
+                    <span id="telemetryGas" class="tele-val">Chlorine Gas (Cl₂)</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Collection Setup:</span>
+                    <span id="telemetryCollectionMode" class="tele-val stat-warn">NOT CONFIGURED</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Fume Hood Airflow:</span>
+                    <span id="telemetryFumeHood" class="tele-val stat-warn">DISABLED (BENCHTOP)</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Jar Cover Disc:</span>
+                    <span id="telemetryCover" class="tele-val">NOT INSTALLED</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Flask Slant/Tilt:</span>
+                    <span id="telemetryTilt" class="tele-val">0° (Vertical)</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Train Continuity:</span>
+                    <span id="telemetryFlaskConn" class="stat-warn">DISCONNECTED</span>
+                </div>
+            </div>
+
+            <div class="sim-layout">
+                <div class="canvas-wrapper" id="canvasFrame">
+                    <div class="canvas-controls-toolbar">
+                        <button class="tool-btn active" id="toolSelect">Select/Move</button>
+                        <button class="tool-btn" id="toolPan">Pan</button>
+                        <button class="tool-btn" id="toolZoomIn">Zoom +</button>
+                        <button class="tool-btn" id="toolZoomOut">Zoom -</button>
+                    </div>
+
+                    <div class="instruction-overlay">
+                        Click on glassware to select it, or click the dropping funnel stopcock valve directly to toggle liquid flow!
+                    </div>
+
+                    <div class="hazard-modal" id="hazardModal">
+                        <h2 id="hazardTitle">SAFETY & APPARATUS VIOLATION</h2>
+                        <p id="hazardMessage"></p>
+                        <div class="details-box" id="hazardDetails"></div>
+                        <button class="sim-btn danger" style="margin-top: 6px; width: 100%;" onclick="document.getElementById('hazardModal').style.display='none'">
+                            Dismiss & Correct Setup
+                        </button>
+                    </div>
+
+                    <div class="end-notification" id="endNotification">
+                        <h2>REACTION COMPLETE</h2>
+                        <p>Gas jar successfully filled with <span id="successGasName" style="color:var(--neon-green); font-weight:700;"></span>.</p>
+                        <button class="sim-btn success" style="margin-top: 8px; width: 100%;" onclick="document.getElementById('endNotification').style.display='none'">
+                            Acknowledge & Continue
+                        </button>
+                    </div>
+
+                    <canvas id="simCanvas"></canvas>
+                </div>
+
+                <div class="controls-panel">
+                    <h3 class="panel-heading">Target Gas & Protocol</h3>
+
+                    <div class="control-group">
+                        <label for="gasSelector">Target Gas to Synthesize</label>
+                        <select id="gasSelector">
+                            <option value="Cl2">Chlorine Gas (Cl₂)</option>
+                            <option value="O2">Oxygen Gas (O₂)</option>
+                            <option value="H2">Hydrogen Gas (H₂)</option>
+                            <option value="N2">Nitrogen Gas (N₂)</option>
+                            <option value="NO2">Nitrogen(IV) Oxide (NO₂)</option>
+                            <option value="NO">Nitrogen(II) Oxide (NO)</option>
+                            <option value="N2O">Nitrogen(I) Oxide (N₂O)</option>
+                            <option value="SO2">Sulphur(IV) Oxide (SO₂)</option>
+                            <option value="CO2">Carbon(IV) Oxide (CO₂)</option>
+                            <option value="CO">Carbon(II) Oxide (CO)</option>
+                            <option value="NH3">Ammonia Gas (NH₃)</option>
+                        </select>
+                    </div>
+
+                    <div class="protocol-wrapper">
+                        <button type="button" class="btn-toggle-protocol" id="toggleProtocolBtn">
+                            <span>Show Setup & Reagent Notes</span>
+                            <span id="protocolToggleIcon">▼</span>
+                        </button>
+                        <div class="protocol-card" id="protocolCard" style="display: none;">
+                            <div><strong>Formula:</strong> <span class="highlight" id="cardFormula">Cl₂</span></div>
+                            <div><strong>Expected Reagents:</strong> <span class="req-chem" id="cardReagents">MnO₂ + Conc. HCl</span></div>
+                            <div><strong>Permitted Collection Method:</strong> <span class="highlight" id="cardCollection">Downward delivery</span></div>
+                            <div><strong>Approved Drying Agents:</strong> <span class="highlight" id="cardDrying">Conc. H₂SO₄ or CaCl₂</span></div>
+                            <div><strong>Density vs. Air:</strong> <span id="cardDensity">Denser than air (71 vs 29)</span></div>
+                            <div><strong>Solubility in Water:</strong> <span id="cardSolubility">Soluble (forms chlorine water)</span></div>
+                            <div><strong>Scientific Rule:</strong> <span id="cardReason">Denser than air, sinks to bottom of jar. Cannot collect over water because it dissolves.</span></div>
+                            <div><strong>Safety Gear:</strong> <span id="cardSafetyGear">Fume Hood Mandatory</span></div>
+                        </div>
+                    </div>
+
+                    <h3 class="panel-heading">Environment & Heating</h3>
+                    <div class="btn-grid">
+                        <button class="sim-btn warning" id="toggleFumeHoodBtn">Fume Hood: OFF</button>
+                        <button class="sim-btn secondary" id="toggleJarCoverBtn">Toggle Jar Cover</button>
+                    </div>
+
+                    <div class="control-group" style="margin-top: 4px;">
+                        <label style="display:flex; justify-content:space-between;">
+                            <span>Bunsen Burner Flame</span>
+                            <span id="burnerStatusBadge" style="color:#94a3b8; font-size:0.75rem; text-transform:none;">Status: OFF</span>
+                        </label>
+                        <div class="btn-grid-3">
+                            <button class="sim-btn danger active" id="quickFlameOff">Flame: OFF</button>
+                            <button class="sim-btn warning" id="quickFlameGentle">Gentle</button>
+                            <button class="sim-btn" id="quickFlameRoaring">Roaring</button>
+                        </div>
+                        <button class="sim-btn secondary" id="alignBurnerBtn" style="margin-top:4px;">Position Under Reaction Flask</button>
+                    </div>
+
+                    <h3 class="panel-heading">Glassware & Train Assembly</h3>
+                    <div class="control-group">
+                        <label for="apparatusDropdown">Select Apparatus to Add</label>
+                        <select id="apparatusDropdown">
+                            <option value="flask_round">Round-Bottom Flask (250ml)</option>
+                            <option value="flask_conical">Conical Flask (Erlenmeyer, 250ml)</option>
+                            <option value="boiling_tube">Hard Glass Boiling Tube</option>
+                            <option value="funnel_dropping">Dropping Funnel (with Stopcock)</option>
+                            <option value="funnel">Thistle Funnel</option>
+                            <option value="wash_bottle">Drying Wash Bottle (Drechsel)</option>
+                            <option value="tower_drying">Drying Tower (Calcium Oxide / CaCl₂)</option>
+                            <option value="collector">Gas Collection Jar</option>
+                            <option value="tube_dynamic_2">Delivery Tube (2-Segment L-Bend)</option>
+                            <option value="tube_dynamic_3">Delivery Tube (3-Segment Bridge)</option>
+                            <option value="tube_dynamic_4">Delivery Tube (4-Segment Flexible)</option>
+                            <option value="cork1">1-Hole Rubber Bung</option>
+                            <option value="cork2">2-Hole Rubber Bung</option>
+                            <option value="burner">Bunsen Burner</option>
+                            <option value="trough">Pneumatic Trough & Beehive</option>
+                        </select>
+                    </div>
+
+                    <div class="btn-grid">
+                        <button class="sim-btn" id="spawnApparatusBtn">+ Add Glassware</button>
+                        <button class="sim-btn success" id="autoSnapTubeBtn">⚡ Auto-Build Gas Train</button>
+                    </div>
+
+                    <div class="inspector-panel" id="inspectorPanel">
+                        <div class="inspector-title">
+                            <span>Selected Apparatus:</span>
+                            <span id="inspectorItemName" style="color:var(--neon-cyan); font-weight:bold;">None</span>
+                        </div>
+
+                        <div id="inspectorSpecificControls" style="display: flex; flex-direction: column; gap: 8px;">
+                            <span style="font-size:0.8rem; color:#64748b; font-style:italic;">Click on any piece of glassware in the canvas to adjust its specific controls.</span>
+                        </div>
+
+                        <div class="btn-grid">
+                            <button class="sim-btn secondary" id="btnSideRotateLeft">↺ Tilt -15°</button>
+                            <button class="sim-btn secondary" id="btnSideRotateRight">↻ Tilt +15°</button>
+                        </div>
+                        <div class="btn-grid">
+                            <button class="sim-btn secondary" id="inspLevel">Level (0° Upright)</button>
+                            <button class="sim-btn danger" id="deleteSelectedBtn">Delete Item</button>
+                        </div>
+                    </div>
+
+                    <h3 class="panel-heading">Chemical Loading & Funnels</h3>
+                    <div class="control-group">
+                        <label for="reagentDropdown">Select Precursor Chemical</label>
+                        <select id="reagentDropdown">
+                            <optgroup label="Liquids / Solutions">
+                                <option value="hcl_conc">Conc. Hydrochloric Acid (HCl)</option>
+                                <option value="water">Water (H₂O - Wash Impurities)</option>
+                                <option value="h2so4_conc">Conc. Sulfuric Acid (H₂SO₄ - Drying)</option>
+                                <option value="h2o2">Hydrogen Peroxide (H₂O₂)</option>
+                                <option value="hcl_dil">Dilute Hydrochloric Acid (HCl)</option>
+                                <option value="h2so4_dil">Dilute Sulfuric Acid (H₂SO₄)</option>
+                                <option value="hno3_conc">Conc. Nitric Acid (HNO₃)</option>
+                                <option value="hno3_dil">Dilute Nitric Acid (HNO₃)</option>
+                                <option value="hcooh">Methanoic Acid (HCOOH)</option>
+                            </optgroup>
+                            <optgroup label="Solids / Metals / Salts">
+                                <option value="mno2">Manganese(IV) Oxide (MnO₂)</option>
+                                <option value="kmnop4">Potassium Permanganate (KMnO₄)</option>
+                                <option value="zn">Granulated Zinc (Zn)</option>
+                                <option value="caco3">Calcium Carbonate (CaCO₃)</option>
+                                <option value="cu">Copper Turnings (Cu)</option>
+                                <option value="nh4cl">Ammonium Chloride (NH₄Cl)</option>
+                                <option value="nano2">Sodium Nitrite (NaNO₂)</option>
+                                <option value="nh4no3">Ammonium Nitrate (NH₄NO₃)</option>
+                                <option value="na2so3">Sodium Sulfite (Na₂SO₃)</option>
+                                <option value="caoh2">Slaked Lime (Ca(OH)₂)</option>
+                                <option value="cao">Quicklime (CaO - Solid Desiccant for NH₃)</option>
+                                <option value="cacl2">Calcium Chloride (CaCl₂ - Solid Desiccant)</option>
+                            </optgroup>
+                        </select>
+                    </div>
+
+                    <div class="btn-grid">
+                        <button class="sim-btn" id="loadReagentBtn">Add to Selected</button>
+                        <button class="sim-btn warning" id="emptyReagentsBtn">Empty Selected</button>
+                    </div>
+
+                    <div class="caution-box" id="cautionBox">
+                        <strong>LAB ALERT:</strong> <span id="cautionText"></span>
+                    </div>
+
+                    <h3 class="panel-heading">Simulation Execution</h3>
+                    <div class="btn-grid">
+                        <button class="sim-btn success" id="generateBtn">▶ Start Reaction</button>
+                        <button class="sim-btn danger" id="clearBtn">Clear Bench</button>
+                    </div>
+                    <div class="btn-grid" style="margin-top: 4px;">
+                        <button class="sim-btn secondary" id="fullscreenBtn" style="grid-column: span 2;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                            </svg>
+                            Toggle Fullscreen View
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. SAFE AD PLACEMENT SLOT -->
+        <div class="ad-slot-wrapper">
+            <div class="ad-disclaimer">Advertisement</div>
+            <div class="ad-box-placeholder">
+                <!-- Google AdSense Responsive Unit Goes Here -->
+                <span>[AdSense Responsive Display Unit]</span>
+            </div>
+        </div>
+
+        <!-- 4. EDUCATIONAL REFERENCE ARTICLE -->
+        <article class="educational-content">
+            <section>
+                <h2>How to Operate the Simulator</h2>
+                <p>Welcome to the virtual inorganic chemistry workstation. This interactive simulation lets you assemble and test various gas preparation configurations. Follow these general steps:</p>
+                <ul>
+                    <li><strong>1. Select the Target Gas:</strong> Use the dropdown menu in the "Target Gas & Protocol" panel to pick the gas you wish to synthesize. Check the <em>"Show Setup & Reagent Notes"</em> to understand the specific safety rules.</li>
+                    <li><strong>2. Assemble the Workbench:</strong> Add a reaction vessel (e.g., Round-Bottom Flask) and the required collection items. You can click <strong>"⚡ Auto-Build Gas Train"</strong> to automatically generate a safe, connected apparatus chain for the target gas.</li>
+                    <li><strong>3. Manipulate Glassware:</strong> Click on any piece of apparatus on the canvas to open its specific controls in the Inspector Panel. Here you can rotate flasks, open/close funnels, or invert gas collection jars.</li>
+                    <li><strong>4. Add Reagents:</strong> Highlight an item on the bench, select the necessary solid or liquid reagent from the dropdown, and click "Add to Selected".</li>
+                    <li><strong>5. Adjust Environment:</strong> Some gases require heat via the Bunsen burner or active ventilation via the Fume Hood. Configure these before pressing <strong>Start Reaction</strong>.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Scientific Theory & Working Principles</h2>
+                <p>In inorganic chemistry, synthesizing and isolating pure gas samples relies heavily on exploiting the gas's physical properties. Two primary factors dictate which collection setup is scientifically sound:</p>
+                <ul>
+                    <li><strong>Relative Density:</strong> Whether a gas is denser or less dense than the surrounding atmospheric air (average molar mass of approx. 29 grams per mole).</li>
+                    <li><strong>Aqueous Solubility:</strong> Whether the gas dissolves, reacts violently, or is completely inert when bubbled through liquid water.</li>
+                </ul>
+
+                <h3>Principles of Laboratory Gas Collection Methods</h3>
+                <p>Depending on the properties mentioned above, chemists utilize three main displacement techniques for collection:</p>
+                <table class="chem-table">
+                    <thead>
+                        <tr>
+                            <th>Collection Method</th>
+                            <th>Jar Geometry</th>
+                            <th>Applicable Gas Properties</th>
+                            <th>Representative Gases</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>1. Downward Delivery</strong><br>(Upward displacement of air)</td>
+                            <td><strong>Upright dry jar</strong><br>(mouth facing UP)</td>
+                            <td>Gases that are <strong>significantly denser than air</strong> (Molar mass &gt; 28.96 g/mol). Cannot be collected over water if water-soluble.</td>
+                            <td>Cl₂ (71), NO₂ (46), SO₂ (64), CO₂ (44)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>2. Upward Delivery</strong><br>(Downward displacement of air)</td>
+                            <td><strong>Inverted dry jar</strong><br>(mouth facing DOWN)</td>
+                            <td>Gases that are <strong>significantly lighter than air</strong> (Molar mass &lt; 28.96 g/mol). Used when gas is extremely water-soluble.</td>
+                            <td>NH₃ (17), dry H₂ (2)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>3. Over Water</strong><br>(Downward displacement of water)</td>
+                            <td><strong>Inverted jar filled with water</strong> in pneumatic trough over beehive shelf</td>
+                            <td>Gases that are <strong>insoluble or sparingly soluble in water</strong>. Mandatory if gas reacts with atmospheric air or has a density nearly identical to air.</td>
+                            <td>N₂ (28), NO (30), CO (28), O₂ (32), H₂ (2)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- NEW SECTION: Drying Gases & Agents -->
+            <section>
+                <h2>Drying Gases & Selection of Drying Agents</h2>
+                <p>After a gas is generated, it often contains moisture (water vapor) or spray impurities. If a dry sample is required, it must be passed through a specific drying agent using a Gas Wash Bottle (for liquids) or a Drying Tower (for solids). The choice of drying agent is critical: <strong>the desiccant must not react chemically with the gas being dried</strong>.</p>
+                <table class="chem-table">
+                    <thead>
+                        <tr>
+                            <th>Drying Agent</th>
+                            <th>Chemical Nature</th>
+                            <th>Compatible Gases</th>
+                            <th>Incompatible Gases (Do NOT use)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Concentrated Sulfuric Acid (H₂SO₄)</strong></td>
+                            <td>Strongly Acidic (Liquid)</td>
+                            <td>Cl₂, SO₂, CO₂, NO₂, O₂, H₂</td>
+                            <td><strong>Ammonia (NH₃)</strong> - Reacts violently to form solid ammonium sulfate.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Anhydrous Calcium Chloride (CaCl₂)</strong></td>
+                            <td>Neutral / Deliquescent Salt</td>
+                            <td>Cl₂, SO₂, CO₂, NO₂, O₂, H₂</td>
+                            <td><strong>Ammonia (NH₃)</strong> - Forms a complex addition compound (CaCl₂·8NH₃).</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Quicklime (Calcium Oxide - CaO)</strong></td>
+                            <td>Basic (Solid)</td>
+                            <td><strong>Ammonia (NH₃)</strong>, O₂, H₂</td>
+                            <td><strong>Cl₂, SO₂, CO₂, NO₂</strong> - Acidic gases react with basic Quicklime.</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p><em>Note on Washing with Water:</em> If a gas is highly soluble in water (like NH₃, SO₂, NO₂), passing it through a water wash bottle will cause it to dissolve completely, creating a vacuum that may cause a dangerous suck-back of liquid into the hot generator. Only insoluble or slightly soluble gases (like Cl₂ for removing HCl fumes) should be washed with water.</p>
+            </section>
+
+            <section>
+                <h2>Mathematical Foundations & Formulas</h2>
+                <p>Calculations in gas preparation revolve around finding molar masses to determine relative density and using ideal gas equations for volume.</p>
+                <div class="formula-box">
+                    Formula 1 (Molar Mass): Molar Mass (M) = Sum of (Atomic Masses of all atoms in the molecule)<br><br>
+                    Formula 2 (Relative Density): Relative Density = Molar Mass of Gas / Average Molar Mass of Air (29 g/mol)<br><br>
+                    Formula 3 (Ideal Gas Law): Pressure x Volume = Number of Moles x Gas Constant x Temperature
+                </div>
+                <p>For example, to determine how to collect Chlorine gas (Cl₂), we look at its atomic mass (35.5). Its molar mass is 35.5 x 2 = 71 g/mol. Since 71 is much greater than 29, it is heavily dense and will naturally sink to the bottom of a container.</p>
+            </section>
+
+            <section>
+                <h2>Real-World Engineering & Industrial Applications</h2>
+                <p>The controlled synthesis and capture of gases is a cornerstone of modern industrial manufacturing:</p>
+                <ul>
+                    <li><strong>The Haber-Bosch Process:</strong> Industrial scale preparation of Ammonia (NH₃) from atmospheric Nitrogen and Hydrogen gases. This ammonia is then utilized globally in the manufacture of agricultural fertilizers.</li>
+                    <li><strong>Contact Process:</strong> The production of Sulfuric Acid involves the generation of Sulfur Dioxide (SO₂), which is then oxidized. Sulfuric acid is highly demanded in battery manufacturing and chemical synthesis.</li>
+                    <li><strong>Water Treatment:</strong> Preparation and controlled delivery of Chlorine gas (Cl₂) is essential for the disinfection and sanitation of municipal drinking water and swimming pools worldwide.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Practice Problems & Diagnostic Tasks</h2>
+                <p>Test your quantitative comprehension and chemical theory using the five laboratory exercises below:</p>
+
+                <div class="task-card">
+                    <div class="task-title">Task 1: Density Analysis for Collection</div>
+                    <p>Calculate the molar mass of Carbon(IV) Oxide (CO₂) given that Carbon has an atomic mass of 12 and Oxygen has an atomic mass of 16. Using this molar mass, determine whether the gas should be collected via upward or downward delivery.</p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 2: Solubility Constraints</div>
+                    <p>Ammonia gas has a molar mass of 17 g/mol and is extremely soluble in water. Explain why attempting to collect Ammonia over water in a pneumatic trough is both ineffective and highly dangerous in a laboratory setup.</p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 3: Air Contamination</div>
+                    <p>Nitrogen(II) Oxide (NO) has a molar mass of 30 g/mol, which is very close to air (29 g/mol). Why must NO exclusively be collected over water rather than relying on downward or upward displacement of air?</p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 4: Safety & Thermal Management</div>
+                    <p>When synthesizing Ammonia from solid Calcium Hydroxide and Ammonium Chloride in a boiling tube, water is produced as a byproduct. Explain the specific positioning angle required for the boiling tube and why failure to do so results in a hazard.</p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 5: Precursor Matching</div>
+                    <p>A student wishes to prepare pure, dry Oxygen gas (O₂) without using external heat. Identify the two required precursor chemicals and the physical state of the gas collection jar.</p>
+                </div>
+
+                <!-- Collapsible Solutions -->
+                <details>
+                    <summary>Click to Reveal Solutions and Step-by-Step Proofs</summary>
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 1:</strong> Molar Mass of CO₂ = 12 + (16 x 2) = 44 g/mol. Since 44 g/mol is greater than the average molar mass of air (29 g/mol), CO₂ is denser than air. Therefore, it must be collected by downward delivery (into an upright dry jar) where the heavy gas displaces the lighter air upwards.</p>
+                    </div>
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 2:</strong> Ammonia's high solubility means the gas dissolves almost instantly upon contacting the water instead of filling the jar. This rapid dissolution causes an extreme drop in pressure (vacuum effect) inside the delivery tube, resulting in cold water being violently sucked back into the hot generator flask, potentially shattering the glass.</p>
+                    </div>
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 3:</strong> Because the densities are almost identical, NO would simply mix with air rather than displacing it efficiently. More importantly, NO spontaneously reacts with the oxygen in atmospheric air to form toxic, brown NO₂ gas. Collecting it over water seals it from atmospheric oxygen.</p>
+                    </div>
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 4:</strong> The boiling tube must be positioned with a downward slant (mouth tilted down at least 15 degrees). If held horizontally or vertically, the condensed water byproduct will flow back onto the red-hot glass base being heated by the Bunsen burner, causing immediate and violent thermal shock and shattering.</p>
+                    </div>
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 5:</strong> To produce dry oxygen without heating, the student must react Hydrogen Peroxide (H₂O₂ liquid) catalyzed by solid Manganese(IV) Oxide (MnO₂). Because the sample must be dry, it must be collected by downward delivery into an upright dry jar, rather than over water.</p>
+                    </div>
+                </details>
+            </section>
+        </article>
+    </main>
+
+    <!-- 5. SYNCHRONIZED COMPLIANCE FOOTER -->
+    <footer>
+        <nav class="footer-nav">
+            <a href="../index.html">Home</a>
+            <a href="../index.html#about-section">About Us</a>
+            <button type="button" class="footer-modal-trigger" onclick="openSimModal('simPrivacyModal')">Privacy Policy</button>
+            <button type="button" class="footer-modal-trigger" onclick="openSimModal('simTermsModal')">Terms of Service</button>
+            <a href="../index.html#contact-section">Contact Us</a>
+            <a href="https://forms.gle/fYxxaNKAh21dPUoBA" target="_blank" rel="noopener noreferrer">Simulator Suggestions</a>
+        </nav>
+        <p>&copy; 2026 LuyaliSims | Engineered by Click & Draft | Dedicated to Open STEM Education</p>
+    </footer>
+
+    <!-- 6. IDENTICAL PRIVACY POLICY MODAL -->
+    <div id="simPrivacyModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="privacyTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeSimModal('simPrivacyModal')">Close [✕]</button>
+            <h2 id="privacyTitle">Privacy Policy</h2>
+            <p class="modal-date">Last Updated: September 2026</p>
+            <p>Welcome to LuyaliSims. We respect your privacy and are committed to protecting your personal data. This privacy policy explains how we treat information when you interact with our educational simulators.</p>
+            
+            <h3>1. Educational Purpose & Information Collection</h3>
+            <p>LuyaliSims is a free educational portal. We do not require account registration, passwords, or personal login information to run any simulation. All simulation calculations occur locally within your browser using client-side JavaScript.</p>
+
+            <h3>2. Google AdSense & Third-Party Cookies</h3>
+            <p>We may display advertisements served by Google AdSense to fund our free educational tools. Google, as a third-party vendor, uses cookies to serve ads on our site based on users' visits to this and other sites on the Internet.</p>
+            <ul>
+                <li>Google's use of advertising cookies enables it and its partners to serve ads based on your visit to LuyaliSims and other sites.</li>
+                <li>Users may opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" style="color: var(--neon-cyan);">Google Ads Settings</a>.</li>
+            </ul>
+
+            <h3>3. Log Files & Analytics</h3>
+            <p>Like standard websites, our hosting servers collect anonymous log records (including IP addresses, browser types, and timestamp references) to monitor server uptime, fix script errors, and optimize simulator performance.</p>
+
+            <h3>4. Children's Online Privacy (COPPA Compliance)</h3>
+            <p>Our educational simulators are built for students and educators of all ages. We do not knowingly solicit or collect personally identifiable information from children under 13.</p>
+
+            <h3>5. Contact Regarding Privacy</h3>
+            <p>If you have any questions regarding this policy, contact us at: <a href="mailto:luyashliz@gmail.com" style="color: var(--neon-cyan);">luyashliz@gmail.com</a>.</p>
+        </div>
+    </div>
+
+    <!-- 7. IDENTICAL TERMS OF SERVICE MODAL -->
+    <div id="simTermsModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="termsTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeSimModal('simTermsModal')">Close [✕]</button>
+            <h2 id="termsTitle">Terms of Service</h2>
+            <p class="modal-date">Effective Date: September 2026</p>
+
+            <h3>1. Permitted Educational Use</h3>
+            <p>All interactive models, simulations, practice problems, and laboratory worksheets on LuyaliSims are made freely available for classroom demonstrations, academic study, tutoring, and self-paced individual learning.</p>
+
+            <h3>2. Intellectual Property</h3>
+            <p>The code architecture, layout designs, and custom interactive engines are the intellectual property of Ian Luyali and Click & Draft. You may use our simulators online in academic settings, but mirroring or re-hosting our code for commercial resale without permission is prohibited.</p>
+
+            <h3>3. Disclaimer of Scientific Warranty</h3>
+            <p>While simulations are engineered to accurately replicate classical mechanics, thermodynamics, and electronics, they are provided as conceptual learning aids. LuyaliSims is not liable for outcomes in real-world high-voltage or hazardous laboratory environments constructed without professional teacher supervision.</p>
+
+            <h3>4. Updates to Terms</h3>
+            <p>We reserve the right to refine these terms as new laboratory modules and features are introduced.</p>
+        </div>
+    </div>
+
+    <!-- 8. SIMULATOR CORE SCRIPT & MODAL LOGIC -->
+    <script>
+        // --- Modal Controls ---
+        function openSimModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeSimModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('policy-modal')) {
+                closeSimModal(e.target.id);
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' || e.key === 'Esc') {
+                document.querySelectorAll('.policy-modal').forEach(m => {
+                    m.style.display = 'none';
+                });
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // --- Fullscreen Implementation ---
+        const simContainer = document.getElementById('simulator-container');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                if (simContainer.requestFullscreen) simContainer.requestFullscreen();
+                else if (simContainer.webkitRequestFullscreen) simContainer.webkitRequestFullscreen();
+                fullscreenBtn.innerHTML = 'Exit Fullscreen';
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+                fullscreenBtn.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                    </svg>
+                    Toggle Fullscreen View`;
+            }
+        });
+
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                fullscreenBtn.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                    </svg>
+                    Toggle Fullscreen View`;
+            }
+            resizeCanvas();
+        });
+
+        // --- Theme & Chemistry Database ---
+        const THEME = {
+            glassBase: "rgba(180, 230, 255, 0.08)",
+            glassBorder: "rgba(160, 235, 255, 0.88)",
+            glassGraduation: "rgba(255, 255, 255, 0.75)",
+            water: "rgba(0, 150, 255, 0.35)",
+            waterSurface: "rgba(0, 243, 255, 0.8)",
+            ceramic: "#f1f5f9",
+            ceramicBorder: "#94a3b8",
+            rubberBung: "#8b261d",
+            rubberBungShadow: "#5c1811",
+            corkHole: "#1c0705",
+            burnerBase: "#1e3a8a",
+            burnerChrome: "#cbd5e1",
+            burnerBrass: "#d97706",
+            flameCore: "#00f3ff",
+            flameGentle: "#ffb700",
+            flameRoaring: "#38bdf8"
+        };
+
+        const gasDatabase = {
+            Cl2: {
+                name: "Chlorine Gas (Cl₂)", formula: "Cl₂", molarMass: 70.9,
+                requiredReagentsText: "KMnO₄ or MnO₂ + Conc. Hydrochloric Acid (HCl)",
+                validSets: [["kmnop4", "hcl_conc"], ["mno2", "hcl_conc"]],
+                allowedMethods: ['downward_delivery'], preferredMethod: 'downward_delivery',
+                allowedDryingAgents: ['h2so4_conc', 'cacl2'],
+                dryingAgentsText: "Conc. H₂SO₄ or CaCl₂ (Washing with water to remove HCl is permitted). Do NOT use Quicklime (CaO).",
+                densityText: "Much denser than air (Molar mass 71 vs air ~29 g/mol)",
+                solubilityText: "Soluble in water (forms chlorine water: Cl₂ + H₂O ⇌ HCl + HOCl)",
+                methodSummary: "Downward delivery into an upright dry jar (fume hood mandatory)",
+                methodRationale: "Because Cl₂ is denser than air, it sinks and displaces air upward. It CANNOT be collected over water because it dissolves and reacts. Upward delivery is forbidden because the heavy gas falls out of an inverted jar.",
+                requiresFumeHood: true, requiresTilt: false, heatRequired: "conditional",
+                toxic: true, color: "rgba(180, 225, 40, 0.55)", bColor: "#ccff00",
+                caution: "LETHAL CHOKING GAS! Wash with water (remove HCl fumes) and Conc. H₂SO₄ (dry). Fume Hood mandatory."
+            },
+            O2: {
+                name: "Oxygen Gas (O₂)", formula: "O₂", molarMass: 32.0,
+                requiredReagentsText: "Hydrogen Peroxide (H₂O₂) + Manganese(IV) Oxide (MnO₂)",
+                validSets: [["h2o2", "mno2"], ["h2o2"]],
+                allowedMethods: ['over_water', 'downward_delivery'], preferredMethod: 'over_water',
+                allowedDryingAgents: ['h2so4_conc', 'cacl2', 'cao'],
+                dryingAgentsText: "Conc. H₂SO₄, CaCl₂, or Quicklime (CaO) (Gas is neutral).",
+                densityText: "Slightly denser than air (Molar mass 32 vs air ~29 g/mol)",
+                solubilityText: "Sparingly soluble / practically insoluble in water",
+                methodSummary: "Over water (pneumatic trough) or downward delivery (dry gas)",
+                methodRationale: "Because O₂ is sparingly soluble in water, collection over water gives visual confirmation of bubbles. For dry oxygen, downward delivery is permitted. Upward delivery is forbidden because O₂ is denser than air and sinks.",
+                requiresFumeHood: false, requiresTilt: false, heatRequired: "none",
+                toxic: false, color: "rgba(0, 243, 255, 0.3)", bColor: "#00f3ff",
+                caution: "Catalytic decomposition. Exothermic at room temperature; do NOT heat."
+            },
+            H2: {
+                name: "Hydrogen Gas (H₂)", formula: "H₂", molarMass: 2.0,
+                requiredReagentsText: "Granulated Zinc (Zn) + Dilute HCl or Dilute H₂SO₄",
+                validSets: [["zn", "hcl_dil"], ["zn", "h2so4_dil"]],
+                allowedMethods: ['over_water', 'upward_delivery'], preferredMethod: 'over_water',
+                allowedDryingAgents: ['h2so4_conc', 'cacl2', 'cao'],
+                dryingAgentsText: "Conc. H₂SO₄, CaCl₂, or Quicklime (CaO) (Gas is neutral).",
+                densityText: "Extremely light; least dense gas known (Molar mass 2 vs air ~29 g/mol)",
+                solubilityText: "Insoluble in water",
+                methodSummary: "Over water (pneumatic trough) or upward delivery (inverted dry jar)",
+                methodRationale: "Because H₂ is insoluble in water, collection over water is safe and effective. If dry H₂ is required, it must be collected by upward delivery into an inverted dry jar. Downward delivery is strictly forbidden because light H₂ immediately floats out of an upright jar.",
+                requiresFumeHood: false, requiresTilt: false, heatRequired: "none",
+                toxic: false, color: "rgba(255, 255, 255, 0.2)", bColor: "#ffffff",
+                caution: "EXTREMELY EXPLOSIVE! Ensure no open flames are near the generator."
+            },
+            N2: {
+                name: "Nitrogen Gas (N₂)", formula: "N₂", molarMass: 28.0,
+                requiredReagentsText: "Ammonium Chloride (NH₄Cl) + Sodium Nitrite (NaNO₂)",
+                validSets: [["nh4cl", "nano2"]],
+                allowedMethods: ['over_water'], preferredMethod: 'over_water',
+                allowedDryingAgents: ['h2so4_conc', 'cacl2', 'cao'],
+                dryingAgentsText: "Conc. H₂SO₄, CaCl₂, or Quicklime (CaO) (Gas is neutral).",
+                densityText: "Density almost identical to air (Molar mass 28 vs air ~29 g/mol)",
+                solubilityText: "Insoluble in water",
+                methodSummary: "Over water ONLY (pneumatic trough and beehive shelf)",
+                methodRationale: "Nitrogen has a molar mass (28 g/mol) virtually identical to air (29 g/mol). It CANNOT be collected by upward or downward delivery because it diffuses into and mixes with air without displacement. Being insoluble in water, it MUST be collected over water.",
+                requiresFumeHood: false, requiresTilt: false, heatRequired: "gentle",
+                toxic: false, color: "rgba(200, 210, 225, 0.25)", bColor: "#94a3b8",
+                caution: "GENTLE HEATING ONLY! Remove flame immediately once reaction starts."
+            },
+            NO2: {
+                name: "Nitrogen(IV) Oxide (NO₂)", formula: "NO₂", molarMass: 46.0,
+                requiredReagentsText: "Copper Turnings (Cu) + Conc. Nitric Acid (HNO₃)",
+                validSets: [["cu", "hno3_conc"]],
+                allowedMethods: ['downward_delivery'], preferredMethod: 'downward_delivery',
+                allowedDryingAgents: ['h2so4_conc', 'cacl2'],
+                dryingAgentsText: "Conc. H₂SO₄ or CaCl₂. Do NOT use Quicklime (CaO).",
+                densityText: "Much denser than air (Molar mass 46 vs air ~29 g/mol)",
+                solubilityText: "Extremely soluble; reacts vigorously with water (2NO₂ + H₂O → HNO₃ + HNO₂)",
+                methodSummary: "Downward delivery into an upright dry jar (fume hood mandatory)",
+                methodRationale: "NO₂ is denser than air and sinks to displace air upward. It CANNOT be collected over water because it dissolves and reacts completely. Upward delivery is forbidden because the heavy gas sinks out.",
+                requiresFumeHood: true, requiresTilt: false, heatRequired: "none",
+                toxic: true, color: "rgba(180, 80, 20, 0.72)", bColor: "#ff6600",
+                caution: "DENSE RED-BROWN POISON! Vigorous effervescence; Fume Hood mandatory."
+            },
+            NO: {
+                name: "Nitrogen(II) Oxide (NO)", formula: "NO", molarMass: 30.0,
+                requiredReagentsText: "Copper Turnings (Cu) + Dilute Nitric Acid (HNO₃)",
+                validSets: [["cu", "hno3_dil"]],
+                allowedMethods: ['over_water'], preferredMethod: 'over_water',
+                allowedDryingAgents: ['h2so4_conc', 'cacl2'],
+                dryingAgentsText: "Usually collected wet over water. If dried: Conc. H₂SO₄ or CaCl₂.",
+                densityText: "Density close to air (Molar mass 30 vs air ~29 g/mol)",
+                solubilityText: "Insoluble in water",
+                methodSummary: "Over water ONLY (pneumatic trough and beehive shelf)",
+                methodRationale: "Nitric oxide is insoluble in water. It CANNOT be collected by air displacement because upon contact with atmospheric oxygen, it oxidizes spontaneously into toxic brown NO₂: 2NO + O₂ → 2NO₂. It MUST be collected over water away from air.",
+                requiresFumeHood: true, requiresTilt: false, heatRequired: "none",
+                toxic: true, color: "rgba(150, 180, 210, 0.25)", bColor: "#93c5fd",
+                caution: "Reacts spontaneously with atmospheric air to form toxic brown NO₂."
+            },
+            N2O: {
+                name: "Nitrogen(I) Oxide (N₂O)", formula: "N₂O", molarMass: 44.0,
+                requiredReagentsText: "Ammonium Nitrate (NH₄NO₃)",
+                validSets: [["nh4no3"]],
+                allowedMethods: ['over_water', 'downward_delivery'], preferredMethod: 'over_water',
+                allowedDryingAgents: ['h2so4_conc', 'cacl2'],
+                dryingAgentsText: "Conc. H₂SO₄ or CaCl₂.",
+                densityText: "Denser than air (Molar mass 44 vs air ~29 g/mol)",
+                solubilityText: "Soluble in cold water, but insoluble / sparingly soluble in warm water",
+                methodSummary: "Over warm water or downward delivery (dry gas)",
+                methodRationale: "N₂O is denser than air, so dry gas can be collected by downward delivery. It dissolves in cold water, but because its solubility drops to near zero in warm water, it is standardly collected over warm water. Upward delivery is forbidden.",
+                requiresFumeHood: false, requiresTilt: false, heatRequired: "gentle",
+                toxic: false, color: "rgba(220, 230, 245, 0.2)", bColor: "#e2e8f0",
+                caution: "EXPLOSION RISK! Controlled gentle heat only. Never overheat solid."
+            },
+            SO2: {
+                name: "Sulphur(IV) Oxide (SO₂)", formula: "SO₂", molarMass: 64.1,
+                requiredReagentsText: "Sodium Sulfite (Na₂SO₃) + Dilute HCl, or Copper + Conc. H₂SO₄",
+                validSets: [["na2so3", "hcl_dil"], ["cu", "h2so4_conc"]],
+                allowedMethods: ['downward_delivery'], preferredMethod: 'downward_delivery',
+                allowedDryingAgents: ['h2so4_conc', 'cacl2'],
+                dryingAgentsText: "Conc. H₂SO₄ or CaCl₂. Do NOT use Quicklime (CaO).",
+                densityText: "Very dense (Molar mass 64.1 vs air ~29 g/mol; ~2.2× air)",
+                solubilityText: "Extremely soluble in water (dissolves to form sulfurous acid: SO₂ + H₂O ⇌ H₂SO₃)",
+                methodSummary: "Downward delivery into an upright dry jar (fume hood mandatory)",
+                methodRationale: "SO₂ is much denser than air and settling occurs readily. It CANNOT be collected over water because it dissolves instantly, producing severe suck-back. Upward delivery is forbidden because it pours out of an inverted jar.",
+                requiresFumeHood: true, requiresTilt: false, heatRequired: "conditional",
+                toxic: true, color: "rgba(190, 220, 255, 0.4)", bColor: "#67e8f9",
+                caution: "Suffocating choking gas. Active Fume Hood extraction mandatory."
+            },
+            CO2: {
+                name: "Carbon(IV) Oxide (CO₂)", formula: "CO₂", molarMass: 44.0,
+                requiredReagentsText: "Calcium Carbonate (CaCO₃) + Dilute HCl",
+                validSets: [["caco3", "hcl_dil"]],
+                allowedMethods: ['downward_delivery', 'over_water'], preferredMethod: 'downward_delivery',
+                allowedDryingAgents: ['h2so4_conc', 'cacl2'],
+                dryingAgentsText: "Conc. H₂SO₄ or CaCl₂. Do NOT use Quicklime (CaO).",
+                densityText: "Denser than air (Molar mass 44 vs air ~29 g/mol; ~1.5× air)",
+                solubilityText: "Sparingly soluble in water",
+                methodSummary: "Downward delivery into an upright dry jar, or over water",
+                methodRationale: "Because CO₂ is dense, downward delivery into an upright jar is the standard method for dry samples. Because it is only sparingly soluble, collection over water is also acceptable. Upward delivery is forbidden as it sinks.",
+                requiresFumeHood: false, requiresTilt: false, heatRequired: "none",
+                toxic: false, color: "rgba(210, 215, 225, 0.2)", bColor: "#cbd5e1",
+                caution: "Dense non-flammable gas. Ensure delivery stem reaches bottom."
+            },
+            CO: {
+                name: "Carbon(II) Oxide (CO)", formula: "CO", molarMass: 28.0,
+                requiredReagentsText: "Methanoic Acid (HCOOH) + Conc. H₂SO₄",
+                validSets: [["hcooh", "h2so4_conc"]],
+                allowedMethods: ['over_water'], preferredMethod: 'over_water',
+                allowedDryingAgents: ['h2so4_conc', 'cacl2', 'cao'],
+                dryingAgentsText: "Conc. H₂SO₄, CaCl₂, or Quicklime (CaO) (Gas is neutral).",
+                densityText: "Density almost identical to air (Molar mass 28 vs air ~29 g/mol)",
+                solubilityText: "Insoluble in water",
+                methodSummary: "Over water ONLY in a Fume Hood",
+                methodRationale: "CO has a molar mass of 28 g/mol, virtually identical to air (29 g/mol). It cannot displace air. Furthermore, CO is an odorless, lethal poison; collecting it by air displacement invites deadly leaks. Because it is insoluble in water, it MUST be collected over water.",
+                requiresFumeHood: true, requiresTilt: false, heatRequired: "gentle",
+                toxic: true, color: "rgba(120, 120, 120, 0.2)", bColor: "#64748b",
+                caution: "LETHAL TOXIC! Odorless and imperceptible. Fume Hood mandatory."
+            },
+            NH3: {
+                name: "Ammonia Gas (NH₃)", formula: "NH₃", molarMass: 17.0,
+                requiredReagentsText: "Ammonium Chloride (NH₄Cl) + Slaked Lime (Ca(OH)₂)",
+                validSets: [["nh4cl", "caoh2"]],
+                allowedMethods: ['upward_delivery'], preferredMethod: 'upward_delivery',
+                allowedDryingAgents: ['cao'],
+                dryingAgentsText: "Quicklime (CaO) ONLY. Do NOT use Conc. H₂SO₄ or CaCl₂.",
+                densityText: "Much less dense than air (Molar mass 17 vs air ~29 g/mol)",
+                solubilityText: "Extremely soluble in water (1 vol H₂O dissolves ~700 vol NH₃)",
+                methodSummary: "Upward delivery into an INVERTED DRY JAR with slotted cover disc",
+                methodRationale: "Ammonia is much lighter than air and rises. It CANNOT be collected by downward delivery because it escapes immediately. It CANNOT be collected over water because it dissolves violently and creates a vacuum suck-back explosion hazard. Furthermore, heating Ca(OH)₂ + NH₄Cl produces water; the boiling tube MUST be clamped with a downward slant so condensed water does not run back to the red-hot base and shatter it.",
+                requiresFumeHood: false, requiresTilt: true, heatRequired: "roaring",
+                toxic: true, color: "rgba(220, 255, 230, 0.3)", bColor: "#86efac",
+                caution: "CRITICAL: Inverted jar, dry upward delivery, and slanted reaction tube mandatory."
+            }
+        };
+
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        const canvasWrapper = document.getElementById('canvasFrame');
+
+        function resizeCanvas() {
+            canvas.width = canvasWrapper.clientWidth;
+            canvas.height = canvasWrapper.clientHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        let appList = [];
+        let particles = [];
+        let droppingDroplets = [];
+        let escapingGasClouds = [];
+        let washBubbles = [];
+        let generatorBubbles = [];
+        let simState = 'idle';
+        let gasFillLevel = 0;
+        let fumeHoodActive = false;
+        let lastFunnelDripTime = 0;
+
+        let cam = { x: canvas.width/2 - 280, y: canvas.height/2 - 180, scale: 0.95, mode: 'select' };
+        
+        let isDragging = false;
+        let dragStartMouse = {x:0, y:0};
+        let dragStartCam = {x:0, y:0};
+        let selectedItem = null;
+        let selectedNode = null;
+        let dragOffset = {x:0, y:0};
+
+        // FUME HOOD TOGGLE
+        const toggleFumeHoodBtn = document.getElementById('toggleFumeHoodBtn');
+        toggleFumeHoodBtn.onclick = () => {
+            fumeHoodActive = !fumeHoodActive;
+            toggleFumeHoodBtn.textContent = fumeHoodActive ? "Fume Hood: ACTIVE" : "Fume Hood: OFF";
+            toggleFumeHoodBtn.className = fumeHoodActive ? "sim-btn success" : "sim-btn warning";
+            const hoodEl = document.getElementById('telemetryFumeHood');
+            if(fumeHoodActive) {
+                hoodEl.textContent = "ACTIVE (0.5 m/s EXHAUST)";
+                hoodEl.className = "tele-val stat-ok";
+            } else {
+                hoodEl.textContent = "DISABLED (BENCHTOP)";
+                hoodEl.className = "tele-val stat-warn";
+            }
+        };
+
+        // JAR COVER TOGGLE
+        const toggleJarCoverBtn = document.getElementById('toggleJarCoverBtn');
+        toggleJarCoverBtn.onclick = () => {
+            let jar = appList.find(a => a.type === 'collector');
+            if(jar) {
+                jar.hasCover = !jar.hasCover;
+                updateTelemetry();
+            } else {
+                alert("Please add a Gas Collection Jar to the workspace first.");
+            }
+        };
+
+        // HEATED ZONE ENGINE
+        function getVesselHeatedZone(vessel) {
+            if(!vessel) return null;
+            let rad = (vessel.rotation || 0) * Math.PI / 180;
+            let localY = (vessel.type === 'flask_round') ? 15 : (vessel.h / 2 - 25);
+            let localX = 0;
+            
+            let wx = vessel.x + (localX * Math.cos(rad) - localY * Math.sin(rad)) * vessel.scale;
+            let wy = vessel.y + (localX * Math.sin(rad) + localY * Math.cos(rad)) * vessel.scale;
+            
+            let radius = (vessel.w / 2) * vessel.scale;
+            let bottomGlassY = wy + radius;
+            
+            return { x: wx, y: wy, bottomY: bottomGlassY, radius: radius };
+        }
+
+        function getOrCreateBurner() {
+            let burner = appList.find(a => a.type === 'burner');
+            if(!burner) {
+                let vessel = appList.find(a => (a.type.includes('flask') || a.type === 'boiling_tube'));
+                let zone = getVesselHeatedZone(vessel);
+                let spawnX = zone ? zone.x : (canvas.width/2 - cam.x) / cam.scale;
+                let spawnY = zone ? (zone.bottomY + 58) : (canvas.height/2 - cam.y) / cam.scale + 60;
+                burner = {
+                    id: Date.now() + Math.random(), type: 'burner', x: spawnX, y: spawnY,
+                    w: 80, h: 100, scale: 1, rotation: 0, flame: 'off', reagents: [], children: []
+                };
+                appList.push(burner);
+            }
+            return burner;
+        }
+
+        function setUnifiedBurnerFlame(state) {
+            let burner = getOrCreateBurner();
+            burner.flame = state;
+
+            const bOff = document.getElementById('quickFlameOff');
+            const bGentle = document.getElementById('quickFlameGentle');
+            const bRoar = document.getElementById('quickFlameRoaring');
+            const bBadge = document.getElementById('burnerStatusBadge');
+
+            [bOff, bGentle, bRoar].forEach(b => b.classList.remove('active'));
+
+            if(state === 'off') {
+                bOff.classList.add('active');
+                bBadge.textContent = "Status: OFF";
+                bBadge.style.color = "#94a3b8";
+            } else if(state === 'gentle') {
+                bGentle.classList.add('active');
+                bBadge.textContent = "Status: GENTLE LUMINOUS";
+                bBadge.style.color = "var(--neon-amber)";
+            } else if(state === 'roaring') {
+                bRoar.classList.add('active');
+                bBadge.textContent = "Status: ROARING BLUE FLAME";
+                bBadge.style.color = "var(--neon-cyan)";
+            }
+
+            updateInspector();
+            updateConnectionTelemetry();
+        }
+
+        document.getElementById('quickFlameOff').onclick = () => setUnifiedBurnerFlame('off');
+        document.getElementById('quickFlameGentle').onclick = () => setUnifiedBurnerFlame('gentle');
+        document.getElementById('quickFlameRoaring').onclick = () => setUnifiedBurnerFlame('roaring');
+
+        document.getElementById('alignBurnerBtn').onclick = () => {
+            let burner = getOrCreateBurner();
+            let vessel = appList.find(a => (a.type.includes('flask') || a.type === 'boiling_tube'));
+            if(vessel) {
+                let zone = getVesselHeatedZone(vessel);
+                burner.x = zone.x;
+                burner.y = zone.bottomY + burner.h / 2 + 10;
+                selectItem(burner);
+            } else {
+                alert("Place a generator flask or boiling tube on the bench first!");
+            }
+        };
+
+        // UI toggles
+        let protocolVisible = false;
+        const toggleProtocolBtn = document.getElementById('toggleProtocolBtn');
+        const protocolCard = document.getElementById('protocolCard');
+        const protocolToggleIcon = document.getElementById('protocolToggleIcon');
+
+        toggleProtocolBtn.onclick = () => {
+            protocolVisible = !protocolVisible;
+            protocolCard.style.display = protocolVisible ? 'flex' : 'none';
+            protocolToggleIcon.textContent = protocolVisible ? '▲' : '▼';
+            toggleProtocolBtn.querySelector('span:first-child').textContent = protocolVisible 
+                ? 'Hide Setup & Reagent Notes' 
+                : 'Show Setup & Reagent Notes';
+        };
+
+        function updateProtocolCard() {
+            const key = document.getElementById('gasSelector').value;
+            const data = gasDatabase[key];
+            document.getElementById('telemetryGas').textContent = data.name;
+            document.getElementById('cautionText').textContent = data.caution;
+            document.getElementById('cardFormula').textContent = data.formula;
+            document.getElementById('cardReagents').textContent = data.requiredReagentsText;
+            document.getElementById('cardCollection').textContent = data.methodSummary;
+            document.getElementById('cardDrying').textContent = data.dryingAgentsText;
+            document.getElementById('cardDensity').textContent = data.densityText;
+            document.getElementById('cardSolubility').textContent = data.solubilityText;
+            document.getElementById('cardReason').textContent = data.methodRationale;
+            document.getElementById('cardSafetyGear').textContent = data.requiresFumeHood 
+                ? "Fume Hood Extraction + Jar Cover Plate MANDATORY" 
+                : (data.allowedMethods.includes('upward_delivery') ? "Inverted Dry Jar + Slotted Cover Disc" : "Standard Bench Setup");
+
+            stopReaction();
+            updateConnectionTelemetry();
+        }
+        document.getElementById('gasSelector').addEventListener('change', updateProtocolCard);
+
+        document.getElementById('toolSelect').onclick = (e) => { cam.mode='select'; updateTools(e.target); };
+        document.getElementById('toolPan').onclick = (e) => { cam.mode='pan'; updateTools(e.target); };
+        document.getElementById('toolZoomIn').onclick = () => { cam.scale = Math.min(cam.scale + 0.15, 2.5); };
+        document.getElementById('toolZoomOut').onclick = () => { cam.scale = Math.max(cam.scale - 0.15, 0.4); };
+        
+        function updateTools(activeBtn) {
+            document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+            activeBtn.classList.add('active');
+        }
+
+        function createDeliveryTube(spawnX, spawnY, segmentCount) {
+            let item = {
+                id: Date.now() + Math.random(), type: 'tube_dynamic', scale: 1, rotation: 0,
+                reagents: [], parent: null, children: [], w: 0, h: 0
+            };
+
+            if(segmentCount === 2) {
+                item.nodes = [{x: spawnX - 80, y: spawnY + 30}, {x: spawnX - 80, y: spawnY - 40}, {x: spawnX + 60, y: spawnY - 40}];
+                item.snaps = [null, null, null];
+            } else if(segmentCount === 3) {
+                item.nodes = [{x: spawnX - 100, y: spawnY + 30}, {x: spawnX - 100, y: spawnY - 50}, {x: spawnX + 60, y: spawnY - 50}, {x: spawnX + 60, y: spawnY + 40}];
+                item.snaps = [null, null, null, null];
+            } else {
+                item.nodes = [{x: spawnX - 120, y: spawnY + 30}, {x: spawnX - 120, y: spawnY - 60}, {x: spawnX, y: spawnY - 60}, {x: spawnX + 80, y: spawnY - 10}, {x: spawnX + 110, y: spawnY + 70}];
+                item.snaps = [null, null, null, null, null];
+            }
+            return item;
+        }
+
+        document.getElementById('spawnApparatusBtn').onclick = () => {
+            const type = document.getElementById('apparatusDropdown').value;
+            let spawnX = (canvas.width/2 - cam.x) / cam.scale;
+            let spawnY = (canvas.height/2 - cam.y) / cam.scale;
+
+            let item = null;
+
+            if(type === 'tube_dynamic_2') {
+                item = createDeliveryTube(spawnX, spawnY, 2);
+            } else if(type === 'tube_dynamic_3') {
+                item = createDeliveryTube(spawnX, spawnY, 3);
+            } else if(type === 'tube_dynamic_4' || type === 'tube_dynamic') {
+                item = createDeliveryTube(spawnX, spawnY, 4);
+            } else {
+                item = { id: Date.now() + Math.random(), type, x: spawnX, y: spawnY, scale: 1, rotation: 0, reagents: [], parent: null, children: [] };
+                
+                if(type === 'collector') { 
+                    item.w = 78; item.h = 190; item.inv = false; item.water = false; item.hasCover = false;
+                    item.ports = { mouth: {x:0, y:-95}, base: {x:0, y:95} }; 
+                } else if(type === 'flask_conical' || type === 'flask_round') { 
+                    item.w = 125; item.h = 155; item.ports = { top: {x:0, y:-78} }; 
+                } else if(type === 'boiling_tube') { 
+                    item.w = 38; item.h = 175; item.ports = { top: {x:0, y:-88} }; 
+                } else if(type === 'wash_bottle') {
+                    item.w = 90; item.h = 180; item.reagents = [];
+                    item.ports = { in: {x: -22, y: -90}, out: {x: 20, y: -90} };
+                } else if(type === 'tower_drying') {
+                    item.w = 60; item.h = 220; item.reagents = [];
+                    item.ports = { in: {x: -30, y: 90}, out: {x: 0, y: -110} };
+                } else if(type === 'funnel') { 
+                    item.w = 48; item.h = 195; item.stem = 135; 
+                    item.ports = { top: {x:0, y:-70}, bottom: {x:0, y:120} }; 
+                } else if(type === 'funnel_dropping') {
+                    item.w = 50; item.h = 210; item.stem = 115; item.tapOpen = false; item.reagents = [];
+                    item.ports = { top: {x:0, y:-75}, bottom: {x:0, y:140} };
+                } else if(type === 'trough') { 
+                    item.w = 300; item.h = 140; item.ports = { in: {x:-120, y:60}, beehive: {x:0, y:-30} }; 
+                } else if(type === 'burner') { 
+                    item.w = 80; item.h = 100; item.flame = 'off'; item.ports = {}; 
+                } else if(type === 'cork1') { 
+                    item.w = 44; item.h = 26; item.ports = { bottom: {x:0, y:13}, hole1: {x:0, y:-10}, hole1_deep: {x:0, y:22} }; 
+                } else if(type === 'cork2') { 
+                    item.w = 44; item.h = 26; item.ports = { bottom: {x:0, y:13}, hole1: {x:-9, y:-10}, hole1_deep: {x:-9, y:22}, hole2: {x:9, y:-10}, hole2_deep: {x:9, y:22} }; 
+                }
+            }
+
+            appList.push(item);
+            selectItem(item);
+            updateConnectionTelemetry();
+        };
+
+        function getGlobalPort(item, portKey) {
+            if(!item || !item.ports || !item.ports[portKey]) return null;
+            const p = item.ports[portKey];
+            let rad = (item.rotation || 0) * Math.PI / 180;
+            let rx = (p.x * Math.cos(rad) - p.y * Math.sin(rad)) * item.scale;
+            let ry = (p.x * Math.sin(rad) + p.y * Math.cos(rad)) * item.scale;
+            return { x: item.x + rx, y: item.y + ry };
+        }
+
+        function rotateItem(item, deltaDeg) {
+            if(!item) return;
+            item.rotation = (item.rotation + deltaDeg) % 360;
+            if(item.rotation > 180) item.rotation -= 360;
+            if(item.rotation < -180) item.rotation += 360;
+            updateConnectionTelemetry();
+            updateInspector();
+        }
+
+        document.getElementById('btnSideRotateLeft').onclick = () => { if(selectedItem) rotateItem(selectedItem, -15); };
+        document.getElementById('btnSideRotateRight').onclick = () => { if(selectedItem) rotateItem(selectedItem, 15); };
+        document.getElementById('inspLevel').onclick = () => { if(selectedItem) { selectedItem.rotation = 0; updateConnectionTelemetry(); updateInspector(); }};
+
+        function lockCorkToFlask(cork, flask) {
+            if(!cork || !flask) return;
+            cork.rotation = flask.rotation;
+            let topP = getGlobalPort(flask, 'top');
+            let rad = (flask.rotation || 0) * Math.PI / 180;
+            cork.x = topP.x + Math.sin(rad) * 2;
+            cork.y = topP.y - Math.cos(rad) * 2;
+            cork.parent = flask;
+            if(!flask.children.includes(cork)) flask.children.push(cork);
+            updateConnectionTelemetry();
+            updateInspector();
+        }
+
+        function lockFunnelToCork(funnel, cork) {
+            if(!funnel || !cork) return;
+            let targetHole = cork.ports.hole1 ? 'hole1' : 'bottom';
+            let holePos = getGlobalPort(cork, targetHole);
+            if(!holePos) return;
+
+            funnel.rotation = cork.rotation;
+            let rad = (cork.rotation || 0) * Math.PI / 180;
+            funnel.x = holePos.x - Math.sin(rad) * 15;
+            funnel.y = holePos.y - Math.cos(rad) * 55;
+            funnel.parent = cork;
+            if(!cork.children.includes(funnel)) cork.children.push(funnel);
+            updateConnectionTelemetry();
+            updateInspector();
+        }
+
+        function pourLiquidThroughFunnel(funnel) {
+            let vessel = appList.find(a => (a.type.includes('flask') || a.type === 'boiling_tube'));
+            if(!vessel) {
+                alert("Please add a reaction flask to receive the liquid precursor.");
+                return;
+            }
+            const dd = document.getElementById('reagentDropdown');
+            const val = dd.value;
+            const txt = dd.options[dd.selectedIndex].text;
+            const isSolid = ['mno2','zn','caco3','cu','kmnop4','nh4cl','nano2','nh4no3','na2so3','caoh2','cao','cacl2'].includes(val);
+
+            if(isSolid) {
+                alert("Only liquid solutions / acids can be poured through a funnel!");
+                return;
+            }
+
+            let startPt = getGlobalPort(funnel, 'top') || { x: funnel.x, y: funnel.y - 70 };
+            for(let k = 0; k < 6; k++) {
+                setTimeout(() => {
+                    droppingDroplets.push({
+                        x: startPt.x + (Math.random() - 0.5) * 4,
+                        y: startPt.y,
+                        vy: 4.0,
+                        reagent: { id: val, name: txt, isSolid: false },
+                        targetVessel: vessel
+                    });
+                }, k * 100);
+            }
+        }
+
+        function updateInspector() {
+            const inspName = document.getElementById('inspectorItemName');
+            const specDiv = document.getElementById('inspectorSpecificControls');
+            specDiv.innerHTML = "";
+
+            if(!selectedItem) {
+                inspName.textContent = "None Selected";
+                let ph = document.createElement('span');
+                ph.style.fontSize = "0.8rem"; ph.style.color = "#64748b"; ph.style.fontStyle = "italic";
+                ph.textContent = "Click on any piece of glassware in the canvas to adjust its specific controls.";
+                specDiv.appendChild(ph);
+                return;
+            }
+
+            let label = selectedItem.type.replace('_', ' ').toUpperCase();
+            if(selectedItem.scale) label += ` [${Math.round(selectedItem.scale*100)}%]`;
+            inspName.textContent = label;
+
+            if(selectedItem.type === 'funnel_dropping') {
+                let btnTap = document.createElement('button');
+                btnTap.className = selectedItem.tapOpen ? "sim-btn success active" : "sim-btn warning";
+                btnTap.style.width = "100%";
+                btnTap.innerHTML = selectedItem.tapOpen 
+                    ? "💧 Stopcock: <strong>OPEN (Flowing)</strong>" 
+                    : "🔒 Stopcock: <strong>CLOSED (Shut)</strong>";
+                btnTap.onclick = () => {
+                    selectedItem.tapOpen = !selectedItem.tapOpen;
+                    updateInspector();
+                };
+
+                let chemStat = document.createElement('div');
+                chemStat.style.fontSize = "0.8rem"; chemStat.style.color = "#cbd5e1";
+                let curChem = selectedItem.reagents.length > 0 ? selectedItem.reagents[0].name : "Empty (No Solution)";
+                chemStat.innerHTML = `Funnel Solution: <span style="color:var(--neon-cyan); font-weight:bold;">${curChem}</span>`;
+
+                let btnFill = document.createElement('button');
+                btnFill.className = "sim-btn secondary";
+                btnFill.style.width = "100%";
+                btnFill.textContent = "Load Selected Liquid into Funnel";
+                btnFill.onclick = () => {
+                    const dd = document.getElementById('reagentDropdown');
+                    const val = dd.value;
+                    const txt = dd.options[dd.selectedIndex].text;
+                    const isSolid = ['mno2','zn','caco3','cu','kmnop4','nh4cl','nano2','nh4no3','na2so3','caoh2','cao','cacl2'].includes(val);
+                    if(isSolid) {
+                        alert("Dropping funnels are strictly for liquid solutions, not solid salts!");
+                        return;
+                    }
+                    selectedItem.reagents = [{ id: val, name: txt, isSolid: false }];
+                    updateInspector();
+                };
+
+                let btnLock = document.createElement('button');
+                btnLock.className = selectedItem.parent ? "sim-btn warning" : "sim-btn success";
+                btnLock.style.width = "100%";
+                btnLock.textContent = selectedItem.parent ? "Detach from Rubber Bung" : "Lock into Flask Rubber Bung";
+                btnLock.onclick = () => {
+                    if(selectedItem.parent) {
+                        detachItem(selectedItem);
+                        moveTree(selectedItem, 35, -35);
+                        updateInspector();
+                        updateConnectionTelemetry();
+                    } else {
+                        let cork = appList.find(a => a.type.includes('cork'));
+                        if(cork) lockFunnelToCork(selectedItem, cork);
+                        else alert("Add a 2-Hole Rubber Bung to the Flask first to lock this funnel!");
+                    }
+                };
+
+                specDiv.appendChild(btnTap);
+                specDiv.appendChild(chemStat);
+                specDiv.appendChild(btnFill);
+                specDiv.appendChild(btnLock);
+            }
+            else if(selectedItem.type === 'funnel') {
+                let btnPour = document.createElement('button');
+                btnPour.className = "sim-btn success";
+                btnPour.style.width = "100%";
+                btnPour.textContent = "Pour Selected Liquid via Funnel";
+                btnPour.onclick = () => pourLiquidThroughFunnel(selectedItem);
+
+                let btnLock = document.createElement('button');
+                btnLock.className = selectedItem.parent ? "sim-btn warning" : "sim-btn success";
+                btnLock.style.width = "100%";
+                btnLock.textContent = selectedItem.parent ? "Detach from Rubber Bung" : "Lock into Flask Rubber Bung";
+                btnLock.onclick = () => {
+                    if(selectedItem.parent) {
+                        detachItem(selectedItem);
+                        moveTree(selectedItem, 35, -35);
+                        updateInspector();
+                        updateConnectionTelemetry();
+                    } else {
+                        let cork = appList.find(a => a.type.includes('cork'));
+                        if(cork) lockFunnelToCork(selectedItem, cork);
+                        else alert("Add a Rubber Bung to the Flask first!");
+                    }
+                };
+
+                specDiv.appendChild(btnPour);
+                specDiv.appendChild(btnLock);
+            }
+            else if(selectedItem.type === 'wash_bottle' || selectedItem.type === 'tower_drying') {
+                let stat = document.createElement('div');
+                stat.style.fontSize = "0.82rem";
+                let chem = selectedItem.reagents.length > 0 ? selectedItem.reagents[0].name : "EMPTY";
+                stat.innerHTML = `Loaded Desiccant/Wash: <strong style="color:var(--neon-green);">${chem}</strong>`;
+                specDiv.appendChild(stat);
+
+                if (selectedItem.type === 'wash_bottle') {
+                    let bGrid = document.createElement('div');
+                    bGrid.className = "btn-grid";
+
+                    let bWater = document.createElement('button');
+                    bWater.className = "sim-btn";
+                    bWater.textContent = "Fill Water";
+                    bWater.onclick = () => { selectedItem.reagents = [{ id: 'water', name: 'Water (H₂O)', isSolid: false }]; updateInspector(); };
+
+                    let bAcid = document.createElement('button');
+                    bAcid.className = "sim-btn warning";
+                    bAcid.textContent = "Fill Conc H₂SO₄";
+                    bAcid.onclick = () => { selectedItem.reagents = [{ id: 'h2so4_conc', name: 'Conc. H₂SO₄ (Drying)', isSolid: false }]; updateInspector(); };
+
+                    bGrid.appendChild(bWater);
+                    bGrid.appendChild(bAcid);
+                    specDiv.appendChild(bGrid);
+                } else {
+                    let bGrid = document.createElement('div');
+                    bGrid.className = "btn-grid";
+
+                    let bCaO = document.createElement('button');
+                    bCaO.className = "sim-btn success";
+                    bCaO.textContent = "Pack Quicklime";
+                    bCaO.onclick = () => { selectedItem.reagents = [{ id: 'cao', name: 'Quicklime (CaO)', isSolid: true }]; updateInspector(); };
+
+                    let bCaCl2 = document.createElement('button');
+                    bCaCl2.className = "sim-btn";
+                    bCaCl2.textContent = "Pack CaCl₂";
+                    bCaCl2.onclick = () => { selectedItem.reagents = [{ id: 'cacl2', name: 'Calcium Chloride (CaCl₂)', isSolid: true }]; updateInspector(); };
+
+                    bGrid.appendChild(bCaO);
+                    bGrid.appendChild(bCaCl2);
+                    specDiv.appendChild(bGrid);
+                }
+
+                let bEmpty = document.createElement('button');
+                bEmpty.className = "sim-btn danger";
+                bEmpty.style.width = "100%";
+                bEmpty.textContent = "Empty Contents";
+                bEmpty.onclick = () => { selectedItem.reagents = []; updateInspector(); };
+                specDiv.appendChild(bEmpty);
+            }
+            else if(selectedItem.type === 'collector') {
+                let curSetup = getDetectedCollectionMethod(selectedItem);
+                let modeBadge = document.createElement('div');
+                modeBadge.style.fontSize = "0.78rem";
+                modeBadge.style.padding = "6px 8px";
+                modeBadge.style.background = "rgba(4, 8, 16, 0.85)";
+                modeBadge.style.border = "1px solid var(--border-glow)";
+                modeBadge.style.borderRadius = "6px";
+                modeBadge.innerHTML = `Current Mode: <strong style="color:var(--neon-green);">${curSetup.shortName}</strong>`;
+                specDiv.appendChild(modeBadge);
+
+                let btnInv = document.createElement('button');
+                btnInv.className = "sim-btn success";
+                btnInv.style.width = "100%";
+                btnInv.textContent = selectedItem.inv ? "Set Upright (Downward Delivery)" : "Invert (Upward Delivery / Water)";
+                btnInv.onclick = () => {
+                    selectedItem.inv = !selectedItem.inv;
+                    if(selectedItem.inv) {
+                        selectedItem.ports.mouth = { x: 0, y: 95 };
+                        selectedItem.ports.base = { x: 0, y: -95 };
+                    } else {
+                        selectedItem.water = false;
+                        selectedItem.ports.mouth = { x: 0, y: -95 };
+                        selectedItem.ports.base = { x: 0, y: 95 };
+                    }
+                    
+                    appList.forEach(tube => {
+                        if(tube.type === 'tube_dynamic') {
+                            tube.snaps.forEach((snap, idx) => {
+                                if(snap && snap.item.id === selectedItem.id && snap.port === 'mouth') {
+                                    let gp = getGlobalPort(selectedItem, 'mouth');
+                                    if(gp) { tube.nodes[idx].x = gp.x; tube.nodes[idx].y = gp.y; }
+                                }
+                            });
+                        }
+                    });
+                    
+                    updateInspector();
+                    updateConnectionTelemetry();
+                };
+
+                let btnWater = document.createElement('button');
+                btnWater.className = selectedItem.water ? "sim-btn warning" : "sim-btn secondary";
+                btnWater.style.width = "100%";
+                btnWater.textContent = selectedItem.water ? "Empty Water (Use Dry Jar)" : "Fill with Water (Over-Water Mode)";
+                btnWater.onclick = () => {
+                    selectedItem.water = !selectedItem.water;
+                    if(selectedItem.water && !selectedItem.inv) {
+                        selectedItem.inv = true;
+                        selectedItem.ports.mouth = { x: 0, y: 95 };
+                        selectedItem.ports.base = { x: 0, y: -95 };
+                    }
+                    updateInspector();
+                    updateConnectionTelemetry();
+                };
+
+                let btnCov = document.createElement('button');
+                btnCov.className = selectedItem.hasCover ? "sim-btn success" : "sim-btn warning";
+                btnCov.style.width = "100%";
+                btnCov.textContent = selectedItem.hasCover ? "Cover Disc: INSTALLED" : "Cover Disc: NOT INSTALLED";
+                btnCov.onclick = () => {
+                    selectedItem.hasCover = !selectedItem.hasCover;
+                    updateInspector();
+                    updateTelemetry();
+                };
+
+                specDiv.appendChild(btnInv);
+                specDiv.appendChild(btnWater);
+                specDiv.appendChild(btnCov);
+            }
+            else if(selectedItem.type === 'trough') {
+                let msg = document.createElement('div');
+                msg.style.fontSize = "0.8rem"; msg.style.color = "#cbd5e1";
+                msg.innerHTML = "Pneumatic Trough & Beehive Shelf.<br>Used for Over-Water Gas Collection methodology.";
+                specDiv.appendChild(msg);
+            }
+            else if(selectedItem.type.includes('cork')) {
+                let btnLock = document.createElement('button');
+                btnLock.className = selectedItem.parent ? "sim-btn warning" : "sim-btn success";
+                btnLock.style.width = "100%";
+                btnLock.textContent = selectedItem.parent ? "Unlock from Flask Neck" : "Lock into Flask Neck";
+                btnLock.onclick = () => {
+                    if(selectedItem.parent) {
+                        detachItem(selectedItem);
+                        moveTree(selectedItem, 30, -30);
+                        updateInspector();
+                        updateConnectionTelemetry();
+                    } else {
+                        let vessel = appList.find(a => (a.type.includes('flask') || a.type === 'boiling_tube'));
+                        if(vessel) lockCorkToFlask(selectedItem, vessel);
+                        else alert("Add a reaction flask to lock this rubber bung into!");
+                    }
+                };
+                specDiv.appendChild(btnLock);
+            }
+            else if(selectedItem.type === 'tube_dynamic') {
+                let grid = document.createElement('div');
+                grid.className = "btn-grid";
+                let b2 = document.createElement('button');
+                b2.className = "sim-btn secondary"; b2.textContent = "2-Seg (L)";
+                b2.onclick = () => setTubeSegments(selectedItem, 2);
+                let b3 = document.createElement('button');
+                b3.className = "sim-btn secondary"; b3.textContent = "3-Seg (Bridge)";
+                b3.onclick = () => setTubeSegments(selectedItem, 3);
+                grid.appendChild(b2);
+                grid.appendChild(b3);
+
+                let b4 = document.createElement('button');
+                b4.className = "sim-btn secondary"; b4.style.width = "100%"; b4.textContent = "4-Seg (Flexible)";
+                b4.onclick = () => setTubeSegments(selectedItem, 4);
+
+                specDiv.appendChild(grid);
+                specDiv.appendChild(b4);
+            }
+        }
+
+        function setTubeSegments(tube, count) {
+            if(!tube || tube.type !== 'tube_dynamic') return;
+            let start = tube.nodes[0];
+            let end = tube.nodes[tube.nodes.length - 1];
+            let newNodes = [];
+            for(let i = 0; i <= count; i++) {
+                let frac = i / count;
+                newNodes.push({
+                    x: start.x + (end.x - start.x) * frac,
+                    y: start.y + (end.y - start.y) * frac - (i > 0 && i < count ? 50 : 0)
+                });
+            }
+            tube.nodes = newNodes;
+            tube.snaps = new Array(newNodes.length).fill(null);
+            updateConnectionTelemetry();
+        }
+
+        document.getElementById('autoSnapTubeBtn').onclick = () => {
+            const key = document.getElementById('gasSelector').value;
+            const gasData = gasDatabase[key];
+
+            let vessel = appList.find(a => (a.type.includes('flask') || a.type === 'boiling_tube'));
+            let cork = appList.find(a => a.type.includes('cork'));
+            let jar = appList.find(a => a.type === 'collector');
+            let washBottles = appList.filter(a => a.type === 'wash_bottle' || a.type === 'tower_drying').sort((a, b) => a.x - b.x);
+            let funnel = appList.find(a => a.type.includes('funnel'));
+
+            if(!vessel) {
+                document.getElementById('apparatusDropdown').value = (key === 'NH3') ? 'boiling_tube' : 'flask_round';
+                document.getElementById('spawnApparatusBtn').click();
+                vessel = appList.find(a => a.type === 'flask_round' || a.type === 'boiling_tube');
+            }
+
+            if(gasData.requiresTilt) vessel.rotation = 30;
+            else vessel.rotation = 0;
+
+            if(!cork) {
+                document.getElementById('apparatusDropdown').value = (key === 'NH3' || key === 'N2O') ? 'cork1' : 'cork2';
+                document.getElementById('spawnApparatusBtn').click();
+                cork = appList.find(a => a.type.includes('cork'));
+            }
+
+            lockCorkToFlask(cork, vessel);
+            if(funnel) lockFunnelToCork(funnel, cork);
+
+            if(!jar) {
+                document.getElementById('apparatusDropdown').value = 'collector';
+                document.getElementById('spawnApparatusBtn').click();
+                jar = appList.find(a => a.type === 'collector');
+                jar.x = vessel.x + (washBottles.length > 0 ? 360 : 220);
+                jar.y = vessel.y + 10;
+            }
+
+            appList = appList.filter(a => a.type !== 'tube_dynamic');
+
+            let targetMethod = gasData.preferredMethod;
+            let trough = appList.find(a => a.type === 'trough');
+
+            if (targetMethod === 'over_water') {
+                if(!trough) {
+                    trough = { id: Date.now() + Math.random(), type: 'trough', x: jar.x, y: jar.y + 70, scale: 1, rotation: 0, reagents: [], children: [], w: 300, h: 140, ports: { in: {x:-120, y:60}, beehive: {x:0, y:-30} } };
+                    appList.push(trough);
+                }
+                jar.inv = true; jar.water = true; jar.hasCover = false;
+                jar.ports.mouth = { x: 0, y: 95 }; jar.ports.base = { x: 0, y: -95 };
+                jar.x = trough.x; jar.y = trough.y - 70;
+            } else if (targetMethod === 'upward_delivery') {
+                if(trough) appList = appList.filter(a => a.id !== trough.id);
+                jar.inv = true; jar.water = false; jar.hasCover = true;
+                jar.ports.mouth = { x: 0, y: 95 }; jar.ports.base = { x: 0, y: -95 };
+            } else {
+                if(trough) appList = appList.filter(a => a.id !== trough.id);
+                jar.inv = false; jar.water = false; jar.hasCover = true;
+                jar.ports.mouth = { x: 0, y: -95 }; jar.ports.base = { x: 0, y: 95 };
+            }
+
+            let deepCorkPort = cork.ports.hole2_deep ? 'hole2_deep' : (cork.ports.hole1_deep ? 'hole1_deep' : 'bottom');
+            let pStart = getGlobalPort(cork, deepCorkPort);
+
+            if(washBottles.length > 0) {
+                let w1In = getGlobalPort(washBottles[0], 'in');
+                let t1 = createDeliveryTube(0, 0, 3);
+                t1.nodes = [{ x: pStart.x, y: pStart.y }, { x: pStart.x, y: pStart.y - 75 }, { x: w1In.x, y: pStart.y - 75 }, { x: w1In.x, y: w1In.y - 10 }];
+                t1.snaps = [ {item: cork, port: deepCorkPort}, null, null, {item: washBottles[0], port: 'in'} ];
+                appList.push(t1);
+
+                for(let i = 0; i < washBottles.length - 1; i++) {
+                    let wOut = getGlobalPort(washBottles[i], 'out');
+                    let wNextIn = getGlobalPort(washBottles[i+1], 'in');
+                    let tInter = createDeliveryTube(0, 0, 3);
+                    tInter.nodes = [{ x: wOut.x, y: wOut.y }, { x: wOut.x, y: wOut.y - 45 }, { x: wNextIn.x, y: wOut.y - 45 }, { x: wNextIn.x, y: wNextIn.y - 10 }];
+                    tInter.snaps = [ {item: washBottles[i], port: 'out'}, null, null, {item: washBottles[i+1], port: 'in'} ];
+                    appList.push(tInter);
+                }
+
+                let lastW = washBottles[washBottles.length - 1];
+                let wLastOut = getGlobalPort(lastW, 'out');
+                let tFinal = createDeliveryTube(0, 0, 3);
+                
+                if (targetMethod === 'over_water') {
+                    let targetPort = { x: trough.x - 120, y: trough.y + 60 };
+                    tFinal.nodes = [{ x: wLastOut.x, y: wLastOut.y }, { x: wLastOut.x, y: wLastOut.y - 50 }, { x: targetPort.x, y: wLastOut.y - 50 }, { x: targetPort.x, y: targetPort.y }];
+                    tFinal.snaps = [ {item: lastW, port: 'out'}, null, null, {item: trough, port: 'in'} ];
+                } else {
+                    tFinal.nodes = [{ x: wLastOut.x, y: wLastOut.y }, { x: wLastOut.x, y: wLastOut.y - 50 }, { x: jar.x, y: wLastOut.y - 50 }, { x: jar.x, y: jar.y + (jar.inv ? -45 : 45) }];
+                    tFinal.snaps = [ {item: lastW, port: 'out'}, null, null, {item: jar, port: 'mouth'} ];
+                }
+                appList.push(tFinal);
+            } else {
+                let tDirect = createDeliveryTube(0, 0, 3);
+                if (targetMethod === 'over_water') {
+                    let targetPort = { x: trough.x - 120, y: trough.y + 60 };
+                    tDirect.nodes = [{ x: pStart.x, y: pStart.y }, { x: pStart.x, y: pStart.y - 75 }, { x: targetPort.x - 40, y: pStart.y - 75 }, { x: targetPort.x, y: targetPort.y }];
+                    tDirect.snaps = [ {item: cork, port: deepCorkPort}, null, null, {item: trough, port: 'in'} ];
+                } else {
+                    tDirect.nodes = [{ x: pStart.x, y: pStart.y }, { x: pStart.x, y: pStart.y - 75 }, { x: jar.x, y: pStart.y - 75 }, { x: jar.x, y: jar.y + (jar.inv ? -45 : 45) }];
+                    tDirect.snaps = [ {item: cork, port: deepCorkPort}, null, null, {item: jar, port: 'mouth'} ];
+                }
+                appList.push(tDirect);
+            }
+
+            selectItem(vessel);
+            updateConnectionTelemetry();
+        };
+
+        document.getElementById('deleteSelectedBtn').onclick = () => {
+            if(selectedItem) {
+                detachItem(selectedItem);
+                function delTree(item) { 
+                    item.children.forEach(c => delTree(c)); 
+                    appList = appList.filter(i => i.id !== item.id); 
+                }
+                delTree(selectedItem); 
+                selectItem(null); 
+                updateConnectionTelemetry();
+            } else {
+                alert("Please click an apparatus on the workspace to select and delete it.");
+            }
+        };
+
+        document.getElementById('clearBtn').onclick = () => { 
+            appList = []; 
+            selectItem(null); 
+            stopReaction(); 
+            updateConnectionTelemetry();
+        };
+
+        document.getElementById('loadReagentBtn').onclick = () => {
+            if(!selectedItem) {
+                alert("Please select an apparatus capable of receiving precursors to add chemicals.");
+                return;
+            }
+            const dd = document.getElementById('reagentDropdown');
+            const val = dd.value;
+            const txt = dd.options[dd.selectedIndex].text;
+            const isSolid = ['mno2','zn','caco3','cu','kmnop4','nh4cl','nano2','nh4no3','na2so3','caoh2','cao','cacl2'].includes(val);
+
+            if(selectedItem.type === 'collector') {
+                if(val !== 'water') {
+                    alert("Gas Collection Jars can only be filled with Water (for over-water collection mode).");
+                    return;
+                }
+                selectedItem.water = true;
+                updateInspector();
+                updateConnectionTelemetry();
+                return;
+            }
+
+            if(selectedItem.type.includes('flask') || selectedItem.type === 'boiling_tube' || selectedItem.type === 'funnel_dropping' || selectedItem.type === 'wash_bottle' || selectedItem.type === 'tower_drying') {
+                if((selectedItem.type === 'funnel_dropping' || selectedItem.type === 'wash_bottle') && isSolid) {
+                    alert("Dropping Funnels and Gas Wash Bottles are strictly for liquids/solutions, not solids!");
+                    return;
+                }
+                if(selectedItem.type === 'tower_drying' && !isSolid) {
+                    alert("Drying Towers are packed with solid desiccants, not liquids!");
+                    return;
+                }
+
+                if(!selectedItem.reagents.find(r=>r.id===val)) {
+                    selectedItem.reagents.push({ id: val, name: txt, isSolid });
+                }
+                updateInspector();
+                updateTelemetry();
+            } else { 
+                alert("Select a Reaction Vessel, Tower, Bottle, or Dropping Funnel to receive this precursor."); 
+            }
+        };
+
+        document.getElementById('emptyReagentsBtn').onclick = () => {
+            if(selectedItem) {
+                if(selectedItem.type === 'collector') {
+                    selectedItem.water = false;
+                } else if (selectedItem.reagents) {
+                    selectedItem.reagents = [];
+                }
+                updateInspector();
+                updateTelemetry();
+                stopReaction();
+            } else {
+                alert("Select an apparatus item to empty its contents.");
+            }
+        };
+
+        function getDetectedCollectionMethod(jar) {
+            if(!jar) return { id: 'none', label: 'NO GAS JAR PRESENT', shortName: 'None' };
+            let hasTrough = appList.some(a => a.type === 'trough');
+            if(jar.water) {
+                if(jar.inv && hasTrough) return { id: 'over_water', label: 'OVER WATER (Downward Displacement of Water)', shortName: 'Over Water' };
+                return { id: 'invalid_water', label: 'UPRIGHT JAR WITH WATER (Invalid Setup)', shortName: 'Invalid Water Jar' };
+            }
+            if(jar.inv) return { id: 'upward_delivery', label: 'UPWARD DELIVERY (Inverted Dry Jar)', shortName: 'Upward Delivery' };
+            return { id: 'downward_delivery', label: 'DOWNWARD DELIVERY (Upright Dry Jar)', shortName: 'Downward Delivery' };
+        }
+
+        function updateTelemetry() {
+            let vessel = appList.find(a => (a.type.includes('flask') || a.type === 'boiling_tube'));
+            let jar = appList.find(a => a.type === 'collector');
+            const key = document.getElementById('gasSelector').value;
+            const gasData = gasDatabase[key];
+            
+            const coverEl = document.getElementById('telemetryCover');
+            if(jar && jar.hasCover) {
+                coverEl.textContent = "INSTALLED";
+                coverEl.className = "tele-val stat-ok";
+            } else {
+                coverEl.textContent = "NOT INSTALLED";
+                coverEl.className = "tele-val stat-warn";
+            }
+
+            if(vessel) {
+                let deg = Math.round(vessel.rotation);
+                let tiltTxt = `${deg}° (Upright)`;
+                if(deg > 5 || deg < -5) tiltTxt = `${deg}° (Slanted)`;
+                document.getElementById('telemetryTilt').textContent = tiltTxt;
+            } else {
+                document.getElementById('telemetryTilt').textContent = "No Vessel";
+            }
+
+            const collModeEl = document.getElementById('telemetryCollectionMode');
+            let detected = getDetectedCollectionMethod(jar);
+            collModeEl.textContent = detected.label;
+
+            if(gasData && gasData.allowedMethods.includes(detected.id)) {
+                collModeEl.className = "tele-val stat-ok";
+            } else {
+                collModeEl.className = "tele-val stat-warn";
+            }
+            updateInspector();
+        }
+
+        function findSnapTarget(x, y, excludeId) {
+            let bestTarget = null;
+            let minDistance = 75 / cam.scale;
+
+            for(let it of appList) {
+                if(it.id === excludeId) continue;
+                for(let pk in it.ports) {
+                    let gp = getGlobalPort(it, pk);
+                    if(!gp) continue;
+                    let d = Math.hypot(gp.x - x, gp.y - y);
+                    if(d < minDistance) {
+                        minDistance = d;
+                        bestTarget = { item: it, port: pk, x: gp.x, y: gp.y, distance: d };
+                    }
+                }
+            }
+            return bestTarget;
+        }
+
+        function moveTree(item, dx, dy) {
+            item.x += dx; item.y += dy;
+            item.children.forEach(c => moveTree(c, dx, dy));
+            appList.forEach(tube => {
+                if(tube.type === 'tube_dynamic') {
+                    tube.snaps.forEach((snap, idx) => {
+                        if(snap && snap.item.id === item.id) {
+                            let gp = getGlobalPort(item, snap.port);
+                            if(gp) {
+                                tube.nodes[idx].x = gp.x; 
+                                tube.nodes[idx].y = gp.y;
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        function detachItem(item) {
+            if(item.parent) {
+                item.parent.children = item.parent.children.filter(c => c.id !== item.id);
+                item.parent = null;
+            }
+        }
+
+        function checkTubeConnections() {
+            let vessel = appList.find(a => (a.type.includes('flask') || a.type === 'boiling_tube'));
+            let cork = appList.find(a => a.type.includes('cork') && a.parent && a.parent.id === vessel?.id);
+            let tubes = appList.filter(a => a.type === 'tube_dynamic');
+            let jar = appList.find(a => a.type === 'collector');
+            let trough = appList.find(a => a.type === 'trough');
+
+            if(!vessel || !cork || tubes.length === 0) return { flaskConnected: false, collectionConnected: false, gasTrainSealed: false };
+
+            let currentApparatus = cork;
+            let visitedTubes = new Set();
+            let flaskConnected = false;
+            let reachedEnd = false;
+
+            for(let step = 0; step < 12; step++) {
+                let match = null;
+
+                for(let t of tubes) {
+                    if(visitedTubes.has(t.id)) continue;
+                    let n0 = t.nodes[0], nN = t.nodes[t.nodes.length - 1];
+                    let s0 = t.snaps[0], sN = t.snaps[t.nodes.length - 1];
+
+                    let startMatches = (s0 && s0.item.id === currentApparatus.id);
+                    let endMatches = (sN && sN.item.id === currentApparatus.id);
+
+                    if(!startMatches && !endMatches) {
+                        for(let pk in currentApparatus.ports) {
+                            let gp = getGlobalPort(currentApparatus, pk);
+                            if(gp) {
+                                if(Math.hypot(n0.x - gp.x, n0.y - gp.y) < 70) { startMatches = true; break; }
+                                if(Math.hypot(nN.x - gp.x, nN.y - gp.y) < 70) { endMatches = true; break; }
+                            }
+                        }
+                    }
+
+                    if(startMatches) { match = { tube: t, exitNode: nN, exitSnap: sN }; break; } 
+                    else if(endMatches) { match = { tube: t, exitNode: n0, exitSnap: s0 }; break; }
+                }
+
+                if(!match) break;
+                visitedTubes.add(match.tube.id);
+                flaskConnected = true;
+
+                let exitNode = match.exitNode, exitSnap = match.exitSnap;
+
+                if(jar) {
+                    let jMouth = getGlobalPort(jar, 'mouth') || { x: jar.x, y: jar.y - jar.h/2 };
+                    let dMouth = Math.hypot(exitNode.x - jMouth.x, exitNode.y - jMouth.y);
+                    let inJar = (exitNode.x >= jar.x - (jar.w*jar.scale)/2 - 30 && exitNode.x <= jar.x + (jar.w*jar.scale)/2 + 30 &&
+                                 exitNode.y >= jar.y - (jar.h*jar.scale)/2 - 35 && exitNode.y <= jar.y + (jar.h*jar.scale)/2 + 35);
+                    
+                    if((exitSnap && exitSnap.item.id === jar.id) || dMouth < 85 || inJar) { reachedEnd = true; break; }
+                }
+
+                if(trough) {
+                    let tIn = getGlobalPort(trough, 'in'), tBeehive = getGlobalPort(trough, 'beehive');
+                    let connectedToTrough = (exitSnap && exitSnap.item.id === trough.id) || (tIn && Math.hypot(exitNode.x - tIn.x, exitNode.y - tIn.y) < 75);
+
+                    if (connectedToTrough) {
+                        if (jar && jar.inv) {
+                            let jMouth = getGlobalPort(jar, 'mouth');
+                            if (tBeehive && jMouth && Math.hypot(jMouth.x - tBeehive.x, jMouth.y - tBeehive.y) < 80) { reachedEnd = true; break; }
+                        }
+                        if (!jar) { reachedEnd = true; break; }
+                    }
+                }
+
+                let nextApp = appList.find(a => {
+                    if(a.type !== 'wash_bottle' && a.type !== 'tower_drying') return false;
+                    let inP = getGlobalPort(a, 'in');
+                    if(!inP) return false;
+                    return (exitSnap && exitSnap.item.id === a.id) || Math.hypot(exitNode.x - inP.x, exitNode.y - inP.y) < 65;
+                });
+
+                if(nextApp) currentApparatus = nextApp; else break;
+            }
+
+            return { flaskConnected, collectionConnected: reachedEnd, gasTrainSealed: reachedEnd };
+        }
+
+        function updateConnectionTelemetry() {
+            const { flaskConnected, collectionConnected, gasTrainSealed } = checkTubeConnections();
+            
+            const flaskConnEl = document.getElementById('telemetryFlaskConn');
+            if(gasTrainSealed) {
+                flaskConnEl.textContent = "FULL TRAIN SEALED";
+                flaskConnEl.className = "stat-ok";
+            } else if(flaskConnected && !collectionConnected) {
+                flaskConnEl.textContent = "LEAK AT OUTLET TIP";
+                flaskConnEl.className = "stat-warn";
+            } else {
+                flaskConnEl.textContent = "DISCONNECTED TRAIN";
+                flaskConnEl.className = "stat-warn";
+            }
+            updateTelemetry();
+        }
+
+        function getMousePos(e) {
+            const r = canvas.getBoundingClientRect();
+            let cx = (e.clientX - r.left)*canvas.width/r.width;
+            let cy = (e.clientY - r.top)*canvas.height/r.height;
+            return { x: (cx - cam.x)/cam.scale, y: (cy - cam.y)/cam.scale, rawX: cx, rawY: cy };
+        }
+
+        function selectItem(item) {
+            selectedItem = item;
+            updateInspector();
+            updateTelemetry();
+        }
+
+        function hitTestApparatus(it, mx, my) {
+            let dx = mx - it.x;
+            let dy = my - it.y;
+            let rad = -(it.rotation || 0) * Math.PI / 180;
+            let lx = (dx * Math.cos(rad) - dy * Math.sin(rad)) / it.scale;
+            let ly = (dx * Math.sin(rad) + dy * Math.cos(rad)) / it.scale;
+
+            if(it.type === 'funnel_dropping' || it.type === 'funnel') return Math.abs(lx) <= (it.w / 2 + 10) && ly >= -80 && ly <= (it.stem ? it.stem + 35 : 150);
+
+            let hw = it.w / 2, hh = it.h / 2;
+            return Math.abs(lx) <= hw && Math.abs(ly) <= hh;
+        }
+
+        canvas.addEventListener('pointerdown', e => {
+            if(e.button !== 0) return;
+            const m = getMousePos(e);
+            
+            if(cam.mode === 'pan') {
+                isDragging = true;
+                dragStartMouse = { x: m.rawX, y: m.rawY };
+                dragStartCam = { x: cam.x, y: cam.y };
+                return;
+            }
+
+            for(let it of appList) {
+                if(it.type === 'funnel_dropping') {
+                    let rad = (it.rotation || 0) * Math.PI / 180;
+                    let tapWorldX = it.x + (-Math.sin(rad) * 22 * it.scale);
+                    let tapWorldY = it.y + (Math.cos(rad) * 22 * it.scale);
+                    if(Math.hypot(m.x - tapWorldX, m.y - tapWorldY) < (28 / cam.scale)) {
+                        it.tapOpen = !it.tapOpen; selectItem(it); updateInspector(); return;
+                    }
+                }
+            }
+
+            selectItem(null);
+            selectedNode = null;
+            
+            for(let i = appList.length - 1; i >= 0; i--) {
+                let it = appList[i];
+                if(it.type === 'tube_dynamic') {
+                    for(let n = 0; n < it.nodes.length; n++) {
+                        if(Math.hypot(it.nodes[n].x - m.x, it.nodes[n].y - m.y) < 26 / cam.scale) {
+                            selectItem(it); selectedNode = n; break;
+                        }
+                    }
+                    if(selectedItem) break;
+                }
+            }
+
+            if(!selectedItem) {
+                for(let i = appList.length - 1; i >= 0; i--) {
+                    let it = appList[i];
+                    if(it.type === 'tube_dynamic') continue;
+                    if(hitTestApparatus(it, m.x, m.y)) {
+                        selectItem(it);
+                        dragOffset = { x: m.x - it.x, y: m.y - it.y };
+                        appList.splice(i, 1); appList.push(it);
+                        break;
+                    }
+                }
+            }
+
+            if(!selectedItem) {
+                for(let i = appList.length - 1; i >= 0; i--) {
+                    let it = appList[i];
+                    if(it.type === 'tube_dynamic') {
+                        for(let s = 0; s < it.nodes.length - 1; s++) {
+                            let n1 = it.nodes[s], n2 = it.nodes[s+1];
+                            let dSeg = distToSegment(m, n1, n2);
+                            if(dSeg < 14 / cam.scale) {
+                                selectItem(it); dragOffset = { x: m.x - n1.x, y: m.y - n1.y }; break;
+                            }
+                        }
+                        if(selectedItem) break;
+                    }
+                }
+            }
+            isDragging = (selectedItem !== null);
+        });
+
+        function distToSegment(p, v, w) {
+            let l2 = (v.x - w.x)*(v.x - w.x) + (v.y - w.y)*(v.y - w.y);
+            if (l2 === 0) return Math.hypot(p.x - v.x, p.y - v.y);
+            let t = ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
+            t = Math.max(0, Math.min(1, t));
+            return Math.hypot(p.x - (v.x + t * (w.x - v.x)), p.y - (v.y + t * (w.y - v.y)));
+        }
+
+        canvas.addEventListener('pointermove', e => {
+            if(e.buttons !== 1) { if(isDragging) endDrag(e); return; }
+            if(!isDragging) return;
+            const m = getMousePos(e);
+            
+            if(cam.mode === 'pan') {
+                cam.x = dragStartCam.x + (m.rawX - dragStartMouse.x);
+                cam.y = dragStartCam.y + (m.rawY - dragStartMouse.y);
+                return;
+            }
+
+            if(selectedItem.type === 'tube_dynamic' && selectedNode !== null) {
+                let currentSnap = selectedItem.snaps[selectedNode];
+                if(currentSnap) {
+                    let gp = getGlobalPort(currentSnap.item, currentSnap.port);
+                    if(gp && Math.hypot(m.x - gp.x, m.y - gp.y) > 28 / cam.scale) selectedItem.snaps[selectedNode] = null;
+                }
+
+                selectedItem.nodes[selectedNode].x = m.x; selectedItem.nodes[selectedNode].y = m.y;
+                
+                let snap = findSnapTarget(m.x, m.y, selectedItem.id);
+                if(snap) { 
+                    selectedItem.nodes[selectedNode].x = snap.x; selectedItem.nodes[selectedNode].y = snap.y; selectedItem._tempSnap = snap; 
+                } else { selectedItem._tempSnap = null; }
+            } else if(selectedItem.type === 'tube_dynamic' && selectedNode === null) {
+                let dx = m.x - (selectedItem.nodes[0].x + dragOffset.x);
+                let dy = m.y - (selectedItem.nodes[0].y + dragOffset.y);
+                selectedItem.nodes.forEach(n => { n.x += dx; n.y += dy; });
+            } else {
+                let dx = (m.x - dragOffset.x) - selectedItem.x;
+                let dy = (m.y - dragOffset.y) - selectedItem.y;
+                moveTree(selectedItem, dx, dy);
+                
+                if(selectedItem.type.includes('cork')) {
+                    let flask = appList.find(a => (a.type.includes('flask') || a.type === 'boiling_tube'));
+                    if(flask) {
+                        let topP = getGlobalPort(flask, 'top');
+                        if(topP && Math.hypot(selectedItem.x - topP.x, selectedItem.y - topP.y) < 45) selectedItem._magneticTarget = { type: 'flask', item: flask };
+                        else selectedItem._magneticTarget = null;
+                    }
+                }
+
+                if(selectedItem.type.includes('funnel')) {
+                    let cork = appList.find(a => a.type.includes('cork'));
+                    if(cork) {
+                        let hole1Pos = getGlobalPort(cork, 'hole1');
+                        let tipPos = getGlobalPort(selectedItem, 'bottom');
+                        if(hole1Pos && tipPos && Math.hypot(tipPos.x - hole1Pos.x, tipPos.y - hole1Pos.y) < 45) selectedItem._magneticTarget = { type: 'cork', item: cork };
+                        else selectedItem._magneticTarget = null;
+                    }
+                }
+
+                if(selectedItem.type === 'collector') {
+                    let trough = appList.find(a => a.type === 'trough');
+                    if(trough) {
+                        let beehivePos = getGlobalPort(trough, 'beehive');
+                        if(beehivePos && Math.hypot(selectedItem.x - beehivePos.x, selectedItem.y - (beehivePos.y - 70)) < 60) selectedItem._magneticTarget = { type: 'trough', item: trough };
+                        else selectedItem._magneticTarget = null;
+                    }
+                }
+            }
+            updateConnectionTelemetry();
+        });
+
+        function endDrag(e) {
+            if(isDragging && selectedItem) {
+                if(selectedItem.type === 'tube_dynamic' && selectedNode !== null) {
+                    if(selectedItem._tempSnap) {
+                        selectedItem.snaps[selectedNode] = selectedItem._tempSnap;
+                        selectedItem.nodes[selectedNode].x = selectedItem._tempSnap.x;
+                        selectedItem.nodes[selectedNode].y = selectedItem._tempSnap.y;
+                        selectedItem._tempSnap = null;
+                    } else {
+                        let jar = appList.find(a => a.type === 'collector');
+                        if(jar) {
+                            let node = selectedItem.nodes[selectedNode];
+                            let jMouth = getGlobalPort(jar, 'mouth') || { x: jar.x, y: jar.y - jar.h/2 };
+                            if(Math.hypot(node.x - jMouth.x, node.y - jMouth.y) < 85) selectedItem.snaps[selectedNode] = { item: jar, port: 'mouth' };
+                        }
+                    }
+                } else if(selectedItem._magneticTarget) {
+                    if(selectedItem._magneticTarget.type === 'flask') lockCorkToFlask(selectedItem, selectedItem._magneticTarget.item);
+                    else if(selectedItem._magneticTarget.type === 'cork') lockFunnelToCork(selectedItem, selectedItem._magneticTarget.item);
+                    else if(selectedItem._magneticTarget.type === 'trough') {
+                        selectedItem.x = selectedItem._magneticTarget.item.x;
+                        selectedItem.y = selectedItem._magneticTarget.item.y - 70;
+                        if (!selectedItem.inv) {
+                            selectedItem.inv = true;
+                            selectedItem.ports.mouth = { x: 0, y: 95 };
+                            selectedItem.ports.base = { x: 0, y: -95 };
+                        }
+                        updateInspector();
+                    }
+                    selectedItem._magneticTarget = null;
+                }
+            }
+            isDragging = false;
+            selectedNode = null;
+            updateConnectionTelemetry();
+        }
+
+        window.addEventListener('pointerup', endDrag);
+        window.addEventListener('mouseup', endDrag);
+        window.addEventListener('pointercancel', endDrag);
+
+        function showHazardAlert(title, message, details) {
+            document.getElementById('hazardTitle').textContent = title;
+            document.getElementById('hazardMessage').textContent = message;
+            document.getElementById('hazardDetails').innerHTML = details;
+            document.getElementById('hazardModal').style.display = 'flex';
+        }
+
+        function triggerEscapeCloud(originX, originY, color) {
+            for(let i = 0; i < 40; i++) {
+                escapingGasClouds.push({ x: originX, y: originY, vx: (Math.random() - 0.5) * 4, vy: -Math.random() * 3.5 - 0.5, radius: 8 + Math.random() * 14, alpha: 0.8, color: color });
+            }
+        }
+
+        // ==========================================
+        // STRICT SCIENTIFIC & RUNTIME VALIDATION ENGINE
+        // ==========================================
+        function validateSetup() {
+            const key = document.getElementById('gasSelector').value;
+            const gasInfo = gasDatabase[key];
+
+            let vessel = appList.find(a => (a.type.includes('flask') || a.type === 'boiling_tube'));
+            if(!vessel) return { valid: false, title: "MISSING GENERATOR VESSEL", desc: "No reaction vessel (flask or boiling tube) was detected on the bench.", details: "Action: Add a Round-Bottom Flask or Boiling Tube." };
+
+            let loadedIds = vessel.reagents.map(r => r.id);
+            let allValidIngredients = Array.from(new Set(gasInfo.validSets.flat()));
+            
+            let contaminatingReagents = vessel.reagents.filter(r => !allValidIngredients.includes(r.id));
+            if(contaminatingReagents.length > 0) return { valid: false, title: "CHEMICAL CONTAMINATION DETECTED", desc: `Foreign chemicals incompatible with ${gasInfo.name} preparation were detected in the generator!`, details: `<strong>Contaminating Chemical(s):</strong> <span style="color:var(--neon-red); font-weight:bold;">${contaminatingReagents.map(r=>r.name).join(', ')}</span><br><strong>Expected Formulation:</strong> ${gasInfo.requiredReagentsText}` };
+
+            let possibleRecipe = gasInfo.validSets.find(recipe => recipe.every(reqId => loadedIds.includes(reqId)));
+            if(!possibleRecipe) return { valid: false, title: "INCOMPLETE PRECURSOR FORMULATION", desc: `Missing essential components required for generating ${gasInfo.name}.`, details: `<strong>Currently Loaded in Flask:</strong> ${vessel.reagents.map(r=>r.name).join(' + ') || 'None'}<br><strong>Mandatory Reagents:</strong> ${gasInfo.requiredReagentsText}` };
+
+            // DRYING AGENT COMPATIBILITY LOGIC
+            let dryingApparatus = appList.filter(a => a.type === 'wash_bottle' || a.type === 'tower_drying');
+            for(let app of dryingApparatus) {
+                if(app.reagents.length > 0) {
+                    let agentId = app.reagents[0].id;
+                    
+                    if (agentId === 'water') {
+                        if (['NH3', 'SO2', 'NO2'].includes(key)) {
+                            return { 
+                                valid: false, 
+                                title: "CRITICAL ERROR: WASHING WITH WATER!", 
+                                desc: `${gasInfo.name} is highly soluble in water. Passing it through a water wash bottle will dissolve the gas completely and cause a hazardous suck-back!`, 
+                                details: "• <strong>Correction:</strong> Remove the water wash bottle. Use appropriate drying agents directly.", 
+                                cloudX: app.x, cloudY: app.y - 70, color: gasInfo.bColor 
+                            };
+                        }
+                        continue; // Water is allowed for washing other gases (e.g. Cl2)
+                    }
+
+                    if (!gasInfo.allowedDryingAgents.includes(agentId)) {
+                        let title = "INVALID DRYING AGENT INCOMPATIBILITY!";
+                        let desc = `The chosen drying agent (${app.reagents[0].name}) reacts with or is unsuitable for drying ${gasInfo.name}.`;
+                        let details = "• <strong>Approved Methods:</strong> " + gasInfo.dryingAgentsText;
+                        
+                        if (key === 'NH3' && agentId === 'h2so4_conc') {
+                            title = "DANGEROUS INCOMPATIBILITY: ACID-BASE NEUTRALIZATION!";
+                            desc = "Ammonia gas (NH₃) is strongly basic and reacts violently with concentrated sulfuric acid to form solid ammonium sulfate!";
+                            details = "• <strong>Correction:</strong> Dry Ammonia gas using a Drying Tower packed with Quicklime (CaO).";
+                        } else if (key === 'NH3' && agentId === 'cacl2') {
+                            title = "CHEMICAL REACTION HAZARD: COMPLEX SALT FORMATION!";
+                            desc = "Ammonia gas reacts with Calcium Chloride to form a solid complex salt (CaCl₂·8NH₃), completely blocking the gas flow!";
+                            details = "• <strong>Correction:</strong> Dry Ammonia gas using a Drying Tower packed with Quicklime (CaO).";
+                        } else if (['Cl2', 'SO2', 'CO2', 'NO2'].includes(key) && agentId === 'cao') {
+                            title = "ACID-BASE REACTION IN DRYING TOWER!";
+                            desc = `${gasInfo.name} is an acidic gas and reacts vigorously with the basic Quicklime (CaO)!`;
+                            details = "• <strong>Correction:</strong> Use Concentrated H₂SO₄ or Anhydrous CaCl₂ to dry acidic gases.";
+                        }
+
+                        return { valid: false, title: title, desc: desc, details: details, cloudX: app.x, cloudY: app.y - 70, color: gasInfo.bColor };
+                    }
+                }
+            }
+
+            if(gasInfo.requiresTilt) {
+                let tiltDeg = Math.abs(vessel.rotation || 0);
+                if(tiltDeg < 15) return { valid: false, title: "CRITICAL THERMAL HAZARD: REACTION TUBE NOT SLANTED!", desc: `The reaction Ca(OH)₂ + 2NH₄Cl → CaCl₂ + 2H₂O + 2NH₃ produces liquid water as a byproduct.`, details: "• <strong>Violation:</strong> The boiling tube is held vertical or near-horizontal (tilt &lt; 15°).<br>• <strong>Scientific Risk:</strong> Condensed water droplets will run back onto the red-hot glass base, causing it to crack and shatter violently from thermal shock!<br>• <strong>Action Required:</strong> Select the generator tube and click '↺ Tilt -15°' until it slopes downward toward the rubber bung." };
+            }
+
+            let jar = appList.find(a => a.type === 'collector');
+            if(!jar) return { valid: false, title: "NO GAS COLLECTION APPARATUS", desc: "No Gas Collection Jar is present on the workbench.", details: "Action: Add a Gas Collection Jar to collect the synthesized product." };
+
+            let currentMethod = getDetectedCollectionMethod(jar);
+
+            if(!gasInfo.allowedMethods.includes(currentMethod.id)) {
+                let errorTitle = "INVALID GAS COLLECTION METHOD!";
+                let errorDesc = `You are attempting to collect <strong>${gasInfo.name}</strong> using <strong>${currentMethod.label}</strong>, which is scientifically invalid.`;
+                let errorDetails = "";
+
+                if(key === 'NH3') {
+                    if(currentMethod.id === 'downward_delivery') {
+                        errorTitle = "INVALID COLLECTION: AMMONIA GAS ESCAPE!";
+                        errorDetails = `• <strong>Current Error:</strong> Your collection jar is standing UPRIGHT (Downward Delivery).<br>` +
+                                       `• <strong>Scientific Reason (Density):</strong> Ammonia has a molar mass of 17 g/mol, making it significantly <strong>less dense (lighter) than air</strong> (approx. 29 g/mol). When fed into an upright jar, the light gas rises immediately and escapes into the room rather than settling at the bottom!<br>` +
+                                       `• <strong>Correction:</strong> Select the Gas Jar and click <strong>'Invert (Upward Delivery)'</strong>.`;
+                    } else if(currentMethod.id === 'over_water') {
+                        errorTitle = "VIOLENT SUCK-BACK & GAS DISSOLUTION HAZARD!";
+                        errorDetails = `• <strong>Current Error:</strong> Attempting to collect Ammonia over water.<br>` +
+                                       `• <strong>Scientific Reason (Solubility):</strong> Ammonia is extraordinarily soluble in water. It dissolves almost instantaneously, producing a vacuum suck-back that draws cold water into the hot generator, cracking the glass!<br>` +
+                                       `• <strong>Correction:</strong> Empty the water from the jar and trough. Collect dry ammonia by <strong>Upward Delivery</strong> into an inverted dry jar.`;
+                    }
+                } else if(key === 'N2' || key === 'CO') {
+                    errorTitle = "COLLECTION FAILURE: TURBULENT AIR MIXING!";
+                    errorDetails = `• <strong>Scientific Reason:</strong> ${gasInfo.name} has a molar mass of 28 g/mol, which is virtually identical to air (approx. 29 g/mol).<br>` +
+                                   `• <strong>Why Air Displacement Fails:</strong> With no density gradient, the gas diffuses into and mixes with room air instead of pushing it out.<br>` +
+                                   `• <strong>Mandatory Method:</strong> Because ${gasInfo.name} is insoluble in water, it <strong>MUST be collected over water</strong> using a pneumatic trough and beehive shelf.`;
+                } else if(key === 'NO') {
+                    errorTitle = "CRITICAL REACTION: AIR CONTAMINATION WITH BROWN NO₂!";
+                    errorDetails = `• <strong>Why Air Displacement Fails:</strong> Nitric oxide (NO) reacts spontaneously with atmospheric oxygen in air: <strong>2NO + O₂ → 2NO₂</strong>, generating toxic brown nitrogen dioxide fumes instantly!<br>` +
+                                   `• <strong>Mandatory Method:</strong> Nitric oxide is insoluble in water and <strong>MUST be collected over water</strong> away from contact with air.`;
+                } else if(currentMethod.id === 'over_water') {
+                    errorTitle = "COLLECTION FAILURE: GAS DISSOLVES IN WATER!";
+                    errorDetails = `• <strong>Scientific Reason:</strong> ${gasInfo.name} is highly soluble in or reacts vigorously with water.<br>` +
+                                   `• <strong>Result:</strong> Gas bubbles dissolve completely into the water trough instead of filling the jar, and rapid dissolution can cause liquid suck-back.<br>` +
+                                   `• <strong>Mandatory Method:</strong> Collect dry gas by <strong>${gasInfo.methodSummary}</strong>.`;
+                } else if(currentMethod.id === 'upward_delivery') {
+                    errorTitle = "INVALID COLLECTION: DENSE GAS SPILL!";
+                    errorDetails = `• <strong>Scientific Reason:</strong> ${gasInfo.name} (Molar mass ${gasInfo.molarMass} g/mol) is <strong>denser than air</strong> (approx. 29 g/mol).<br>` +
+                                   `• <strong>Result:</strong> An inverted dry jar allows the dense gas to sink and pour out the open bottom rim into the room!<br>` +
+                                   `• <strong>Correction:</strong> Select the jar and set it <strong>Upright (Downward Delivery)</strong> so the heavy gas fills from the base upward.`;
+                } else {
+                    errorDetails = `• <strong>Scientific Rule:</strong> ${gasInfo.methodRationale}<br>` +
+                                   `• <strong>Mandatory Method:</strong> ${gasInfo.methodSummary}.`;
+                }
+
+                return { valid: false, title: errorTitle, desc: errorDesc, details: errorDetails, cloudX: jar.x, cloudY: jar.y - 40, color: gasInfo.bColor };
+            }
+
+            if(gasInfo.toxic) {
+                const jarUncovered = !jar || (!jar.hasCover && !jar.water);
+                const fumeHoodOff = !fumeHoodActive;
+
+                if(jarUncovered && fumeHoodOff) return { valid: false, title: "CRITICAL HAZARD: UNSEALED TOXIC GAS EMISSION!", desc: `${gasInfo.name} is a hazardous/toxic gas. Generating it without jar sealing AND bench ventilation risks acute poisoning!`, details: "• <strong>Violation 1:</strong> The Gas Collection Jar has NO COVER PLATE or WATER SEAL.<br>• <strong>Violation 2:</strong> Fume Hood ventilation is DISABLED.<br><br><strong>Actions:</strong> Install the cover slip and click 'Fume Hood: OFF' to activate exhaust air.", cloudX: vessel.x, cloudY: vessel.y - 80, color: gasInfo.bColor };
+                if(gasInfo.requiresFumeHood && fumeHoodOff) return { valid: false, title: "MANDATORY FUME HOOD EXTRACTION REQUIRED!", desc: `${gasInfo.name} is classified as an acute toxic inhalation danger. A covered jar alone is insufficient.`, details: "• <strong>Action Required:</strong> Click 'Fume Hood: OFF' to activate laminar flow exhaust.", cloudX: vessel.x, cloudY: vessel.y - 80, color: gasInfo.bColor };
+            }
+
+            let burner = appList.find(a => a.type === 'burner');
+            let zone = getVesselHeatedZone(vessel);
+            let isUnderVessel = burner && zone && Math.abs(burner.x - zone.x) < 55 && (burner.y > zone.y);
+            let heatLevel = (burner && isUnderVessel) ? burner.flame : 'off';
+
+            let requiredHeat = gasInfo.heatRequired;
+            if (key === 'Cl2') {
+                if (loadedIds.includes('mno2')) requiredHeat = 'gentle';
+                if (loadedIds.includes('kmnop4')) requiredHeat = 'none';
+            } else if (key === 'SO2') {
+                if (loadedIds.includes('cu')) requiredHeat = 'gentle';
+                if (loadedIds.includes('na2so3')) requiredHeat = 'none';
+            }
+
+            if(requiredHeat === 'roaring' && heatLevel !== 'roaring') return { valid: false, title: "ROARING HEAT REQUIRED!", desc: `The synthesis of ${gasInfo.name} requires intense heating with a roaring blue Bunsen flame directly under the precursor reaction zone.`, details: "• Select 'Roaring' under Bunsen Burner Flame and position the burner properly under the vessel." };
+            if(requiredHeat === 'gentle') {
+                if (heatLevel === 'off') return { valid: false, title: "HEAT REQUIRED TO PROCEED!", desc: `The synthesis of ${gasInfo.name} using these exact precursors requires heating to proceed.`, details: "• Select 'Gentle' or 'Roaring' under Bunsen Burner Flame and position the burner properly under the vessel." };
+                else if (key === 'N2O' && heatLevel === 'roaring') return { valid: false, title: "CRITICAL EXPLOSION RISK: OVERHEATING!", desc: "Ammonium nitrate decomposes explosively if heated too strongly to generate N₂O.", details: "• Set Bunsen burner to a Gentle Luminous flame for safe, controlled decomposition." };
+            }
+            if(requiredHeat === 'none' && heatLevel !== 'off') return { valid: false, title: "UNNECESSARY & HAZARDOUS HEATING!", desc: `The synthesis of ${gasInfo.name} using these precursors is spontaneous and highly exothermic at room temperature. Applying heat is dangerous!`, details: "• Select 'Flame: OFF' on the Bunsen burner or drag it away from the reaction vessel." };
+
+            const { gasTrainSealed } = checkTubeConnections();
+            if(!gasTrainSealed) return { valid: false, title: "LEAKAGE DETECTED: DISCONNECTED APPARATUS", desc: `Synthesized gas cannot be contained because delivery connections are unsealed.`, details: "• One or more delivery tube tips are venting into room air rather than connecting into wash bottles or the collection jar mouth.<br><br><span style='color:var(--neon-green); font-weight:bold;'>Tip: Click '⚡ Auto-Build Gas Train' to automatically lock the entire apparatus series together!</span>", cloudX: vessel.x, cloudY: vessel.y - 80, color: gasInfo.bColor };
+
+            return { valid: true };
+        }
+        // ==========================================
+
+        function startSimulation() {
+            simState = 'running'; gasFillLevel = 0; particles = []; escapingGasClouds = []; washBubbles = []; generatorBubbles = [];
+            document.getElementById('endNotification').style.display = 'none'; updateConnectionTelemetry();
+        }
+
+        document.getElementById('generateBtn').onclick = () => {
+            const key = document.getElementById('gasSelector').value;
+            const gasInfo = gasDatabase[key];
+
+            let vessel = appList.find(a => (a.type.includes('flask') || a.type === 'boiling_tube'));
+            if(!vessel) {
+                showHazardAlert("MISSING REACTION VESSEL", "A reaction vessel (Flask or Boiling Tube) is required on the bench.", "Action: Select a reaction vessel from the glassware dropdown and click '+ Add Glassware'.");
+                return;
+            }
+
+            let loadedIds = vessel.reagents.map(r => r.id);
+            let funnel = appList.find(a => a.type === 'funnel_dropping' && a.reagents.length > 0);
+            let matchedRecipe = gasInfo.validSets.find(recipe => recipe.every(reqId => loadedIds.includes(reqId)));
+
+            if(!matchedRecipe && funnel && funnel.reagents.length > 0) {
+                let combinedIds = [...loadedIds, funnel.reagents[0].id];
+                let canComplete = gasInfo.validSets.find(recipe => recipe.every(reqId => combinedIds.includes(reqId)));
+                if(canComplete) { funnel.tapOpen = true; updateInspector(); return; }
+            }
+
+            let status = validateSetup();
+            if(status.valid) startSimulation();
+            else { showHazardAlert(status.title, status.desc, status.details); if(status.cloudX !== undefined) triggerEscapeCloud(status.cloudX, status.cloudY, status.color); }
+        };
+
+        function stopReaction() { 
+            simState = 'idle'; gasFillLevel = 0; particles = []; escapingGasClouds = []; washBubbles = []; generatorBubbles = [];
+            document.getElementById('endNotification').style.display = 'none'; updateConnectionTelemetry();
+        }
+
+        // DRAWING
+        function drawRealisticOpenVessel(it) {
+            let w = it.w, h = it.h;
+            let rad = (it.rotation || 0) * Math.PI / 180;
+
+            if(it.type === 'boiling_tube') {
+                ctx.beginPath(); ctx.moveTo(-w/2, -h/2 + 6); ctx.lineTo(-w/2, h/2 - w/2); ctx.arc(0, h/2 - w/2, w/2, Math.PI, 0, true); ctx.lineTo(w/2, -h/2 + 6); ctx.stroke();
+                ctx.beginPath(); ctx.ellipse(0, -h/2 + 6, w/2 + 4, 5, 0, 0, Math.PI*2); ctx.stroke(); ctx.fillStyle = "rgba(255, 255, 255, 0.12)"; ctx.fill();
+
+                if(it.reagents.length > 0) {
+                    ctx.save(); ctx.beginPath(); ctx.moveTo(-w/2 + 2, -h/2 + 6); ctx.lineTo(-w/2 + 2, h/2 - w/2); ctx.arc(0, h/2 - w/2, w/2 - 2, Math.PI, 0, true); ctx.lineTo(w/2 - 2, -h/2 + 6); ctx.closePath(); ctx.clip();
+                    ctx.rotate(-rad);
+                    let pts = [{lx: -w/2, ly: -h/2 + 6}, {lx: w/2, ly: -h/2 + 6}, {lx: -w/2, ly: h/2 - w/2}, {lx: w/2, ly: h/2 - w/2}, {lx: 0, ly: h/2}];
+                    let maxWY = -Infinity;
+                    pts.forEach(p => { let wy = p.lx * Math.sin(rad) + p.ly * Math.cos(rad); if(wy > maxWY) maxWY = wy; });
+
+                    if(it.reagents.some(r => !r.isSolid)) {
+                        ctx.fillStyle = "rgba(0, 180, 255, 0.45)"; let liqHeight = 46; ctx.fillRect(-180, maxWY - liqHeight, 360, liqHeight + 30);
+                        ctx.strokeStyle = "rgba(0, 243, 255, 0.75)"; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(-180, maxWY - liqHeight); ctx.lineTo(180, maxWY - liqHeight); ctx.stroke();
+                    }
+                    if(it.reagents.some(r => r.isSolid)) {
+                        ctx.fillStyle = "#334155"; let solidHeight = 28; ctx.beginPath(); ctx.ellipse(0, maxWY - solidHeight/2, w + 10, solidHeight, 0, 0, Math.PI*2); ctx.fill();
+                        ctx.fillStyle = "#64748b";
+                        for(let k = 0; k < 12; k++) { ctx.beginPath(); ctx.arc((k%4 - 1.5) * 8, maxWY - 8 - Math.floor(k/4) * 6, 2, 0, Math.PI*2); ctx.fill(); }
+                    }
+                    ctx.restore();
+                }
+                return;
+            }
+
+            if(it.type === 'flask_conical') {
+                let neckW = 34, neckH = 50, topY = -h/2, neckBottomY = topY + neckH, baseY = h/2;
+                ctx.beginPath(); ctx.moveTo(-neckW/2, topY + 4); ctx.lineTo(-neckW/2, neckBottomY); ctx.lineTo(-w/2 + 12, baseY - 8); ctx.quadraticCurveTo(-w/2, baseY, -w/2 + 16, baseY); ctx.lineTo(w/2 - 16, baseY); ctx.quadraticCurveTo(w/2, baseY, w/2 - 12, baseY - 8); ctx.lineTo(neckW/2, neckBottomY); ctx.lineTo(neckW/2, topY + 4); ctx.stroke();
+                ctx.fillStyle = THEME.glassBase; ctx.fill();
+                ctx.beginPath(); ctx.ellipse(0, topY + 4, neckW/2 + 5, 5.5, 0, 0, Math.PI*2); ctx.stroke();
+
+                if(it.reagents.length > 0) {
+                    ctx.save(); ctx.beginPath(); ctx.moveTo(-neckW/2, neckBottomY); ctx.lineTo(-w/2 + 14, baseY); ctx.lineTo(w/2 - 14, baseY); ctx.lineTo(neckW/2, neckBottomY); ctx.closePath(); ctx.clip();
+                    ctx.rotate(-rad);
+                    let pts = [{lx: -neckW/2, ly: neckBottomY}, {lx: neckW/2, ly: neckBottomY}, {lx: -w/2 + 14, ly: baseY}, {lx: w/2 - 14, ly: baseY}];
+                    let maxWY = -Infinity;
+                    pts.forEach(p => { let wy = p.lx * Math.sin(rad) + p.ly * Math.cos(rad); if(wy > maxWY) maxWY = wy; });
+
+                    if(it.reagents.some(r => !r.isSolid)) { ctx.fillStyle = "rgba(0, 180, 255, 0.45)"; let liqHeight = 52; ctx.fillRect(-180, maxWY - liqHeight, 360, liqHeight + 30); }
+                    if(it.reagents.some(r => r.isSolid)) { ctx.fillStyle = "#334155"; ctx.beginPath(); ctx.ellipse(0, maxWY - 12, w/2 - 10, 14, 0, 0, Math.PI*2); ctx.fill(); }
+                    ctx.restore();
+                }
+                return;
+            }
+
+            if(it.type === 'flask_round') {
+                let neckW = 34, neckH = 52, topY = -h/2, R = 50; 
+                let phi = Math.asin((neckW/2) / R);
+                let bulbCenterY = topY + neckH + R * Math.cos(phi) - 6;
+
+                ctx.beginPath(); ctx.moveTo(-neckW/2, topY + 4); ctx.lineTo(-neckW/2, bulbCenterY - R * Math.cos(phi)); ctx.arc(0, bulbCenterY, R, 1.5 * Math.PI - phi, 1.5 * Math.PI + phi, true); ctx.lineTo(neckW/2, topY + 4); ctx.stroke();
+                ctx.fillStyle = THEME.glassBase; ctx.fill();
+                ctx.beginPath(); ctx.ellipse(0, topY + 4, neckW/2 + 5, 5.5, 0, 0, Math.PI*2); ctx.stroke();
+
+                if(it.reagents.length > 0) {
+                    ctx.save(); ctx.beginPath(); ctx.arc(0, bulbCenterY, R - 2, 0, Math.PI*2); ctx.clip();
+                    ctx.rotate(-rad);
+                    let bulbWY = bulbCenterY * Math.cos(rad);
+                    let maxWY = bulbWY + R;
+
+                    if(it.reagents.some(r => !r.isSolid)) { ctx.fillStyle = "rgba(0, 180, 255, 0.45)"; let liqHeight = 45; ctx.fillRect(-180, maxWY - liqHeight, 360, liqHeight + 30); }
+                    if(it.reagents.some(r => r.isSolid)) { ctx.fillStyle = "#334155"; ctx.beginPath(); ctx.ellipse(0, maxWY - 12, R - 14, 12, 0, 0, Math.PI*2); ctx.fill(); }
+                    ctx.restore();
+                }
+                return;
+            }
+        }
+
+        function drawItems() {
+            if(fumeHoodActive) {
+                ctx.save(); ctx.strokeStyle = "rgba(0, 243, 255, 0.45)"; ctx.lineWidth = 3; ctx.setLineDash([8, 6]); ctx.strokeRect(-480, -220, 1400, 540);
+                ctx.fillStyle = "rgba(0, 243, 255, 0.04)"; ctx.fillRect(-480, -220, 1400, 540);
+                ctx.font = "bold 12px 'Share Tech Mono', monospace"; ctx.fillStyle = "#00f3ff"; ctx.fillText("LAMINAR FLOW FUME EXTRACTION CANOPY [ACTIVE: 0.5 m/s]", -460, -200); ctx.restore();
+            }
+
+            appList.forEach(it => {
+                if(it.type === 'tube_dynamic') {
+                    it.snaps.forEach((snap, idx) => {
+                        if(snap) { let gp = getGlobalPort(snap.item, snap.port); if(gp) { it.nodes[idx].x = gp.x; it.nodes[idx].y = gp.y; } }
+                    });
+                    ctx.strokeStyle = "rgba(180, 235, 255, 0.85)"; ctx.lineWidth = 9; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+                    ctx.beginPath(); ctx.moveTo(it.nodes[0].x, it.nodes[0].y);
+                    for(let i=1; i<it.nodes.length; i++) ctx.lineTo(it.nodes[i].x, it.nodes[i].y);
+                    ctx.stroke();
+                    ctx.strokeStyle = "rgba(8, 14, 24, 0.85)"; ctx.lineWidth = 3.5; ctx.stroke();
+                    
+                    it.nodes.forEach((n, idx) => { 
+                        let isSnapped = it.snaps[idx] !== null;
+                        ctx.fillStyle = isSnapped ? "#00ff88" : "#00f3ff"; ctx.beginPath(); ctx.arc(n.x, n.y, 6/cam.scale, 0, Math.PI*2); ctx.fill(); 
+                        ctx.strokeStyle = isSnapped ? "#00ff88" : "#ffffff"; ctx.lineWidth = isSnapped ? 2 : 1; ctx.stroke();
+                    });
+                }
+            });
+
+            appList.forEach(it => {
+                if(it.type === 'tube_dynamic') return;
+                ctx.save(); ctx.translate(it.x, it.y); ctx.scale(it.scale, it.scale); ctx.rotate((it.rotation || 0) * Math.PI / 180);
+                
+                if(selectedItem && selectedItem.id === it.id) {
+                    ctx.shadowColor = "#00f3ff"; ctx.shadowBlur = 18; ctx.strokeStyle = "rgba(0, 243, 255, 0.6)"; ctx.lineWidth = 2; ctx.strokeRect(-it.w/2 - 8, -it.h/2 - 8, it.w + 16, it.h + 16);
+                }
+
+                ctx.strokeStyle = THEME.glassBorder; ctx.lineWidth = 3.5;
+
+                if(it.type.includes('flask') || it.type === 'boiling_tube') { drawRealisticOpenVessel(it); }
+                else if (it.type.includes('cork')) {
+                    ctx.fillStyle = THEME.rubberBung; ctx.beginPath(); ctx.moveTo(-it.w/2 + 4, -it.h/2); ctx.lineTo(it.w/2 - 4, -it.h/2); ctx.lineTo(it.w/2, it.h/2); ctx.lineTo(-it.w/2, it.h/2); ctx.closePath(); ctx.fill();
+                    ctx.fillStyle = THEME.corkHole;
+                    if(it.type === 'cork1') { ctx.fillRect(-4, -it.h/2, 8, it.h); }
+                    if(it.type === 'cork2') { ctx.fillRect(-12, -it.h/2, 6, it.h); ctx.fillRect(6, -it.h/2, 6, it.h); }
+                }
+                else if (it.type === 'funnel') {
+                    ctx.strokeStyle = THEME.glassBorder; ctx.lineWidth = 3; ctx.fillStyle = THEME.glassBase;
+                    ctx.fillRect(-3, -15, 6, it.stem); ctx.strokeRect(-3, -15, 6, it.stem);
+                    ctx.beginPath(); ctx.arc(0, -35, 18, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(-24, -65); ctx.lineTo(24, -65); ctx.lineTo(12, -48); ctx.lineTo(-12, -48); ctx.closePath(); ctx.fill(); ctx.stroke();
+                }
+                else if (it.type === 'funnel_dropping') {
+                    ctx.strokeStyle = THEME.glassBorder; ctx.lineWidth = 3; ctx.fillStyle = THEME.glassBase;
+                    ctx.beginPath(); ctx.moveTo(-16, -65); ctx.lineTo(-16, -5); ctx.lineTo(-4, 15); ctx.lineTo(4, 15); ctx.lineTo(16, -5); ctx.lineTo(16, -65); ctx.stroke(); ctx.fill();
+                    ctx.beginPath(); ctx.ellipse(0, -65, 18, 5, 0, 0, Math.PI*2); ctx.stroke();
+
+                    if(it.reagents.length > 0) { ctx.fillStyle = "rgba(0, 180, 255, 0.4)"; ctx.fillRect(-14, -45, 28, 40); }
+                    ctx.fillStyle = THEME.glassBase; ctx.fillRect(-3, 29, 6, it.stem); ctx.strokeRect(-3, 29, 6, it.stem);
+                    ctx.fillStyle = "#e2e8f0"; ctx.fillRect(-10, 15, 20, 14);
+
+                    ctx.save(); ctx.translate(0, 22);
+                    if(it.tapOpen) { ctx.fillStyle = "#00ff88"; ctx.fillRect(-3.5, -16, 7, 32); ctx.fillStyle = "#ffffff"; ctx.fillRect(-7, -4, 14, 8); }
+                    else { ctx.fillStyle = "#ff3366"; ctx.fillRect(-18, -3.5, 36, 7); ctx.fillStyle = "#ffffff"; ctx.fillRect(-4, -7, 8, 14); }
+                    ctx.restore();
+                }
+                else if (it.type === 'wash_bottle') {
+                    ctx.strokeStyle = THEME.glassBorder; ctx.lineWidth = 3.5; ctx.fillStyle = THEME.glassBase;
+                    let neckW = 34, neckH = 28, topY = -it.h/2, baseY = it.h/2;
+                    ctx.beginPath(); ctx.ellipse(0, baseY, it.w/2 + 4, 7, 0, 0, Math.PI*2); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(-neckW/2, topY + 12); ctx.lineTo(-neckW/2, topY + neckH); ctx.quadraticCurveTo(-it.w/2, topY + neckH + 12, -it.w/2, topY + neckH + 28); ctx.lineTo(-it.w/2, baseY - 6); ctx.quadraticCurveTo(-it.w/2, baseY, -it.w/2 + 8, baseY); ctx.lineTo(it.w/2 - 8, baseY); ctx.quadraticCurveTo(it.w/2, baseY, it.w/2, baseY - 6); ctx.lineTo(it.w/2, topY + neckH + 28); ctx.quadraticCurveTo(it.w/2, topY + neckH + 12, neckW/2, topY + neckH); ctx.lineTo(neckW/2, topY + 12); ctx.stroke(); ctx.fill();
+
+                    ctx.fillStyle = THEME.rubberBung; ctx.beginPath(); ctx.moveTo(-neckW/2 + 2, topY + 12); ctx.lineTo(neckW/2 - 2, topY + 12); ctx.lineTo(neckW/2 + 2, topY + 28); ctx.lineTo(-neckW/2 - 2, topY + 28); ctx.fill();
+
+                    if(it.reagents.length > 0) {
+                        let isConcAcid = it.reagents.some(r => r.id === 'h2so4_conc');
+                        ctx.fillStyle = isConcAcid ? "rgba(254, 240, 138, 0.42)" : "rgba(0, 180, 255, 0.35)"; ctx.fillRect(-it.w/2 + 3, baseY - 68, it.w - 6, 64);
+                        ctx.fillStyle = "#cbd5e1"; ctx.font = "bold 9px monospace"; ctx.fillText(it.reagents[0].name.slice(0, 14), -it.w/2 + 10, baseY - 20);
+                    } else { ctx.fillStyle = "#64748b"; ctx.font = "italic 9px monospace"; ctx.fillText("[EMPTY BOTTLE]", -32, baseY - 20); }
+
+                    ctx.fillStyle = "rgba(180, 235, 255, 0.85)"; ctx.fillRect(-22, topY - 14, 6, baseY - topY - 14); ctx.strokeRect(-22, topY - 14, 6, baseY - topY - 14); ctx.fillRect(16, topY - 14, 6, 48); ctx.strokeRect(16, topY - 14, 6, 48);
+                }
+                else if (it.type === 'tower_drying') {
+                    ctx.strokeStyle = THEME.glassBorder; ctx.lineWidth = 3.5; ctx.fillStyle = THEME.glassBase;
+                    ctx.beginPath(); ctx.moveTo(-it.w/2, -it.h/2 + 20); ctx.lineTo(-it.w/2, it.h/2 - 20); ctx.quadraticCurveTo(0, it.h/2, it.w/2, it.h/2 - 20); ctx.lineTo(it.w/2, -it.h/2 + 20); ctx.stroke(); ctx.fill();
+
+                    if (it.reagents.length > 0) {
+                        ctx.fillStyle = "rgba(226, 232, 240, 0.85)"; 
+                        for (let y = it.h/2 - 30; y > -it.h/2 + 35; y -= 12) {
+                            for (let x = -it.w/2 + 12; x < it.w/2 - 10; x += 12) {
+                                ctx.beginPath(); ctx.arc(x + (Math.random()*6 - 3), y + (Math.random()*6 - 3), 6, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+                            }
+                        }
+                    }
+
+                    ctx.fillStyle = THEME.rubberBung; ctx.beginPath(); ctx.moveTo(-it.w/2 + 2, -it.h/2 + 8); ctx.lineTo(it.w/2 - 2, -it.h/2 + 8); ctx.lineTo(it.w/2 + 2, -it.h/2 + 20); ctx.lineTo(-it.w/2 - 2, -it.h/2 + 20); ctx.fill();
+                    ctx.fillStyle = THEME.glassBase; ctx.fillRect(-it.w/2 - 20, it.h/2 - 40, 20, 8); ctx.strokeRect(-it.w/2 - 20, it.h/2 - 40, 20, 8); ctx.fillRect(-4, -it.h/2 - 10, 8, 25); ctx.strokeRect(-4, -it.h/2 - 10, 8, 25);
+                    if (it.reagents.length > 0) { ctx.fillStyle = "#1e293b"; ctx.font = "bold 12px monospace"; let chemText = it.reagents[0].id === 'cao' ? "CaO" : (it.reagents[0].id === 'cacl2' ? "CaCl₂" : it.reagents[0].name.slice(0,5)); ctx.fillText(chemText, -18, 0); }
+                }
+                else if (it.type === 'trough') {
+                    ctx.strokeStyle = THEME.glassBorder; ctx.lineWidth = 3.5; ctx.fillStyle = THEME.glassBase;
+                    ctx.beginPath(); ctx.moveTo(-it.w/2, -it.h/2); ctx.lineTo(-it.w/2, it.h/2); ctx.lineTo(it.w/2, it.h/2); ctx.lineTo(it.w/2, -it.h/2); ctx.stroke();
+                    ctx.fillStyle = "rgba(0, 150, 255, 0.35)"; ctx.fillRect(-it.w/2, 10, it.w, it.h/2 - 10);
+                    ctx.strokeStyle = "rgba(0, 243, 255, 0.8)"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(-it.w/2, 10); ctx.lineTo(it.w/2, 10); ctx.stroke();
+                    ctx.fillStyle = "#cbd5e1"; ctx.strokeStyle = "#94a3b8"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(-45, it.h/2); ctx.lineTo(-45, it.h/2 - 50); ctx.quadraticCurveTo(0, it.h/2 - 70, 45, it.h/2 - 50); ctx.lineTo(45, it.h/2); ctx.fill(); ctx.stroke();
+                    ctx.fillStyle = "#1e293b"; ctx.beginPath(); ctx.arc(-25, it.h/2 - 15, 12, 0, Math.PI*2); ctx.fill();
+                    ctx.beginPath(); ctx.ellipse(0, it.h/2 - 60, 14, 5, 0, 0, Math.PI*2); ctx.fill();
+                }
+                else if (it.type === 'collector') {
+                    ctx.strokeStyle = THEME.glassBorder; ctx.lineWidth = 3.5; ctx.fillStyle = THEME.glassBase;
+                    let mouthY = it.inv ? it.h/2 : -it.h/2; let baseY = it.inv ? -it.h/2 : it.h/2;
+
+                    ctx.beginPath(); ctx.ellipse(0, baseY, it.w/2 + 12, 8, 0, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(-it.w/2, mouthY); ctx.lineTo(-it.w/2, baseY); ctx.lineTo(it.w/2, baseY); ctx.lineTo(it.w/2, mouthY); ctx.stroke(); ctx.fillRect(-it.w/2, Math.min(mouthY, baseY), it.w, Math.abs(mouthY - baseY));
+
+                    let gLevel = (simState !== 'idle') ? (it.h * gasFillLevel) : 0;
+                    if(it.water) {
+                        ctx.fillStyle = "rgba(0, 150, 255, 0.35)";
+                        if (it.inv) { let waterHeight = it.h - 13 - gLevel; if (waterHeight > 0) ctx.fillRect(-it.w/2 + 3, baseY + 3 + gLevel, it.w - 6, waterHeight); } 
+                        else { let waterHeight = it.h - 13 - gLevel; if (waterHeight > 0) ctx.fillRect(-it.w/2 + 3, baseY - waterHeight - 3, it.w - 6, waterHeight); }
+                    }
+
+                    if(it.hasCover) {
+                        ctx.fillStyle = "rgba(220, 245, 255, 0.9)"; ctx.beginPath(); ctx.ellipse(0, mouthY - 4, it.w/2 + 10, 8, 0, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+                    }
+
+                    if(simState !== 'idle') {
+                        const gData = gasDatabase[document.getElementById('gasSelector').value] || gasDatabase.Cl2;
+                        ctx.fillStyle = gData.color || "rgba(180, 225, 40, 0.4)";
+                        if(it.inv) ctx.fillRect(-it.w/2 + 3, baseY + 3, it.w - 6, gLevel);
+                        else ctx.fillRect(-it.w/2 + 3, baseY - gLevel - 3, it.w - 6, gLevel);
+                    }
+                }
+                else if (it.type === 'burner') {
+                    ctx.fillStyle = THEME.burnerBase; ctx.beginPath(); ctx.moveTo(-it.w/2, it.h/2); ctx.lineTo(it.w/2, it.h/2); ctx.lineTo(it.w/4, it.h/2 - 20); ctx.lineTo(-it.w/4, it.h/2 - 20); ctx.closePath(); ctx.fill();
+                    ctx.fillStyle = THEME.burnerChrome; ctx.fillRect(-8, -it.h/2, 16, it.h - 32);
+
+                    let now = Date.now() * 0.009;
+                    let flick = Math.sin(now) * 3 + Math.cos(now * 2.3) * 2;
+
+                    if(it.flame === 'gentle') {
+                        ctx.save(); ctx.shadowColor = "#ffb700"; ctx.shadowBlur = 28; ctx.fillStyle = "rgba(255, 183, 0, 0.9)";
+                        ctx.beginPath(); ctx.moveTo(0, -it.h/2 - 58 + flick); ctx.quadraticCurveTo(-16, -it.h/2 - 22, -8, -it.h/2); ctx.lineTo(8, -it.h/2); ctx.quadraticCurveTo(16, -it.h/2 - 22, 0, -it.h/2 - 58 + flick); ctx.fill();
+                        ctx.fillStyle = "#fffbeb"; ctx.beginPath(); ctx.moveTo(0, -it.h/2 - 32 + flick*0.5); ctx.quadraticCurveTo(-7, -it.h/2 - 12, -4, -it.h/2); ctx.lineTo(4, -it.h/2); ctx.quadraticCurveTo(7, -it.h/2 - 12, 0, -it.h/2 - 32 + flick*0.5); ctx.fill(); ctx.restore();
+                    } else if(it.flame === 'roaring') {
+                        ctx.save(); ctx.shadowColor = "#00f3ff"; ctx.shadowBlur = 35; ctx.fillStyle = "rgba(0, 150, 255, 0.85)";
+                        ctx.beginPath(); ctx.moveTo(0, -it.h/2 - 82 + flick * 1.4); ctx.quadraticCurveTo(-18, -it.h/2 - 32, -8, -it.h/2); ctx.lineTo(8, -it.h/2); ctx.quadraticCurveTo(18, -it.h/2 - 32, 0, -it.h/2 - 82 + flick * 1.4); ctx.fill();
+                        ctx.fillStyle = "#00f3ff"; ctx.beginPath(); ctx.moveTo(0, -it.h/2 - 42 + flick * 0.4); ctx.lineTo(-6, -it.h/2); ctx.lineTo(6, -it.h/2); ctx.closePath(); ctx.fill();
+                        ctx.fillStyle = "#ffffff"; ctx.beginPath(); ctx.moveTo(0, -it.h/2 - 18); ctx.lineTo(-3, -it.h/2); ctx.lineTo(3, -it.h/2); ctx.closePath(); ctx.fill(); ctx.restore();
+                    }
+                }
+                ctx.restore();
+            });
+
+            // WIRE GAUZE & TRIPOD ADAPTIVE RENDER
+            let vessel = appList.find(a => (a.type.includes('flask') || a.type === 'boiling_tube'));
+            let burner = appList.find(a => a.type === 'burner');
+            let zone = getVesselHeatedZone(vessel);
+
+            if(vessel && burner && zone && Math.abs(burner.x - zone.x) < 55 && burner.y > zone.y) {
+                ctx.save();
+                let gzY = burner.y - burner.h/2 - 6;
+                ctx.fillStyle = "#64748b"; ctx.fillRect(burner.x - 38, gzY - 3, 76, 5);
+                ctx.strokeStyle = "#cbd5e1"; ctx.lineWidth = 1;
+                for(let gx = burner.x - 34; gx <= burner.x + 34; gx += 6) { ctx.beginPath(); ctx.moveTo(gx, gzY - 3); ctx.lineTo(gx, gzY + 2); ctx.stroke(); }
+                ctx.fillStyle = "rgba(241, 245, 249, 0.9)"; ctx.beginPath(); ctx.arc(burner.x, gzY, 15, 0, Math.PI*2); ctx.fill();
+                ctx.strokeStyle = "#475569"; ctx.lineWidth = 3.5; ctx.beginPath(); ctx.moveTo(burner.x - 36, gzY); ctx.lineTo(burner.x - 55, gzY + 95); ctx.moveTo(burner.x + 36, gzY); ctx.lineTo(burner.x + 55, gzY + 95); ctx.stroke(); ctx.restore();
+            }
+        }
+
+        function updatePhysics() {
+            let now = Date.now();
+
+            if (simState === 'running') {
+                let status = validateSetup();
+                if (!status.valid) {
+                    stopReaction();
+                    let funnel = appList.find(a => a.type === 'funnel_dropping');
+                    if (funnel && funnel.tapOpen) { funnel.tapOpen = false; updateInspector(); }
+                    showHazardAlert("RUNTIME INTERRUPTED: " + status.title, status.desc, status.details);
+                    if (status.cloudX !== undefined) triggerEscapeCloud(status.cloudX, status.cloudY, status.color);
+                    return; 
+                }
+            }
+
+            appList.forEach(it => {
+                if(it.type === 'funnel_dropping' && it.tapOpen && it.reagents.length > 0) {
+                    if(now - lastFunnelDripTime > 130) {
+                        lastFunnelDripTime = now;
+                        let bottomPt = getGlobalPort(it, 'bottom');
+                        if(bottomPt) {
+                            let vessel = appList.find(a => (a.type.includes('flask') || a.type === 'boiling_tube'));
+                            droppingDroplets.push({ x: bottomPt.x + (Math.random() - 0.5) * 2, y: bottomPt.y, vy: 4.2, reagent: it.reagents[0], targetVessel: vessel });
+                        }
+                    }
+                }
+            });
+
+            for(let i = droppingDroplets.length - 1; i >= 0; i--) {
+                let d = droppingDroplets[i];
+                d.y += d.vy;
+                ctx.fillStyle = "#38bdf8"; ctx.beginPath(); ctx.arc(d.x * cam.scale + cam.x, d.y * cam.scale + cam.y, 4.5 * cam.scale, 0, Math.PI*2); ctx.fill();
+
+                if(d.targetVessel && d.y >= (d.targetVessel.y - d.targetVessel.h / 4)) {
+                    if(!d.targetVessel.reagents.find(r => r.id === d.reagent.id)) { d.targetVessel.reagents.push(d.reagent); updateTelemetry(); }
+
+                    const key = document.getElementById('gasSelector').value;
+                    const gasInfo = gasDatabase[key];
+                    let hasAllReagents = gasInfo.validSets.some(recipe => recipe.every(reqId => d.targetVessel.reagents.map(r => r.id).includes(reqId)));
+
+                    if(hasAllReagents && simState === 'idle') {
+                        let status = validateSetup();
+                        if(status.valid) startSimulation();
+                        else {
+                            let funnel = appList.find(a => a.type === 'funnel_dropping');
+                            if(funnel) { funnel.tapOpen = false; updateInspector(); }
+                            showHazardAlert(status.title, status.desc, status.details);
+                            if(status.cloudX !== undefined) triggerEscapeCloud(status.cloudX, status.cloudY, status.color);
+                        }
+                    }
+                    droppingDroplets.splice(i, 1);
+                }
+            }
+
+            for(let i = escapingGasClouds.length - 1; i >= 0; i--) {
+                let c = escapingGasClouds[i];
+                c.x += c.vx; c.y += c.vy; c.radius += 0.35; c.alpha -= 0.012;
+                ctx.save(); ctx.fillStyle = c.color; ctx.globalAlpha = Math.max(0, c.alpha); ctx.beginPath(); ctx.arc(c.x * cam.scale + cam.x, c.y * cam.scale + cam.y, c.radius * cam.scale, 0, Math.PI*2); ctx.fill(); ctx.restore();
+                if(c.alpha <= 0) escapingGasClouds.splice(i, 1);
+            }
+
+            if (simState === 'running') {
+                const key = document.getElementById('gasSelector').value;
+                const gData = gasDatabase[key] || gasDatabase.Cl2;
+                let vessel = appList.find(a => (a.type.includes('flask') || a.type === 'boiling_tube'));
+                let tubes = appList.filter(a => a.type === 'tube_dynamic');
+                let jar = appList.find(a => a.type === 'collector');
+                let washBottles = appList.filter(a => a.type === 'wash_bottle');
+                let trough = appList.find(a => a.type === 'trough');
+
+                if(vessel && Math.random() < 0.65) {
+                    generatorBubbles.push({ vessel: vessel, localX: (Math.random() - 0.5) * (vessel.w * 0.45), localY: (vessel.type === 'flask_round' ? 18 : vessel.h/2 - 25), speed: 1.6 + Math.random() * 1.4, r: 2 + Math.random() * 2.2, life: 1.0 });
+                }
+
+                for(let b = generatorBubbles.length - 1; b >= 0; b--) {
+                    let gb = generatorBubbles[b];
+                    gb.localY -= gb.speed; gb.life -= 0.018;
+
+                    let rad = (gb.vessel.rotation || 0) * Math.PI / 180;
+                    let wx = gb.vessel.x + (gb.localX * Math.cos(rad) - gb.localY * Math.sin(rad)) * gb.vessel.scale;
+                    let wy = gb.vessel.y + (gb.localX * Math.sin(rad) + gb.localY * Math.cos(rad)) * gb.vessel.scale;
+
+                    ctx.save(); ctx.strokeStyle = gData.bColor; ctx.fillStyle = "rgba(255, 255, 255, 0.5)"; ctx.beginPath(); ctx.arc(wx * cam.scale + cam.x, wy * cam.scale + cam.y, gb.r * cam.scale, 0, Math.PI*2); ctx.fill(); ctx.stroke(); ctx.restore();
+
+                    if(gb.localY <= -gb.vessel.h/2 + 10 || gb.life <= 0) generatorBubbles.splice(b, 1);
+                }
+
+                washBottles.forEach(wb => {
+                    let dipTip = { x: wb.x - 22, y: wb.y + wb.h/2 - 14 }, liquidSurfaceY = wb.y + wb.h/2 - 68;
+                    if(Math.random() < 0.75) washBubbles.push({ wbId: wb.id, x: dipTip.x + (Math.random() - 0.5) * 6, y: dipTip.y, vy: -Math.random() * 2.5 - 1.5, wobble: Math.random() * Math.PI * 2, r: 3 + Math.random() * 3, surfaceY: liquidSurfaceY });
+                });
+
+                if (trough && jar && jar.inv && jar.water && gasFillLevel < 1.0) {
+                    if (Math.random() < 0.6) washBubbles.push({ wbId: 'trough', x: trough.x + (Math.random() - 0.5) * 12, y: trough.y + 10, vy: -Math.random() * 2.5 - 1.5, wobble: Math.random() * Math.PI * 2, r: 4 + Math.random() * 3, surfaceY: jar.y - jar.h/2 + (jar.h * gasFillLevel) + 10 });
+                }
+
+                for(let b = washBubbles.length - 1; b >= 0; b--) {
+                    let bub = washBubbles[b];
+                    bub.y += bub.vy; bub.x += Math.sin(bub.wobble += 0.2) * 0.8;
+                    ctx.save(); ctx.strokeStyle = "rgba(255, 255, 255, 0.9)"; ctx.fillStyle = gData.color; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(bub.x * cam.scale + cam.x, bub.y * cam.scale + cam.y, bub.r * cam.scale, 0, Math.PI*2); ctx.fill(); ctx.stroke(); ctx.restore();
+                    if(bub.y <= bub.surfaceY) washBubbles.splice(b, 1);
+                }
+
+                if(particles.length < 50 && vessel) particles.push({ tubeIndex: 0, path: 0, t: 0, ox: (Math.random()-0.5) * (vessel.w * 0.35), speed: 0.016 + Math.random() * 0.008 });
+                
+                particles.forEach((p, idx) => {
+                    p.t += p.speed;
+                    
+                    if(p.path === 0 && vessel) {
+                        let rad = (vessel.rotation || 0) * Math.PI / 180;
+                        let localStartY = (vessel.type === 'flask_round' ? 18 : vessel.h/2 - 25), localEndY = -vessel.h/2 + 6;
+                        let localY = localStartY - p.t * (localStartY - localEndY), localX = p.ox * (1 - p.t * 0.8);
+                        p.x = vessel.x + (localX * Math.cos(rad) - localY * Math.sin(rad)) * vessel.scale;
+                        p.y = vessel.y + (localX * Math.sin(rad) + localY * Math.cos(rad)) * vessel.scale;
+
+                        if(p.t >= 1.0) { 
+                            if(tubes.length > 0) { p.path = 1; p.t = 0; p.tubeIndex = 0; } 
+                            else { triggerEscapeCloud(p.x, p.y, gData.bColor); particles.splice(idx, 1); }
+                        }
+                    } 
+                    else if (p.path === 1) {
+                        let activeTube = tubes[p.tubeIndex];
+                        if(!activeTube) { particles.splice(idx, 1); return; }
+
+                        let segs = activeTube.nodes.length - 1;
+                        let s = Math.floor(p.t * segs); if(s >= segs) s = segs - 1;
+                        let lt = (p.t * segs) - s;
+                        let n0 = activeTube.nodes[s], n1 = activeTube.nodes[s+1];
+                        p.x = n0.x + (n1.x - n0.x) * lt; p.y = n0.y + (n1.y - n0.y) * lt;
+
+                        if(p.t >= 1.0) {
+                            if(p.tubeIndex < tubes.length - 1) { p.tubeIndex++; p.t = 0; } 
+                            else if(jar) { p.path = 2; p.t = 0; p.targetJarX = jar.x + (Math.random() - 0.5) * (jar.w - 24); } 
+                            else { triggerEscapeCloud(p.x, p.y, gData.bColor); particles.splice(idx, 1); }
+                        }
+                    }
+                    else if (p.path === 2 && jar) {
+                        p.x = p.targetJarX;
+                        if(jar.inv) {
+                            let mouthY = jar.y + jar.h/2, ceilingY = jar.y - jar.h/2;
+                            p.y = (mouthY - 10) - p.t * (mouthY - ceilingY);
+                            let currentGasBoundary = ceilingY + (jar.h * gasFillLevel);
+                            if(p.y <= currentGasBoundary || p.t >= 1.0) { particles.splice(idx, 1); gasFillLevel += 0.005; }
+                        } else {
+                            let mouthY = jar.y - jar.h/2, floorY = jar.y + jar.h/2;
+                            p.y = (mouthY + 10) + p.t * (floorY - mouthY);
+                            let currentGasBoundary = floorY - (jar.h * gasFillLevel);
+                            if(p.y >= currentGasBoundary || p.t >= 1.0) { particles.splice(idx, 1); gasFillLevel += 0.005; }
+                        }
+
+                        if(gasFillLevel >= 1.0) {
+                            simState = 'finished'; gasFillLevel = 1.0;
+                            document.getElementById('successGasName').textContent = gData.name;
+                            document.getElementById('endNotification').style.display = 'flex';
+                            updateConnectionTelemetry();
+                        }
+                    }
+
+                    ctx.fillStyle = gData.bColor; ctx.globalAlpha = 0.88;
+                    let sx = p.x * cam.scale + cam.x, sy = p.y * cam.scale + cam.y;
+                    ctx.beginPath(); ctx.arc(sx, sy, 4.2 * cam.scale, 0, Math.PI*2); ctx.fill(); ctx.globalAlpha = 1.0;
+                });
+            }
+        }
+
+        function renderLoop() {
+            try {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.save(); ctx.translate(cam.x, cam.y); ctx.scale(cam.scale, cam.scale);
+                
+                ctx.strokeStyle = "rgba(30, 41, 59, 0.45)"; ctx.lineWidth = 1;
+                for(let i=-2000; i<3000; i+=60) { ctx.beginPath(); ctx.moveTo(i,-2000); ctx.lineTo(i,3000); ctx.stroke(); }
+                for(let i=-2000; i<3000; i+=60) { ctx.beginPath(); ctx.moveTo(-2000,i); ctx.lineTo(3000,i); ctx.stroke(); }
+                
+                ctx.fillStyle = "#1e293b"; ctx.fillRect(-500, 320, 2000, 400); 
+                ctx.strokeStyle = "#00f3ff"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(-500, 320); ctx.lineTo(1500, 320); ctx.stroke();
+                
+                drawItems();
+                ctx.restore();
+                updatePhysics();
+            } catch(e) { console.error("Render Loop Error: ", e); }
+            requestAnimationFrame(renderLoop);
+        }
+
+        updateProtocolCard();
+        requestAnimationFrame(renderLoop);
+    </script>
+</body>
+</html>

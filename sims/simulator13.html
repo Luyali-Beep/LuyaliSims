@@ -1,0 +1,2799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Interactive Cathode Ray Tube (CRT) and Cathode Ray Oscilloscope (CRO) laboratory simulator with thermionic emission, cylindrical electrostatic lenses, space-charge crowding, and graticule waveform analysis.">
+    <title>Cathode Ray Tube (CRT) & CRO Laboratory Simulator - LuyaliSims</title>
+
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg?v=1">
+    
+    <!-- Import Futuristic Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Base Reset & Variables */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --neon-cyan: #00f3ff;
+            --neon-magenta: #bc13fe;
+            --neon-green: #00ff88;
+            --neon-amber: #ffaa00;
+            --neon-red: #ff3344;
+            --phosphor-green: #00ff77;
+            --electric-purple: #c340ff;
+            --bg-dark: #070a12;
+            --panel-bg: rgba(16, 24, 43, 0.88);
+            --border-glow: rgba(0, 243, 255, 0.35);
+            --text-main: #e2e8f0;
+            --text-dim: #8da4be;
+            --font-mono: 'Share Tech Mono', monospace;
+            --font-sans: 'Rajdhani', sans-serif;
+            --font-head: 'Orbitron', sans-serif;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 85% 15%, rgba(0, 243, 255, 0.08), transparent 45%),
+                radial-gradient(circle at 15% 85%, rgba(188, 19, 254, 0.08), transparent 45%),
+                linear-gradient(180deg, #05070e 0%, #0a0e1a 100%);
+            color: var(--text-main);
+            padding: 16px 20px;
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* 1. HEADER & TOP NAVIGATION */
+        header {
+            max-width: 1380px;
+            margin: 0 auto 15px auto;
+        }
+
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 18px;
+            background: rgba(16, 24, 43, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(188, 19, 254, 0.5);
+            color: #e580ff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(188, 19, 254, 0.2);
+            border-color: var(--neon-magenta);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
+            transform: translateX(-3px);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .nav-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.92rem;
+            transition: color 0.25s, text-shadow 0.25s;
+        }
+
+        .nav-links a:hover {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 8px var(--neon-cyan);
+        }
+
+        h1 {
+            font-family: var(--font-head);
+            color: var(--neon-cyan);
+            text-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+            margin: 6px 0 10px 0;
+            font-size: clamp(1.4rem, 3.4vw, 2.3rem);
+            letter-spacing: 1.5px;
+            text-align: center;
+        }
+
+        .lead-summary {
+            max-width: 1050px;
+            margin: 0 auto 20px auto;
+            text-align: center;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: #cbd5e1;
+        }
+        .lead-summary span {
+            color: var(--neon-cyan);
+            font-weight: 700;
+        }
+
+        main {
+            max-width: 1380px;
+            margin: 0 auto;
+        }
+
+        /* 2. SIMULATOR WORKSPACE */
+        #simulator-container {
+            background: linear-gradient(135deg, rgba(16, 24, 43, 0.88) 0%, rgba(8, 12, 22, 0.94) 100%);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-glow);
+            border-radius: 16px;
+            padding: 22px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75), 0 0 25px rgba(0, 243, 255, 0.12);
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        /* Telemetry HUD Bar */
+        .hud-telemetry {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 10px;
+            background: rgba(4, 8, 16, 0.88);
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            border-radius: 10px;
+            padding: 10px 16px;
+            margin-bottom: 16px;
+            font-family: var(--font-mono);
+            font-size: 0.86rem;
+        }
+
+        .telemetry-item {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .tele-label {
+            color: #7b93ab;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tele-val {
+            color: var(--neon-cyan);
+            font-weight: 700;
+        }
+
+        .tele-val.green { color: var(--phosphor-green); }
+        .tele-val.pink  { color: #ff55bb; }
+        .tele-val.amber { color: var(--neon-amber); }
+
+        /* Quick Deflection Sweep Toolbar */
+        .quick-sweep-bar {
+            background: rgba(8, 14, 26, 0.85);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            border-radius: 10px;
+            padding: 8px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .quick-sweep-title {
+            font-family: var(--font-head);
+            font-size: 0.8rem;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .quick-sweep-btn-group {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .btn-sweep-mode {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #bcd5e8;
+            padding: 6px 12px;
+            font-size: 0.82rem;
+            font-family: var(--font-mono);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-sweep-mode:hover {
+            border-color: var(--neon-cyan);
+            color: var(--neon-cyan);
+        }
+        .btn-sweep-mode.active {
+            background: rgba(0, 243, 255, 0.22);
+            border-color: var(--neon-cyan);
+            color: #fff;
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.4);
+        }
+
+        .action-btn-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .sim-btn {
+            background: linear-gradient(180deg, rgba(16, 28, 54, 0.9) 0%, rgba(8, 14, 28, 0.95) 100%);
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            color: var(--neon-cyan);
+            font-family: var(--font-head);
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 7px 14px;
+            min-height: 38px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+        }
+        .sim-btn:hover {
+            border-color: var(--neon-cyan);
+            color: #fff;
+            box-shadow: 0 0 14px rgba(0, 243, 255, 0.5);
+            transform: translateY(-2px);
+        }
+        .sim-btn.secondary {
+            border-color: rgba(188, 19, 254, 0.5);
+            color: #e580ff;
+        }
+        .sim-btn.secondary:hover {
+            border-color: var(--neon-magenta);
+            color: #fff;
+            box-shadow: 0 0 14px rgba(188, 19, 254, 0.6);
+        }
+        .sim-btn.power-btn {
+            border-color: var(--phosphor-green);
+            color: var(--phosphor-green);
+        }
+        .sim-btn.power-btn.off {
+            border-color: var(--neon-red);
+            color: var(--neon-red);
+            background: rgba(255, 51, 68, 0.12);
+        }
+
+        /* Displays Grid: Dual Holographic Viewports */
+        .displays-grid {
+            display: grid;
+            grid-template-columns: 1.8fr 1.2fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        @media (max-width: 1080px) {
+            .displays-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .viewport-card {
+            background: rgba(10, 16, 28, 0.95);
+            border: 1px solid var(--border-glow);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), inset 0 0 25px rgba(0, 243, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .viewport-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 14px;
+            background: rgba(3, 7, 14, 0.85);
+            border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+            font-size: 0.82rem;
+            letter-spacing: 0.8px;
+            font-family: var(--font-mono);
+            color: var(--neon-cyan);
+        }
+
+        .viewport-content {
+            position: relative;
+            width: 100%;
+            height: 480px;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+        }
+
+        #crtCanvas {
+            background: radial-gradient(circle at 40% 50%, #06111f 0%, #02050b 100%);
+        }
+
+        #screenCanvas {
+            background: radial-gradient(circle at 50% 50%, #022013 0%, #010c07 80%, #000402 100%);
+        }
+
+        .viewport-view-modes {
+            position: absolute;
+            bottom: 12px;
+            left: 12px;
+            display: flex;
+            gap: 6px;
+            z-index: 10;
+            background: rgba(3, 7, 13, 0.92);
+            padding: 5px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+        }
+
+        .btn-mini-mode {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-dim);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 5px 11px;
+            font-size: 0.76rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: var(--font-mono);
+            font-weight: 600;
+        }
+        .btn-mini-mode:hover {
+            color: var(--neon-cyan);
+            border-color: var(--neon-cyan);
+        }
+        .btn-mini-mode.active {
+            background: rgba(0, 243, 255, 0.25);
+            color: #ffffff;
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.4);
+        }
+
+        /* Preset Waveform Bar */
+        .preset-bar {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            padding: 8px 14px;
+            background: rgba(6, 11, 20, 0.8);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            border-radius: 8px;
+            overflow-x: auto;
+            margin-bottom: 16px;
+        }
+
+        .preset-tag {
+            font-family: var(--font-head);
+            font-size: 0.74rem;
+            color: var(--neon-cyan);
+            white-space: nowrap;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-preset {
+            background: rgba(255, 255, 255, 0.04);
+            color: #bcd5e8;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 6px;
+            padding: 4px 12px;
+            font-size: 0.8rem;
+            font-family: var(--font-sans);
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .btn-preset:hover {
+            border-color: var(--neon-cyan);
+            color: var(--neon-cyan);
+            background: rgba(0, 243, 255, 0.12);
+        }
+
+        /* Controls Deck & Tabs */
+        .controls-deck {
+            background: linear-gradient(145deg, rgba(11, 17, 30, 0.95) 0%, rgba(6, 9, 16, 0.98) 100%);
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            border-radius: 12px;
+            padding: 18px;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .deck-tabs {
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: transparent;
+            color: var(--text-dim);
+            border: none;
+            padding: 8px 16px;
+            font-family: var(--font-head);
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .tab-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .tab-btn.active {
+            color: var(--neon-cyan);
+            background: rgba(0, 243, 255, 0.14);
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+        }
+
+        .deck-section {
+            display: none;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 14px;
+        }
+        .deck-section.active {
+            display: grid;
+        }
+
+        .control-group {
+            background: rgba(4, 9, 18, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative;
+        }
+        .control-group::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--neon-cyan);
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+            opacity: 0.6;
+        }
+        .control-group.accent-purple::before { background: var(--electric-purple); }
+        .control-group.accent-green::before  { background: var(--phosphor-green); }
+        .control-group.accent-amber::before  { background: var(--neon-amber); }
+
+        .control-label-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.86rem;
+            font-weight: 700;
+            color: #cbd5e1;
+        }
+
+        .control-value {
+            font-family: var(--font-mono);
+            color: var(--neon-green);
+            background: rgba(0, 0, 0, 0.4);
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 0.84rem;
+            border: 1px solid rgba(0, 255, 136, 0.25);
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            background: #0c1527;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            height: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 6px 0;
+        }
+        input[type="range"]:focus { outline: none; }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #00f3ff 30%, #0088aa 100%);
+            border: 2px solid #fff;
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.8);
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+
+        select.deck-select {
+            background: #060c18;
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            color: #e2e8f0;
+            font-family: var(--font-sans);
+            font-weight: 600;
+            font-size: 0.92rem;
+            padding: 6px 10px;
+            border-radius: 6px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .switch-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.88rem;
+            color: #cbd5e1;
+            font-weight: 600;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 38px;
+            height: 20px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider-switch {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #17283c;
+            transition: .3s;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.12);
+        }
+        .slider-switch:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 2px;
+            bottom: 2px;
+            background-color: #888;
+            transition: .3s;
+            border-radius: 50%;
+        }
+        input:checked + .slider-switch {
+            background-color: rgba(0, 243, 255, 0.4);
+            border-color: var(--neon-cyan);
+        }
+        input:checked + .slider-switch:before {
+            transform: translateX(18px);
+            background-color: var(--neon-cyan);
+            box-shadow: 0 0 8px var(--neon-cyan);
+        }
+
+        /* Tooltip */
+        #tooltip {
+            position: absolute;
+            background: rgba(5, 11, 20, 0.95);
+            border: 1px solid var(--electric-purple);
+            color: #fff;
+            padding: 10px 14px;
+            border-radius: 8px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.15s ease-in-out;
+            z-index: 200;
+            max-width: 320px;
+            font-size: 0.85rem;
+            box-shadow: 0 6px 22px rgba(195, 64, 255, 0.35);
+        }
+        #tooltip h4 {
+            color: var(--neon-cyan);
+            margin-bottom: 4px;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-family: var(--font-head);
+        }
+        #tooltip .badge-v {
+            font-family: var(--font-mono);
+            background: rgba(195, 64, 255, 0.25);
+            color: #eab4ff;
+            border: 1px solid var(--electric-purple);
+            font-size: 0.72rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        #tooltip p {
+            color: #cedee9;
+            font-size: 0.82rem;
+            line-height: 1.4;
+        }
+
+        /* 3. POLICY-COMPLIANT AD CONTAINER */
+        .ad-slot-wrapper {
+            margin: 30px auto;
+            text-align: center;
+            clear: both;
+        }
+
+        .ad-disclaimer {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            margin-bottom: 6px;
+            font-family: var(--font-mono);
+        }
+
+        .ad-box-placeholder {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            min-height: 90px;
+            max-width: 970px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #475569;
+            font-size: 0.85rem;
+            border-radius: 8px;
+            font-family: var(--font-mono);
+        }
+
+        /* 4. EDUCATIONAL CONTENT SECTION */
+        .educational-content {
+            line-height: 1.75;
+            font-size: 1.05rem;
+            color: #94a3b8;
+            background: rgba(10, 14, 23, 0.85);
+            padding: 30px;
+            border-radius: 16px;
+            border-left: 4px solid var(--neon-cyan);
+            border-top: 1px solid rgba(0, 243, 255, 0.2);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin-bottom: 35px;
+        }
+
+        .educational-content h2 {
+            font-family: var(--font-head);
+            color: var(--neon-magenta);
+            border-bottom: 1px solid rgba(188, 19, 254, 0.3);
+            padding-bottom: 8px;
+            margin-top: 1.8em;
+            margin-bottom: 0.6em;
+            font-size: 1.45rem;
+        }
+
+        .educational-content h2:first-of-type {
+            margin-top: 0.4em;
+        }
+
+        .educational-content h3 {
+            font-family: var(--font-head);
+            color: #38bdf8;
+            margin-top: 1.4em;
+            margin-bottom: 0.4em;
+            font-size: 1.15rem;
+        }
+
+        .educational-content p {
+            margin-bottom: 1rem;
+        }
+
+        .educational-content ul, .educational-content ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .educational-content li {
+            margin-bottom: 0.4rem;
+        }
+
+        .formula-box {
+            background: rgba(4, 9, 20, 0.75);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-left: 3px solid var(--neon-green);
+            padding: 14px 18px;
+            margin: 14px 0;
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            color: #a7f3d0;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .task-card {
+            background: rgba(15, 23, 42, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 18px;
+        }
+
+        .task-title {
+            font-family: var(--font-head);
+            font-size: 1rem;
+            color: var(--neon-cyan);
+            margin-bottom: 8px;
+        }
+
+        details {
+            margin-top: 25px;
+            background: rgba(5, 10, 20, 0.85);
+            border: 1px solid rgba(188, 19, 254, 0.4);
+            border-radius: 10px;
+            padding: 15px 20px;
+        }
+
+        summary {
+            font-family: var(--font-head);
+            font-weight: 700;
+            color: #e580ff;
+            cursor: pointer;
+            padding: 6px 0;
+            user-select: none;
+            outline: none;
+        }
+
+        .solution-step {
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.12);
+            padding: 14px 0;
+            font-size: 0.98rem;
+        }
+        .solution-step:last-child {
+            border-bottom: none;
+        }
+
+        /* 5. FOOTER & ALIGNED LINKS */
+        footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px 20px 20px 20px;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .footer-nav {
+            display: flex;
+            justify-content: center;
+            gap: 22px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .footer-nav a, .footer-modal-trigger {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.2s, text-shadow 0.2s;
+            font-family: var(--font-sans);
+            font-size: 0.95rem;
+            font-weight: 600;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .footer-nav a:hover, .footer-modal-trigger:hover {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
+        }
+
+        /* 6. POLICY MODALS */
+        .policy-modal {
+            position: fixed !important;
+            top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
+            width: 100vw !important; height: 100vh !important;
+            background: rgba(4, 7, 15, 0.92) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 99999 !important;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-body {
+            background: linear-gradient(145deg, #0b111e 0%, #060913 100%);
+            border: 2px solid var(--neon-cyan);
+            border-radius: 16px;
+            max-width: 820px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 35px 30px;
+            color: #cbd5e1;
+            box-shadow: 0 0 40px rgba(0, 243, 255, 0.25);
+            line-height: 1.75;
+            position: relative;
+            text-align: left;
+        }
+
+        .modal-body h2 {
+            font-family: var(--font-head);
+            color: var(--neon-cyan);
+            margin-top: 0;
+            font-size: 1.6rem;
+        }
+
+        .modal-body h3 {
+            color: var(--neon-magenta);
+            font-family: var(--font-head);
+            margin-top: 24px;
+            margin-bottom: 8px;
+            font-size: 1.15rem;
+        }
+
+        .modal-date {
+            font-family: var(--font-mono);
+            color: var(--neon-green);
+            font-size: 0.9rem;
+            margin-top: -6px;
+            margin-bottom: 16px;
+        }
+
+        .modal-close-btn {
+            background: linear-gradient(180deg, rgba(188, 19, 254, 0.4), rgba(188, 19, 254, 0.15));
+            border: 1px solid var(--neon-magenta);
+            color: #fff;
+            padding: 8px 18px;
+            font-family: var(--font-head);
+            font-size: 0.85rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            float: right;
+            margin-bottom: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close-btn:hover {
+            background: var(--neon-magenta);
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.8);
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            #simulator-container, .educational-content { padding: 14px; }
+            .viewport-content { height: 380px; }
+            .modal-body { padding: 22px 18px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. HEADER & TOP NAVIGATION -->
+    <header>
+        <nav class="top-nav">
+            <a href="../index.html" class="back-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Back to LuyaliSims
+            </a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="../index.html#about-section">About Us</a>
+                <a href="../index.html#contact-section">Contact Us</a>
+                <a href="https://forms.gle/fYxxaNKAh21dPUoBA" target="_blank" rel="noopener noreferrer">Feedback</a>
+            </div>
+            <span style="font-family: 'Share Tech Mono', monospace; font-size: 0.85rem; color: #64748b;">
+                MODULE ID: CRO-CRT-304
+            </span>
+        </nav>
+        
+        <h1>Cathode Ray Tube & CRO Advanced Laboratory</h1>
+        
+        <!-- Contextual Summary: Substantial text above the fold -->
+        <p class="lead-summary">
+            Investigate the electrodynamics of an authentic <span>Cathode Ray Tube (CRT)</span> and the signal processing stages of a <span>Cathode Ray Oscilloscope (CRO)</span>. Observe thermionic electrons boiling off the oxide cathode, crowding behind the negative <strong>Wehnelt cylinder aperture</strong>, focusing through coaxial electrostatic cylindrical lens anodes, undergoing orthogonal plate deflection, and stimulating visible luminescence across a calibrated 8×10 P31 phosphor graticule display.
+        </p>
+    </header>
+
+    <main>
+        <!-- 2. SIMULATOR WORKSPACE -->
+        <section id="simulator-container" aria-label="Interactive Cathode Ray Oscilloscope Laboratory">
+            
+            <!-- Real-Time Telemetry HUD -->
+            <div class="hud-telemetry">
+                <div class="telemetry-item">
+                    <span class="tele-label">Heater Temperature</span>
+                    <span id="hud-heater" class="tele-val amber">950 °C</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Beam Current (Cathode)</span>
+                    <span id="hud-current" class="tele-val green">45.0 µA</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Accelerating Anode (Va)</span>
+                    <span id="hud-va" class="tele-val">1600 V</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Electron Velocity (v)</span>
+                    <span id="hud-vel" class="tele-val pink">2.37 × 10⁷ m/s</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Electrostatic Focus</span>
+                    <span id="hud-waist" class="tele-val green">OPTIMAL (SHARP)</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Wehnelt Grid Bias (Vg)</span>
+                    <span id="hud-grid-status" class="tele-val">GATED PASS</span>
+                </div>
+            </div>
+
+            <!-- Quick Deflection Sweep Toolbar -->
+            <div class="quick-sweep-bar">
+                <div class="quick-sweep-title">
+                    <span>⚡ Deflection Mode:</span>
+                </div>
+                <div class="quick-sweep-btn-group">
+                    <button class="btn-sweep-mode active" id="btn-mode-both">Both X & Y (Full Waveform)</button>
+                    <button class="btn-sweep-mode" id="btn-mode-xonly">Timebase Only (Horizontal Sweep Line)</button>
+                    <button class="btn-sweep-mode" id="btn-mode-yonly">Y-Signal Only (Vertical Oscillation Line)</button>
+                    <button class="btn-sweep-mode" id="btn-mode-none">No Deflection (Stationary Spot)</button>
+                </div>
+                <div class="action-btn-group">
+                    <button class="sim-btn power-btn" id="btn-power">HV Power: ON</button>
+                    <button class="sim-btn secondary" id="btn-slowmo">Slow Motion: OFF</button>
+                    <button class="sim-btn" id="fullscreenBtn">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                        </svg>
+                        Fullscreen
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dual Viewports: Internal CRT Cutaway & Front Phosphor Graticule Display -->
+            <div class="displays-grid">
+                
+                <div class="viewport-card">
+                    <div class="viewport-header">
+                        <span id="crt-view-title">VIEW: ENTIRE CRO TUBE CUTAWAY</span>
+                        <span id="beam-status-tag" style="color:var(--phosphor-green); font-family:var(--font-mono);">BEAM ACTIVE (PULSED EMISSION)</span>
+                    </div>
+                    <div class="viewport-content" id="crt-viewport">
+                        <canvas id="crtCanvas"></canvas>
+
+                        <div class="viewport-view-modes">
+                            <button class="btn-mini-mode active" id="btn-cam-full">🔭 Entire CRO</button>
+                            <button class="btn-mini-mode" id="btn-cam-gun">⚡ Electron Gun</button>
+                            <button class="btn-mini-mode" id="btn-cam-plates">🔀 Deflection System</button>
+                            <button class="btn-mini-mode" id="btn-cam-screen">📺 Phosphor Display</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="viewport-card">
+                    <div class="viewport-header">
+                        <span>CRO FRONT PANEL PHOSPHOR (P31)</span>
+                        <span id="cro-readout-header" style="color:var(--phosphor-green); font-family:var(--font-mono);">Y: 10.0 V/DIV | X: 2.5 ms/DIV</span>
+                    </div>
+                    <div class="viewport-content" id="screen-viewport">
+                        <canvas id="screenCanvas"></canvas>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Syllabus Waveforms Preset Bar -->
+            <div class="preset-bar">
+                <span class="preset-tag">STANDARD SYLLABUS WAVEFORMS:</span>
+                <button class="btn-preset" id="pre-sine">1. Pure AC Sine Wave</button>
+                <button class="btn-preset" id="pre-dc">2. Pure DC Voltage Level</button>
+                <button class="btn-preset" id="pre-halfwave">3. Half-Wave Rectified</button>
+                <button class="btn-preset" id="pre-fullwave">4. Full-Wave Rectified</button>
+                <button class="btn-preset" id="pre-square">5. Square Wave Pulse</button>
+                <button class="btn-preset" id="pre-acdc">6. AC with DC Offset</button>
+            </div>
+
+            <!-- Controls Console Deck -->
+            <div class="controls-deck">
+                
+                <div class="deck-tabs">
+                    <button class="tab-btn active" data-tab="tab-gun">⚡ 1. Cathode & Cylindrical Gun</button>
+                    <button class="tab-btn" data-tab="tab-cro">📺 2. CRO Timebase & Y-Gain</button>
+                    <button class="tab-btn" data-tab="tab-signal">🔌 3. Signal Generator (AC & DC)</button>
+                    <button class="tab-btn" data-tab="tab-visuals">👁️ 4. Visual Guides & Overlays</button>
+                </div>
+
+                <!-- Tab 1: Electron Gun Controls -->
+                <div class="deck-section active" id="tab-gun">
+                    
+                    <div class="control-group accent-purple">
+                        <div class="control-label-row">
+                            <span>Control Grid Bias (Vg Wehnelt)</span>
+                            <span class="control-value" id="val-grid">-28.0 V</span>
+                        </div>
+                        <input type="range" id="sl-grid" min="-110" max="0" step="1" value="-28">
+                        <small style="color:var(--text-dim); font-size:0.75rem;">
+                            Regulates the electrostatic potential barrier. As bias becomes highly negative, notice thermal electrons <strong>crowd and hover behind the aperture</strong>, halting beam current (cutoff).
+                        </small>
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-label-row">
+                            <span>Focusing Anode (Vf Cylindrical Lens)</span>
+                            <span class="control-value" id="val-focus">480 V</span>
+                        </div>
+                        <input type="range" id="sl-focus" min="100" max="1000" step="5" value="480">
+                        <small style="color:var(--neon-cyan); font-size:0.75rem;">
+                            Adjusts the coaxial electrostatic lens focal length. Aligns the focal waist sharply on the phosphor screen or blooms into an unfocused disk.
+                        </small>
+                    </div>
+
+                    <div class="control-group accent-green">
+                        <div class="control-label-row">
+                            <span>Accelerating Anode (Va Cylinder)</span>
+                            <span class="control-value" id="val-accel">1600 V</span>
+                        </div>
+                        <input type="range" id="sl-accel" min="500" max="3000" step="50" value="1600">
+                        <small style="color:var(--phosphor-green); font-size:0.75rem;">
+                            Directly sets electron velocity, beam stiffness (deflection sensitivity D proportional to 1/Va), and impact luminescence intensity.
+                        </small>
+                    </div>
+
+                    <div class="control-group accent-amber">
+                        <div class="control-label-row">
+                            <span>Filament Heater Temperature</span>
+                            <span class="control-value" id="val-heater">950 °C</span>
+                        </div>
+                        <input type="range" id="sl-heater" min="300" max="1300" step="10" value="950">
+                        <small style="color:var(--text-dim); font-size:0.75rem;">
+                            Drives thermionic emission from the barium/strontium oxide cathode sleeve.
+                        </small>
+                    </div>
+
+                </div>
+
+                <!-- Tab 2: Oscilloscope Timebase & Y-Gain -->
+                <div class="deck-section" id="tab-cro">
+                    
+                    <div class="control-group accent-green">
+                        <div class="control-label-row">
+                            <span>Y-Gain (Volts / Div)</span>
+                            <span class="control-value" id="val-volts-div">10.0 V/div</span>
+                        </div>
+                        <input type="range" id="sl-volts-div" min="2" max="50" step="1" value="10">
+                        <div class="control-label-row" style="margin-top:6px;">
+                            <span>Y-Position (Vertical Shift)</span>
+                            <span class="control-value" id="val-cro-ypos">0.0 div</span>
+                        </div>
+                        <input type="range" id="sl-cro-ypos" min="-4" max="4" step="0.1" value="0">
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-label-row">
+                            <span>Timebase (Time / Div)</span>
+                            <span class="control-value" id="val-time-div">2.5 ms/div</span>
+                        </div>
+                        <input type="range" id="sl-time-div" min="0.5" max="20" step="0.5" value="2.5">
+                        <div class="control-label-row" style="margin-top:6px;">
+                            <span>X-Position (Horizontal Shift)</span>
+                            <span class="control-value" id="val-cro-xpos">0.0 div</span>
+                        </div>
+                        <input type="range" id="sl-cro-xpos" min="-5" max="5" step="0.1" value="0">
+                    </div>
+
+                    <div class="control-group accent-purple">
+                        <div class="control-label-row">
+                            <span>Independent Axis Gates</span>
+                        </div>
+                        <div class="switch-row">
+                            <span>Y-Deflection (Vertical Signal)</span>
+                            <label class="switch">
+                                <input type="checkbox" id="chk-y-enable" checked>
+                                <span class="slider-switch"></span>
+                            </label>
+                        </div>
+                        <div class="switch-row" style="margin-top:8px;">
+                            <span>X-Deflection (Timebase Sweep)</span>
+                            <label class="switch">
+                                <input type="checkbox" id="chk-x-enable" checked>
+                                <span class="slider-switch"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="control-group accent-amber">
+                        <div class="control-label-row">
+                            <span>Phosphor Persistence</span>
+                            <span class="control-value" id="val-phosphor">Medium (P31)</span>
+                        </div>
+                        <input type="range" id="sl-persistence" min="0.05" max="0.95" step="0.05" value="0.75">
+                        <div class="control-label-row" style="margin-top:6px;">
+                            <span>Graticule Illumination</span>
+                            <span class="control-value" id="val-illum">80%</span>
+                        </div>
+                        <input type="range" id="sl-illum" min="10" max="100" step="5" value="80">
+                    </div>
+
+                </div>
+
+                <!-- Tab 3: Signal Generator -->
+                <div class="deck-section" id="tab-signal">
+                    
+                    <div class="control-group accent-amber">
+                        <div class="control-label-row">
+                            <span>Signal Waveform Type</span>
+                        </div>
+                        <select class="deck-select" id="sel-ac-wave">
+                            <option value="sine">AC Sine Wave (Alternating)</option>
+                            <option value="dc">DC Voltage Level (Constant)</option>
+                            <option value="halfwave">Half-Wave Rectified (Diodes)</option>
+                            <option value="fullwave">Full-Wave Rectified (Bridge)</option>
+                            <option value="square">Square Wave Pulse</option>
+                            <option value="triangle">Triangular Wave</option>
+                        </select>
+                        <div class="control-label-row" style="margin-top:6px;">
+                            <span>Input Coupling Mode</span>
+                        </div>
+                        <select class="deck-select" id="sel-coupling">
+                            <option value="dc">DC Coupling (Passes AC + DC Offset)</option>
+                            <option value="ac">AC Coupling (Blocks DC Component)</option>
+                            <option value="gnd">GND (Ground 0V Reference Level)</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group accent-green">
+                        <div class="control-label-row">
+                            <span>Signal Amplitude (Peak V₀)</span>
+                            <span class="control-value" id="val-ac-amp">30.0 V</span>
+                        </div>
+                        <input type="range" id="sl-ac-amp" min="0" max="80" step="1" value="30">
+                        <div class="control-label-row" style="margin-top:6px;">
+                            <span>Signal Frequency</span>
+                            <span class="control-value" id="val-ac-freq">50 Hz</span>
+                        </div>
+                        <input type="range" id="sl-ac-freq" min="5" max="200" step="5" value="50">
+                    </div>
+
+                    <div class="control-group accent-purple">
+                        <div class="control-label-row">
+                            <span>DC Voltage Level / Offset</span>
+                            <span class="control-value" id="val-dc-level">0.0 V</span>
+                        </div>
+                        <input type="range" id="sl-dc-level" min="-50" max="50" step="1" value="0">
+                        <div class="switch-row" style="margin-top:10px;">
+                            <span>Invert Input Polarity</span>
+                            <label class="switch">
+                                <input type="checkbox" id="chk-y-invert">
+                                <span class="slider-switch"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-label-row">
+                            <span>Deflection Rigidity Notice</span>
+                        </div>
+                        <p style="font-size:0.78rem; color:var(--text-dim); line-height:1.5;">
+                            Increasing the Accelerating Anode potential (Va) increases forward electron momentum. Notice how the trace height shrinks for identical signal voltage because stiffer beams undergo less deflection.
+                        </p>
+                    </div>
+
+                </div>
+
+                <!-- Tab 4: Visual Overlays & Guides -->
+                <div class="deck-section" id="tab-visuals">
+                    
+                    <div class="control-group accent-green">
+                        <div class="control-label-row"><span>Exam Measurement Guides</span></div>
+                        <div class="switch-row">
+                            <span>Show Measurement Brackets (Vpp & T)</span>
+                            <label class="switch">
+                                <input type="checkbox" id="chk-show-guides" checked>
+                                <span class="slider-switch"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-label-row"><span>Deflection Plates & Fields</span></div>
+                        <div class="switch-row">
+                            <span>Show Electric Field Lines</span>
+                            <label class="switch">
+                                <input type="checkbox" id="chk-efield" checked>
+                                <span class="slider-switch"></span>
+                            </label>
+                        </div>
+                        <div class="switch-row" style="margin-top:8px;">
+                            <span>Show Electron Particles</span>
+                            <label class="switch">
+                                <input type="checkbox" id="chk-show-particles" checked>
+                                <span class="slider-switch"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-label-row"><span>Phosphor Material Type</span></div>
+                        <select class="deck-select" id="sel-phosphor-color">
+                            <option value="p31">Classic Green Phosphor (P31 - ZnS:Cu)</option>
+                            <option value="p7">Radar Long-Persistence Cyan (P7 Cascade)</option>
+                            <option value="p4">Monochrome TV White (P4 ZnS:Ag + ZnCdS:Ag)</option>
+                        </select>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- Tooltip Overlay -->
+        <div id="tooltip">
+            <h4><span id="tt-name">Cathode</span> <span class="badge-v" id="tt-volt">-1600V</span></h4>
+            <p id="tt-desc">Emits electrons via thermionic heating.</p>
+        </div>
+
+        <!-- 3. SAFE AD PLACEMENT SLOT -->
+        <div class="ad-slot-wrapper">
+            <div class="ad-disclaimer">Advertisement</div>
+            <div class="ad-box-placeholder">
+                <span>[AdSense Responsive Display Unit]</span>
+            </div>
+        </div>
+
+        <!-- 4. EDUCATIONAL REFERENCE ARTICLE -->
+        <article class="educational-content">
+            <section>
+                <h2>How to Operate the Simulator</h2>
+                <p>
+                    This virtual laboratory provides a dual-perspective view of electron beam electrodynamics. The left panel models the inner physical cutaway of a glass vacuum envelope Cathode Ray Tube (CRT), while the right panel renders the calibrated front panel 8×10 graticule display of a benchtop Cathode Ray Oscilloscope (CRO).
+                </p>
+                <ol>
+                    <li>
+                        <strong>Inspect Tube Stages:</strong> Use the camera presets (Entire CRO, Electron Gun, Deflection System, Phosphor Display) to zoom into specific subsystems. Hover the mouse cursor over any mechanical component to inspect its physical function and operating voltage.
+                    </li>
+                    <li>
+                        <strong>Regulate Electron Flow:</strong> In Tab 1, adjust the <em>Filament Heater Temp</em> to boil off electrons. Modify the <em>Control Grid Bias (Vg)</em> between 0 V and -110 V. When bias approaches -90 V (cutoff), note how thermal electrons crowd and form a static space-charge pool behind the aperture without streaming forward.
+                    </li>
+                    <li>
+                        <strong>Tune Focus & Acceleration:</strong> Shift the <em>Focusing Anode (Vf)</em> to achieve a sharp focal waist on the screen. Vary the <em>Accelerating Anode (Va)</em> to witness how higher kinetic energy increases beam stiffness, causing the vertical deflection amplitude to compress for identical input voltages.
+                    </li>
+                    <li>
+                        <strong>Select Waveforms & Modes:</strong> In Tab 3, choose between sinusoidal AC, pure DC, half-wave, full-wave, square, or triangular waveforms. In the Deflection Mode toolbar, isolate timebase-only (horizontal line), signal-only (vertical line), stationary spot, or both axes simultaneously.
+                    </li>
+                    <li>
+                        <strong>Calibrate Graticule Readings:</strong> In Tab 2, alter <em>Y-Gain (Volts/Div)</em> and <em>Timebase (Time/Div)</em>. Adjust <em>Phosphor Persistence</em> to see lingering beam trails, and dial <em>Graticule Illumination</em> to balance grid visibility against ambient contrast.
+                    </li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>Scientific Theory & Working Principles</h2>
+                
+                <h3>1. Thermionic Emission & Space Charge Formation</h3>
+                <p>
+                    The electron gun originates at an indirectly heated oxide-coated cathode sleeve (barium and strontium oxides on a nickel cylinder). When energized by an internal coiled tungsten filament at approximately 900 °C to 1050 °C, electrons absorb sufficient thermal energy to overcome the material work function (Phi ≈ 1.2 eV). In the presence of a strong negative potential on the surrounding Wehnelt cylinder (control grid), emitted electrons cannot escape into the forward field; instead, they accumulate in front of the emitting surface as a dense space-charge cloud, governed by the Richardson-Dushman and Child-Langmuir relationships.
+                </p>
+
+                <h3>2. Coaxial Electrostatic Cylindrical Lens</h3>
+                <p>
+                    The beam passes through the drilled central pinhole of the Wehnelt cylinder into two or three coaxial cylindrical anodes. By maintaining the first focusing cylinder at an intermediate potential (e.g., +400 V to +600 V) while the pre-accelerating and accelerating cylinders are elevated to +1500 V to +3000 V, non-uniform curved electrostatic equipotential surfaces are established across the gap. The curved electric field components exert inward radial forces (Fr = -e · Er) that bend divergent electron trajectories back toward the central tube axis, converging the beam into a minimal waist diameter at the plane of the phosphor screen.
+                </p>
+
+                <h3>3. Orthogonal Electrostatic Deflection</h3>
+                <p>
+                    The high-velocity, collimated beam travels into two orthogonal sets of metallic parallel plates:
+                </p>
+                <ul>
+                    <li>
+                        <strong>Y-Plates (Vertical Deflection):</strong> Positioned horizontally with an electric field oriented vertically. When an input voltage signal Vd is applied, electrons experience a vertical transverse electrostatic force Fy = e · Ey = e · (Vd / d), causing a parabolic trajectory while within the plate field and a straight drift trajectory thereafter.
+                    </li>
+                    <li>
+                        <strong>X-Plates (Horizontal Timebase Sweep):</strong> Positioned vertically with an electric field oriented horizontally. An internal sweep generator feeds a linear sawtooth voltage ramp (Vx proportional to t) to sweep the spot steadily from left to right, followed by a rapid flyback during which the grid is blanked off.
+                    </li>
+                </ul>
+
+                <h3>4. Phosphor Screen Luminescence</h3>
+                <p>
+                    Upon reaching the front glass faceplate, energetic electrons collide with a thin polycrystalline inorganic phosphor layer (such as P31 zinc sulfide activated with copper, ZnS:Cu). The kinetic energy of each electron excites lattice electrons across the phosphor bandgap. As these excited states relax through recombination centers, visible photons (green, ~525 nm) are released via fluorescence (prompt emission within nanoseconds) and phosphorescence (delayed luminescence lasting tens of milliseconds). A grounded conductive graphite coating (Aquadag) coats the funnel interior to collect secondary electrons and prevent negative charge accumulation on the faceplate.
+                </p>
+            </section>
+
+            <section>
+                <h2>Mathematical Foundations & Formulas</h2>
+                <p>
+                    Quantitative analysis of the electron beam and oscilloscope graticule relies on fundamental classical electrodynamics. All calculations avoid raw formatting symbols:
+                </p>
+                <div class="formula-box">
+                    Formula 1 (Electron Kinetic Energy & Velocity):<br>
+                    Kinetic Energy: Ek = e · Va = 0.5 · m_e · v²<br>
+                    Velocity: v = √((2 · e · Va) / m_e)<br>
+                    where e = 1.6022 × 10⁻¹⁹ C, m_e = 9.1094 × 10⁻³¹ kg, Va = accelerating anode potential.<br><br>
+
+                    Formula 2 (Transit Time Through Deflection Plates):<br>
+                    Transit Time: t_p = l / v = l · √(m_e / (2 · e · Va))<br>
+                    where l = axial plate length.<br><br>
+
+                    Formula 3 (Total Screen Deflection):<br>
+                    Transverse Displacement: D = (l · L · Vd) / (2 · d · Va)<br>
+                    where L = drift distance from plate center to screen, d = plate separation distance, Vd = applied deflection voltage.<br><br>
+
+                    Formula 4 (Deflection Sensitivity & Factor):<br>
+                    Deflection Sensitivity: S = D / Vd = (l · L) / (2 · d · Va)   [units: mm/V or cm/V]<br>
+                    Deflection Factor: G = 1 / S = (2 · d · Va) / (l · L)   [units: V/cm]<br><br>
+
+                    Formula 5 (Oscilloscope Voltage & Time Readings):<br>
+                    Peak-to-Peak Voltage: V_pp = (Vertical Peak-to-Peak Divisions) × (Y-Gain in Volts/Div)<br>
+                    Signal Amplitude: V_0 = V_pp / 2<br>
+                    RMS Voltage (Sine Wave): V_rms = V_0 / √2 = 0.7071 · V_0<br>
+                    Wave Period: T = (Horizontal Divisions per Cycle) × (Timebase Setting in Time/Div)<br>
+                    Frequency: f = 1 / T
+                </div>
+            </section>
+
+            <section>
+                <h2>Real-World Engineering & Industrial Applications</h2>
+                <p>
+                    The electrodynamic architecture modeled in this laboratory formed the cornerstone of 20th-century electronics and remains vital in high-energy physics:
+                </p>
+                <ul>
+                    <li>
+                        <strong>Analog Oscilloscopes (Testing & Telecommunications):</strong> For over six decades, analog oscilloscopes provided real-time hardware signal tracing with zero digitization lag, making them indispensable for radar pulse inspection, RF oscillator alignment, and audio amplifier harmonic analysis.
+                    </li>
+                    <li>
+                        <strong>Medical Diagnostic Electrocardiography (ECG & Vectorcardiograms):</strong> Dual-axis CRO screens historically traced the cardiac vector loop directly by routing lead signals to the X and Y axes simultaneously (Lissajous figures), immediately exposing bundle branch blocks and myocardial infarctions.
+                    </li>
+                    <li>
+                        <strong>Aviation & Naval Plan Position Indicator (PPI) Radar:</strong> Marine and air-traffic radar systems employed rotating deflection yokes and long-persistence phosphors (P7 cascade) to paint revolving radial sweeps, maintaining clear echoes of aircraft and coastlines between antenna revolutions.
+                    </li>
+                    <li>
+                        <strong>Particle Accelerators & Synchrotrons:</strong> Modern particle accelerators utilize advanced electrostatic and magnetic deflection chambers operating on identical Lorentz-force deflection formulas to steer relativistic electron bunches into beamlines for macromolecular crystallography and medical isotope production.
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Practice Problems & Diagnostic Tasks</h2>
+                <p>
+                    Test your quantitative comprehension of electron acceleration, deflection physics, and graticule signal interpretation with the five exercises below:
+                </p>
+
+                <div class="task-card">
+                    <div class="task-title">Task 1: Voltage and RMS Calculations from Graticule</div>
+                    <p>
+                        A sinusoidal AC signal is fed into the Y-input of a CRO. The Y-gain control is set to 5.0 V/div. On the graticule, the peak-to-peak vertical trace occupies exactly 6.4 vertical divisions. Calculate:
+                        <br>a) The peak-to-peak voltage (V_pp).
+                        <br>b) The peak amplitude (V_0).
+                        <br>c) The root-mean-square voltage (V_rms).
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 2: Signal Frequency from Timebase Calibration</div>
+                    <p>
+                        An unknown audio frequency generator is connected to a CRO with the timebase calibrated to 0.50 ms/div. Two complete full cycles of the displayed waveform span a horizontal distance of 8.0 divisions. Determine:
+                        <br>a) The time period (T) of one complete cycle.
+                        <br>b) The fundamental frequency (f) of the signal.
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 3: Accelerating Anode Velocity & Relativistic Assessment</div>
+                    <p>
+                        The accelerating anode potential of a laboratory CRT is set to Va = 2500 V. Given that electron charge e = 1.602 × 10⁻¹⁹ C and electron rest mass m_e = 9.109 × 10⁻³¹ kg:
+                        <br>a) Calculate the kinetic energy acquired by each electron in joules.
+                        <br>b) Compute the forward axial velocity (v) of the electrons as they emerge from the anode.
+                        <br>c) Express this velocity as a percentage of the speed of light (c = 3.00 × 10⁸ m/s) and confirm whether non-relativistic mechanics is valid.
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 4: Deflection Sensitivity and Beam Rigidity Analysis</div>
+                    <p>
+                        A CRT has deflection plates of length l = 3.0 cm separated by a distance d = 1.0 cm. The axial distance from the center of the plates to the phosphor screen is L = 20.0 cm.
+                        <br>a) If Va = 1200 V, calculate the deflection sensitivity (S) in mm/V.
+                        <br>b) What is the screen displacement (D) when a potential difference of Vd = 36.0 V is applied across the plates?
+                        <br>c) If the operator increases Va from 1200 V to 2400 V while keeping Vd constant, explain quantitatively what happens to the deflection D.
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 5: Multistage Troubleshooting (Timebase Failure Diagnosis)</div>
+                    <p>
+                        A technician suspects that the horizontal timebase sweep circuit of an oscilloscope has suffered a total component failure.
+                        <br>a) What visual pattern will appear on the phosphor screen if an AC sinusoidal signal is applied to the Y-input while the timebase sweep generator is completely dead?
+                        <br>b) How could the technician verify that the vertical deflection amplifier is still functioning correctly using only the front panel controls?
+                        <br>c) If the Wehnelt cylinder bias is accidentally shorted to -120 V, what will happen to the screen trace regardless of the input signals, and why?
+                    </p>
+                </div>
+
+                <!-- Collapsible Detailed Solutions -->
+                <details>
+                    <summary>Click to Reveal Solutions and Step-by-Step Proofs</summary>
+                    
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 1:</strong></p>
+                        <p>a) Peak-to-peak voltage: V_pp = (divisions) × (Y-Gain) = 6.4 div × 5.0 V/div = <strong>32.0 V</strong>.</p>
+                        <p>b) Peak amplitude: V_0 = V_pp / 2 = 32.0 V / 2 = <strong>16.0 V</strong>.</p>
+                        <p>c) Root-mean-square voltage for a pure sine wave: V_rms = V_0 / √2 = 16.0 V / 1.4142 = <strong>11.31 V</strong>.</p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 2:</strong></p>
+                        <p>a) Two full cycles occupy 8.0 divisions, meaning one complete cycle occupies: 8.0 div / 2 = 4.0 divisions per cycle.<br>
+                        Period: T = 4.0 div × 0.50 ms/div = 2.0 ms = <strong>2.0 × 10⁻³ s</strong>.</p>
+                        <p>b) Frequency: f = 1 / T = 1 / (2.0 × 10⁻³ s) = <strong>500 Hz</strong>.</p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 3:</strong></p>
+                        <p>a) Kinetic Energy: Ek = e · Va = (1.602 × 10⁻¹⁹ C) × (2500 V) = <strong>4.005 × 10⁻¹⁶ J</strong>.</p>
+                        <p>b) Velocity: v = √((2 · Ek) / m_e) = √((2 × 4.005 × 10⁻¹⁶ J) / (9.109 × 10⁻³¹ kg)) = √(8.793 × 10¹⁴) = <strong>2.965 × 10⁷ m/s</strong>.</p>
+                        <p>c) Percentage of speed of light: (2.965 × 10⁷ m/s / 3.00 × 10⁸ m/s) × 100% = <strong>9.88% of c</strong>. Since v is below 10% of c, relativistic mass increase is under 0.5%, fully justifying classical Newtonian mechanics.</p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 4:</strong></p>
+                        <p>a) Deflection Sensitivity: S = (l · L) / (2 · d · Va).<br>
+                        Converting all units to meters: l = 0.03 m, L = 0.20 m, d = 0.01 m, Va = 1200 V.<br>
+                        S = (0.03 × 0.20) / (2 × 0.01 × 1200) = 0.006 / 24 = 0.00025 m/V = <strong>0.25 mm/V</strong>.</p>
+                        <p>b) Deflection displacement: D = S · Vd = 0.25 mm/V × 36.0 V = <strong>9.0 mm (0.90 cm)</strong>.</p>
+                        <p>c) Since S is inversely proportional to Va, doubling Va from 1200 V to 2400 V halves the deflection sensitivity from 0.25 mm/V to 0.125 mm/V. Consequently, the screen displacement drops by exactly 50% to <strong>4.5 mm</strong>. Higher electron momentum creates a stiffer beam that deflects less.</p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 5:</strong></p>
+                        <p>a) With no horizontal sweep voltage, the electron beam cannot travel across the screen. The Y-plates will oscillate the beam purely vertically along the central axis, displaying a <strong>single vertical line</strong> whose total height equals the peak-to-peak voltage.</p>
+                        <p>b) The technician can adjust the Y-Gain or Y-Position control. If changing Y-Gain expands or shrinks the vertical line length proportionally, and adjusting Y-Position moves the line up and down, the vertical amplifier is proven to be operational.</p>
+                        <p>c) A grid bias of -120 V exceeds the tube's cutoff threshold (approximately -90 V). The electrostatic potential well formed by the Wehnelt cylinder will completely repel all thermionic electrons back into the cathode space charge cloud. The beam current drops to 0 µA, resulting in a <strong>completely dark, blank screen</strong> with no trace visible.</p>
+                    </div>
+                </details>
+            </section>
+        </article>
+    </main>
+
+    <!-- 5. SYNCHRONIZED COMPLIANCE FOOTER -->
+    <footer>
+        <nav class="footer-nav">
+            <a href="../index.html">Home</a>
+            <a href="../index.html#about-section">About Us</a>
+            <button type="button" class="footer-modal-trigger" onclick="openSimModal('simPrivacyModal')">Privacy Policy</button>
+            <button type="button" class="footer-modal-trigger" onclick="openSimModal('simTermsModal')">Terms of Service</button>
+            <a href="../index.html#contact-section">Contact Us</a>
+            <a href="https://forms.gle/fYxxaNKAh21dPUoBA" target="_blank" rel="noopener noreferrer">Simulator Suggestions</a>
+        </nav>
+        <p>&copy; 2026 LuyaliSims | Engineered by Click & Draft | Dedicated to Open STEM Education</p>
+    </footer>
+
+    <!-- 6. IDENTICAL PRIVACY POLICY MODAL -->
+    <div id="simPrivacyModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="privacyTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeSimModal('simPrivacyModal')">Close [✕]</button>
+            <h2 id="privacyTitle">Privacy Policy</h2>
+            <p class="modal-date">Last Updated: September 2026</p>
+            <p>Welcome to LuyaliSims. We respect your privacy and are committed to protecting your personal data. This privacy policy explains how we treat information when you interact with our educational simulators.</p>
+            
+            <h3>1. Educational Purpose & Information Collection</h3>
+            <p>LuyaliSims is a free educational portal. We do not require account registration, passwords, or personal login information to run any simulation. All simulation calculations occur locally within your browser using client-side JavaScript.</p>
+
+            <h3>2. Google AdSense & Third-Party Cookies</h3>
+            <p>We may display advertisements served by Google AdSense to fund our free educational tools. Google, as a third-party vendor, uses cookies to serve ads on our site based on users' visits to this and other sites on the Internet.</p>
+            <ul>
+                <li>Google's use of advertising cookies enables it and its partners to serve ads based on your visit to LuyaliSims and other sites.</li>
+                <li>Users may opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" style="color: var(--neon-cyan);">Google Ads Settings</a>.</li>
+            </ul>
+
+            <h3>3. Log Files & Analytics</h3>
+            <p>Like standard websites, our hosting servers collect anonymous log records (including IP addresses, browser types, and timestamp references) to monitor server uptime, fix script errors, and optimize simulator performance.</p>
+
+            <h3>4. Children's Online Privacy (COPPA Compliance)</h3>
+            <p>Our educational simulators are built for students and educators of all ages. We do not knowingly solicit or collect personally identifiable information from children under 13.</p>
+
+            <h3>5. Contact Regarding Privacy</h3>
+            <p>If you have any questions regarding this policy, contact us at: <a href="mailto:luyashliz@gmail.com" style="color: var(--neon-cyan);">luyashliz@gmail.com</a>.</p>
+        </div>
+    </div>
+
+    <!-- 7. IDENTICAL TERMS OF SERVICE MODAL -->
+    <div id="simTermsModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="termsTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeSimModal('simTermsModal')">Close [✕]</button>
+            <h2 id="termsTitle">Terms of Service</h2>
+            <p class="modal-date">Effective Date: September 2026</p>
+
+            <h3>1. Permitted Educational Use</h3>
+            <p>All interactive models, simulations, practice problems, and laboratory worksheets on LuyaliSims are made freely available for classroom demonstrations, academic study, tutoring, and self-paced individual learning.</p>
+
+            <h3>2. Intellectual Property</h3>
+            <p>The code architecture, layout designs, and custom interactive engines are the intellectual property of Ian Luyali and Click & Draft. You may use our simulators online in academic settings, but mirroring or re-hosting our code for commercial resale without permission is prohibited.</p>
+
+            <h3>3. Disclaimer of Scientific Warranty</h3>
+            <p>While simulations are engineered to accurately replicate classical mechanics, thermodynamics, and electronics, they are provided as conceptual learning aids. LuyaliSims is not liable for outcomes in real-world high-voltage or hazardous laboratory environments constructed without professional teacher supervision.</p>
+
+            <h3>4. Updates to Terms</h3>
+            <p>We reserve the right to refine these terms as new laboratory modules and features are introduced.</p>
+        </div>
+    </div>
+
+    <!-- 8. CORE SIMULATOR SCRIPT ENGINE -->
+    <script>
+        // Modal Controls
+        function openSimModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeSimModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('policy-modal')) {
+                closeSimModal(e.target.id);
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' || e.key === 'Esc') {
+                document.querySelectorAll('.policy-modal').forEach(m => {
+                    m.style.display = 'none';
+                });
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // Fullscreen Implementation
+        const simContainer = document.getElementById('simulator-container');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                if (simContainer.requestFullscreen) simContainer.requestFullscreen();
+                else if (simContainer.webkitRequestFullscreen) simContainer.webkitRequestFullscreen();
+                fullscreenBtn.innerHTML = 'Exit Screen';
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+                fullscreenBtn.innerHTML = 'Fullscreen';
+            }
+        });
+
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                fullscreenBtn.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                    </svg> Fullscreen`;
+            }
+            setTimeout(handleResize, 150);
+        });
+
+        // Physical Constants
+        const Q_E = 1.60217663e-19;
+        const M_E = 9.1093837e-31;
+
+        // Virtual Coordinate Space for CRT Canvas
+        const CRT_W = 1000;
+        const CRT_H = 500;
+        const AXIS_Y = 250;
+
+        const X_FILAMENT = 80;
+        const X_CATHODE  = 105;
+        const X_GRID     = 130;
+        const X_ANODE1   = 185;
+        const X_ANODE2   = 285;
+        const X_YPLATES  = 395;
+        const X_XPLATES  = 505;
+        const X_SCREEN   = 790;
+
+        // Simulator State Object
+        const state = {
+            power: true,
+            slowMo: false,
+
+            // Target voltages
+            targetHeaterTemp: 950,
+            targetGridBias: -28,
+            targetFocusVolt: 480,
+            targetAccelVolt: 1600,
+
+            // Smoothed voltages (fluid lerp)
+            heaterTemp: 950,
+            gridBias: -28,
+            focusVolt: 480,
+            accelVolt: 1600,
+
+            enableYDeflection: true,
+            enableXDeflection: true,
+
+            signalType: 'sine',
+            coupling: 'dc',
+            acAmp: 30,
+            acFreq: 50,
+            dcLevel: 0,
+            yInvert: false,
+
+            voltsDiv: 10,
+            croYPos: 0,
+            timeDiv: 2.5,
+            croXPos: 0,
+            persistence: 0.75,
+            graticuleIllum: 0.8,
+            showGuides: true,
+            showEField: true,
+            showParticles: true,
+            phosphorType: 'p31',
+
+            camTarget: 'full',
+            cam: {
+                currentZoom: 1.0,
+                targetZoom: 1.0,
+                currentX: 450,
+                targetX: 450,
+                currentY: 250,
+                targetY: 250
+            },
+
+            velocity: 0,
+            currentMicroAmps: 0,
+            beamDiameter: 1.0,
+            focusWaistX: 790,
+            screenSpotRadius: 1.0,
+            instantVy: 0,
+            instantVx: 0,
+            deflectionY_cm: 0,
+            deflectionX_cm: 0,
+            simTime: 0,
+
+            impactSparks: []
+        };
+
+        const CAMERA_PRESETS = {
+            full:   { zoom: 1.0, x: 450, y: 250, title: 'VIEW: ENTIRE CRO TUBE CUTAWAY' },
+            gun:    { zoom: 2.3, x: 215, y: 250, title: 'VIEW: ELECTRON GUN (EMISSION & ACCELERATION)' },
+            plates: { zoom: 2.2, x: 460, y: 250, title: 'VIEW: DEFLECTION SYSTEM (ELECTROSTATIC PLATES)' },
+            screen: { zoom: 1.9, x: 700, y: 250, title: 'VIEW: PHOSPHOR DISPLAY & SCREEN FLUX' }
+        };
+
+        const crtCanvas = document.getElementById('crtCanvas');
+        const crtCtx = crtCanvas.getContext('2d');
+        const crtViewport = document.getElementById('crt-viewport');
+
+        const screenCanvas = document.getElementById('screenCanvas');
+        const screenCtx = screenCanvas.getContext('2d');
+        const screenViewport = document.getElementById('screen-viewport');
+
+        // Particle Pools
+        const beamParticles = [];
+        const crowdedParticles = [];
+        const MAX_BEAM_PARTICLES = 160;
+        const MAX_CROWDED_PARTICLES = 140;
+
+        function handleResize() {
+            if (crtViewport && screenViewport) {
+                crtCanvas.width = crtViewport.clientWidth;
+                crtCanvas.height = crtViewport.clientHeight;
+                screenCanvas.width = screenViewport.clientWidth;
+                screenCanvas.height = screenViewport.clientHeight;
+            }
+        }
+        window.addEventListener('resize', handleResize);
+        handleResize();
+
+        // Signal Evaluation Function
+        function evaluateSignal(t) {
+            if (state.coupling === 'gnd') return 0;
+
+            let omega = 2 * Math.PI * state.acFreq;
+            let ac = 0;
+
+            if (state.signalType === 'sine') {
+                ac = state.acAmp * Math.sin(omega * t);
+            } else if (state.signalType === 'dc') {
+                ac = 0;
+            } else if (state.signalType === 'halfwave') {
+                let s = Math.sin(omega * t);
+                ac = s > 0 ? state.acAmp * s : 0;
+            } else if (state.signalType === 'fullwave') {
+                ac = state.acAmp * Math.abs(Math.sin(omega * t));
+            } else if (state.signalType === 'square') {
+                ac = state.acAmp * Math.sign(Math.sin(omega * t));
+            } else if (state.signalType === 'triangle') {
+                ac = state.acAmp * (2 / Math.PI) * Math.asin(Math.sin(omega * t));
+            }
+
+            let dc = (state.signalType === 'dc') ? state.acAmp : state.dcLevel;
+            let total = (state.coupling === 'ac') ? ac : (ac + dc);
+
+            return state.yInvert ? -total : total;
+        }
+
+        // Smooth Voltage Transitions
+        function updateSmoothVoltages(dt) {
+            const lerpSpeed = Math.min(1.0, dt * 7.5);
+            state.heaterTemp += (state.targetHeaterTemp - state.heaterTemp) * lerpSpeed;
+            state.gridBias   += (state.targetGridBias - state.gridBias) * lerpSpeed;
+            state.focusVolt  += (state.targetFocusVolt - state.focusVolt) * lerpSpeed;
+            state.accelVolt  += (state.targetAccelVolt - state.accelVolt) * lerpSpeed;
+        }
+
+        // Main Physics Solver
+        function computePhysics(dt) {
+            updateSmoothVoltages(dt);
+
+            if (!state.power) {
+                state.velocity = 0;
+                state.currentMicroAmps = 0;
+                state.beamDiameter = 0;
+                state.instantVy = 0;
+                state.instantVx = 0;
+                state.deflectionY_cm = 0;
+                state.deflectionX_cm = 0;
+                return;
+            }
+
+            // Richardson-Dushman emission factor
+            let emissionFactor = state.heaterTemp > 650 ? Math.pow((state.heaterTemp - 650) / 600, 2.5) : 0;
+            
+            // Grid Transmission: Cutoff at -90 V
+            let cutoffVoltage = -90;
+            let gridTransmission = 0;
+            if (state.gridBias > cutoffVoltage) {
+                gridTransmission = Math.pow((state.gridBias - cutoffVoltage) / (-cutoffVoltage), 1.9);
+            }
+            state.currentMicroAmps = Math.min(250, emissionFactor * gridTransmission * 180);
+
+            // Electron Velocity from accelerating potential Va
+            let Va = Math.max(300, state.accelVolt);
+            state.velocity = Math.sqrt((2 * Q_E * Va) / M_E);
+
+            // Electrostatic Lens Waist
+            let optimalVf = Va * 0.30;
+            let kFocus = state.focusVolt / optimalVf; // 1.0 = sharp focus on screen
+
+            const X_LENS = 240;
+            state.focusWaistX = X_LENS + (X_SCREEN - X_LENS) / Math.max(0.2, kFocus);
+
+            let focalMismatch = Math.abs(kFocus - 1.0);
+            state.beamDiameter = Math.max(0.8, 0.8 + (focalMismatch * 28));
+            state.screenSpotRadius = Math.max(1.8, 1.8 + (focalMismatch * 35));
+
+            let step = state.slowMo ? dt * 0.15 : dt;
+            state.simTime += step;
+
+            let vyRaw = evaluateSignal(state.simTime);
+            state.instantVy = state.enableYDeflection ? vyRaw : 0;
+
+            let sweepPeriod = (state.timeDiv * 1e-3) * 10;
+            let rampPhase = (state.simTime % sweepPeriod) / sweepPeriod;
+            let vxRaw = (rampPhase * 2 - 1) * 75;
+            state.instantVx = state.enableXDeflection ? vxRaw : 0;
+
+            const L_DRIFT = 0.28, L_PLATE = 0.04, D_SEP = 0.012;
+            state.deflectionY_cm = (L_PLATE * L_DRIFT * state.instantVy) / (2 * D_SEP * Va) * 100;
+            state.deflectionX_cm = (L_PLATE * L_DRIFT * state.instantVx) / (2 * D_SEP * Va) * 100;
+
+            // Trigger phosphor impact sparks
+            if (state.currentMicroAmps > 1.0 && Math.random() < 0.6) {
+                state.impactSparks.push({
+                    x: X_SCREEN,
+                    y: AXIS_Y - (state.deflectionY_cm * 24),
+                    vx: (Math.random() - 0.9) * 2.2,
+                    vy: (Math.random() - 0.5) * 2.5,
+                    life: 0,
+                    maxLife: 15 + Math.random() * 10
+                });
+            }
+
+            for (let i = state.impactSparks.length - 1; i >= 0; i--) {
+                let s = state.impactSparks[i];
+                s.x += s.vx;
+                s.y += s.vy;
+                s.life++;
+                if (s.life >= s.maxLife) state.impactSparks.splice(i, 1);
+            }
+        }
+
+        // Particle Update Routine
+        function updateParticles() {
+            if (!state.power || state.heaterTemp < 650) {
+                beamParticles.length = 0;
+                crowdedParticles.length = 0;
+                return;
+            }
+
+            let cutoffVoltage = -90;
+            let gridTransmission = state.gridBias > cutoffVoltage ? (state.gridBias - cutoffVoltage) / (-cutoffVoltage) : 0;
+            let crowdingTendency = 1.0 - gridTransmission;
+
+            // 1. Space Charge Crowding Behind Wehnelt Grid
+            let targetCrowdCount = Math.floor(crowdingTendency * MAX_CROWDED_PARTICLES);
+            if (crowdedParticles.length < targetCrowdCount && Math.random() < 0.8) {
+                crowdedParticles.push({
+                    x: X_CATHODE + 4 + Math.random() * 15,
+                    y: AXIS_Y + (Math.random() - 0.5) * 26,
+                    vx: (Math.random() - 0.5) * 0.4,
+                    vy: (Math.random() - 0.5) * 0.6,
+                    life: 0,
+                    maxLife: 70 + Math.random() * 60
+                });
+            }
+
+            for (let i = crowdedParticles.length - 1; i >= 0; i--) {
+                let cp = crowdedParticles[i];
+                cp.life++;
+
+                let dx = cp.x - (X_GRID + 14);
+                let repelStrength = Math.abs(state.gridBias) * 0.0006;
+                cp.vx += dx * repelStrength;
+
+                let dy = cp.y - AXIS_Y;
+                cp.vy += (Math.random() - 0.5) * 0.2 - dy * 0.02;
+
+                cp.x += cp.vx;
+                cp.y += cp.vy;
+
+                if (cp.x < X_CATHODE + 2) { cp.x = X_CATHODE + 2; cp.vx *= -0.5; }
+                if (cp.x > X_GRID + 12) { cp.x = X_GRID + 12; cp.vx *= -0.5; }
+                if (Math.abs(cp.y - AXIS_Y) > 20) { cp.vy *= -0.8; }
+
+                if (cp.life >= cp.maxLife || crowdedParticles.length > targetCrowdCount) {
+                    crowdedParticles.splice(i, 1);
+                }
+            }
+
+            // 2. Transmitted Beam Particles
+            let spawnRate = Math.min(10, Math.floor(state.currentMicroAmps / 12) + 1);
+            let speedFactor = Math.sqrt(state.accelVolt / 1600);
+
+            if (gridTransmission > 0.05 && beamParticles.length < MAX_BEAM_PARTICLES) {
+                for (let k = 0; k < spawnRate; k++) {
+                    beamParticles.push({
+                        x: X_GRID + 15,
+                        y: AXIS_Y + (Math.random() - 0.5) * 3,
+                        vx: 1.4 * speedFactor,
+                        vy: (Math.random() - 0.5) * 0.4,
+                        initialRadius: (Math.random() - 0.5) * 12
+                    });
+                }
+            }
+
+            for (let i = beamParticles.length - 1; i >= 0; i--) {
+                let p = beamParticles[i];
+
+                if (p.x >= X_GRID && p.x < X_ANODE2 + 50) {
+                    let forwardAccel = 0.28 * (state.accelVolt / 1600);
+                    p.vx += forwardAccel;
+                }
+
+                if (p.x >= X_ANODE1 && p.x < X_SCREEN) {
+                    let envelopeRadius = getBeamEnvelopeRadius(p.x);
+                    let targetY = AXIS_Y + (p.initialRadius / 12) * envelopeRadius;
+
+                    if (p.x >= X_YPLATES) {
+                        let defFraction = (p.x - X_YPLATES) / (X_SCREEN - X_YPLATES);
+                        targetY -= (state.deflectionY_cm * 24) * defFraction;
+                    }
+                    p.vy += (targetY - p.y) * 0.09;
+                }
+
+                p.x += p.vx;
+                p.y += p.vy;
+
+                if (p.x >= X_SCREEN || p.y < AXIS_Y - 140 || p.y > AXIS_Y + 140) {
+                    beamParticles.splice(i, 1);
+                }
+            }
+        }
+
+        function getBeamEnvelopeRadius(x) {
+            const X_LENS = 240;
+            const W_LENS = 14.0;
+            let W_WAIST = 1.0;
+
+            if (x < X_LENS) {
+                return 3.0 + (x - (X_GRID + 14)) * 0.1;
+            }
+
+            let distToWaist = Math.abs(x - state.focusWaistX);
+            let totalFocusDist = Math.abs(state.focusWaistX - X_LENS);
+            if (totalFocusDist < 1) totalFocusDist = 1;
+
+            let slope = (W_LENS - W_WAIST) / totalFocusDist;
+            return W_WAIST + distToWaist * slope;
+        }
+
+        function updateCamera() {
+            const c = state.cam;
+            c.currentZoom += (c.targetZoom - c.currentZoom) * 0.12;
+            c.currentX += (c.targetX - c.currentX) * 0.12;
+            c.currentY += (c.targetY - c.currentY) * 0.12;
+        }
+
+        // Render Internal CRT Cutaway
+        function renderCRT() {
+            crtCtx.clearRect(0, 0, crtCanvas.width, crtCanvas.height);
+
+            crtCtx.save();
+            let scale = Math.min(crtCanvas.width / CRT_W, crtCanvas.height / CRT_H);
+            let offX = (crtCanvas.width - CRT_W * scale) / 2;
+            let offY = (crtCanvas.height - CRT_H * scale) / 2;
+
+            crtCtx.translate(offX, offY);
+            crtCtx.scale(scale, scale);
+
+            const c = state.cam;
+            crtCtx.translate(CRT_W / 2, CRT_H / 2);
+            crtCtx.scale(c.currentZoom, c.currentZoom);
+            crtCtx.translate(-c.currentX, -c.currentY);
+
+            drawGlassEnvelope(crtCtx);
+            drawCylindricalHardware(crtCtx);
+            drawRealisticDeflectionPlates(crtCtx);
+
+            if (state.power && state.currentMicroAmps > 0.5) {
+                drawBeamInTube(crtCtx);
+            }
+
+            // Draw Crowded Electrons behind Grid
+            if (state.showParticles && state.power) {
+                crtCtx.save();
+                for (let cp of crowdedParticles) {
+                    let alpha = Math.min(0.8, (cp.life / 20));
+                    crtCtx.fillStyle = `rgba(0, 255, 170, ${alpha})`;
+                    crtCtx.shadowColor = '#00ffaa';
+                    crtCtx.shadowBlur = 4;
+                    crtCtx.beginPath();
+                    crtCtx.arc(cp.x, cp.y, 1.4, 0, Math.PI * 2);
+                    crtCtx.fill();
+                }
+
+                // Draw Fast Beam Particles
+                for (let bp of beamParticles) {
+                    crtCtx.fillStyle = '#ffffff';
+                    crtCtx.shadowColor = '#00f3ff';
+                    crtCtx.shadowBlur = 6;
+                    crtCtx.beginPath();
+                    crtCtx.arc(bp.x, bp.y, 1.5, 0, Math.PI * 2);
+                    crtCtx.fill();
+                }
+
+                // Draw Impact Sparks
+                for (let sp of state.impactSparks) {
+                    let sparkAlpha = 1.0 - (sp.life / sp.maxLife);
+                    crtCtx.fillStyle = `rgba(255, 255, 255, ${sparkAlpha})`;
+                    crtCtx.shadowColor = '#00ff77';
+                    crtCtx.shadowBlur = 8;
+                    crtCtx.beginPath();
+                    crtCtx.arc(sp.x, sp.y, 1.6, 0, Math.PI * 2);
+                    crtCtx.fill();
+                }
+                crtCtx.restore();
+            }
+
+            crtCtx.restore();
+        }
+
+        function drawGlassEnvelope(ctx) {
+            ctx.beginPath();
+            ctx.moveTo(70, AXIS_Y - 45);
+            ctx.lineTo(X_XPLATES + 90, AXIS_Y - 45);
+            ctx.quadraticCurveTo(630, AXIS_Y - 50, X_SCREEN, AXIS_Y - 160);
+            ctx.quadraticCurveTo(X_SCREEN + 30, AXIS_Y, X_SCREEN, AXIS_Y + 160);
+            ctx.quadraticCurveTo(630, AXIS_Y + 50, X_XPLATES + 90, AXIS_Y + 45);
+            ctx.lineTo(70, AXIS_Y + 45);
+            ctx.closePath();
+
+            let grad = ctx.createLinearGradient(0, AXIS_Y - 160, 0, AXIS_Y + 160);
+            grad.addColorStop(0, 'rgba(0, 180, 255, 0.08)');
+            grad.addColorStop(0.5, 'rgba(0, 25, 50, 0.28)');
+            grad.addColorStop(1, 'rgba(0, 180, 255, 0.08)');
+            ctx.fillStyle = grad;
+            ctx.fill();
+
+            ctx.lineWidth = 2.5;
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.65)';
+            ctx.stroke();
+
+            // Conductive Aquadag Coating
+            ctx.beginPath();
+            ctx.moveTo(X_XPLATES + 90, AXIS_Y - 43);
+            ctx.quadraticCurveTo(630, AXIS_Y - 48, X_SCREEN - 8, AXIS_Y - 156);
+            ctx.lineTo(X_SCREEN - 8, AXIS_Y - 146);
+            ctx.quadraticCurveTo(630, AXIS_Y - 38, X_XPLATES + 90, AXIS_Y - 33);
+            ctx.fillStyle = 'rgba(15, 20, 30, 0.9)';
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(X_XPLATES + 90, AXIS_Y + 43);
+            ctx.quadraticCurveTo(630, AXIS_Y + 48, X_SCREEN - 8, AXIS_Y + 156);
+            ctx.lineTo(X_SCREEN - 8, AXIS_Y + 146);
+            ctx.quadraticCurveTo(630, AXIS_Y + 38, X_XPLATES + 90, AXIS_Y + 33);
+            ctx.fillStyle = 'rgba(15, 20, 30, 0.9)';
+            ctx.fill();
+
+            // Screen Phosphor Internal Layer
+            ctx.beginPath();
+            ctx.moveTo(X_SCREEN - 2, AXIS_Y - 156);
+            ctx.quadraticCurveTo(X_SCREEN + 26, AXIS_Y, X_SCREEN - 2, AXIS_Y + 156);
+            ctx.lineWidth = 6;
+            ctx.strokeStyle = state.phosphorType === 'p31' ? 'rgba(0, 255, 119, 0.5)' : 'rgba(0, 243, 255, 0.5)';
+            ctx.stroke();
+        }
+
+        function drawCylindricalHardware(ctx) {
+            // 1. Helical Tungsten Filament
+            ctx.save();
+            let heaterGlow = Math.min(1.0, Math.max(0.1, (state.heaterTemp - 300) / 900));
+            ctx.strokeStyle = state.power ? `rgba(255, ${Math.floor(70 + heaterGlow*150)}, 30, ${heaterGlow})` : '#4d2015';
+            ctx.lineWidth = 3.2;
+            ctx.shadowColor = '#ff6600';
+            ctx.shadowBlur = state.power && state.heaterTemp > 600 ? 16 * heaterGlow : 0;
+            ctx.beginPath();
+            let coils = 6;
+            let startX = X_FILAMENT;
+            for (let i = 0; i <= coils; i++) {
+                let cx = startX + i * 3.5;
+                let cy = AXIS_Y + ((i % 2 === 0) ? -9 : 9);
+                if (i === 0) ctx.moveTo(cx, cy);
+                else ctx.lineTo(cx, cy);
+            }
+            ctx.stroke();
+            ctx.restore();
+
+            // 2. Nickel Cathode Sleeve with Oxide Cap
+            let cathGrad = ctx.createLinearGradient(0, AXIS_Y - 14, 0, AXIS_Y + 14);
+            cathGrad.addColorStop(0, '#506375');
+            cathGrad.addColorStop(0.3, '#d4e4f2');
+            cathGrad.addColorStop(0.7, '#7e93a6');
+            cathGrad.addColorStop(1, '#2c3a47');
+            ctx.fillStyle = cathGrad;
+            ctx.fillRect(X_CATHODE - 2, AXIS_Y - 14, 20, 28);
+            ctx.strokeStyle = '#22303c';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(X_CATHODE - 2, AXIS_Y - 14, 20, 28);
+
+            // Barium Oxide Cap
+            let capColor = state.power && state.heaterTemp > 650 ? '#ffaa77' : '#cfd8e3';
+            ctx.fillStyle = capColor;
+            ctx.fillRect(X_CATHODE + 18, AXIS_Y - 14, 4, 28);
+
+            // 3. Wehnelt Cylinder (Control Grid)
+            drawRealistic3DCylinder(ctx, X_GRID, AXIS_Y - 28, 22, 56, 8, `Grid: ${state.gridBias.toFixed(0)}V`, 'rgba(195, 64, 255, 0.4)');
+
+            // 4. Focusing Anode Coaxial Cylinder
+            let vfColor = `rgba(0, 243, 255, ${Math.min(1.0, 0.3 + state.focusVolt / 1000)})`;
+            drawRealistic3DCylinder(ctx, X_ANODE1, AXIS_Y - 34, 65, 68, 16, `+Vf Lens: ${state.focusVolt.toFixed(0)}V`, vfColor);
+
+            // 5. Accelerating Anode Coaxial Cylinder
+            let vaColor = `rgba(0, 255, 119, ${Math.min(1.0, 0.3 + state.accelVolt / 3000)})`;
+            drawRealistic3DCylinder(ctx, X_ANODE2, AXIS_Y - 38, 80, 76, 14, `+Va Accel: ${state.accelVolt.toFixed(0)}V`, vaColor);
+
+            // Equipotential Field Lines
+            drawEquipotentialLensCurves(ctx);
+        }
+
+        function drawRealistic3DCylinder(ctx, x, y, w, h, boreH, label, potentialGlow) {
+            ctx.save();
+            let halfH = (h - boreH) / 2;
+
+            let metalGrad = ctx.createLinearGradient(0, y, 0, y + h);
+            metalGrad.addColorStop(0, '#2e3d4c');
+            metalGrad.addColorStop(0.15, '#8fa6bc');
+            metalGrad.addColorStop(0.35, '#f0f6fc');
+            metalGrad.addColorStop(0.65, '#6c8297');
+            metalGrad.addColorStop(1, '#1e2933');
+
+            ctx.fillStyle = metalGrad;
+            ctx.fillRect(x, y, w, halfH);
+            ctx.fillRect(x, y + halfH + boreH, w, halfH);
+
+            let boreGrad = ctx.createLinearGradient(0, y + halfH, 0, y + halfH + boreH);
+            boreGrad.addColorStop(0, '#0a1017');
+            boreGrad.addColorStop(0.5, '#15202b');
+            boreGrad.addColorStop(1, '#0a1017');
+            ctx.fillStyle = boreGrad;
+            ctx.fillRect(x, y + halfH, w, boreH);
+
+            ctx.fillStyle = '#9cb5cc';
+            ctx.beginPath();
+            ctx.ellipse(x, y + h / 2, 4, h / 2, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = potentialGlow;
+            ctx.lineWidth = 1.6;
+            ctx.strokeRect(x, y, w, halfH);
+            ctx.strokeRect(x, y + halfH + boreH, w, halfH);
+
+            ctx.fillStyle = potentialGlow;
+            ctx.font = '10px Share Tech Mono, monospace';
+            ctx.fillText(label, x + 2, y + h + 15);
+            ctx.restore();
+        }
+
+        function drawEquipotentialLensCurves(ctx) {
+            ctx.save();
+            let midX = (X_ANODE1 + 65 + X_ANODE2) / 2;
+            let curvature = (state.accelVolt - state.focusVolt) / 2200;
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.35)';
+            ctx.lineWidth = 1.2;
+            ctx.setLineDash([3, 3]);
+
+            for (let i = -1; i <= 1; i++) {
+                ctx.beginPath();
+                let cx = midX + i * 14;
+                ctx.moveTo(cx - curvature * 10, AXIS_Y - 26);
+                ctx.quadraticCurveTo(cx + curvature * 15, AXIS_Y, cx - curvature * 10, AXIS_Y + 26);
+                ctx.stroke();
+            }
+            ctx.restore();
+        }
+
+        function drawRealisticDeflectionPlates(ctx) {
+            let vy = state.instantVy;
+            let vx = state.instantVx;
+
+            // Vertical Y-Plates
+            let topColor = vy > 2 ? 'rgba(255, 60, 80, 0.85)' : vy < -2 ? 'rgba(0, 180, 255, 0.85)' : '#657b95';
+            let botColor = vy > 2 ? 'rgba(0, 180, 255, 0.85)' : vy < -2 ? 'rgba(255, 60, 80, 0.85)' : '#657b95';
+
+            let plateGradTop = ctx.createLinearGradient(X_YPLATES, AXIS_Y - 38, X_YPLATES + 60, AXIS_Y - 26);
+            plateGradTop.addColorStop(0, '#5a6e82');
+            plateGradTop.addColorStop(0.5, '#c5d8ea');
+            plateGradTop.addColorStop(1, '#3b4b5a');
+
+            ctx.fillStyle = plateGradTop;
+            ctx.beginPath();
+            ctx.moveTo(X_YPLATES, AXIS_Y - 26);
+            ctx.lineTo(X_YPLATES + 40, AXIS_Y - 26);
+            ctx.lineTo(X_YPLATES + 65, AXIS_Y - 38);
+            ctx.lineTo(X_YPLATES + 65, AXIS_Y - 44);
+            ctx.lineTo(X_YPLATES, AXIS_Y - 32);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = topColor;
+            ctx.lineWidth = 1.8;
+            ctx.stroke();
+
+            ctx.fillStyle = plateGradTop;
+            ctx.beginPath();
+            ctx.moveTo(X_YPLATES, AXIS_Y + 26);
+            ctx.lineTo(X_YPLATES + 40, AXIS_Y + 26);
+            ctx.lineTo(X_YPLATES + 65, AXIS_Y + 38);
+            ctx.lineTo(X_YPLATES + 65, AXIS_Y + 44);
+            ctx.lineTo(X_YPLATES, AXIS_Y + 32);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = botColor;
+            ctx.stroke();
+
+            ctx.fillStyle = state.enableYDeflection ? '#00f3ff' : '#657b95';
+            ctx.font = '10px Share Tech Mono, monospace';
+            ctx.fillText(`Y-Plates: ${state.enableYDeflection ? (vy >= 0 ? '+' : '') + vy.toFixed(1) + 'V' : 'OFF'}`, X_YPLATES - 10, AXIS_Y - 52);
+
+            // E-Field Lines
+            if (state.showEField && state.enableYDeflection && Math.abs(vy) > 3) {
+                ctx.save();
+                let dir = vy > 0 ? -1 : 1;
+                ctx.strokeStyle = vy > 0 ? 'rgba(255, 80, 100, 0.6)' : 'rgba(0, 200, 255, 0.6)';
+                ctx.fillStyle = ctx.strokeStyle;
+                ctx.lineWidth = 1.2;
+
+                for (let i = 0; i < 4; i++) {
+                    let lx = X_YPLATES + 10 + i * 13;
+                    let yStart = dir < 0 ? AXIS_Y - 20 : AXIS_Y + 20;
+                    let yEnd   = dir < 0 ? AXIS_Y + 20 : AXIS_Y - 20;
+
+                    ctx.beginPath();
+                    ctx.moveTo(lx, yStart);
+                    ctx.lineTo(lx, yEnd);
+                    ctx.stroke();
+
+                    ctx.beginPath();
+                    ctx.moveTo(lx, yEnd);
+                    ctx.lineTo(lx - 3, yEnd - dir * 5);
+                    ctx.lineTo(lx + 3, yEnd - dir * 5);
+                    ctx.fill();
+                }
+                ctx.restore();
+            }
+
+            // Horizontal X-Plates
+            let leftXColor = vx > 2 ? 'rgba(255, 60, 80, 0.85)' : vx < -2 ? 'rgba(0, 180, 255, 0.85)' : '#657b95';
+            let rightXColor = vx > 2 ? 'rgba(0, 180, 255, 0.85)' : vx < -2 ? 'rgba(255, 60, 80, 0.85)' : '#657b95';
+
+            let xPlateGrad = ctx.createLinearGradient(0, AXIS_Y - 36, 0, AXIS_Y + 36);
+            xPlateGrad.addColorStop(0, '#536577');
+            xPlateGrad.addColorStop(0.5, '#b9cedf');
+            xPlateGrad.addColorStop(1, '#344350');
+
+            ctx.fillStyle = xPlateGrad;
+            ctx.fillRect(X_XPLATES, AXIS_Y - 36, 12, 72);
+            ctx.strokeStyle = leftXColor;
+            ctx.strokeRect(X_XPLATES, AXIS_Y - 36, 12, 72);
+
+            ctx.fillRect(X_XPLATES + 34, AXIS_Y - 36, 12, 72);
+            ctx.strokeStyle = rightXColor;
+            ctx.strokeRect(X_XPLATES + 34, AXIS_Y - 36, 12, 72);
+
+            ctx.fillStyle = state.enableXDeflection ? '#00f3ff' : '#657b95';
+            ctx.fillText(`X-Plates: ${state.enableXDeflection ? (vx >= 0 ? '+' : '') + vx.toFixed(1) + 'V' : 'OFF'}`, X_XPLATES - 10, AXIS_Y + 54);
+        }
+
+        function drawBeamInTube(ctx) {
+            ctx.save();
+            let pColor = state.phosphorType === 'p31' ? '#00ff77' : (state.phosphorType === 'p7' ? '#00f3ff' : '#ffffff');
+            
+            let vaBrightness = Math.min(1.0, 0.35 + (state.accelVolt / 3000) * 0.65);
+            let beamAlpha = Math.min(0.9, (state.currentMicroAmps / 100) * vaBrightness);
+            let hitY = AXIS_Y - (state.deflectionY_cm * 24);
+
+            // Beam Envelope
+            ctx.beginPath();
+            for (let x = X_GRID + 14; x <= X_SCREEN; x += 15) {
+                let r = getBeamEnvelopeRadius(x);
+                let def = (x >= X_YPLATES) ? ((x - X_YPLATES) / (X_SCREEN - X_YPLATES)) * (hitY - AXIS_Y) : 0;
+                let y = AXIS_Y + def - r;
+                if (x === X_GRID + 14) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            for (let x = X_SCREEN; x >= X_GRID + 14; x -= 15) {
+                let r = getBeamEnvelopeRadius(x);
+                let def = (x >= X_YPLATES) ? ((x - X_YPLATES) / (X_SCREEN - X_YPLATES)) * (hitY - AXIS_Y) : 0;
+                let y = AXIS_Y + def + r;
+                ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+
+            let envGrad = ctx.createLinearGradient(X_GRID, AXIS_Y, X_SCREEN, hitY);
+            envGrad.addColorStop(0, 'rgba(0, 243, 255, 0.15)');
+            envGrad.addColorStop(1, state.phosphorType === 'p31' ? `rgba(0, 255, 119, ${beamAlpha * 0.38})` : `rgba(0, 243, 255, ${beamAlpha * 0.38})`);
+            ctx.fillStyle = envGrad;
+            ctx.fill();
+
+            // Core Electron Beam Path
+            ctx.beginPath();
+            ctx.moveTo(X_GRID + 14, AXIS_Y);
+            ctx.lineTo(X_YPLATES, AXIS_Y);
+            let exitY = AXIS_Y + (hitY - AXIS_Y) * 0.25;
+            ctx.quadraticCurveTo(X_YPLATES + 30, AXIS_Y, X_YPLATES + 60, exitY);
+            ctx.lineTo(X_SCREEN, hitY);
+
+            ctx.strokeStyle = pColor;
+            ctx.globalAlpha = beamAlpha;
+            ctx.lineWidth = Math.max(1.2, state.beamDiameter * 0.45);
+            ctx.shadowColor = pColor;
+            ctx.shadowBlur = 12 * vaBrightness;
+            ctx.stroke();
+
+            // Screen Phosphor Impact Bloom
+            let spotRad = state.screenSpotRadius;
+            let impactBloomRadius = spotRad * 3.5;
+
+            let impactGrad = ctx.createRadialGradient(X_SCREEN, hitY, 0, X_SCREEN, hitY, impactBloomRadius);
+            impactGrad.addColorStop(0, '#ffffff');
+            impactGrad.addColorStop(0.2, pColor);
+            impactGrad.addColorStop(0.6, state.phosphorType === 'p31' ? 'rgba(0, 255, 119, 0.35)' : 'rgba(0, 243, 255, 0.35)');
+            impactGrad.addColorStop(1, 'transparent');
+
+            ctx.fillStyle = impactGrad;
+            ctx.beginPath();
+            ctx.arc(X_SCREEN, hitY, impactBloomRadius, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        // Render CRO Front Panel Phosphor Screen
+        function renderCROScreen() {
+            let w = screenCanvas.width;
+            let h = screenCanvas.height;
+            let cx = w / 2;
+            let cy = h / 2;
+
+            // Persistence Fade: controlled dynamically by state.persistence
+            let fadeAlpha = Math.max(0.05, 1.0 - state.persistence);
+            screenCtx.fillStyle = `rgba(1, 12, 7, ${fadeAlpha})`;
+            screenCtx.fillRect(0, 0, w, h);
+
+            // Draw 8x10 Graticule (Brightness regulated by state.graticuleIllum)
+            drawCROGraticule(screenCtx, w, h, cx, cy);
+
+            if (!state.power || state.currentMicroAmps < 0.2) return;
+
+            let divW = w / 10;
+            let divH = h / 8;
+            let pColor = state.phosphorType === 'p31' ? '#00ff77' : (state.phosphorType === 'p7' ? '#00f3ff' : '#ffffff');
+
+            let vaBrightness = Math.min(1.0, 0.4 + (state.accelVolt / 3000) * 0.6);
+            let traceThickness = Math.max(1.5, state.beamDiameter * 0.85);
+
+            screenCtx.save();
+            screenCtx.strokeStyle = pColor;
+            screenCtx.lineWidth = traceThickness;
+            screenCtx.shadowColor = pColor;
+            screenCtx.shadowBlur = Math.max(4, 12 * vaBrightness * (1.0 / (state.beamDiameter * 0.5)));
+
+            // CASE 1: Both Deflection Axes Active (Standard Waveform)
+            if (state.enableXDeflection && state.enableYDeflection) {
+                let totalTimeWindow = (state.timeDiv * 1e-3) * 10;
+
+                screenCtx.beginPath();
+                for (let px = 0; px <= w; px += 2) {
+                    let fraction = px / w;
+                    let tSample = fraction * totalTimeWindow;
+
+                    let vSample = evaluateSignal(tSample);
+                    let yDivs = vSample / state.voltsDiv;
+                    let py = cy - (yDivs + state.croYPos) * divH;
+
+                    if (px === 0) screenCtx.moveTo(px, py);
+                    else screenCtx.lineTo(px, py);
+                }
+                screenCtx.stroke();
+
+                let sweepPhase = (state.simTime % totalTimeWindow) / totalTimeWindow;
+                let dotX = sweepPhase * w;
+                let dotYDivs = evaluateSignal(sweepPhase * totalTimeWindow) / state.voltsDiv;
+                let dotY = cy - (dotYDivs + state.croYPos) * divH;
+
+                screenCtx.beginPath();
+                screenCtx.arc(dotX, dotY, Math.max(3.5, state.beamDiameter * 1.5), 0, Math.PI * 2);
+                screenCtx.fillStyle = '#ffffff';
+                screenCtx.fill();
+
+                if (state.showGuides && state.signalType !== 'dc') {
+                    drawMeasurementGuides(screenCtx, w, h, cx, cy, divW, divH, totalTimeWindow);
+                }
+            }
+            // CASE 2: Timebase Sweep Only (Horizontal Line)
+            else if (state.enableXDeflection && !state.enableYDeflection) {
+                let py = cy - state.croYPos * divH;
+                screenCtx.beginPath();
+                screenCtx.moveTo(0, py);
+                screenCtx.lineTo(w, py);
+                screenCtx.stroke();
+
+                let totalTimeWindow = (state.timeDiv * 1e-3) * 10;
+                let sweepPhase = (state.simTime % totalTimeWindow) / totalTimeWindow;
+                screenCtx.beginPath();
+                screenCtx.arc(sweepPhase * w, py, Math.max(3.5, state.beamDiameter * 1.5), 0, Math.PI * 2);
+                screenCtx.fillStyle = '#ffffff';
+                screenCtx.fill();
+            }
+            // CASE 3: Vertical Y-Signal Only (Vertical Oscillation Line)
+            else if (!state.enableXDeflection && state.enableYDeflection) {
+                let px = cx + state.croXPos * divW;
+                let vPeak = state.acAmp / state.voltsDiv;
+                let yTop = cy - (vPeak + state.croYPos) * divH;
+                let yBot = cy - (-vPeak + state.croYPos) * divH;
+
+                screenCtx.beginPath();
+                screenCtx.moveTo(px, yTop);
+                screenCtx.lineTo(px, yBot);
+                screenCtx.stroke();
+
+                let curYDivs = evaluateSignal(state.simTime) / state.voltsDiv;
+                let curY = cy - (curYDivs + state.croYPos) * divH;
+                screenCtx.beginPath();
+                screenCtx.arc(px, curY, Math.max(3.5, state.beamDiameter * 1.5), 0, Math.PI * 2);
+                screenCtx.fillStyle = '#ffffff';
+                screenCtx.fill();
+            }
+            // CASE 4: No Deflection (Stationary Pinhole Spot)
+            else {
+                let px = cx + state.croXPos * divW;
+                let py = cy - state.croYPos * divH;
+                screenCtx.beginPath();
+                screenCtx.arc(px, py, Math.max(3.5, state.beamDiameter * 2.2), 0, Math.PI * 2);
+                screenCtx.fillStyle = '#ffffff';
+                screenCtx.shadowBlur = 14 * vaBrightness;
+                screenCtx.fill();
+            }
+
+            screenCtx.restore();
+        }
+
+        function drawCROGraticule(ctx, w, h, cx, cy) {
+            ctx.save();
+            let divW = w / 10;
+            let divH = h / 8;
+            let illum = state.graticuleIllum;
+
+            // Secondary Graticule Lines
+            ctx.strokeStyle = state.phosphorType === 'p31' 
+                ? `rgba(0, 255, 119, ${0.22 * illum})` 
+                : `rgba(0, 243, 255, ${0.22 * illum})`;
+            ctx.lineWidth = 1;
+
+            ctx.beginPath();
+            for (let i = 0; i <= 10; i++) {
+                let x = i * divW;
+                ctx.moveTo(x, 0); ctx.lineTo(x, h);
+            }
+            for (let j = 0; j <= 8; j++) {
+                let y = j * divH;
+                ctx.moveTo(0, y); ctx.lineTo(w, y);
+            }
+            ctx.stroke();
+
+            // Central Crosshairs
+            ctx.strokeStyle = state.phosphorType === 'p31' 
+                ? `rgba(0, 255, 119, ${0.48 * illum})` 
+                : `rgba(0, 243, 255, ${0.48 * illum})`;
+            ctx.lineWidth = 1.3;
+
+            ctx.beginPath();
+            ctx.moveTo(0, cy); ctx.lineTo(w, cy);
+            ctx.moveTo(cx, 0); ctx.lineTo(cx, h);
+            ctx.stroke();
+
+            // Subdivision Ticks (5 minor ticks per major division)
+            let subX = divW / 5;
+            let subY = divH / 5;
+            ctx.beginPath();
+            for (let x = 0; x <= w; x += subX) {
+                ctx.moveTo(x, cy - 3.5); ctx.lineTo(x, cy + 3.5);
+            }
+            for (let y = 0; y <= h; y += subY) {
+                ctx.moveTo(cx - 3.5, y); ctx.lineTo(cx + 3.5, y);
+            }
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        function drawMeasurementGuides(ctx, w, h, cx, cy, divW, divH, totalTimeWindow) {
+            ctx.save();
+            let vPeak = state.acAmp;
+            let vDivs = (vPeak / state.voltsDiv);
+            let vppDivs = vDivs * 2;
+
+            let period = 1 / state.acFreq;
+            let hDivsPerCycle = (period / (state.timeDiv * 1e-3));
+
+            ctx.strokeStyle = 'rgba(255, 200, 0, 0.85)';
+            ctx.fillStyle = '#ffcc00';
+            ctx.lineWidth = 1.2;
+            ctx.setLineDash([4, 4]);
+            ctx.font = '11px Share Tech Mono, monospace';
+
+            let guideX = cx + 3 * divW;
+            let crestY = cy - (vDivs + state.croYPos) * divH;
+            let troughY = cy - (-vDivs + state.croYPos) * divH;
+
+            ctx.beginPath();
+            ctx.moveTo(guideX - 10, crestY);
+            ctx.lineTo(guideX + 10, crestY);
+            ctx.moveTo(guideX, crestY);
+            ctx.lineTo(guideX, troughY);
+            ctx.moveTo(guideX - 10, troughY);
+            ctx.lineTo(guideX + 10, troughY);
+            ctx.stroke();
+
+            ctx.setLineDash([]);
+            ctx.fillText(`V_pp: ${vppDivs.toFixed(1)} div × ${state.voltsDiv}V = ${(vppDivs * state.voltsDiv).toFixed(1)}V`, guideX + 14, (crestY + troughY) / 2);
+
+            if (hDivsPerCycle <= 9) {
+                let startX = cx - (hDivsPerCycle / 2) * divW;
+                let endX = startX + hDivsPerCycle * divW;
+                let barY = 24;
+
+                ctx.setLineDash([4, 4]);
+                ctx.beginPath();
+                ctx.moveTo(startX, barY - 6);
+                ctx.lineTo(startX, barY + 6);
+                ctx.moveTo(startX, barY);
+                ctx.lineTo(endX, barY);
+                ctx.moveTo(endX, barY - 6);
+                ctx.lineTo(endX, barY + 6);
+                ctx.stroke();
+
+                ctx.setLineDash([]);
+                ctx.fillText(`T = ${hDivsPerCycle.toFixed(1)} div × ${state.timeDiv}ms = ${(period * 1000).toFixed(1)}ms (f = ${state.acFreq}Hz)`, startX, barY + 16);
+            }
+
+            ctx.restore();
+        }
+
+        function updateTelemetryHUD() {
+            document.getElementById('hud-heater').innerText = `${state.heaterTemp.toFixed(0)} °C`;
+            document.getElementById('hud-current').innerText = `${state.currentMicroAmps.toFixed(1)} µA`;
+            document.getElementById('hud-va').innerText = `${state.accelVolt.toFixed(0)} V`;
+
+            let vel_10_7 = state.velocity / 1e7;
+            document.getElementById('hud-vel').innerText = `${vel_10_7.toFixed(2)} × 10⁷ m/s`;
+
+            let kFocus = state.focusVolt / (state.accelVolt * 0.30);
+            let focusStatus = 'OPTIMAL (SHARP SPOT)';
+            if (kFocus < 0.85) focusStatus = 'UNDER-FOCUSED (DIFFUSE)';
+            else if (kFocus > 1.15) focusStatus = 'OVER-FOCUSED (EARLY WAIST)';
+            document.getElementById('hud-waist').innerText = focusStatus;
+
+            let gridText = state.gridBias <= -85 ? 'CUTOFF (CROWDED)' : state.gridBias < -45 ? 'RESTRICTED (PARTIAL)' : 'OPEN PASS';
+            document.getElementById('hud-grid-status').innerText = gridText;
+
+            document.getElementById('cro-readout-header').innerText = `Y: ${state.voltsDiv.toFixed(1)} V/DIV | X: ${state.timeDiv.toFixed(1)} ms/DIV`;
+            document.getElementById('crt-view-title').innerText = CAMERA_PRESETS[state.camTarget].title;
+        }
+
+        // Animation Loop
+        let lastTime = performance.now();
+        function loop(timestamp) {
+            let dt = (timestamp - lastTime) / 1000;
+            lastTime = timestamp;
+            if (dt > 0.1) dt = 0.1;
+
+            computePhysics(dt);
+            updateParticles();
+            updateCamera();
+            renderCRT();
+            renderCROScreen();
+            updateTelemetryHUD();
+
+            requestAnimationFrame(loop);
+        }
+        requestAnimationFrame(loop);
+
+        // Camera Inspector Views
+        function setInspectorView(targetKey) {
+            state.camTarget = targetKey;
+            const target = CAMERA_PRESETS[targetKey];
+            state.cam.targetZoom = target.zoom;
+            state.cam.targetX = target.x;
+            state.cam.targetY = target.y;
+
+            document.querySelectorAll('.btn-mini-mode').forEach(b => b.classList.remove('active'));
+            const activeBtn = document.getElementById(`btn-cam-${targetKey}`);
+            if (activeBtn) activeBtn.classList.add('active');
+        }
+
+        document.getElementById('btn-cam-full').addEventListener('click', () => setInspectorView('full'));
+        document.getElementById('btn-cam-gun').addEventListener('click', () => setInspectorView('gun'));
+        document.getElementById('btn-cam-plates').addEventListener('click', () => setInspectorView('plates'));
+        document.getElementById('btn-cam-screen').addEventListener('click', () => setInspectorView('screen'));
+
+        // Tab Navigation
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.deck-section').forEach(s => s.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(btn.getAttribute('data-tab')).classList.add('active');
+            });
+        });
+
+        // Deflection Modes
+        function setDeflectionMode(mode) {
+            document.querySelectorAll('.btn-sweep-mode').forEach(b => b.classList.remove('active'));
+            if (mode === 'both') {
+                state.enableXDeflection = true;
+                state.enableYDeflection = true;
+                document.getElementById('btn-mode-both').classList.add('active');
+            } else if (mode === 'xonly') {
+                state.enableXDeflection = true;
+                state.enableYDeflection = false;
+                document.getElementById('btn-mode-xonly').classList.add('active');
+            } else if (mode === 'yonly') {
+                state.enableXDeflection = false;
+                state.enableYDeflection = true;
+                document.getElementById('btn-mode-yonly').classList.add('active');
+            } else if (mode === 'none') {
+                state.enableXDeflection = false;
+                state.enableYDeflection = false;
+                document.getElementById('btn-mode-none').classList.add('active');
+            }
+            document.getElementById('chk-x-enable').checked = state.enableXDeflection;
+            document.getElementById('chk-y-enable').checked = state.enableYDeflection;
+        }
+
+        document.getElementById('btn-mode-both').addEventListener('click', () => setDeflectionMode('both'));
+        document.getElementById('btn-mode-xonly').addEventListener('click', () => setDeflectionMode('xonly'));
+        document.getElementById('btn-mode-yonly').addEventListener('click', () => setDeflectionMode('yonly'));
+        document.getElementById('btn-mode-none').addEventListener('click', () => setDeflectionMode('none'));
+
+        document.getElementById('chk-x-enable').addEventListener('change', e => state.enableXDeflection = e.target.checked);
+        document.getElementById('chk-y-enable').addEventListener('change', e => state.enableYDeflection = e.target.checked);
+
+        // Slider Event Helpers
+        function bindSlider(id, targetKey, valId, unit, formatter = v => v) {
+            const sl = document.getElementById(id);
+            const val = document.getElementById(valId);
+            sl.addEventListener('input', (e) => {
+                let v = parseFloat(e.target.value);
+                state[targetKey] = v;
+                if (val) val.innerText = `${formatter(v)} ${unit}`.trim();
+            });
+        }
+
+        bindSlider('sl-volts-div', 'voltsDiv', 'val-volts-div', 'V/div', v => v.toFixed(1));
+        bindSlider('sl-cro-ypos', 'croYPos', 'val-cro-ypos', 'div', v => v.toFixed(1));
+        bindSlider('sl-time-div', 'timeDiv', 'val-time-div', 'ms/div', v => v.toFixed(1));
+        bindSlider('sl-cro-xpos', 'croXPos', 'val-cro-xpos', 'div', v => v.toFixed(1));
+
+        bindSlider('sl-ac-amp', 'acAmp', 'val-ac-amp', 'V', v => v.toFixed(1));
+        bindSlider('sl-ac-freq', 'acFreq', 'val-ac-freq', 'Hz');
+        bindSlider('sl-dc-level', 'dcLevel', 'val-dc-level', 'V', v => v.toFixed(1));
+
+        bindSlider('sl-heater', 'targetHeaterTemp', 'val-heater', '°C');
+        bindSlider('sl-grid', 'targetGridBias', 'val-grid', 'V', v => v.toFixed(1));
+        bindSlider('sl-focus', 'targetFocusVolt', 'val-focus', 'V');
+        bindSlider('sl-accel', 'targetAccelVolt', 'val-accel', 'V');
+
+        // Fully Connected Phosphor Persistence & Graticule Illumination
+        bindSlider('sl-persistence', 'persistence', 'val-phosphor', '', v => {
+            if (v >= 0.85) return 'Long (Radar/P7)';
+            if (v >= 0.50) return 'Medium (P31)';
+            return 'Fast / Low';
+        });
+
+        const illumSlider = document.getElementById('sl-illum');
+        const illumVal = document.getElementById('val-illum');
+        illumSlider.addEventListener('input', (e) => {
+            let v = parseFloat(e.target.value);
+            state.graticuleIllum = v / 100;
+            if (illumVal) illumVal.innerText = `${v.toFixed(0)}%`;
+        });
+
+        document.getElementById('sel-ac-wave').addEventListener('change', e => state.signalType = e.target.value);
+        document.getElementById('sel-coupling').addEventListener('change', e => state.coupling = e.target.value);
+        document.getElementById('chk-y-invert').addEventListener('change', e => state.yInvert = e.target.checked);
+        document.getElementById('chk-show-guides').addEventListener('change', e => state.showGuides = e.target.checked);
+        document.getElementById('chk-efield').addEventListener('change', e => state.showEField = e.target.checked);
+        document.getElementById('chk-show-particles').addEventListener('change', e => state.showParticles = e.target.checked);
+        document.getElementById('sel-phosphor-color').addEventListener('change', e => state.phosphorType = e.target.value);
+
+        // HV Power & SlowMo Toggles
+        document.getElementById('btn-power').addEventListener('click', (e) => {
+            state.power = !state.power;
+            e.target.classList.toggle('off', !state.power);
+            e.target.innerText = state.power ? 'HV Power: ON' : 'HV Power: OFF';
+            document.getElementById('beam-status-tag').innerText = state.power ? 'BEAM ACTIVE (PULSED EMISSION)' : 'HV SHUTDOWN (OFF)';
+            document.getElementById('beam-status-tag').style.color = state.power ? 'var(--phosphor-green)' : 'var(--neon-red)';
+        });
+
+        document.getElementById('btn-slowmo').addEventListener('click', (e) => {
+            state.slowMo = !state.slowMo;
+            e.target.classList.toggle('active', state.slowMo);
+            e.target.innerText = state.slowMo ? 'Slow Motion: ON' : 'Slow Motion: OFF';
+        });
+
+        // Waveform Presets
+        document.getElementById('pre-sine').addEventListener('click', () => {
+            setDeflectionMode('both');
+            state.signalType = 'sine'; document.getElementById('sel-ac-wave').value = 'sine';
+            state.coupling = 'dc'; document.getElementById('sel-coupling').value = 'dc';
+            state.acAmp = 30; document.getElementById('sl-ac-amp').value = 30; document.getElementById('val-ac-amp').innerText = '30.0 V';
+            state.acFreq = 50; document.getElementById('sl-ac-freq').value = 50; document.getElementById('val-ac-freq').innerText = '50 Hz';
+            state.timeDiv = 2.5; document.getElementById('sl-time-div').value = 2.5; document.getElementById('val-time-div').innerText = '2.5 ms/div';
+            state.voltsDiv = 10; document.getElementById('sl-volts-div').value = 10; document.getElementById('val-volts-div').innerText = '10.0 V/div';
+        });
+
+        document.getElementById('pre-dc').addEventListener('click', () => {
+            setDeflectionMode('both');
+            state.signalType = 'dc'; document.getElementById('sel-ac-wave').value = 'dc';
+            state.coupling = 'dc'; document.getElementById('sel-coupling').value = 'dc';
+            state.acAmp = 20; document.getElementById('sl-ac-amp').value = 20; document.getElementById('val-ac-amp').innerText = '20.0 V';
+            state.voltsDiv = 10; document.getElementById('sl-volts-div').value = 10; document.getElementById('val-volts-div').innerText = '10.0 V/div';
+        });
+
+        document.getElementById('pre-halfwave').addEventListener('click', () => {
+            setDeflectionMode('both');
+            state.signalType = 'halfwave'; document.getElementById('sel-ac-wave').value = 'halfwave';
+            state.acAmp = 30; document.getElementById('sl-ac-amp').value = 30; document.getElementById('val-ac-amp').innerText = '30.0 V';
+        });
+
+        document.getElementById('pre-fullwave').addEventListener('click', () => {
+            setDeflectionMode('both');
+            state.signalType = 'fullwave'; document.getElementById('sel-ac-wave').value = 'fullwave';
+            state.acAmp = 30; document.getElementById('sl-ac-amp').value = 30; document.getElementById('val-ac-amp').innerText = '30.0 V';
+        });
+
+        document.getElementById('pre-square').addEventListener('click', () => {
+            setDeflectionMode('both');
+            state.signalType = 'square'; document.getElementById('sel-ac-wave').value = 'square';
+            state.acAmp = 30; document.getElementById('sl-ac-amp').value = 30; document.getElementById('val-ac-amp').innerText = '30.0 V';
+        });
+
+        document.getElementById('pre-acdc').addEventListener('click', () => {
+            setDeflectionMode('both');
+            state.signalType = 'sine'; document.getElementById('sel-ac-wave').value = 'sine';
+            state.coupling = 'dc'; document.getElementById('sel-coupling').value = 'dc';
+            state.acAmp = 20; document.getElementById('sl-ac-amp').value = 20; document.getElementById('val-ac-amp').innerText = '20.0 V';
+            state.dcLevel = 20; document.getElementById('sl-dc-level').value = 20; document.getElementById('val-dc-level').innerText = '20.0 V';
+        });
+
+        // Component Information for Interactive Tooltip
+        const componentsInfo = [
+            { name: 'Tungsten Filament', minX: 75, maxX: 100, minY: AXIS_Y - 20, maxY: AXIS_Y + 20, volt: '6.3V AC', desc: 'Resistively heats cathode sleeve to ~1000°C for thermionic emission.' },
+            { name: 'Oxide Cathode', minX: 103, maxX: 125, minY: AXIS_Y - 20, maxY: AXIS_Y + 20, volt: '-1600V (HV Neg)', desc: 'Barium/strontium oxide surface that constantly boils off thermal electrons.' },
+            { name: 'Wehnelt Control Grid', minX: 128, maxX: 155, minY: AXIS_Y - 35, maxY: AXIS_Y + 35, volt: 'Variable Neg', desc: 'Electrostatic cup. When negative, electrons crowd behind aperture; when near 0V, they stream through.' },
+            { name: 'Focusing Anode Cylinder', minX: 180, maxX: 255, minY: AXIS_Y - 45, maxY: AXIS_Y + 45, volt: '+480V', desc: 'Coaxial cylinder forming electrostatic lens that converges electrons to a focal waist.' },
+            { name: 'Accelerating Anode Cylinder', minX: 280, maxX: 370, minY: AXIS_Y - 45, maxY: AXIS_Y + 45, volt: '+1600V', desc: 'Accelerates electrons toward the phosphor screen, setting velocity and beam stiffness.' },
+            { name: 'Vertical Y-Plates', minX: 395, maxX: 465, minY: AXIS_Y - 50, maxY: AXIS_Y + 50, volt: 'Signal Input', desc: 'Flared planar plates applying vertical electrostatic deflection.' },
+            { name: 'Horizontal X-Plates', minX: 505, maxX: 555, minY: AXIS_Y - 45, maxY: AXIS_Y + 45, volt: 'Timebase Ramp', desc: 'Applies horizontal sawtooth field to sweep the beam across the screen.' },
+            { name: 'Phosphor Screen Face', minX: 780, maxX: 815, minY: AXIS_Y - 160, maxY: AXIS_Y + 160, volt: 'Grounded / Anode', desc: 'Inorganic phosphor layer (P31) converting electron kinetic energy into visible photons.' }
+        ];
+
+        const tooltip = document.getElementById('tooltip');
+        crtCanvas.addEventListener('pointermove', (e) => {
+            let rect = crtCanvas.getBoundingClientRect();
+            let mouseX = e.clientX - rect.left;
+            let mouseY = e.clientY - rect.top;
+
+            let scale = Math.min(crtCanvas.width / CRT_W, crtCanvas.height / CRT_H);
+            let offX = (crtCanvas.width - CRT_W * scale) / 2;
+            let offY = (crtCanvas.height - CRT_H * scale) / 2;
+
+            let normX = (mouseX - offX) / scale;
+            let normY = (mouseY - offY) / scale;
+
+            const c = state.cam;
+            let virtX = (normX - CRT_W / 2) / c.currentZoom + c.currentX;
+            let virtY = (normY - CRT_H / 2) / c.currentZoom + c.currentY;
+
+            let found = componentsInfo.find(comp => virtX >= comp.minX && virtX <= comp.maxX && virtY >= comp.minY && virtY <= comp.maxY);
+            if (found) {
+                tooltip.style.opacity = 1;
+                tooltip.style.left = (e.clientX + 14) + 'px';
+                tooltip.style.top = (e.clientY + 14) + 'px';
+                document.getElementById('tt-name').innerText = found.name;
+                document.getElementById('tt-volt').innerText = found.volt;
+                document.getElementById('tt-desc').innerText = found.desc;
+            } else {
+                tooltip.style.opacity = 0;
+            }
+        });
+        crtCanvas.addEventListener('pointerleave', () => tooltip.style.opacity = 0);
+    </script>
+</body>
+</html>
