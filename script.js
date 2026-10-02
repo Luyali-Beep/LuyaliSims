@@ -55,7 +55,7 @@ const simulatorsData = [
   "title": "The Periodic Table: Elemental Rummy",
   "category": "Sciences",
   "description": "Chemistry: An interactive card game laboratory simulator where learners assemble chemical melds, track valence electrons, and master periodic table trends.",
-  "image": "images/elementalrummy.jpg",
+  "image": "images/elementalrummy.jpeg",
   "url": "sims/simulator7.html"
   },
   {
@@ -63,7 +63,7 @@ const simulatorsData = [
   "title": "English Language: Grammar Dash",
   "category": "Exploration & others",
   "description": "English Games: An interactive sentence-building laboratory where students identify parts of speech, assemble phrases and sentences, and explore English grammar rules.",
-  "image": "images/grammardash.jpg",
+  "image": "images/grammardash.jpeg",
   "url": "sims/simulator8.html"
   },
   {
@@ -71,7 +71,7 @@ const simulatorsData = [
   "title": "AC to DC Rectification Laboratory",
   "category": "Sciences",
   "description": "Physics: Explore half-wave, center-tapped, and bridge rectifiers with dual-trace oscilloscope waveforms, diode biasing, and capacitor smoothing filters.",
-  "image": "images/rectification.jpg",
+  "image": "images/rectification.jpeg",
   "url": "sims/simulator9.html"
   },
   {
@@ -79,7 +79,7 @@ const simulatorsData = [
   "title": "Gas Preparation & Inorganic Synthesis",
   "category": "Sciences",
   "description": "Chemistry: An interactive inorganic synthesis simulator where students assemble glassware trains, test gas collection methods, and safely generate gases like Cl₂, O₂, and NH₃.",
-  "image": "images/gasprep.jpg",
+  "image": "images/gasprep.jpeg",
   "url": "sims/simulator10.html"
   },
   {
@@ -87,7 +87,7 @@ const simulatorsData = [
   "title": "Ultimate Physics Circuit Lab Pro",
   "category": "Sciences",
   "description": "Physics: An interactive circuit workbench to design AC/DC circuits, calibrate components, inspect CRO oscilloscope waveforms, and log experimental data.",
-  "image": "images/circuitlab.jpg",
+  "image": "images/circuitlab.jpeg",
   "url": "sims/simulator11.html"
   },
   {
@@ -95,7 +95,7 @@ const simulatorsData = [
   "title": "Photoelectric Effect & Circuit Laboratory",
   "category": "Sciences",
   "description": "Physics: An interactive quantum physics simulator to construct circuits, illuminate metal cathodes, determine stopping potentials, and plot characteristic I-V curves.",
-  "image": "images/photoelectric.jpg",
+  "image": "images/photoelectric.jpeg",
   "url": "sims/simulator12.html"
   },
   {
@@ -103,7 +103,7 @@ const simulatorsData = [
   "title": "Cathode Ray Tube & CRO Advanced Lab",
   "category": "Sciences",
   "description": "Physics: Explore electron beam electrodynamics inside a CRT cutaway and analyze real-time waveforms on an authentic 8×10 phosphor CRO graticule.",
-  "image": "images/cro-crt.jpg",
+  "image": "images/cro-crt.jpeg",
   "url": "sims/simulator13.html"
   } 
 ];
