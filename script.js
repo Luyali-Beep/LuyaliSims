@@ -7,7 +7,7 @@ const simulatorsData = [
     title: "3D Monolayer Oil Drop Experiment",
     category: "Sciences",
     description: "Explore the classical physics of the Oil Drop Experiment in an interactive 3D environment.",
-    image: "images/oildrop.jpg",
+    image: "images/oildrop.jpeg",
     url: "sims/simulator1.html"
   },
   {
