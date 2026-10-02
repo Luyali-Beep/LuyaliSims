@@ -2,7 +2,7 @@
 // 1. DATA REPOSITORY
 // ===================================================
 const simulatorsData = [
-  {
+   {
     id: "sim-1",
     title: "3D Monolayer Oil Drop Experiment",
     category: "Sciences",
@@ -51,7 +51,6 @@ const simulatorsData = [
     url: "sims/simulator6.html"
   }
 ];
-
 // ===================================================
 // 2. PAGINATION & FILTER STATE
 // ===================================================
