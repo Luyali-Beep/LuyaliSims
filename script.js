@@ -105,6 +105,54 @@ const simulatorsData = [
     description: "Physics: Explore electron beam electrodynamics inside a CRT cutaway and analyze real-time waveforms on an authentic 8×10 phosphor CRO graticule.",
     image: "images/cro-crt.jpeg",
     url: "sims/simulator13.html"
+  },
+  {
+  "id": "sim-14",
+  "title": "Energy Band Theory & Extrinsic Carrier Transport Simulator",
+  "category": "Sciences",
+  "description": "Physics: Solid-State Physics: Explore electronic band structure, extrinsic doping (N/P-type), valence-to-conduction band excitation, and P-N junction biasing mechanics.",
+  "image": "images/energybands.jpeg",
+  "url": "sims/simulator14.html"
+  },
+  {
+  "id": "sim-15",
+  "title": "Electrostatic Physics Laboratory Simulator",
+  "category": "Sciences",
+  "description": "Physics: Simulate gold-leaf electroscopes, conductive sphere induction and contact charging, and dynamic electric field streamlines with Coulomb force vectors.",
+  "image": "images/electrostatics.jpeg",
+  "url": "sims/simulator15.html"
+  },
+  {
+  "id": "sim-16",
+  "title": "RC Capacitor Physics Studio & Laboratory",
+  "category": "Sciences",
+  "description": "Physics: Construct interactive RC circuits, analyze transient charging and discharging curves, test dielectric polarization, and measure circuit time constants.",
+  "image": "images/rccapacitor.jpeg",
+  "url": "sims/simulator16.html"
+  },
+  {
+  "id": "sim-17",
+  "title": "Wave Properties & Phenomena Laboratory",
+  "category": "Sciences",
+  "description": "Physics: Investigate rectilinear propagation, reflection, Snell's law refraction, aperture diffraction, and two-point interference across water, sound, and light waves.",
+  "image": "images/waveproperties.jpeg",
+  "url": "sims/simulator17.html"
+  },
+  {
+  "id": "sim-18",
+  "title": "Flame Emission & Combustion Laboratory",
+  "category": "Sciences",
+  "description": "Chemistry: Investigate characteristic atomic flame emission spectra for metal cations and analyze organic ignition, charring, and soot behaviors under qualitative lab conditions.",
+  "image": "images/flametest.jpeg",
+  "url": "sims/simulator18.html"
+  },
+  {
+  "id": "sim-19",
+  "title": "Advanced Gas Laws & Diffusion Laboratory",
+  "category": "Sciences",
+  "description": "Chemistry & Physics: Explore Boyle's Law, Charles's Law, and Graham's Law of diffusion with interactive molecular kinetics, live charts, and precipitate ring formation.",
+  "image": "images/gaslaws.jpeg",
+  "url": "sims/simulator19.html"
   }
 ];
 
