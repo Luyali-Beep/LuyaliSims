@@ -1,0 +1,2373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Interactive Wave Properties and Wavefront Physics Laboratory - Investigate rectilinear propagation, reflection, refraction, diffraction, and two-point interference in water, sound, and light.">
+    <title>Wave Properties Laboratory - LuyaliSims STEM Labs</title>
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    
+    <!-- Import Futuristic Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Base Reset & Theme Variables */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --neon-cyan: #00f3ff;
+            --neon-magenta: #bc13fe;
+            --neon-green: #00ff88;
+            --neon-orange: #fb923c;
+            --bg-dark: #070a12;
+            --panel-bg: rgba(16, 24, 43, 0.88);
+            --border-glow: rgba(0, 243, 255, 0.35);
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 85% 15%, rgba(0, 243, 255, 0.08), transparent 45%),
+                radial-gradient(circle at 15% 85%, rgba(188, 19, 254, 0.08), transparent 45%),
+                linear-gradient(180deg, #05070e 0%, #0a0e1a 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 16px 20px;
+            overflow-x: hidden;
+        }
+
+        /* 1. HEADER & NAVIGATION */
+        header {
+            max-width: 1200px;
+            margin: 0 auto 15px auto;
+        }
+
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 18px;
+            background: rgba(16, 24, 43, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(188, 19, 254, 0.5);
+            color: #e580ff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(188, 19, 254, 0.2);
+            border-color: var(--neon-magenta);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
+            transform: translateX(-3px);
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+            margin: 6px 0 10px 0;
+            font-size: clamp(1.4rem, 3.6vw, 2.3rem);
+            letter-spacing: 1.5px;
+            text-align: center;
+        }
+
+        .lead-summary {
+            max-width: 950px;
+            margin: 0 auto 20px auto;
+            text-align: center;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: #cbd5e1;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* 2. SIMULATOR WORKSPACE */
+        #simulator-container {
+            background: linear-gradient(135deg, rgba(16, 24, 43, 0.9) 0%, rgba(8, 12, 22, 0.95) 100%);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-glow);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 25px rgba(0, 243, 255, 0.12);
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .hud-telemetry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(4, 8, 16, 0.85);
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            border-radius: 10px;
+            padding: 10px 16px;
+            margin-bottom: 14px;
+            font-family: 'Share Tech Mono', monospace;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .telemetry-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+        }
+
+        .tele-label {
+            color: #8da4be;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+        }
+
+        .tele-val {
+            color: var(--neon-cyan);
+            font-weight: 700;
+        }
+
+        .tele-val.pink { color: #ff55bb; }
+        .tele-val.green { color: var(--neon-green); }
+        .tele-val.orange { color: var(--neon-orange); }
+
+        /* Phenomena Tabs Bar */
+        .tabs-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 140px;
+            background: rgba(11, 18, 32, 0.9);
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            color: #94a3b8;
+            padding: 9px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.76rem;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            transition: all 0.2s ease;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .tab-btn:hover {
+            color: #fff;
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.25);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(180deg, rgba(0, 243, 255, 0.2) 0%, rgba(16, 28, 54, 0.9) 100%);
+            border-color: var(--neon-cyan);
+            color: var(--neon-cyan);
+            box-shadow: 0 0 14px rgba(0, 243, 255, 0.35);
+        }
+
+        /* Simulator Grid */
+        .sim-layout {
+            display: grid;
+            grid-template-columns: 1.75fr 1fr;
+            gap: 18px;
+            align-items: stretch;
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            width: 100%;
+            background: radial-gradient(circle at 50% 50%, #08171a 0%, #02070a 100%);
+            border-radius: 12px;
+            overflow: hidden;
+            touch-action: none;
+            border: 3px solid #1e293b;
+            box-shadow: 
+                0 0 0 2px rgba(0, 243, 255, 0.35),
+                0 15px 35px rgba(0, 0, 0, 0.8),
+                inset 0 0 35px rgba(0, 0, 0, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 480px;
+        }
+
+        .canvas-wrapper::before {
+            content: " ";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.18) 0px, rgba(0, 0, 0, 0.18) 1px, transparent 1px, transparent 3px);
+            pointer-events: none;
+            z-index: 4;
+        }
+
+        canvas#simCanvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+        }
+
+        .banner-explanation {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            background: rgba(10, 16, 30, 0.92);
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            line-height: 1.4;
+            color: #cbd5e1;
+            pointer-events: none;
+            z-index: 6;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        /* Oscilloscope Mini-Monitor */
+        .sub-cro {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            width: 320px;
+            height: 190px;
+            background: #020904;
+            border: 2px solid #164019;
+            border-radius: 6px;
+            display: none;
+            z-index: 10;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.25);
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .cro-topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 8px;
+            background: #051408;
+            border-bottom: 1px solid #164019;
+            font-size: 0.68rem;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .cro-mode-toggle {
+            background: #0f2e14;
+            border: 1px solid #22c55e;
+            color: #4ade80;
+            padding: 2px 7px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.65rem;
+            transition: 0.2s;
+        }
+
+        .cro-mode-toggle:hover {
+            background: #14532d;
+            color: #86efac;
+        }
+
+        /* Controls Panel */
+        .controls-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: linear-gradient(145deg, rgba(11, 17, 30, 0.92) 0%, rgba(6, 9, 16, 0.96) 100%);
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            max-height: 560px;
+            overflow-y: auto;
+        }
+
+        .panel-heading {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.82rem;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            border-bottom: 1px solid rgba(0, 243, 255, 0.25);
+            padding-bottom: 4px;
+            margin: 0;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .control-group label {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #cbd5e1;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .control-group label span {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--neon-green);
+        }
+
+        select, input[type="range"] {
+            min-height: 38px;
+        }
+
+        select {
+            background: #060c18;
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            color: #e2e8f0;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding: 6px 10px;
+            border-radius: 8px;
+            outline: none;
+            cursor: pointer;
+            transition: border-color 0.2s ease;
+        }
+
+        select:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            background: #0c1527;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            height: 7px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 6px 0;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #00f3ff 30%, #0088aa 100%);
+            border: 2px solid #fff;
+            box-shadow: 0 0 8px rgba(0, 243, 255, 0.8);
+            cursor: pointer;
+        }
+
+        .legend-strip {
+            display: flex;
+            gap: 12px;
+            background: rgba(4, 9, 20, 0.75);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            padding: 7px 10px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend-color-box {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .sim-btn {
+            background: linear-gradient(180deg, rgba(16, 28, 54, 0.95) 0%, rgba(8, 14, 28, 0.95) 100%);
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            color: var(--neon-cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 9px;
+            min-height: 42px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .sim-btn:hover {
+            border-color: var(--neon-cyan);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .sim-btn.secondary {
+            border-color: rgba(188, 19, 254, 0.5);
+            color: #e580ff;
+        }
+
+        .sim-btn.secondary:hover {
+            border-color: var(--neon-magenta);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
+        }
+
+        .sim-btn.pulse-trigger {
+            border-color: var(--neon-orange);
+            color: var(--neon-orange);
+            grid-column: 1 / -1;
+        }
+
+        .sim-btn.pulse-trigger:hover {
+            background: rgba(251, 146, 60, 0.2);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(251, 146, 60, 0.6);
+        }
+
+        /* 3. POLICY-COMPLIANT AD CONTAINER */
+        .ad-slot-wrapper {
+            margin: 30px auto;
+            text-align: center;
+            clear: both;
+        }
+
+        .ad-disclaimer {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            margin-bottom: 6px;
+        }
+
+        .ad-box-placeholder {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            min-height: 90px;
+            max-width: 970px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #475569;
+            font-size: 0.85rem;
+            border-radius: 8px;
+        }
+
+        /* 4. EDUCATIONAL CONTENT SECTION */
+        .educational-content {
+            line-height: 1.75;
+            font-size: 1.05rem;
+            color: #94a3b8;
+            background: rgba(10, 14, 23, 0.85);
+            padding: 30px;
+            border-radius: 16px;
+            border-left: 4px solid var(--neon-cyan);
+            border-top: 1px solid rgba(0, 243, 255, 0.2);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin-bottom: 35px;
+        }
+
+        .educational-content h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-magenta);
+            border-bottom: 1px solid rgba(188, 19, 254, 0.3);
+            padding-bottom: 8px;
+            margin-top: 1.8em;
+            margin-bottom: 0.6em;
+            font-size: 1.45rem;
+        }
+
+        .educational-content h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: #38bdf8;
+            margin-top: 1.4em;
+            margin-bottom: 0.4em;
+            font-size: 1.15rem;
+        }
+
+        .formula-box {
+            background: rgba(4, 9, 20, 0.7);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-left: 3px solid var(--neon-green);
+            padding: 14px 18px;
+            margin: 14px 0;
+            border-radius: 6px;
+            font-family: 'Share Tech Mono', monospace;
+            color: #a7f3d0;
+            font-size: 1.02rem;
+            line-height: 1.6;
+        }
+
+        .task-card {
+            background: rgba(15, 23, 42, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 18px 22px;
+            margin-bottom: 18px;
+        }
+
+        .task-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.02rem;
+            color: var(--neon-cyan);
+            margin-bottom: 8px;
+        }
+
+        details {
+            margin-top: 25px;
+            background: rgba(5, 10, 20, 0.85);
+            border: 1px solid rgba(188, 19, 254, 0.4);
+            border-radius: 10px;
+            padding: 16px 22px;
+        }
+
+        summary {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            color: #e580ff;
+            cursor: pointer;
+            padding: 6px 0;
+            user-select: none;
+            outline: none;
+        }
+
+        .solution-step {
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+            padding: 14px 0;
+        }
+
+        .solution-step:last-child {
+            border-bottom: none;
+        }
+
+        /* 5. FOOTER & ALIGNED LINKS */
+        footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px 20px 20px 20px;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .footer-nav {
+            display: flex;
+            justify-content: center;
+            gap: 22px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .footer-nav a, .footer-modal-trigger {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.2s, text-shadow 0.2s;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .footer-nav a:hover, .footer-modal-trigger:hover {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
+        }
+
+        /* 6. POLICY MODALS */
+        .policy-modal {
+            position: fixed !important;
+            top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
+            width: 100vw !important; height: 100vh !important;
+            background: rgba(4, 7, 15, 0.92) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 99999 !important;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-body {
+            background: linear-gradient(145deg, #0b111e 0%, #060913 100%);
+            border: 2px solid var(--neon-cyan);
+            border-radius: 16px;
+            max-width: 820px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 35px 30px;
+            color: #cbd5e1;
+            box-shadow: 0 0 40px rgba(0, 243, 255, 0.25);
+            line-height: 1.75;
+            position: relative;
+            text-align: left;
+        }
+
+        .modal-body h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-cyan);
+            margin-top: 0;
+            font-size: 1.6rem;
+        }
+
+        .modal-body h3 {
+            color: var(--neon-magenta);
+            font-family: 'Orbitron', sans-serif;
+            margin-top: 24px;
+            margin-bottom: 8px;
+            font-size: 1.15rem;
+        }
+
+        .modal-date {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--neon-green);
+            font-size: 0.9rem;
+            margin-top: -6px;
+            margin-bottom: 16px;
+        }
+
+        .modal-close-btn {
+            background: linear-gradient(180deg, rgba(188, 19, 254, 0.4), rgba(188, 19, 254, 0.15));
+            border: 1px solid var(--neon-magenta);
+            color: #fff;
+            padding: 8px 18px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            float: right;
+            margin-bottom: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close-btn:hover {
+            background: var(--neon-magenta);
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.8);
+        }
+
+        @media (max-width: 900px) {
+            .sim-layout { grid-template-columns: 1fr; }
+            .canvas-wrapper { min-height: 380px; }
+            .sub-cro { width: 280px; height: 160px; }
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            #simulator-container, .educational-content { padding: 14px; }
+            .tab-btn { min-width: 100%; }
+            .btn-grid { grid-template-columns: 1fr; }
+            .hud-telemetry { flex-direction: column; align-items: flex-start; }
+            .modal-body { padding: 22px 18px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. HEADER & TOP NAVIGATION -->
+    <header>
+        <nav class="top-nav">
+            <a href="../index.html" class="back-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Back to LuyaliSims
+            </a>
+            <span style="font-family: 'Share Tech Mono', monospace; font-size: 0.85rem; color: #64748b;">
+                MODULE ID: PHYS-WAVE-05
+            </span>
+        </nav>
+        
+        <h1>Wave Properties & Phenomena Laboratory</h1>
+        
+        <p class="lead-summary">
+            Explore the five universal wave behaviors: rectilinear propagation, reflection across curved boundaries, Snell's law refraction, aperture diffraction, and two-point coherent interference. Dynamically toggle between ripple-tank surface water waves, acoustic sound pressure waves with dual-channel CRO monitoring, and optical monochromatic laser beams.
+        </p>
+    </header>
+
+    <main>
+        <!-- 2. SIMULATOR APP WORKSPACE -->
+        <section id="simulator-container" aria-label="Interactive Simulator Workspace">
+            
+            <!-- Telemetry Status Bar -->
+            <div class="hud-telemetry">
+                <div class="telemetry-item">
+                    <span class="tele-label">Engine:</span>
+                    <span id="tele-status" class="tele-val">RUNNING</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Speed (v₁):</span>
+                    <span id="readout-speed" class="tele-val">1.50 m/s</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Frequency (f):</span>
+                    <span id="readout-freq" class="tele-val pink">1.00 Hz</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Wavelength (λ₁):</span>
+                    <span id="readout-lambda" class="tele-val green">1.50 m (150 cm)</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Medium:</span>
+                    <span id="readout-medium" class="tele-val orange">WATER</span>
+                </div>
+            </div>
+
+            <!-- Phenomena Mode Tabs -->
+            <div class="tabs-bar">
+                <button class="tab-btn active" onclick="switchTab('rectilinear')">1. Rectilinear</button>
+                <button class="tab-btn" onclick="switchTab('reflection')">2. Reflection</button>
+                <button class="tab-btn" onclick="switchTab('refraction')">3. Refraction</button>
+                <button class="tab-btn" onclick="switchTab('diffraction')">4. Diffraction</button>
+                <button class="tab-btn" onclick="switchTab('interference')">5. Interference</button>
+            </div>
+
+            <div class="sim-layout">
+                <!-- Visual Holographic Canvas Display -->
+                <div class="canvas-wrapper" id="canvasFrame">
+                    <div class="banner-explanation" id="bannerText"></div>
+                    <canvas id="simCanvas" width="760" height="460"></canvas>
+
+                    <!-- Embedded Dual-Trace Cathode Ray Oscilloscope (CRO) -->
+                    <div class="sub-cro" id="croBox">
+                        <div class="cro-topbar">
+                            <span style="color:#00f3ff;">CH1: SOURCE</span> | <span style="color:#00ff88;">CH2: DETECTOR</span>
+                            <button class="cro-mode-toggle" id="croModeBtn" onclick="toggleCroMode()">Mode: Spatial λ</button>
+                        </div>
+                        <canvas id="croCanvas" width="320" height="155"></canvas>
+                    </div>
+                </div>
+
+                <!-- Simulation Controls Console -->
+                <div class="controls-panel">
+                    <h3 class="panel-heading">Wave & Medium Properties</h3>
+
+                    <div class="control-group">
+                        <label for="waveMediumSelect">Physical Phenomenon Medium</label>
+                        <select id="waveMediumSelect" onchange="setMedium(this.value)">
+                            <option value="water" selected>Water Surface Waves (Ripple Tank)</option>
+                            <option value="sound">Sound Waves (Acoustics & CRO Dual Trace)</option>
+                            <option value="light">Light Waves (Optics Bench & Fringes)</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="waveGenMode">Generation Mode</label>
+                        <select id="waveGenMode" onchange="setWaveGenMode(this.value)">
+                            <option value="continuous" selected>Continuous Wave Train</option>
+                            <option value="pulse">Single Wave Pulse</option>
+                        </select>
+                    </div>
+
+                    <div class="legend-strip">
+                        <div class="legend-item">
+                            <div class="legend-color-box" id="keySourceColor" style="background:#00f3ff;"></div>
+                            <span>Incident Front</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color-box" id="keyObsColor" style="background:#fb923c;"></div>
+                            <span>Observed / Shifted</span>
+                        </div>
+                    </div>
+
+                    <h3 class="panel-heading">SI Kinematic Variables</h3>
+
+                    <div class="control-group">
+                        <label for="paramSpeed">Phase Velocity in Medium 1 (v₁) <span id="valSpeed">1.50 m/s</span></label>
+                        <input type="range" id="paramSpeed" min="0.5" max="3.5" step="0.05" value="1.5">
+                    </div>
+
+                    <div class="control-group">
+                        <label for="paramFreq">Excitation Frequency (f) <span id="valFreq">1.00 Hz</span></label>
+                        <input type="range" id="paramFreq" min="0.3" max="2.5" step="0.05" value="1.0">
+                    </div>
+
+                    <div class="control-group">
+                        <label>Computed Wavelength (λ₁ = v₁ / f)</label>
+                        <input type="text" id="paramLambda" value="1.50 m" disabled style="background:#060c18; border:1px solid rgba(0, 243, 255, 0.3); color:var(--neon-green); font-weight:bold; padding:6px 10px; border-radius:6px; font-family:'Share Tech Mono', monospace;">
+                    </div>
+
+                    <h3 class="panel-heading">Boundary & Geometric Controls</h3>
+                    <div id="dynamicControls"></div>
+
+                    <!-- Action Controls -->
+                    <div class="btn-grid">
+                        <button id="pulseTriggerBtn" class="sim-btn pulse-trigger" style="display:none;" onclick="firePulse()">⚡ Fire Wave Pulse</button>
+                        <button id="playBtn" class="sim-btn" onclick="togglePlay()">Pause</button>
+                        <button class="sim-btn secondary" onclick="resetSim()">Reset</button>
+                        <button id="fullscreenBtn" class="sim-btn secondary" style="grid-column: 1 / -1;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                            </svg>
+                            Toggle Fullscreen
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. SAFE AD PLACEMENT SLOT -->
+        <div class="ad-slot-wrapper">
+            <div class="ad-disclaimer">Advertisement</div>
+            <div class="ad-box-placeholder">
+                <span>[Google AdSense Responsive Display Banner]</span>
+            </div>
+        </div>
+
+        <!-- 4. EDUCATIONAL REFERENCE ARTICLE -->
+        <article class="educational-content">
+            <section>
+                <h2>How to Operate the Simulator</h2>
+                <p>
+                    This interactive laboratory reproduces the classical wave tank, optical bench, and acoustic probe experiments. Use the upper tabs to select the wave phenomenon you wish to inspect:
+                </p>
+                <ul>
+                    <li><strong>Tab 1 (Rectilinear Propagation):</strong> Examine how plane or circular wavefronts radiate normal to their surface, maintaining constant wavelength in a homogeneous medium.</li>
+                    <li><strong>Tab 2 (Reflection):</strong> Compare plane, concave, and convex reflective barriers. Observe plane waves converging toward a real focus F (where focal length f = R / 2) or diverging away from a virtual focal point behind a convex surface.</li>
+                    <li><strong>Tab 3 (Refraction):</strong> Adjust refractive indices n₁ and n₂ or medium depths to verify Snell's Law. Watch wave velocity and wavelength alter abruptly while source frequency remains perfectly invariant.</li>
+                    <li><strong>Tab 4 (Diffraction):</strong> Modulate aperture size w relative to wavelength λ to observe the Huygens stadium envelope transition from linear beams to circular arcs.</li>
+                    <li><strong>Tab 5 (Interference):</strong> Contrast coherent synchronized wave emitters against drifting incoherent sources. When configured to sound mode, drag the yellow Microphone Probe across the field to observe spatial and temporal superposition traces on the dual-trace CRO monitor!</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Scientific Theory & Working Principles</h2>
+                <p>
+                    A mechanical or electromagnetic wave represents the propagation of energy through a medium (or vacuum) without the permanent displacement of mass. The periodic perturbation is governed by four core axioms:
+                </p>
+                <h3>1. Huygens-Fresnel Wavelet Principle</h3>
+                <p>
+                    Every point on a primary wavefront acts as a secondary source of spherical wavelets. The envelope tangent to these secondary wavelets establishes the new wavefront. When passing an obstacle or aperture, wavelets that are unobstructed spread laterally into the geometrical shadow zone. When aperture width w is comparable to or smaller than wavelength λ (w ≤ λ), diffraction is pronounced and wave fronts emerge as pure semicircles. When w is significantly larger than λ, the central portion continues essentially straight as a plane wave, with bending confined to the edges.
+                </p>
+                <h3>2. Snell's Law and Refraction Invariance</h3>
+                <p>
+                    When a wave crosses the interface between two media of differing optical or mechanical densities, its propagation speed changes from v₁ to v₂. Because wavefront continuity must be preserved at every node along the interface boundary, the oscillation frequency f cannot change. Consequently, the spatial wavelength must scale proportionally: λ₁ / λ₂ = v₁ / v₂ = n₂ / n₁. If incidence is oblique, the difference in phase velocity causes the wavefront to pivot according to Snell's law: n₁ sin(θ₁) = n₂ sin(θ₂).
+                </p>
+                <h3>3. Principle of Superposition & Interference</h3>
+                <p>
+                    When two or more waves traverse the same region simultaneously, the resultant displacement at any coordinate is the algebraic vector sum of individual displacements: y_total = y₁ + y₂. For two mutually coherent sources operating at identical frequency with zero initial phase difference, constructive interference occurs wherever the path length difference Δr equals an integer multiple of wavelengths (Δr = m λ, where m = 0, ±1, ±2...). Destructive interference (nodal lines with zero amplitude) occurs where the path difference equals an odd number of half-wavelengths: Δr = (m + 0.5) λ.
+                </p>
+            </section>
+
+            <section>
+                <h2>Mathematical Foundations & Formulas</h2>
+                <p>
+                    The fundamental relationships modeled throughout the laboratory include:
+                </p>
+                <div class="formula-box">
+                    Universal Wave Equation: v = f × λ<br>
+                    Wave Period: T = 1 / f<br>
+                    Wave Number: k = 2π / λ, Angular Frequency: ω = 2πf<br>
+                    Snell's Law of Refraction: (sin θ₁) / (sin θ₂) = v₁ / v₂ = λ₁ / λ₂ = n₂ / n₁<br>
+                    Spherical Reflector Focal Length: f_mirror = R / 2<br>
+                    Aperture Diffraction Condition: sin θ_min = λ / w<br>
+                    Interference Path Difference: Δr = |r₁ - r₂|<br>
+                    Constructive Antinodes: Δr = m × λ (m = 0, 1, 2, ...)<br>
+                    Destructive Nodes: Δr = (m + 0.5) × λ (m = 0, 1, 2, ...)
+                </div>
+            </section>
+
+            <section>
+                <h2>Real-World Engineering & Industrial Applications</h2>
+                <p>
+                    The principles visualized in this simulator are integral to multiple high-tech disciplines:
+                </p>
+                <ul>
+                    <li><strong>Medical Ultrasound Imaging (Sonar & Beamforming):</strong> Phased-array transducers emit acoustic waves with carefully calibrated time delays, using constructive interference to steer acoustic beams deep into human tissue and construct detailed real-time diagnostic cross-sections.</li>
+                    <li><strong>Fiber-Optic Telecommunications:</strong> Fiber cables utilize total internal reflection and controlled refractive index profiles across the silica core and cladding to transmit terabits of data per second with minimal signal attenuation.</li>
+                    <li><strong>Noise-Cancelling Headphones (Acoustic Destructive Superposition):</strong> Exterior microphones capture incoming ambient acoustic noise and generate an inverted anti-phase sound wave. When combined at the ear canal, destructive interference neutralizes low-frequency environmental rumble.</li>
+                    <li><strong>Radar & Satellite Parabolic Dishes:</strong> Concave reflectors leverage geometric reflection to collect weak plane waves from distant satellites and focus them onto a focal receiver feed horn, magnifying signal intensity thousands of times.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Practice Problems & Diagnostic Tasks</h2>
+                <p>Test your quantitative physics skills using the five senior school laboratory exercises below:</p>
+
+                <div class="task-card">
+                    <div class="task-title">Task 1: Basic Parameter Calculation (Ripple Tank Wave Speed)</div>
+                    <p>
+                        A ripple tank vibrator creates 24 complete ripples in a span of 8.0 seconds. A student measures the distance between 5 consecutive bright wave crests on the projection screen to be 60.0 cm. Calculate the frequency of the wave source, the wavelength of the water wave, and the wave propagation velocity in meters per second.
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 2: Proportional Variation (Aperture Diffraction Geometry)</div>
+                    <p>
+                        A water wave with velocity v = 1.60 m/s and frequency f = 2.00 Hz approaches an adjustable barrier opening of width w = 1.60 m. Describe the diffraction pattern observed on the other side. If the frequency of the source is subsequently doubled while the wave speed and slit width remain unchanged, determine the new wavelength and explain how the diffraction pattern changes.
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 3: Refraction & Boundary Snell's Law</div>
+                    <p>
+                        A plane water wave moving through a deep region with velocity v₁ = 2.40 m/s enters a shallow region at an angle of incidence θ₁ = 35.0 degrees to the normal. In the shallow water, the wave slows down to v₂ = 1.50 m/s. Given that the source frequency is maintained at 1.20 Hz throughout, calculate the wavelength in deep water, the wavelength in shallow water, and the angle of refraction θ₂.
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 4: Reverse Calculation (Two-Source Acoustic Interference)</div>
+                    <p>
+                        Two loudspeakers spaced 2.50 m apart emit in-phase coherent sound waves at a frequency of 680 Hz into an auditorium where the speed of sound is 340 m/s. A microphone positioned along an observation axis is 4.00 m from Speaker 1 and 4.75 m from Speaker 2. Determine the path difference at the microphone position, and state whether the microphone detects constructive reinforcement, complete destructive cancellation, or an intermediate signal.
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 5: Multi-Step Real-World Troubleshooting (Concave Mirror Focus)</div>
+                    <p>
+                        An acoustic dish designed as a spherical concave reflector has a radius of curvature R = 1.80 m. Plane sound waves traveling at 340 m/s with a frequency of 850 Hz arrive parallel to the principal axis.
+                        <br>
+                        (a) Calculate the location of the focal point F measured from the vertex of the dish.
+                        <br>
+                        (b) Find the wavelength of the incident sound.
+                        <br>
+                        (c) How many full wavelengths are contained between the vertex of the reflector and its focus?
+                    </p>
+                </div>
+
+                <!-- Collapsible Solutions -->
+                <details>
+                    <summary>Click to Reveal Solutions and Step-by-Step Proofs</summary>
+                    
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 1:</strong></p>
+                        <p>1. Frequency f = number of cycles / total time = 24 / 8.0 s = <strong>3.0 Hz</strong>.</p>
+                        <p>2. The distance between 5 consecutive crests spans 4 full wavelengths: 4 λ = 60.0 cm = 0.60 m. Therefore, λ = 0.60 m / 4 = <strong>0.15 m (15.0 cm)</strong>.</p>
+                        <p>3. Velocity v = f × λ = 3.0 Hz × 0.15 m = <strong>0.45 m/s</strong>.</p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 2:</strong></p>
+                        <p>1. Initial wavelength λ₁ = v / f₁ = 1.60 m/s / 2.00 Hz = 0.80 m.</p>
+                        <p>2. Comparing slit width to wavelength: w / λ₁ = 1.60 m / 0.80 m = 2.0. Because w > λ, the wave passes through with minimal spreading in the center (maintaining plane wave fronts) with slight curved bending only at the edges.</p>
+                        <p>3. When frequency is doubled to f₂ = 4.00 Hz: new wavelength λ₂ = 1.60 m/s / 4.00 Hz = <strong>0.40 m</strong>.</p>
+                        <p>4. Now w / λ₂ = 1.60 m / 0.40 m = 4.0. The aperture is now four times wider than the wavelength, so diffraction spreading decreases substantially. Waves pass through almost entirely as a straight rectilinear beam with sharp geometrical shadows.</p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 3:</strong></p>
+                        <p>1. Wavelength in deep water λ₁ = v₁ / f = 2.40 m/s / 1.20 Hz = <strong>2.00 m</strong>.</p>
+                        <p>2. Wavelength in shallow water λ₂ = v₂ / f = 1.50 m/s / 1.20 Hz = <strong>1.25 m</strong>.</p>
+                        <p>3. By Snell's Law: (sin θ₁) / (sin θ₂) = v₁ / v₂.</p>
+                        <p>sin θ₂ = sin(35.0°) × (v₂ / v₁) = 0.57358 × (1.50 / 2.40) = 0.57358 × 0.625 = 0.35848.</p>
+                        <p>θ₂ = arcsin(0.35848) = <strong>21.0 degrees</strong> (the refracted wave bends toward the normal).</p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 4:</strong></p>
+                        <p>1. Wavelength of the sound λ = v / f = 340 m/s / 680 Hz = 0.50 m.</p>
+                        <p>2. Path difference Δr = |r₂ - r₁| = 4.75 m - 4.00 m = <strong>0.75 m</strong>.</p>
+                        <p>3. Express path difference in terms of wavelength: Δr / λ = 0.75 m / 0.50 m = 1.5 = 3 / 2.</p>
+                        <p>4. Since Δr = (1 + 0.5) λ (an odd multiple of half-wavelengths), the sound waves arrive exactly 180 degrees out of phase, creating <strong>complete destructive interference (a nodal quiet point)</strong>.</p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 5:</strong></p>
+                        <p>1. For a spherical reflector with radius R = 1.80 m, focal length f_mirror = R / 2 = 1.80 m / 2 = <strong>0.90 m</strong> from the vertex.</p>
+                        <p>2. Wavelength λ = v / f = 340 m/s / 850 Hz = <strong>0.40 m (40.0 cm)</strong>.</p>
+                        <p>3. Number of wavelengths between vertex and focus = f_mirror / λ = 0.90 m / 0.40 m = <strong>2.25 wavelengths</strong>.</p>
+                    </div>
+                </details>
+            </section>
+        </article>
+    </main>
+
+    <!-- 5. SYNCHRONIZED COMPLIANCE FOOTER -->
+    <footer>
+        <nav class="footer-nav">
+            <a href="../index.html">Home</a>
+            <a href="../index.html#about-section">About Us</a>
+            <button type="button" class="footer-modal-trigger" onclick="openSimModal('simPrivacyModal')">Privacy Policy</button>
+            <button type="button" class="footer-modal-trigger" onclick="openSimModal('simTermsModal')">Terms of Service</button>
+            <a href="../index.html#contact-section">Contact Us</a>
+            <a href="https://forms.gle/fYxxaNKAh21dPUoBA" target="_blank" rel="noopener noreferrer">Simulator Suggestions</a>
+        </nav>
+        <p>&copy; 2026 LuyaliSims | Engineered by Click &amp; Draft | Dedicated to Open STEM Education</p>
+    </footer>
+
+    <!-- 6. IDENTICAL PRIVACY POLICY MODAL -->
+    <div id="simPrivacyModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="privacyTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeSimModal('simPrivacyModal')">Close [✕]</button>
+            <h2 id="privacyTitle">Privacy Policy</h2>
+            <p class="modal-date">Last Updated: September 2026</p>
+            <p>Welcome to LuyaliSims. We respect your privacy and are committed to protecting your personal data. This privacy policy explains how we treat information when you interact with our educational simulators.</p>
+            
+            <h3>1. Educational Purpose & Information Collection</h3>
+            <p>LuyaliSims is a free educational portal. We do not require account registration, passwords, or personal login information to run any simulation. All physics modeling calculations occur client-side inside your browser via local JavaScript.</p>
+
+            <h3>2. Google AdSense & Third-Party Cookies</h3>
+            <p>We may display advertisements served by Google AdSense to fund our free educational tools. Google, as a third-party vendor, uses cookies to serve ads on our site based on users' visits to this and other sites on the Internet.</p>
+            <ul>
+                <li>Google's use of advertising cookies enables it and its partners to serve ads based on your visit to LuyaliSims and other sites.</li>
+                <li>Users may opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" style="color: var(--neon-cyan);">Google Ads Settings</a>.</li>
+            </ul>
+
+            <h3>3. Log Files & Analytics</h3>
+            <p>Like standard web infrastructure, our hosting servers collect anonymous log records (including IP addresses, browser types, and timestamp references) to monitor uptime and optimize simulator performance.</p>
+
+            <h3>4. Children's Online Privacy (COPPA Compliance)</h3>
+            <p>Our educational simulators are built for students and educators of all ages. We do not knowingly solicit or collect personally identifiable information from children under 13.</p>
+
+            <h3>5. Contact Regarding Privacy</h3>
+            <p>If you have any questions regarding this policy, contact us at: <a href="mailto:luyashliz@gmail.com" style="color: var(--neon-cyan);">luyashliz@gmail.com</a>.</p>
+        </div>
+    </div>
+
+    <!-- 7. IDENTICAL TERMS OF SERVICE MODAL -->
+    <div id="simTermsModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="termsTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeSimModal('simTermsModal')">Close [✕]</button>
+            <h2 id="termsTitle">Terms of Service</h2>
+            <p class="modal-date">Effective Date: September 2026</p>
+
+            <h3>1. Permitted Educational Use</h3>
+            <p>All interactive models, simulations, practice problems, and laboratory worksheets on LuyaliSims are made freely available for classroom demonstrations, academic study, tutoring, and self-paced individual learning.</p>
+
+            <h3>2. Intellectual Property</h3>
+            <p>The code architecture, layout designs, and custom interactive physics engines are the intellectual property of Ian Luyali and Click &amp; Draft. You may use our simulators online in academic settings, but mirroring or re-hosting our code for commercial resale without permission is prohibited.</p>
+
+            <h3>3. Disclaimer of Scientific Warranty</h3>
+            <p>While simulations are engineered to accurately replicate classical mechanics, wave dynamics, and physical optics, they are provided as conceptual learning aids. LuyaliSims is not liable for outcomes in real-world hazardous laboratory environments constructed without professional supervision.</p>
+
+            <h3>4. Updates to Terms</h3>
+            <p>We reserve the right to refine these terms as new laboratory modules and features are introduced.</p>
+        </div>
+    </div>
+
+    <!-- 8. COMPLETE SIMULATOR ENGINE SCRIPT -->
+    <script>
+        /* =========================================================================
+         * MODAL CONTROLS & FULLSCREEN
+         * ========================================================================= */
+        function openSimModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeSimModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('policy-modal')) {
+                closeSimModal(e.target.id);
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' || e.key === 'Esc') {
+                document.querySelectorAll('.policy-modal').forEach(m => {
+                    m.style.display = 'none';
+                });
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        const simContainer = document.getElementById('simulator-container');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                if (simContainer.requestFullscreen) simContainer.requestFullscreen();
+                else if (simContainer.webkitRequestFullscreen) simContainer.webkitRequestFullscreen();
+                fullscreenBtn.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"></path>
+                    </svg> Exit Fullscreen`;
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+                fullscreenBtn.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                    </svg> Toggle Fullscreen`;
+            }
+        });
+
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                fullscreenBtn.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                    </svg> Toggle Fullscreen`;
+            }
+        });
+
+        /* =========================================================================
+         * WAVE SIMULATION ENGINE & STATE
+         * ========================================================================= */
+        const canvas = document.getElementById("simCanvas");
+        const ctx = canvas.getContext("2d");
+        const croCanvas = document.getElementById("croCanvas");
+        const croCtx = croCanvas.getContext("2d");
+
+        const PX_PER_METER = 50.0; 
+
+        let currentTab = "rectilinear";
+        let medium = "water";
+        let genMode = "continuous";
+        let isRunning = true;
+        let simTime = 0;
+        let lastTimestamp = 0;
+        let croMode = "spatial"; 
+
+        let waveDistanceMeters = 0;
+        let activePulses = [];
+
+        // Primary Wave Model
+        let wave = {
+            v: 1.50, 
+            f: 1.00, 
+            get lambda() { return this.v / this.f; },
+            get lambdaPx() { return this.lambda * PX_PER_METER; }
+        };
+
+        const state = {
+            rectilinear: { sourceShape: "plane" },
+            reflection: { waveShape: "plane", reflectorShape: "concave", reflectorAngle: 0 },
+            refraction: { n1: 1.0, n2: 1.8, boundaryAngle: 28 },
+            diffraction: { sourceShape: "plane", slitCount: 1, slitWidthMeters: 1.5 },
+            interference: { sourcesCount: 2, coherent: true, phase1: 0, phase2: 0, speakerPos: { s1: 150, s2: 310 }, micPos: { x: 500, y: 230 } }
+        };
+
+        // DOM Element Bindings
+        const paramFreq = document.getElementById("paramFreq");
+        const paramSpeed = document.getElementById("paramSpeed");
+        const paramLambda = document.getElementById("paramLambda");
+        const valFreq = document.getElementById("valFreq");
+        const valSpeed = document.getElementById("valSpeed");
+        const readoutSpeed = document.getElementById("readout-speed");
+        const readoutFreq = document.getElementById("readout-freq");
+        const readoutLambda = document.getElementById("readout-lambda");
+        const readoutMedium = document.getElementById("readout-medium");
+        const teleStatus = document.getElementById("tele-status");
+        const bannerText = document.getElementById("bannerText");
+        const dynamicControls = document.getElementById("dynamicControls");
+        const croBox = document.getElementById("croBox");
+        const croModeBtn = document.getElementById("croModeBtn");
+        const pulseTriggerBtn = document.getElementById("pulseTriggerBtn");
+        const playBtn = document.getElementById("playBtn");
+
+        function updateParameters() {
+            wave.v = parseFloat(paramSpeed.value);
+            wave.f = parseFloat(paramFreq.value);
+
+            const l = wave.lambda;
+            const lText = l >= 1.0 ? `${l.toFixed(2)} m` : `${(l * 100).toFixed(1)} cm`;
+            paramLambda.value = lText;
+            valFreq.textContent = `${wave.f.toFixed(2)} Hz`;
+            valSpeed.textContent = `${wave.v.toFixed(2)} m/s`;
+            
+            readoutSpeed.textContent = `${wave.v.toFixed(2)} m/s`;
+            readoutFreq.textContent = `${wave.f.toFixed(2)} Hz`;
+            readoutLambda.textContent = `${l.toFixed(2)} m (${(l * 100).toFixed(0)} cm)`;
+
+            if (currentTab === "diffraction") renderControls();
+        }
+        paramFreq.addEventListener("input", updateParameters);
+        paramSpeed.addEventListener("input", updateParameters);
+
+        function setMedium(val) {
+            medium = val;
+            readoutMedium.textContent = val.toUpperCase();
+            const keySrc = document.getElementById("keySourceColor");
+            const keyObs = document.getElementById("keyObsColor");
+
+            if (medium === "water") {
+                keySrc.style.background = "#00f3ff"; keyObs.style.background = "#fb923c";
+                paramSpeed.min = "0.4"; paramSpeed.max = "3.0"; paramSpeed.step = "0.05"; paramSpeed.value = "1.5";
+            } else if (medium === "sound") {
+                keySrc.style.background = "#00f3ff"; keyObs.style.background = "#c084fc";
+                paramSpeed.min = "1.0"; paramSpeed.max = "5.0"; paramSpeed.step = "0.1"; paramSpeed.value = "2.5";
+            } else {
+                keySrc.style.background = "#ef4444"; keyObs.style.background = "#eab308";
+                paramSpeed.min = "1.0"; paramSpeed.max = "4.0"; paramSpeed.step = "0.1"; paramSpeed.value = "2.0";
+            }
+
+            croBox.style.display = (medium === "sound" || currentTab === "refraction") ? "flex" : "none";
+            updateParameters();
+            renderControls();
+        }
+
+        function setWaveGenMode(mode) {
+            genMode = mode;
+            pulseTriggerBtn.style.display = (mode === "pulse") ? "inline-flex" : "none";
+            activePulses = [];
+        }
+
+        function firePulse() {
+            activePulses.push({ xMeters: 50 / PX_PER_METER, distMeters: 0 });
+            if (activePulses.length > 5) activePulses.shift();
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+            const targetBtn = Array.from(document.querySelectorAll(".tab-btn")).find(b => b.getAttribute("onclick").includes(tab));
+            if (targetBtn) targetBtn.classList.add("active");
+            activePulses = [];
+            croBox.style.display = (medium === "sound" || currentTab === "refraction") ? "flex" : "none";
+            renderControls();
+        }
+
+        function togglePlay() {
+            isRunning = !isRunning;
+            playBtn.textContent = isRunning ? "Pause" : "Resume";
+            teleStatus.textContent = isRunning ? "RUNNING" : "PAUSED";
+            teleStatus.className = isRunning ? "tele-val" : "tele-val pink";
+        }
+
+        function resetSim() {
+            simTime = 0; waveDistanceMeters = 0; activePulses = [];
+            state.interference.phase1 = 0; state.interference.phase2 = 0;
+        }
+
+        function toggleCroMode() {
+            croMode = (croMode === "spatial") ? "time" : "spatial";
+            croModeBtn.textContent = (croMode === "spatial") ? "Mode: Spatial λ" : "Mode: Time Base V(t)";
+        }
+
+        // Draggable Microphone Probe Interaction
+        let isDraggingMic = false;
+        canvas.addEventListener("pointerdown", (e) => {
+            if (medium === "sound" && currentTab === "interference") {
+                const rect = canvas.getBoundingClientRect();
+                const mx = (e.clientX - rect.left) * (canvas.width / rect.width);
+                const my = (e.clientY - rect.top) * (canvas.height / rect.height);
+                if (Math.hypot(mx - state.interference.micPos.x, my - state.interference.micPos.y) < 32) {
+                    isDraggingMic = true;
+                }
+            }
+        });
+        window.addEventListener("pointerup", () => isDraggingMic = false);
+        canvas.addEventListener("pointermove", (e) => {
+            if (isDraggingMic) {
+                const rect = canvas.getBoundingClientRect();
+                state.interference.micPos.x = Math.max(160, Math.min(canvas.width - 20, (e.clientX - rect.left) * (canvas.width / rect.width)));
+                state.interference.micPos.y = Math.max(20, Math.min(canvas.height - 20, (e.clientY - rect.top) * (canvas.height / rect.height)));
+            }
+        });
+
+        /* =========================================================================
+         * DYNAMIC CONTROL BUILDER
+         * ========================================================================= */
+        function renderControls() {
+            let html = "";
+            croBox.style.display = (medium === "sound" || currentTab === "refraction") ? "flex" : "none";
+
+            if (currentTab === "rectilinear") {
+                bannerText.innerHTML = `<strong>Rectilinear Propagation:</strong> Wavefronts advance along straight lines perpendicular to their surfaces. Velocity v determines how fast crests travel across space.`;
+                html = `
+                    <div class="control-group">
+                        <label>Wavefront Geometry</label>
+                        <select onchange="state.rectilinear.sourceShape = this.value">
+                            <option value="plane" ${state.rectilinear.sourceShape==='plane'?'selected':''}>Plane Waves (Linear Fronts)</option>
+                            <option value="circular" ${state.rectilinear.sourceShape==='circular'?'selected':''}>Circular Waves (Point Source)</option>
+                        </select>
+                    </div>`;
+            }
+            else if (currentTab === "reflection") {
+                bannerText.innerHTML = `<strong>Reflection (Law of Reflection):</strong><br>
+                    • <strong>Concave Reflector:</strong> Hollow side faces wave; gathers plane waves to real <strong>Focal Point F</strong> (f = R / 2).<br>
+                    • <strong>Convex Reflector:</strong> Bulging side faces wave; scatters plane waves from <strong>Virtual Focus F</strong> behind mirror.<br>
+                    Notice: Reflected wavefront geometry strictly matches the incidence angle (θᵢ = θᵣ).`;
+                html = `
+                    <div class="control-group">
+                        <label>Source Wave Shape</label>
+                        <select onchange="state.reflection.waveShape = this.value">
+                            <option value="plane" ${state.reflection.waveShape==='plane'?'selected':''}>Plane Wave</option>
+                            <option value="circular" ${state.reflection.waveShape==='circular'?'selected':''}>Circular Wave</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Reflector Shape</label>
+                        <select onchange="state.reflection.reflectorShape = this.value; renderControls();">
+                            <option value="concave" ${state.reflection.reflectorShape==='concave'?'selected':''}>Concave Reflector (Converging to Real F)</option>
+                            <option value="convex" ${state.reflection.reflectorShape==='convex'?'selected':''}>Convex Reflector (Diverging from Virtual F)</option>
+                            <option value="flat" ${state.reflection.reflectorShape==='flat'?'selected':''}>Flat Barrier (Plane Mirror)</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Reflector Tilt Angle <span id="lblRefAngle">${state.reflection.reflectorAngle}°</span></label>
+                        <input type="range" min="-40" max="40" value="${state.reflection.reflectorAngle}" oninput="state.reflection.reflectorAngle = parseInt(this.value); document.getElementById('lblRefAngle').textContent=this.value+'°';">
+                    </div>`;
+            }
+            else if (currentTab === "refraction") {
+                const v1 = wave.v / state.refraction.n1;
+                const v2 = wave.v / state.refraction.n2;
+
+                bannerText.innerHTML = `<strong>Refraction (Snell's Law):</strong> Incident wavefronts physically cross the interface. At the boundary node, the wavefront connects flawlessly to the refracted wavefront, which is rotated by the deviation angle (Δθ = θ₁ - θ₂). Notice spatial wavelength compression!`;
+                html = `
+                    <div class="control-group">
+                        <label>Medium 1 Index / Depth (n₁) <span id="lblN1">n₁ = ${state.refraction.n1}</span></label>
+                        <input type="range" min="1.0" max="2.2" step="0.1" value="${state.refraction.n1}" oninput="state.refraction.n1 = parseFloat(this.value); renderControls();">
+                        <small style="font-size:0.75rem; color:#8da4be">Speed v₁ = ${(v1).toFixed(2)} m/s | λ₁ = ${(v1/wave.f).toFixed(2)} m</small>
+                    </div>
+                    <div class="control-group">
+                        <label>Medium 2 Index / Depth (n₂) <span id="lblN2">n₂ = ${state.refraction.n2}</span></label>
+                        <input type="range" min="1.0" max="2.5" step="0.1" value="${state.refraction.n2}" oninput="state.refraction.n2 = parseFloat(this.value); renderControls();">
+                        <small style="font-size:0.75rem; color:#8da4be">Speed v₂ = ${(v2).toFixed(2)} m/s | λ₂ = ${(v2/wave.f).toFixed(2)} m</small>
+                    </div>
+                    <div class="control-group">
+                        <label>Interface Boundary Angle <span id="lblBndAngle">${state.refraction.boundaryAngle}°</span></label>
+                        <input type="range" min="-45" max="45" value="${state.refraction.boundaryAngle}" oninput="state.refraction.boundaryAngle = parseInt(this.value); document.getElementById('lblBndAngle').textContent=this.value+'°';">
+                    </div>`;
+            }
+            else if (currentTab === "diffraction") {
+                const lambda = wave.lambda;
+                const slitW = state.diffraction.slitWidthMeters;
+                const isCircular = (slitW <= lambda);
+
+                bannerText.innerHTML = `<strong>Diffraction Huygens Envelope:</strong><br>
+                    • <strong>Aperture w ≤ λ (${slitW.toFixed(2)} m ≤ ${lambda.toFixed(2)} m):</strong> Diffracted waves approximate <em>PURE CIRCULAR ARCS</em> spreading deep into the shadow.<br>
+                    • <strong>Aperture w > λ:</strong> Waves retain an inner <em>ALMOST PLANE WAVE</em> beam alongside distinct curved edges.`;
+
+                html = `
+                    <div class="control-group">
+                        <label>Source Wave Shape</label>
+                        <select onchange="state.diffraction.sourceShape = this.value">
+                            <option value="plane" ${state.diffraction.sourceShape==='plane'?'selected':''}>Plane Wave</option>
+                            <option value="circular" ${state.diffraction.sourceShape==='circular'?'selected':''}>Circular Wave</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Aperture Width (w) <span id="lblSlitW">${slitW.toFixed(2)} m</span></label>
+                        <input type="range" min="0.3" max="3.5" step="0.1" value="${slitW}" oninput="state.diffraction.slitWidthMeters = parseFloat(this.value); document.getElementById('lblSlitW').textContent=parseFloat(this.value).toFixed(2)+' m'; renderControls();">
+                        <span style="font-size:0.78rem; font-weight:bold; color:${isCircular ? '#00f3ff' : '#fb923c'};">
+                            ${isCircular ? '✓ w ≤ λ: Semicircular Diffracted Waves' : '→ w > λ: Straight Plane Beam with Edge Arcs'}
+                        </span>
+                    </div>
+                    <div class="control-group">
+                        <label>Number of Slit Openings</label>
+                        <select onchange="state.diffraction.slitCount = parseInt(this.value)">
+                            <option value="1" ${state.diffraction.slitCount===1?'selected':''}>Single Slit</option>
+                            <option value="2" ${state.diffraction.slitCount===2?'selected':''}>Double Slit</option>
+                            <option value="3" ${state.diffraction.slitCount===3?'selected':''}>Triple Slit (Diffraction Grating)</option>
+                        </select>
+                    </div>`;
+            }
+            else if (currentTab === "interference") {
+                bannerText.innerHTML = `<strong>Interference:</strong> Superposition of two wave sources.<br>
+                    • <strong>Coherent:</strong> Stable nodal lines (zero amplitude) and antinodal tracks.<br>
+                    • <strong>Incoherent:</strong> Random phase jitter destroys static interference fringes.<br>
+                    • In <strong>Sound Mode</strong>, move the Yellow Mic Probe to observe the CRO react to nodes and phase jitter!`;
+                html = `
+                    <div class="control-group">
+                        <label>Number of Point Sources</label>
+                        <select onchange="state.interference.sourcesCount = parseInt(this.value)">
+                            <option value="1" ${state.interference.sourcesCount===1?'selected':''}>1 Source (No interference)</option>
+                            <option value="2" ${state.interference.sourcesCount===2?'selected':''}>2 Sources (Superposition)</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Source Coherence Mode</label>
+                        <select onchange="state.interference.coherent = (this.value==='true')">
+                            <option value="true" ${state.interference.coherent?'selected':''}>Coherent (Synchronized Phase)</option>
+                            <option value="false" ${!state.interference.coherent?'selected':''}>Incoherent (Drifting Phase Jitter)</option>
+                        </select>
+                    </div>`;
+            }
+
+            dynamicControls.innerHTML = html;
+        }
+
+        /* =========================================================================
+         * RENDERING SYSTEM
+         * ========================================================================= */
+        function getMediumColors() {
+            if (medium === "water") {
+                return { srcFront: "#00f3ff", obsFront: "#fb923c", bg: "#060d17" };
+            } else if (medium === "sound") {
+                return { srcFront: "#00f3ff", obsFront: "#c084fc", bg: "#080b14" };
+            } else {
+                return { srcFront: "#ef4444", obsFront: "#eab308", bg: "#050508" };
+            }
+        }
+
+        function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const colors = getMediumColors();
+
+            ctx.fillStyle = colors.bg;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            drawScaleBar();
+            const lambdaPx = wave.lambdaPx;
+
+            /* --------------------------------------------------
+             * 1. RECTILINEAR PROPAGATION
+             * -------------------------------------------------- */
+            if (currentTab === "rectilinear") {
+                drawSourceIndicator(60, canvas.height / 2);
+
+                if (genMode === "continuous") {
+                    const offsetPx = (waveDistanceMeters * PX_PER_METER) % lambdaPx;
+                    ctx.strokeStyle = colors.srcFront;
+                    ctx.lineWidth = 3;
+
+                    if (state.rectilinear.sourceShape === "plane") {
+                        for (let x = 60 + offsetPx; x <= canvas.width; x += lambdaPx) {
+                            ctx.beginPath();
+                            ctx.moveTo(x, 40);
+                            ctx.lineTo(x, canvas.height - 40);
+                            ctx.stroke();
+                        }
+                    } else {
+                        for (let r = offsetPx; r <= canvas.width + 100; r += lambdaPx) {
+                            if (r > 4) {
+                                ctx.beginPath();
+                                ctx.arc(60, canvas.height / 2, r, -Math.PI / 2.1, Math.PI / 2.1);
+                                ctx.stroke();
+                            }
+                        }
+                    }
+                } else {
+                    drawPulses(colors.srcFront);
+                }
+            }
+
+            /* --------------------------------------------------
+             * 2. REFLECTION
+             * -------------------------------------------------- */
+            else if (currentTab === "reflection") {
+                const obX = 460;
+                const obY = canvas.height / 2;
+                const theta = (state.reflection.reflectorAngle * Math.PI) / 180;
+                const R = 200;
+                const focalDist = R / 2;
+
+                drawSourceIndicator(60, obY);
+
+                if (genMode === "continuous") {
+                    ctx.save();
+                    ctx.translate(obX, obY);
+                    ctx.rotate(theta);
+                    ctx.beginPath();
+                    ctx.rect(-canvas.width * 2, -canvas.height * 2, canvas.width * 2, canvas.height * 4);
+                    ctx.clip();
+                    ctx.rotate(-theta);
+                    ctx.translate(-obX, -obY);
+
+                    // Incident Waves
+                    ctx.lineWidth = 3;
+                    ctx.strokeStyle = colors.srcFront;
+                    let phaseOffset = (waveDistanceMeters * PX_PER_METER) % lambdaPx;
+                    
+                    for (let x = 60 + phaseOffset - 2 * lambdaPx; x <= canvas.width + 100; x += lambdaPx) {
+                        if (state.reflection.waveShape === "plane") {
+                            ctx.beginPath();
+                            ctx.moveTo(x, -canvas.height);
+                            ctx.lineTo(x, canvas.height * 2);
+                            ctx.stroke();
+                        } else {
+                            let r = x - 60;
+                            if (r > 4) {
+                                ctx.beginPath();
+                                ctx.arc(60, obY, r, -Math.PI/1.5, Math.PI/1.5);
+                                ctx.stroke();
+                            }
+                        }
+                    }
+
+                    // Reflected Waves
+                    ctx.strokeStyle = colors.obsFront;
+                    
+                    if (state.reflection.reflectorShape === "flat") {
+                        ctx.save();
+                        ctx.translate(obX, obY);
+                        ctx.rotate(theta);
+                        ctx.scale(-1, 1);
+                        ctx.rotate(-theta);
+                        ctx.translate(-obX, -obY);
+                        
+                        for (let x = 60 + phaseOffset - 2 * lambdaPx; x <= canvas.width + 500; x += lambdaPx) {
+                            if (state.reflection.waveShape === "plane") {
+                                if (x > obX - 200) {
+                                    ctx.beginPath();
+                                    ctx.moveTo(x, -canvas.height);
+                                    ctx.lineTo(x, canvas.height * 2);
+                                    ctx.stroke();
+                                }
+                            } else {
+                                let r = x - 60;
+                                if (r > 4 && x > obX - 200) {
+                                    ctx.beginPath();
+                                    ctx.arc(60, obY, r, -Math.PI/1.2, Math.PI/1.2);
+                                    ctx.stroke();
+                                }
+                            }
+                        }
+                        ctx.restore();
+                    } else {
+                        let D_total = waveDistanceMeters * PX_PER_METER;
+                        let reflPhaseOffset = (D_total - (obX - 60)) % lambdaPx;
+                        if (reflPhaseOffset < 0) reflPhaseOffset += lambdaPx;
+                        
+                        ctx.save();
+                        ctx.translate(obX, obY);
+                        ctx.rotate(2 * theta);
+                        
+                        if (state.reflection.reflectorShape === "concave") {
+                            for (let d = reflPhaseOffset; d < 500; d += lambdaPx) {
+                                if (d < focalDist) {
+                                    ctx.beginPath();
+                                    ctx.arc(-focalDist, 0, focalDist - d, -Math.PI / 2.5, Math.PI / 2.5);
+                                    ctx.stroke();
+                                } else {
+                                    ctx.beginPath();
+                                    ctx.arc(-focalDist, 0, d - focalDist, Math.PI * 0.6, Math.PI * 1.4);
+                                    ctx.stroke();
+                                }
+                            }
+                        } else if (state.reflection.reflectorShape === "convex") {
+                            for (let d = reflPhaseOffset; d < 500; d += lambdaPx) {
+                                ctx.beginPath();
+                                ctx.arc(focalDist, 0, focalDist + d, Math.PI * 0.65, Math.PI * 1.35);
+                                ctx.stroke();
+                            }
+                        }
+                        ctx.restore();
+                    }
+                    ctx.restore();
+                } else {
+                    drawReflectionPulse(colors.srcFront, colors.obsFront, obX, obY, focalDist);
+                }
+
+                // Draw Reflector Surface
+                ctx.save();
+                ctx.translate(obX, obY);
+                ctx.rotate(theta);
+                ctx.strokeStyle = "#e2e8f0";
+                ctx.lineWidth = 6;
+                ctx.shadowColor = "rgba(0, 243, 255, 0.5)";
+                ctx.shadowBlur = 8;
+
+                if (state.reflection.reflectorShape === "concave") {
+                    ctx.beginPath();
+                    ctx.arc(-R, 0, R, -0.26 * Math.PI, 0.26 * Math.PI);
+                    ctx.stroke();
+                    ctx.fillStyle = "#ef4444";
+                    ctx.beginPath();
+                    ctx.arc(-focalDist, 0, 5, 0, 2 * Math.PI);
+                    ctx.fill();
+                    ctx.font = "bold 11px monospace";
+                    ctx.fillText("Real Focus F", -focalDist - 40, -12);
+                } else if (state.reflection.reflectorShape === "convex") {
+                    ctx.beginPath();
+                    ctx.arc(R, 0, R, 0.74 * Math.PI, 1.26 * Math.PI);
+                    ctx.stroke();
+                    ctx.fillStyle = "#ef4444";
+                    ctx.beginPath();
+                    ctx.arc(focalDist, 0, 4, 0, 2 * Math.PI);
+                    ctx.fill();
+                    ctx.font = "bold 11px monospace";
+                    ctx.fillText("Virtual F", focalDist + 8, 4);
+                } else {
+                    ctx.beginPath();
+                    ctx.moveTo(0, -160);
+                    ctx.lineTo(0, 160);
+                    ctx.stroke();
+                    ctx.setLineDash([5, 5]);
+                    ctx.lineWidth = 1.5;
+                    ctx.strokeStyle = "rgba(255,255,255,0.7)";
+                    ctx.beginPath();
+                    ctx.moveTo(0, 0);
+                    ctx.lineTo(-80, 0);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                    ctx.font = "11px monospace";
+                    ctx.fillStyle = "#cbd5e1";
+                    ctx.fillText("Normal N", -78, -8);
+                }
+                ctx.restore();
+            }
+
+            /* --------------------------------------------------
+             * 3. REFRACTION
+             * -------------------------------------------------- */
+            else if (currentTab === "refraction") {
+                const boundX = 380;
+                const boundY = canvas.height / 2;
+                const bAngleRad = (state.refraction.boundaryAngle * Math.PI) / 180;
+
+                const n1 = state.refraction.n1;
+                const n2 = state.refraction.n2;
+                const v1 = wave.v / n1;
+                const v2 = wave.v / n2;
+                const l1Px = (v1 / wave.f) * PX_PER_METER;
+                const l2Px = (v2 / wave.f) * PX_PER_METER;
+
+                const theta1 = bAngleRad;
+                const sinTheta2 = (n1 / n2) * Math.sin(theta1);
+                const theta2 = Math.asin(Math.max(-0.95, Math.min(0.95, sinTheta2)));
+                const deltaTheta = theta1 - theta2;
+
+                const tanB = Math.tan(bAngleRad);
+                const isVertical = Math.abs(bAngleRad) < 0.001;
+                
+                const topX = isVertical ? boundX : boundX - boundY * tanB;
+                const botX = isVertical ? boundX : boundX + (canvas.height - boundY) * tanB;
+
+                // Medium 2 Shading
+                ctx.save();
+                ctx.beginPath();
+                ctx.moveTo(topX, 0);
+                ctx.lineTo(canvas.width, 0);
+                ctx.lineTo(canvas.width, canvas.height);
+                ctx.lineTo(botX, canvas.height);
+                ctx.closePath();
+                ctx.fillStyle = (medium === "water") ? "rgba(14, 116, 144, 0.22)" : "rgba(255, 255, 255, 0.05)";
+                ctx.fill();
+                ctx.restore();
+
+                // Interface Border
+                ctx.strokeStyle = "#00f3ff";
+                ctx.lineWidth = 2.5;
+                ctx.setLineDash([7, 6]);
+                ctx.beginPath();
+                ctx.moveTo(topX, 0);
+                ctx.lineTo(botX, canvas.height);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Readouts on Canvas
+                ctx.font = "bold 12px sans-serif";
+                ctx.fillStyle = colors.srcFront;
+                ctx.fillText(`Medium 1: v₁ = ${v1.toFixed(2)} m/s, λ₁ = ${(v1/wave.f).toFixed(2)} m`, 20, 40);
+                ctx.fillStyle = colors.obsFront;
+                ctx.fillText(`Medium 2: v₂ = ${v2.toFixed(2)} m/s, λ₂ = ${(v2/wave.f).toFixed(2)} m`, boundX + 20, 40);
+
+                drawSourceIndicator(40, canvas.height / 2);
+
+                if (genMode === "continuous") {
+                    const dist1Px = (waveDistanceMeters * (v1 / wave.v) * PX_PER_METER);
+                    const phaseOffset1 = dist1Px % l1Px;
+                    ctx.lineWidth = 3;
+
+                    const minX = -canvas.width;
+                    const maxX = canvas.width * 2;
+
+                    // Medium 1 Incident Waves
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.moveTo(0, 0);
+                    ctx.lineTo(topX, 0);
+                    ctx.lineTo(botX, canvas.height);
+                    ctx.lineTo(0, canvas.height);
+                    ctx.closePath();
+                    ctx.clip();
+
+                    ctx.strokeStyle = colors.srcFront;
+                    for (let x0 = minX; x0 <= maxX; x0 += l1Px) {
+                        const curX = x0 + phaseOffset1;
+                        ctx.beginPath();
+                        ctx.moveTo(curX, 40);
+                        ctx.lineTo(curX, canvas.height - 40);
+                        ctx.stroke();
+                    }
+                    ctx.restore();
+
+                    // Medium 2 Refracted Waves
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.moveTo(topX, 0);
+                    ctx.lineTo(canvas.width, 0);
+                    ctx.lineTo(canvas.width, canvas.height);
+                    ctx.lineTo(botX, canvas.height);
+                    ctx.closePath();
+                    ctx.clip();
+
+                    ctx.strokeStyle = colors.obsFront;
+                    for (let x0 = minX; x0 <= maxX; x0 += l1Px) {
+                        const curX = x0 + phaseOffset1;
+                        
+                        if (isVertical) {
+                            const refX = boundX + (curX - boundX) * (l2Px / l1Px);
+                            ctx.beginPath();
+                            ctx.moveTo(refX, 40);
+                            ctx.lineTo(refX, canvas.height - 40);
+                            ctx.stroke();
+                        } else {
+                            let yInt = boundY + (curX - boundX) / tanB;
+                            ctx.save();
+                            ctx.translate(curX, yInt);
+                            ctx.rotate(-deltaTheta);
+                            ctx.beginPath();
+                            ctx.moveTo(0, -canvas.height * 2);
+                            ctx.lineTo(0, canvas.height * 2);
+                            ctx.stroke();
+                            ctx.restore();
+                        }
+                    }
+                    ctx.restore();
+                } else {
+                    drawRefractionPulse(colors.srcFront, colors.obsFront, boundX, boundY, bAngleRad, v1, v2, l1Px, l2Px, deltaTheta, isVertical, topX, botX);
+                }
+            }
+
+            /* --------------------------------------------------
+             * 4. DIFFRACTION
+             * -------------------------------------------------- */
+            else if (currentTab === "diffraction") {
+                const barX = 260;
+                const slitWPx = state.diffraction.slitWidthMeters * PX_PER_METER;
+                const count = state.diffraction.slitCount;
+                const cy = canvas.height / 2;
+
+                const slits = [];
+                if (count === 1) slits.push(cy);
+                if (count === 2) { slits.push(cy - 70); slits.push(cy + 70); }
+                if (count === 3) { slits.push(cy - 95); slits.push(cy); slits.push(cy + 95); }
+
+                // Barrier Walls
+                ctx.strokeStyle = "#475569";
+                ctx.lineWidth = 10;
+                let lastY = 0;
+                for (let s of slits) {
+                    const topEdge = s - slitWPx / 2;
+                    ctx.beginPath();
+                    ctx.moveTo(barX, lastY);
+                    ctx.lineTo(barX, topEdge);
+                    ctx.stroke();
+                    lastY = s + slitWPx / 2;
+                }
+                ctx.beginPath();
+                ctx.moveTo(barX, lastY);
+                ctx.lineTo(barX, canvas.height);
+                ctx.stroke();
+
+                ctx.fillStyle = "#94a3b8";
+                ctx.font = "11px monospace";
+                ctx.fillText(`Slit w = ${state.diffraction.slitWidthMeters.toFixed(2)} m | λ = ${wave.lambda.toFixed(2)} m`, barX - 70, 24);
+
+                drawSourceIndicator(40, canvas.height / 2);
+
+                if (genMode === "continuous") {
+                    const travelOffsetPx = (waveDistanceMeters * PX_PER_METER) % lambdaPx;
+
+                    // 1. Incident Wavefronts
+                    ctx.strokeStyle = colors.srcFront;
+                    ctx.lineWidth = 3;
+
+                    for (let x = 40 + travelOffsetPx; x <= barX; x += lambdaPx) {
+                        if (state.diffraction.sourceShape === "plane") {
+                            ctx.beginPath();
+                            ctx.moveTo(x, 40);
+                            ctx.lineTo(x, canvas.height - 40);
+                            ctx.stroke();
+                        } else {
+                            ctx.beginPath();
+                            ctx.arc(40, cy, x - 40, -Math.PI / 2.3, Math.PI / 2.3);
+                            ctx.stroke();
+                        }
+                    }
+
+                    // 2. Diffracted Wavefronts (Huygens Stadium Envelope)
+                    ctx.strokeStyle = colors.obsFront;
+
+                    for (let d = travelOffsetPx; d < canvas.width - barX; d += lambdaPx) {
+                        if (d < 2) continue;
+                        for (let s of slits) {
+                            ctx.beginPath();
+                            ctx.arc(barX, s - slitWPx / 2, d, -Math.PI / 2, 0);
+                            ctx.lineTo(barX + d, s + slitWPx / 2);
+                            ctx.arc(barX, s + slitWPx / 2, d, 0, Math.PI / 2);
+                            ctx.stroke();
+                        }
+                    }
+                } else {
+                    drawDiffractionPulse(colors.srcFront, colors.obsFront, barX, slits, slitWPx);
+                }
+            }
+
+            /* --------------------------------------------------
+             * 5. INTERFERENCE
+             * -------------------------------------------------- */
+            else if (currentTab === "interference") {
+                const s1Y = state.interference.speakerPos.s1;
+                const s2Y = state.interference.speakerPos.s2;
+                const sX = 140;
+
+                if (!state.interference.coherent) {
+                    state.interference.phase2 += (Math.random() - 0.5) * 0.7;
+                } else {
+                    state.interference.phase2 = 0;
+                }
+
+                drawSourceIndicator(sX, s1Y, "S₁");
+                if (state.interference.sourcesCount === 2) {
+                    drawSourceIndicator(sX, s2Y, "S₂");
+                }
+
+                if (genMode === "continuous") {
+                    const offset1Px = (waveDistanceMeters * PX_PER_METER) % lambdaPx;
+                    const offset2Px = ((waveDistanceMeters * PX_PER_METER) + (state.interference.phase2 / (2 * Math.PI)) * lambdaPx) % lambdaPx;
+
+                    ctx.lineWidth = 2.5;
+
+                    for (let r = offset1Px; r < 550; r += lambdaPx) {
+                        ctx.strokeStyle = colors.srcFront;
+                        ctx.beginPath();
+                        ctx.arc(sX, s1Y, r, -Math.PI / 2.3, Math.PI / 2.3);
+                        ctx.stroke();
+
+                        if (state.interference.sourcesCount === 2) {
+                            const r2 = (r - offset1Px + offset2Px + lambdaPx) % 550;
+                            ctx.strokeStyle = colors.obsFront;
+                            ctx.beginPath();
+                            ctx.arc(sX, s2Y, r2, -Math.PI / 2.3, Math.PI / 2.3);
+                            ctx.stroke();
+                        }
+                    }
+
+                    // Nodal tracks
+                    if (state.interference.sourcesCount === 2 && state.interference.coherent) {
+                        ctx.strokeStyle = "rgba(255, 255, 255, 0.45)";
+                        ctx.setLineDash([4, 6]);
+                        ctx.lineWidth = 1.8;
+                        const d = s2Y - s1Y;
+
+                        for (let m = -1; m <= 1; m += 2) {
+                            const sinTh = (0.5 * lambdaPx) / d;
+                            if (Math.abs(sinTh) <= 0.95) {
+                                const theta = Math.asin(sinTh);
+                                ctx.beginPath();
+                                ctx.moveTo(sX, (s1Y + s2Y) / 2);
+                                ctx.lineTo(sX + 450, ((s1Y + s2Y) / 2) + m * 450 * Math.tan(theta));
+                                ctx.stroke();
+                            }
+                        }
+                        ctx.setLineDash([]);
+                        ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+                        ctx.font = "11px monospace";
+                        ctx.fillText("Destructive Nodal Line", sX + 220, ((s1Y + s2Y) / 2) - 30);
+                    }
+                } else {
+                    drawInterferencePulse(colors.srcFront, colors.obsFront, sX, s1Y, s2Y);
+                }
+
+                // Optical interference fringe screen
+                if (medium === "light") {
+                    const scrX = canvas.width - 32;
+                    const scrW = 20;
+
+                    ctx.fillStyle = "#000000";
+                    ctx.fillRect(scrX, 20, scrW, canvas.height - 40);
+                    ctx.strokeStyle = "#475569";
+                    ctx.strokeRect(scrX, 20, scrW, canvas.height - 40);
+
+                    const k = (2 * Math.PI) / wave.lambdaPx;
+
+                    for (let y = 20; y < canvas.height - 20; y++) {
+                        const r1 = Math.hypot(scrX - sX, y - s1Y);
+                        const r2 = (state.interference.sourcesCount === 2) ? Math.hypot(scrX - sX, y - s2Y) : r1;
+                        const delta = r1 - r2;
+
+                        let intensity = 1.0;
+                        if (state.interference.sourcesCount === 2) {
+                            intensity = state.interference.coherent ? Math.pow(Math.cos(0.5 * k * delta), 2) : 0.45;
+                        }
+
+                        ctx.fillStyle = `rgba(239, 68, 68, ${intensity})`;
+                        ctx.fillRect(scrX + 2, y, scrW - 4, 1);
+                    }
+
+                    ctx.fillStyle = "#ffffff";
+                    ctx.font = "10px monospace";
+                    ctx.fillText("Interference Screen", scrX - 160, 36);
+                }
+
+                // Draggable Acoustic Probe
+                if (medium === "sound") {
+                    const mic = state.interference.micPos;
+                    ctx.strokeStyle = "#facc15";
+                    ctx.lineWidth = 2.5;
+                    ctx.beginPath();
+                    ctx.arc(mic.x, mic.y, 12, 0, 2 * Math.PI);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(mic.x - 16, mic.y); ctx.lineTo(mic.x + 16, mic.y);
+                    ctx.moveTo(mic.x, mic.y - 16); ctx.lineTo(mic.x, mic.y + 16);
+                    ctx.stroke();
+                    ctx.fillStyle = "#facc15";
+                    ctx.font = "11px monospace";
+                    ctx.fillText("Microphone Probe", mic.x + 16, mic.y - 8);
+                }
+            }
+        }
+
+        /* =========================================================================
+         * PULSE DRAWING ROUTINES
+         * ========================================================================= */
+        function drawPulses(color) {
+            for (let p of activePulses) {
+                const rPx = p.distMeters * PX_PER_METER;
+                if (rPx > 0 && rPx < canvas.width + 100) {
+                    ctx.strokeStyle = color;
+                    ctx.lineWidth = 5;
+                    ctx.beginPath();
+                    if (state.rectilinear.sourceShape === "plane") {
+                        ctx.moveTo(p.xMeters * PX_PER_METER + rPx, 40);
+                        ctx.lineTo(p.xMeters * PX_PER_METER + rPx, canvas.height - 40);
+                    } else {
+                        ctx.arc(p.xMeters * PX_PER_METER, canvas.height / 2, rPx, -Math.PI / 2.3, Math.PI / 2.3);
+                    }
+                    ctx.stroke();
+                }
+            }
+        }
+
+        function drawReflectionPulse(srcCol, obsCol, obX, obY, focalDist) {
+            const theta = (state.reflection.reflectorAngle * Math.PI) / 180;
+            
+            ctx.save();
+            ctx.translate(obX, obY);
+            ctx.rotate(theta);
+            ctx.beginPath();
+            ctx.rect(-canvas.width * 2, -canvas.height * 2, canvas.width * 2, canvas.height * 4);
+            ctx.clip();
+            ctx.rotate(-theta);
+            ctx.translate(-obX, -obY);
+
+            for (let p of activePulses) {
+                const startXPx = p.xMeters * PX_PER_METER;
+                const rPx = p.distMeters * PX_PER_METER;
+                const currentX = startXPx + rPx;
+                
+                ctx.strokeStyle = srcCol;
+                ctx.lineWidth = 5;
+                ctx.beginPath();
+                if (state.reflection.waveShape === "plane") {
+                    ctx.moveTo(currentX, -canvas.height);
+                    ctx.lineTo(currentX, canvas.height * 2);
+                } else {
+                    let r = currentX - startXPx;
+                    if (r > 4) ctx.arc(startXPx, obY, r, -Math.PI/1.5, Math.PI/1.5);
+                }
+                ctx.stroke();
+                
+                if (currentX > obX - 200) {
+                    ctx.strokeStyle = obsCol;
+                    if (state.reflection.reflectorShape === "flat") {
+                        ctx.save();
+                        ctx.translate(obX, obY);
+                        ctx.rotate(theta);
+                        ctx.scale(-1, 1);
+                        ctx.rotate(-theta);
+                        ctx.translate(-obX, -obY);
+                        
+                        ctx.beginPath();
+                        if (state.reflection.waveShape === "plane") {
+                            ctx.moveTo(currentX, -canvas.height);
+                            ctx.lineTo(currentX, canvas.height * 2);
+                        } else {
+                            let r = currentX - startXPx;
+                            if (r > 4) ctx.arc(startXPx, obY, r, -Math.PI/1.2, Math.PI/1.2);
+                        }
+                        ctx.stroke();
+                        ctx.restore();
+                    } else {
+                        const reboundPx = currentX - obX;
+                        if (reboundPx > 0) {
+                            ctx.save();
+                            ctx.translate(obX, obY);
+                            ctx.rotate(2 * theta);
+                            
+                            if (state.reflection.reflectorShape === "concave") {
+                                if (reboundPx < focalDist) {
+                                    ctx.beginPath();
+                                    ctx.arc(-focalDist, 0, focalDist - reboundPx, -Math.PI / 2.5, Math.PI / 2.5);
+                                    ctx.stroke();
+                                } else {
+                                    ctx.beginPath();
+                                    ctx.arc(-focalDist, 0, reboundPx - focalDist, Math.PI * 0.6, Math.PI * 1.4);
+                                    ctx.stroke();
+                                }
+                            } else {
+                                ctx.beginPath();
+                                ctx.arc(focalDist, 0, focalDist + reboundPx, Math.PI * 0.65, Math.PI * 1.35);
+                                ctx.stroke();
+                            }
+                            ctx.restore();
+                        }
+                    }
+                }
+            }
+            ctx.restore(); 
+        }
+
+        function drawRefractionPulse(srcCol, obsCol, boundX, boundY, bAngleRad, v1, v2, l1Px, l2Px, deltaTheta, isVertical, topX, botX) {
+            const tanB = Math.tan(bAngleRad);
+            
+            for (let p of activePulses) {
+                const dist1Px = p.distMeters * (v1 / wave.v) * PX_PER_METER;
+                const startXPx = p.xMeters * PX_PER_METER;
+                const curX = startXPx + dist1Px;
+
+                ctx.save();
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(topX, 0);
+                ctx.lineTo(botX, canvas.height);
+                ctx.lineTo(0, canvas.height);
+                ctx.closePath();
+                ctx.clip();
+
+                ctx.strokeStyle = srcCol;
+                ctx.lineWidth = 5;
+                ctx.beginPath();
+                ctx.moveTo(curX, 40);
+                ctx.lineTo(curX, canvas.height - 40);
+                ctx.stroke();
+                ctx.restore();
+
+                ctx.save();
+                ctx.beginPath();
+                ctx.moveTo(topX, 0);
+                ctx.lineTo(canvas.width, 0);
+                ctx.lineTo(canvas.width, canvas.height);
+                ctx.lineTo(botX, canvas.height);
+                ctx.closePath();
+                ctx.clip();
+
+                ctx.strokeStyle = obsCol;
+                ctx.lineWidth = 5;
+                
+                if (isVertical) {
+                    const refX = boundX + (curX - boundX) * (l2Px / l1Px);
+                    ctx.beginPath();
+                    ctx.moveTo(refX, 40);
+                    ctx.lineTo(refX, canvas.height - 40);
+                    ctx.stroke();
+                } else {
+                    let yInt = boundY + (curX - boundX) / tanB;
+                    ctx.save();
+                    ctx.translate(curX, yInt);
+                    ctx.rotate(-deltaTheta);
+                    ctx.beginPath();
+                    ctx.moveTo(0, -canvas.height * 2);
+                    ctx.lineTo(0, canvas.height * 2);
+                    ctx.stroke();
+                    ctx.restore();
+                }
+                ctx.restore();
+            }
+        }
+
+        function drawDiffractionPulse(srcCol, obsCol, barX, slits, slitWPx) {
+            for (let p of activePulses) {
+                const frontX = p.xMeters * PX_PER_METER + p.distMeters * PX_PER_METER;
+                if (frontX <= barX) {
+                    ctx.strokeStyle = srcCol;
+                    ctx.lineWidth = 5;
+                    ctx.beginPath();
+                    if (state.diffraction.sourceShape === "plane") {
+                        ctx.moveTo(frontX, 40);
+                        ctx.lineTo(frontX, canvas.height - 40);
+                    } else {
+                        let r = frontX - p.xMeters * PX_PER_METER;
+                        if (r > 4) ctx.arc(p.xMeters * PX_PER_METER, canvas.height / 2, r, -Math.PI/2.3, Math.PI/2.3);
+                    }
+                    ctx.stroke();
+                } else {
+                    const d = frontX - barX;
+                    ctx.strokeStyle = obsCol;
+                    ctx.lineWidth = 5;
+                    for (let s of slits) {
+                        ctx.beginPath();
+                        ctx.arc(barX, s - slitWPx / 2, d, -Math.PI / 2, 0);
+                        ctx.lineTo(barX + d, s + slitWPx / 2);
+                        ctx.arc(barX, s + slitWPx / 2, d, 0, Math.PI / 2);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        function drawInterferencePulse(srcCol, obsCol, sX, s1Y, s2Y) {
+            for (let p of activePulses) {
+                const rPx = p.distMeters * PX_PER_METER;
+                if (rPx > 4 && rPx < 550) {
+                    ctx.strokeStyle = srcCol;
+                    ctx.lineWidth = 5;
+                    ctx.beginPath();
+                    ctx.arc(sX, s1Y, rPx, -Math.PI / 2.3, Math.PI / 2.3);
+                    ctx.stroke();
+
+                    if (state.interference.sourcesCount === 2) {
+                        ctx.strokeStyle = obsCol;
+                        ctx.beginPath();
+                        ctx.arc(sX, s2Y, rPx, -Math.PI / 2.3, Math.PI / 2.3);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        function drawSourceIndicator(x, y, label = "Source") {
+            ctx.fillStyle = (medium === "sound") ? "#0284c7" : "#00f3ff";
+            ctx.beginPath();
+            ctx.arc(x, y, 7, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "11px monospace";
+            ctx.fillText(label, x - 22, y - 12);
+        }
+
+        function drawScaleBar() {
+            const barLengthPx = 1.0 * PX_PER_METER;
+            const startX = canvas.width - barLengthPx - 25;
+            const startY = canvas.height - 25;
+
+            ctx.strokeStyle = "#94a3b8";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+            ctx.lineTo(startX + barLengthPx, startY);
+            ctx.moveTo(startX, startY - 4); ctx.lineTo(startX, startY + 4);
+            ctx.moveTo(startX + barLengthPx, startY - 4); ctx.lineTo(startX + barLengthPx, startY + 4);
+            ctx.stroke();
+
+            ctx.fillStyle = "#94a3b8";
+            ctx.font = "10px monospace";
+            ctx.fillText("1.0 Metre Scale", startX - 8, startY - 8);
+        }
+
+        /* =========================================================================
+         * DUAL-TRACE CRO OSCILLOSCOPE MONITOR
+         * ========================================================================= */
+        function drawCRO(time) {
+            croCtx.fillStyle = "#020803";
+            croCtx.fillRect(0, 0, croCanvas.width, croCanvas.height);
+
+            // Phosphor Grid
+            croCtx.strokeStyle = "#0e3314";
+            croCtx.lineWidth = 1;
+            for (let x = 0; x < croCanvas.width; x += 20) {
+                croCtx.beginPath(); croCtx.moveTo(x, 0); croCtx.lineTo(x, croCanvas.height); croCtx.stroke();
+            }
+            for (let y = 0; y < croCanvas.height; y += 20) {
+                croCtx.beginPath(); croCtx.moveTo(0, y); croCtx.lineTo(croCanvas.width, y); croCtx.stroke();
+            }
+
+            const v1 = wave.v / state.refraction.n1;
+            const v2 = wave.v / state.refraction.n2;
+            const l1 = v1 / wave.f;
+            const l2 = v2 / wave.f;
+            const omega = 2 * Math.PI * wave.f;
+            const k1 = 2 * Math.PI / l1;
+            const k2 = 2 * Math.PI / l2;
+
+            if (croMode === "spatial") {
+                croCtx.font = "9px monospace";
+
+                // CH1 (Trace 1)
+                croCtx.fillStyle = "#00f3ff";
+                croCtx.fillText(currentTab === "interference" ? `CH1 (Src 1): λ=${l1.toFixed(2)}m` : `CH1 (Med 1): v₁=${v1.toFixed(2)}m/s, λ₁=${l1.toFixed(2)}m`, 8, 16);
+                croCtx.strokeStyle = "#00f3ff";
+                croCtx.lineWidth = 1.8;
+                croCtx.beginPath();
+                const midY1 = 45;
+                for (let i = 0; i < croCanvas.width; i++) {
+                    const xMeters = (i / croCanvas.width) * 5.0; 
+                    const y = midY1 - Math.sin(k1 * xMeters - omega * time) * 20;
+                    if (i === 0) croCtx.moveTo(i, y); else croCtx.lineTo(i, y);
+                }
+                croCtx.stroke();
+
+                // CH2 (Trace 2)
+                croCtx.fillStyle = "#00ff88";
+                if (currentTab === "interference") {
+                    croCtx.fillText(`CH2 (Detect): Spatial Superposition (Mic Axis)`, 8, 92);
+                    croCtx.strokeStyle = "#00ff88";
+                    croCtx.lineWidth = 1.8;
+                    croCtx.beginPath();
+                    const midY2 = 120;
+                    
+                    const my = state.interference.micPos.y / PX_PER_METER;
+                    const s1y = state.interference.speakerPos.s1 / PX_PER_METER;
+                    const s2y = state.interference.speakerPos.s2 / PX_PER_METER;
+                    
+                    for (let i = 0; i < croCanvas.width; i++) {
+                        const scanX = 2.8 + (i / croCanvas.width) * 5.0;
+                        const r1 = Math.hypot(scanX - 2.8, my - s1y);
+                        const r2 = Math.hypot(scanX - 2.8, my - s2y);
+                        
+                        let sig = Math.sin(k1 * r1 - omega * time);
+                        if (state.interference.sourcesCount === 2) {
+                            sig += Math.sin(k1 * r2 - omega * time + state.interference.phase2);
+                        }
+                        const y = midY2 - (sig * 10);
+                        if (i === 0) croCtx.moveTo(i, y); else croCtx.lineTo(i, y);
+                    }
+                    croCtx.stroke();
+                } else {
+                    croCtx.fillText(`CH2 (Med 2): v₂=${v2.toFixed(2)}m/s, λ₂=${l2.toFixed(2)}m`, 8, 92);
+                    croCtx.strokeStyle = "#00ff88";
+                    croCtx.lineWidth = 1.8;
+                    croCtx.beginPath();
+                    const midY2 = 120;
+                    for (let i = 0; i < croCanvas.width; i++) {
+                        const xMeters = (i / croCanvas.width) * 5.0;
+                        const y = midY2 - Math.sin(k2 * xMeters - omega * time) * 20;
+                        if (i === 0) croCtx.moveTo(i, y); else croCtx.lineTo(i, y);
+                    }
+                    croCtx.stroke();
+                }
+            } 
+            else {
+                // TIME BASE MODE
+                croCtx.font = "9px monospace";
+                croCtx.fillStyle = "#00f3ff";
+                croCtx.fillText(`CH1 (Src): f = ${wave.f.toFixed(2)} Hz`, 8, 16);
+                croCtx.strokeStyle = "#00f3ff";
+                croCtx.lineWidth = 2.0;
+                croCtx.beginPath();
+                const midY1 = 48;
+                for (let i = 0; i < croCanvas.width; i++) {
+                    const t = time - (croCanvas.width - i) * 0.005;
+                    const y = midY1 - Math.sin(omega * t) * 22;
+                    if (i === 0) croCtx.moveTo(i, y); else croCtx.lineTo(i, y);
+                }
+                croCtx.stroke();
+
+                croCtx.fillStyle = "#00ff88";
+                if (currentTab === "interference") {
+                    const isCoherent = state.interference.coherent;
+                    croCtx.fillText(`CH2 (Detect): Mic Signal ${isCoherent ? '(Coherent)' : '(Incoherent)'}`, 8, 96);
+                    
+                    croCtx.strokeStyle = "#00ff88";
+                    croCtx.lineWidth = 2.0;
+                    croCtx.beginPath();
+                    const midY2 = 125;
+                    
+                    const mx = state.interference.micPos.x / PX_PER_METER;
+                    const my = state.interference.micPos.y / PX_PER_METER;
+                    const s1y = state.interference.speakerPos.s1 / PX_PER_METER;
+                    const s2y = state.interference.speakerPos.s2 / PX_PER_METER;
+                    const sX = 140 / PX_PER_METER; 
+                    
+                    const r1 = Math.hypot(mx - sX, my - s1y);
+                    const r2 = Math.hypot(mx - sX, my - s2y);
+
+                    for (let i = 0; i < croCanvas.width; i++) {
+                        const t = time - (croCanvas.width - i) * 0.005;
+                        let sig = Math.sin(k1 * r1 - omega * t);
+                        
+                        if (state.interference.sourcesCount === 2) {
+                            const renderPhase = isCoherent ? 0 : state.interference.phase2 + (Math.random() - 0.5) * 2.0;
+                            sig += Math.sin(k1 * r2 - omega * t + renderPhase);
+                        }
+                        const y = midY2 - (sig * 10.5);
+                        if (i === 0) croCtx.moveTo(i, y); else croCtx.lineTo(i, y);
+                    }
+                    croCtx.stroke();
+                } else {
+                    croCtx.fillText(`CH2 (Out): f = ${wave.f.toFixed(2)} Hz (Frequency Constant)`, 8, 96);
+                    croCtx.strokeStyle = "#00ff88";
+                    croCtx.lineWidth = 2.0;
+                    croCtx.beginPath();
+                    const midY2 = 125;
+                    for (let i = 0; i < croCanvas.width; i++) {
+                        const t = time - (croCanvas.width - i) * 0.005;
+                        const phaseLag = (currentTab === "refraction") ? (state.refraction.n2 - state.refraction.n1) * Math.PI : 0;
+                        const y = midY2 - Math.sin(omega * t - phaseLag) * 20;
+                        if (i === 0) croCtx.moveTo(i, y); else croCtx.lineTo(i, y);
+                    }
+                    croCtx.stroke();
+                }
+            }
+        }
+
+        /* =========================================================================
+         * MAIN SIMULATION ANIMATION LOOP
+         * ========================================================================= */
+        function loop(timestamp) {
+            if (!lastTimestamp) lastTimestamp = timestamp;
+            const dt = Math.min((timestamp - lastTimestamp) / 1000, 0.1);
+            lastTimestamp = timestamp;
+
+            if (isRunning) {
+                simTime += dt;
+                waveDistanceMeters += wave.v * dt;
+
+                for (let p of activePulses) {
+                    p.distMeters += wave.v * dt;
+                }
+                activePulses = activePulses.filter(p => p.distMeters * PX_PER_METER < canvas.width + 300);
+            }
+
+            render();
+            if (medium === "sound" || currentTab === "refraction") {
+                drawCRO(simTime);
+            }
+
+            requestAnimationFrame(loop);
+        }
+
+        // Initialize state
+        updateParameters();
+        renderControls();
+        requestAnimationFrame(loop);
+    </script>
+</body>
+</html>

@@ -1,0 +1,2290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Interactive Energy Band Theory, Extrinsic Semiconductor Doping, and Carrier Transport Laboratory Simulator - LuyaliSims STEM Labs.">
+    <title>Energy Band Theory & Extrinsic Carrier Transport Simulator - LuyaliSims</title>
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    
+    <!-- Import Futuristic Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Base Reset & Variables */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --neon-cyan: #00f3ff;
+            --neon-magenta: #bc13fe;
+            --neon-green: #00ff88;
+            --neon-amber: #ffaa00;
+            --neon-red: #ff3366;
+            --bg-dark: #070a12;
+            --panel-bg: rgba(16, 24, 43, 0.85);
+            --border-glow: rgba(0, 243, 255, 0.35);
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 85% 15%, rgba(0, 243, 255, 0.08), transparent 45%),
+                radial-gradient(circle at 15% 85%, rgba(188, 19, 254, 0.08), transparent 45%),
+                linear-gradient(180deg, #05070e 0%, #0a0e1a 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 16px 20px;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* 1. HEADER & TOP NAVIGATION */
+        header {
+            max-width: 1300px;
+            margin: 0 auto 15px auto;
+        }
+
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 18px;
+            background: rgba(16, 24, 43, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(188, 19, 254, 0.5);
+            color: #e580ff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(188, 19, 254, 0.2);
+            border-color: var(--neon-magenta);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
+            transform: translateX(-3px);
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+            margin: 6px 0 10px 0;
+            font-size: clamp(1.4rem, 3.4vw, 2.3rem);
+            letter-spacing: 1.5px;
+            text-align: center;
+        }
+
+        h1 span {
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .lead-summary {
+            max-width: 980px;
+            margin: 0 auto 20px auto;
+            text-align: center;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: #cbd5e1;
+        }
+
+        main {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        /* 2. SIMULATOR WORKSPACE */
+        #simulator-container {
+            background: linear-gradient(135deg, rgba(16, 24, 43, 0.85) 0%, rgba(8, 12, 22, 0.9) 100%);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-glow);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 25px rgba(0, 243, 255, 0.12);
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        /* Top Module Tabs Bar */
+        .hud-tabs-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+            background: rgba(6, 10, 22, 0.75);
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+        }
+
+        .mod-tabs-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .mod-tab-btn {
+            background: #0d1527;
+            border: 1px solid #1e293b;
+            color: #94a3b8;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+        }
+
+        .mod-tab-btn:hover {
+            border-color: var(--neon-cyan);
+            color: #ffffff;
+        }
+
+        .mod-tab-btn.active {
+            background: rgba(188, 19, 254, 0.25);
+            border-color: var(--neon-magenta);
+            color: #ffffff;
+            box-shadow: 0 0 12px rgba(188, 19, 254, 0.45);
+        }
+
+        .sim-action-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .hud-action-btn {
+            background: linear-gradient(180deg, rgba(16, 28, 54, 0.9) 0%, rgba(8, 14, 28, 0.95) 100%);
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            color: var(--neon-cyan);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 7px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .hud-action-btn:hover {
+            border-color: var(--neon-cyan);
+            color: #fff;
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+        }
+
+        /* Telemetry Status Bar */
+        .hud-telemetry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(4, 8, 16, 0.85);
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            border-radius: 10px;
+            padding: 10px 16px;
+            margin-bottom: 18px;
+            font-family: 'Share Tech Mono', monospace;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .telemetry-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.92rem;
+        }
+
+        .tele-label {
+            color: #8da4be;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .tele-val {
+            color: var(--neon-cyan);
+            font-weight: 700;
+        }
+
+        .tele-val.amber {
+            color: var(--neon-amber);
+        }
+
+        .tele-val.green {
+            color: var(--neon-green);
+        }
+
+        .tele-val.pink {
+            color: #ff55bb;
+        }
+
+        .sim-layout {
+            display: grid;
+            grid-template-columns: 1.8fr 1fr;
+            gap: 20px;
+            align-items: stretch;
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            width: 100%;
+            background: radial-gradient(circle at 50% 50%, #08171a 0%, #02070a 100%);
+            border-radius: 12px;
+            overflow: hidden;
+            touch-action: none;
+            border: 3px solid #1e293b;
+            box-shadow: 
+                0 0 0 2px rgba(0, 243, 255, 0.4),
+                0 15px 35px rgba(0, 0, 0, 0.8),
+                inset 0 0 35px rgba(0, 0, 0, 0.95);
+        }
+
+        .canvas-wrapper::before {
+            content: " ";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: 
+                linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, transparent 50%),
+                repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.2) 0px, rgba(0, 0, 0, 0.2) 1px, transparent 1px, transparent 3px);
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            aspect-ratio: 16 / 10;
+            cursor: crosshair;
+        }
+
+        .controls-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: linear-gradient(145deg, rgba(11, 17, 30, 0.9) 0%, rgba(6, 9, 16, 0.95) 100%);
+            padding: 18px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            max-height: 720px;
+            overflow-y: auto;
+        }
+
+        .panel-heading {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border-bottom: 1px solid rgba(0, 243, 255, 0.25);
+            padding-bottom: 5px;
+            margin-top: 4px;
+            margin-bottom: 0;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .control-group label {
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: #cbd5e1;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .control-group label span {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--neon-green);
+        }
+
+        select, input[type="range"] {
+            min-height: 42px;
+        }
+
+        select {
+            background: #060c18;
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            color: #e2e8f0;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 600;
+            font-size: 0.98rem;
+            padding: 7px 12px;
+            border-radius: 8px;
+            outline: none;
+            cursor: pointer;
+            transition: border 0.2s;
+        }
+
+        select:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.4);
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            background: #0c1527;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            height: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 6px 0;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #00f3ff 30%, #0088aa 100%);
+            border: 2px solid #fff;
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.8);
+            cursor: pointer;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #00f3ff 30%, #0088aa 100%);
+            border: 2px solid #fff;
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.8);
+            cursor: pointer;
+        }
+
+        .bias-preset-cluster {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .bias-btn {
+            background: rgba(16, 24, 43, 0.7);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            color: #cbd5e1;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .bias-btn:hover {
+            border-color: var(--neon-cyan);
+            color: #ffffff;
+        }
+
+        .bias-btn.active {
+            background: rgba(0, 243, 255, 0.2);
+            border-color: var(--neon-cyan);
+            color: #ffffff;
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.4);
+        }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 6px;
+        }
+
+        .sim-btn {
+            background: linear-gradient(180deg, rgba(16, 28, 54, 0.9) 0%, rgba(8, 14, 28, 0.95) 100%);
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            color: var(--neon-cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 9px;
+            min-height: 44px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .sim-btn:hover {
+            border-color: var(--neon-cyan);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .sim-btn.secondary {
+            border-color: rgba(188, 19, 254, 0.5);
+            color: #e580ff;
+        }
+
+        .sim-btn.secondary:hover {
+            border-color: var(--neon-magenta);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
+        }
+
+        /* 3. POLICY-COMPLIANT AD CONTAINER */
+        .ad-slot-wrapper {
+            margin: 30px auto;
+            text-align: center;
+            clear: both;
+        }
+
+        .ad-disclaimer {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            margin-bottom: 6px;
+        }
+
+        .ad-box-placeholder {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            min-height: 90px;
+            max-width: 970px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #475569;
+            font-size: 0.85rem;
+            border-radius: 8px;
+        }
+
+        /* 4. EDUCATIONAL CONTENT SECTION */
+        .educational-content {
+            line-height: 1.75;
+            font-size: 1.05rem;
+            color: #94a3b8;
+            background: rgba(10, 14, 23, 0.85);
+            padding: 30px;
+            border-radius: 16px;
+            border-left: 4px solid var(--neon-cyan);
+            border-top: 1px solid rgba(0, 243, 255, 0.2);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin-bottom: 35px;
+        }
+
+        .educational-content h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-magenta);
+            border-bottom: 1px solid rgba(188, 19, 254, 0.3);
+            padding-bottom: 8px;
+            margin-top: 1.8em;
+            margin-bottom: 0.6em;
+            font-size: 1.45rem;
+        }
+
+        .educational-content h2:first-of-type {
+            margin-top: 0;
+        }
+
+        .educational-content h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: #38bdf8;
+            margin-top: 1.4em;
+            margin-bottom: 0.4em;
+            font-size: 1.15rem;
+        }
+
+        .educational-content p {
+            margin-bottom: 1em;
+            color: #cbd5e1;
+        }
+
+        .educational-content ul, .educational-content ol {
+            margin-bottom: 1.25rem;
+            padding-left: 1.6rem;
+        }
+
+        .educational-content li {
+            margin-bottom: 0.5rem;
+            color: #cbd5e1;
+        }
+
+        .formula-box {
+            background: rgba(4, 9, 20, 0.7);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-left: 3px solid var(--neon-green);
+            padding: 14px 18px;
+            margin: 14px 0;
+            border-radius: 6px;
+            font-family: 'Share Tech Mono', monospace;
+            color: #a7f3d0;
+            font-size: 1.02rem;
+            overflow-x: auto;
+        }
+
+        .task-card {
+            background: rgba(15, 23, 42, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 18px;
+        }
+
+        .task-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            color: var(--neon-cyan);
+            margin-bottom: 8px;
+        }
+
+        details {
+            margin-top: 25px;
+            background: rgba(5, 10, 20, 0.8);
+            border: 1px solid rgba(188, 19, 254, 0.4);
+            border-radius: 10px;
+            padding: 15px 20px;
+        }
+
+        summary {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            color: #e580ff;
+            cursor: pointer;
+            padding: 6px 0;
+            user-select: none;
+            outline: none;
+        }
+
+        .solution-step {
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+            padding: 14px 0;
+            font-size: 0.98rem;
+            line-height: 1.7;
+        }
+
+        .solution-step:last-child {
+            border-bottom: none;
+        }
+
+        .solution-step strong {
+            color: var(--neon-green);
+        }
+
+        /* 5. FOOTER & ACCURATE ALIGNED LINKS */
+        footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px 20px 20px 20px;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .footer-nav {
+            display: flex;
+            justify-content: center;
+            gap: 22px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .footer-nav a, .footer-modal-trigger {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.2s, text-shadow 0.2s;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .footer-nav a:hover, .footer-modal-trigger:hover {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
+        }
+
+        /* 6. SELF-CONTAINED POLICY MODALS */
+        .policy-modal {
+            position: fixed !important;
+            top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
+            width: 100vw !important; height: 100vh !important;
+            background: rgba(4, 7, 15, 0.92) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 99999 !important;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-body {
+            background: linear-gradient(145deg, #0b111e 0%, #060913 100%);
+            border: 2px solid var(--neon-cyan);
+            border-radius: 16px;
+            max-width: 820px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 35px 30px;
+            color: #cbd5e1;
+            box-shadow: 0 0 40px rgba(0, 243, 255, 0.25);
+            line-height: 1.75;
+            position: relative;
+            text-align: left;
+        }
+
+        .modal-body h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-cyan);
+            margin-top: 0;
+            font-size: 1.6rem;
+        }
+
+        .modal-body h3 {
+            color: var(--neon-magenta);
+            font-family: 'Orbitron', sans-serif;
+            margin-top: 24px;
+            margin-bottom: 8px;
+            font-size: 1.15rem;
+        }
+
+        .modal-date {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--neon-green);
+            font-size: 0.9rem;
+            margin-top: -6px;
+            margin-bottom: 16px;
+        }
+
+        .modal-close-btn {
+            background: linear-gradient(180deg, rgba(188, 19, 254, 0.4), rgba(188, 19, 254, 0.15));
+            border: 1px solid var(--neon-magenta);
+            color: #fff;
+            padding: 8px 18px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            float: right;
+            margin-bottom: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close-btn:hover {
+            background: var(--neon-magenta);
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.8);
+        }
+
+        @media (max-width: 1024px) {
+            .sim-layout { grid-template-columns: 1fr; }
+            .controls-panel { max-height: none; }
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            #simulator-container, .educational-content { padding: 14px; }
+            .hud-tabs-bar { flex-direction: column; align-items: stretch; }
+            .hud-telemetry { flex-direction: column; align-items: flex-start; }
+            .btn-grid { grid-template-columns: 1fr; }
+            .modal-body { padding: 22px 18px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. HEADER & TOP NAVIGATION -->
+    <header>
+        <nav class="top-nav">
+            <a href="../index.html" class="back-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Back to LuyaliSims
+            </a>
+            <span style="font-family: 'Share Tech Mono', monospace; font-size: 0.85rem; color: #64748b;">
+                MODULE ID: EBT-05Q
+            </span>
+        </nav>
+        
+        <h1>Energy Band Theory &amp; <span>Carrier Transport</span></h1>
+        
+        <!-- Contextual Summary: Substantial text above the fold -->
+        <p class="lead-summary">
+            Investigate how forbidden energy gaps (Eg), thermal lattice perturbations, and donor/acceptor impurity dopants govern macroscopic electronic conduction. Observe real-time valence-to-conduction band excitation, intra-valence hole propagation, minority carrier populations under mass action equilibrium, and active P-N junction potential barrier modulation.
+        </p>
+    </header>
+
+    <main>
+        <!-- 2. SIMULATOR APP WORKSPACE -->
+        <section id="simulator-container" aria-label="Energy Band Theory Simulator Workspace">
+            
+            <!-- Top Module Tabs Bar -->
+            <div class="hud-tabs-bar">
+                <div class="mod-tabs-group">
+                    <button type="button" class="mod-tab-btn active" id="tabMod1" onclick="setPedagogicalMode('BANDS')">1. Band Structure</button>
+                    <button type="button" class="mod-tab-btn" id="tabMod2" onclick="setPedagogicalMode('DOPING')">2. Extrinsic Doping</button>
+                    <button type="button" class="mod-tab-btn" id="tabMod3" onclick="setPedagogicalMode('THERMAL')">3. Thermal Breakdown</button>
+                    <button type="button" class="mod-tab-btn" id="tabMod4" onclick="setPedagogicalMode('DIODE')">4. Diode Biasing (P-N)</button>
+                </div>
+                <div class="sim-action-group">
+                    <button type="button" class="hud-action-btn" id="slowMoBtn" onclick="toggleSlowMo()"><span id="slowMoIcon">⚡</span> <span id="slowMoText">1.0x Speed</span></button>
+                    <button type="button" class="hud-action-btn" id="pauseBtn" onclick="togglePause()"><span id="pauseText">⏸ Pause</span></button>
+                    <button type="button" class="hud-action-btn" onclick="resetSimulator()">↺ Reset</button>
+                    <button type="button" class="hud-action-btn" id="fullscreenBtn">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                        </svg> Fullscreen
+                    </button>
+                </div>
+            </div>
+
+            <!-- Telemetry Status Bar -->
+            <div class="hud-telemetry">
+                <div class="telemetry-item">
+                    <span class="tele-label">Transport Regime:</span>
+                    <span id="stateDisp" class="tele-val">Thermal Equilibrium</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">CB Electrons (n):</span>
+                    <span id="cbCountDisp" class="tele-val">0</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">VB Mobile Holes (p):</span>
+                    <span id="vbCountDisp" class="tele-val amber">0</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Circuit Current:</span>
+                    <span id="ammeterDisp" class="tele-val green">0.00 mA</span>
+                </div>
+            </div>
+
+            <div class="sim-layout">
+                <!-- Dual Mode Canvas Display -->
+                <div class="canvas-wrapper" id="canvasFrame">
+                    <canvas id="simCanvas" width="1120" height="700"></canvas>
+                </div>
+
+                <!-- 3D Controls Console -->
+                <div class="controls-panel">
+                    <h3 class="panel-heading">Specimen Parameters</h3>
+
+                    <div class="control-group">
+                        <label for="materialSelect">Substrate Specimen:</label>
+                        <select id="materialSelect" onchange="selectMaterial(this.value)">
+                            <option value="Si" selected>Silicon (Semiconductor) [Eg: 1.12 eV]</option>
+                            <option value="Cu">Copper (Conductor) [Eg: Overlap 0.0 eV]</option>
+                            <option value="SiO2">Silicon Dioxide (Insulator) [Eg: 9.0 eV]</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="tempSlider">Lattice Temperature: <span id="tempDisp">300 K</span></label>
+                        <input type="range" id="tempSlider" min="0" max="2200" step="10" value="300" oninput="onTempChange(this.value)">
+                    </div>
+
+                    <!-- Diode Biasing Preset Cluster (Displayed in Mode 4) -->
+                    <div id="diodeControlSection" style="display: none;">
+                        <h3 class="panel-heading">P-N Junction Presets</h3>
+                        <div class="bias-preset-cluster">
+                            <button type="button" class="bias-btn active" id="btnBiasFwd" onclick="setBiasPreset('FWD')">
+                                <span>Forward Bias</span><span style="color: var(--neon-green)">+0.80 V</span>
+                            </button>
+                            <button type="button" class="bias-btn" id="btnBiasRev" onclick="setBiasPreset('REV')">
+                                <span>Reverse Bias</span><span style="color: var(--neon-amber)">-4.00 V</span>
+                            </button>
+                            <button type="button" class="bias-btn" id="btnBiasBkd" onclick="setBiasPreset('BKD')">
+                                <span>Avalanche Breakdown</span><span style="color: var(--neon-red)">-12.0 V</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Chemical Doping Controls -->
+                    <h3 class="panel-heading" id="dopingHeaderTitle">Extrinsic Doping</h3>
+                    <div class="control-group" id="dopingTypePod">
+                        <label for="dopingSelect">Dopant Impurity:</label>
+                        <select id="dopingSelect" onchange="onDopingChange(this.value)">
+                            <option value="intrinsic" selected>Intrinsic (Pure Undoped)</option>
+                            <option value="pentavalent">Pentavalent (As/P) &rarr; N-Type</option>
+                            <option value="trivalent">Trivalent (B/Al) &rarr; P-Type</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group" id="dopConcPod">
+                        <label for="dopConcSlider">Doping Density: <span id="dopConcDisp">Moderate</span></label>
+                        <input type="range" id="dopConcSlider" min="1" max="3" step="1" value="2" oninput="onDopConcChange(this.value)">
+                    </div>
+
+                    <!-- External Electrical Bias -->
+                    <h3 class="panel-heading">Electrical Biasing</h3>
+                    <div class="control-group">
+                        <label for="biasSlider">External Voltage: <span id="biasDisp">0.00 V</span></label>
+                        <input type="range" id="biasSlider" min="-15" max="3" step="0.05" value="0" oninput="onBiasChange(this.value)">
+                    </div>
+
+                    <div class="btn-grid">
+                        <button type="button" class="sim-btn" onclick="resetSimulator()">Default Setup</button>
+                        <button type="button" class="sim-btn secondary" onclick="togglePause()"><span id="btnSecondaryPauseText">Pause Run</span></button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. POLICY-COMPLIANT AD CONTAINER -->
+        <div class="ad-slot-wrapper">
+            <div class="ad-disclaimer">Advertisement</div>
+            <div class="ad-box-placeholder">
+                <span>[AdSense Responsive Display Unit - Module Slot ID: EBT-05Q-Leaderboard]</span>
+            </div>
+        </div>
+
+        <!-- 4. EDUCATIONAL REFERENCE ARTICLE -->
+        <article class="educational-content">
+            <section>
+                <h2>How to Operate the Simulator</h2>
+                <p>
+                    This virtual solid-state laboratory allows you to explore quantum carrier statistics, atomic bond hopping, and solid-state device mechanics in real time. Use the following steps to maximize your insights:
+                </p>
+                <ol>
+                    <li><strong>Pedagogical Mode Tabs:</strong> Switch between <em>1. Band Structure</em> (ideal energy gap visualization), <em>2. Extrinsic Doping</em> (donor/acceptor states), <em>3. Thermal Breakdown</em> (structural lattice destruction), and <em>4. Diode Biasing</em> (unipolar p-n junction with potential barrier profiles).</li>
+                    <li><strong>Lattice Temperature Slider:</strong> Adjust temperature from absolute zero (0 K) to past melting points (2200 K). Observe how thermal energy excites valence electrons upward across the forbidden gap (Eg) into the conduction band (Ec), leaving behind vacant orbitals (holes).</li>
+                    <li><strong>Chemical Doping Selector:</strong> In Silicon, switch between intrinsic, pentavalent (N-type, introducing donor energy level Ed near Ec), and trivalent (P-type, introducing acceptor energy level Ea near Ev). Note that doping does not eliminate minority carriers; thermal generation maintains minority populations.</li>
+                    <li><strong>Electrical Biasing Slider &amp; Presets:</strong> Apply external potential. In P-N junction mode, observe how forward bias (&gt; 0.70 V) flattens the internal potential barrier q(Vbi &minus; V) allowing active diffusion, while reverse bias widens the depletion zone until impact ionization sparks avalanche breakdown.</li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>Scientific Theory &amp; Working Principles</h2>
+                <p>
+                    Isolated atoms possess discrete electronic energy levels. When millions of atoms condense into a crystalline solid, the Pauli exclusion principle forces overlapping valence orbitals to split into continuous bands of allowed energy states separated by a <strong>forbidden energy gap</strong> (band gap, Eg).
+                </p>
+                <h3>1. Conductors, Semiconductors, and Insulators</h3>
+                <p>
+                    In metallic conductors such as Copper (Cu), the highest occupied energy band is partially filled or directly overlaps the empty conduction band (Eg = 0 eV). Electrons wander through the lattice at room temperature under infinitesimal electric fields. In electrical insulators such as Silicon Dioxide (SiO2), the band gap is immense (Eg &approx; 9.0 eV); thermal energy at room temperature is completely insufficient to promote valence electrons into the conduction band. In semiconductors like Silicon (Eg &approx; 1.12 eV at 300 K), moderate thermal agitation elevates valence electrons into conduction states.
+                </p>
+                <h3>2. Physical Mechanism of Hole Transport</h3>
+                <p>
+                    A <strong>hole</strong> is not an independent physical particle; it is a vacant quantum state left in a covalent bond. When an electron is promoted to the conduction band, the remaining vacancy has an effective positive charge +q. Transport occurs when a neighboring valence electron hops laterally into the vacancy. As valence electrons hop to the left, the vacant hole appears to migrate to the right. Both conduction band free electrons and valence band mobile holes contribute additively to net electrical conductivity.
+                </p>
+                <h3>3. Extrinsic Doping &amp; The Law of Mass Action</h3>
+                <p>
+                    Pure silicon has an intrinsic carrier density ni where electron concentration n equals hole concentration p (n = p = ni). When a pentavalent atom (e.g., Arsenic, As) with 5 valence electrons substitutes a silicon atom, four electrons form covalent bonds, while the fifth is loosely bound at a donor level Ed situated only &approx; 0.045 eV below Ec. Thermal energy ionizes this donor atom, producing n &approx; Nd. Even though electrons are the overwhelming majority carrier, minority holes are continuously created and destroyed via thermal generation-recombination across the full band gap.
+                </p>
+            </section>
+
+            <section>
+                <h2>Mathematical Foundations &amp; Formulas</h2>
+                <p>
+                    The quantitative behavior of carrier concentration, thermal excitation, and junction mechanics is governed by standard solid-state equations:
+                </p>
+                <div class="formula-box">
+                    Formula 1 (Law of Mass Action): n &times; p = ni(T)&sup2;<br>
+                    Formula 2 (Intrinsic Carrier Concentration): ni(T) = B &times; T^(3/2) &times; exp(-Eg / (2 &times; kB &times; T))<br>
+                    Formula 3 (Total Drift Current Density): J = q &times; (n &times; &mu;n + p &times; &mu;p) &times; E<br>
+                    Formula 4 (Ideal Diode Equation): I = Is &times; [exp(q &times; V / (&eta; &times; kB &times; T)) &minus; 1]<br>
+                    Formula 5 (Built-In Potential): Vbi = (kB &times; T / q) &times; ln((Na &times; Nd) / ni&sup2;)
+                </div>
+                <p>
+                    Where q = 1.602 &times; 10^-19 C is elementary charge, kB = 8.617 &times; 10^-5 eV/K is Boltzmann's constant, T is absolute temperature in Kelvin, &mu;n and &mu;p are electron and hole mobilities, and &eta; is the junction ideality factor.
+                </p>
+            </section>
+
+            <section>
+                <h2>Real-World Engineering &amp; Industrial Applications</h2>
+                <p>
+                    Energy band gap engineering forms the bedrock of modern electronics, power conversion, and optoelectronics:
+                </p>
+                <ul>
+                    <li><strong>Photovoltaic Solar Cells:</strong> Silicon p-n junctions absorb incident solar photons with energies h&nu; &ge; 1.12 eV, creating electron-hole pairs. The built-in electric field sweeps electrons into the n-region and holes into the p-region, generating DC electricity.</li>
+                    <li><strong>Wide-Bandgap (WBG) Power Semiconductors:</strong> Gallium Nitride (GaN, Eg = 3.4 eV) and Silicon Carbide (SiC, Eg = 3.26 eV) support critical breakdown electric fields ten times higher than Silicon. They enable electric vehicles and aerospace power inverters to operate at voltages exceeding 1200 V with 99% conversion efficiency and reduced heatsink footprints.</li>
+                    <li><strong>Light Emitting Diodes (LEDs) and Laser Diodes:</strong> In direct bandgap semiconductors such as Indium Gallium Nitride (InGaN), electrons recombine with holes directly across Eg, releasing energy as visible photons (h&nu; = Eg) rather than heat, driving energy-efficient illumination and fiber optic communications.</li>
+                    <li><strong>Cryogenic CMOS &amp; Quantum Computing:</strong> At liquid helium temperatures (4 K), carrier freeze-out occurs where thermal energy kB&times;T is insufficient to ionize donor/acceptor states, dictating the design of cryogenic readout amplifiers for superconducting qubits.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Practice Problems &amp; Diagnostic Tasks</h2>
+                <p>Test your quantitative understanding using the five diagnostic exercises below:</p>
+
+                <div class="task-card">
+                    <div class="task-title">Task 1: Minority Carrier Density Calculation</div>
+                    <p>
+                        A silicon specimen at room temperature (T = 300 K, where ni = 1.5 &times; 10^10 cm^-3) is uniformly doped with Arsenic (pentavalent) at a donor density Nd = 3.0 &times; 10^16 cm^-3. Assuming complete donor ionization and non-degeneracy, calculate the equilibrium minority carrier hole concentration (p).
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 2: Thermal Voltage &amp; Diode Forward Current Ratio</div>
+                    <p>
+                        At T = 300 K, the thermal voltage Vt = (kB &times; T / q) is 0.0259 V. An ideal p-n junction diode (&eta; = 1.0) carries a forward bias current of 2.0 mA at a forward voltage of 0.650 V. Calculate the new forward current if the external bias is increased to 0.702 V while maintaining temperature constant.
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 3: Built-In Junction Potential Calculation</div>
+                    <p>
+                        A silicon step junction at T = 300 K (Vt = 0.0259 V, ni = 1.5 &times; 10^10 cm^-3) has an acceptor doping density Na = 2.0 &times; 10^17 cm^-3 on the p-side and a donor doping density Nd = 5.0 &times; 10^15 cm^-3 on the n-side. Calculate the built-in potential barrier (Vbi) of this junction.
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 4: Reverse Saturation Current Extraction</div>
+                    <p>
+                        A high-voltage power rectifier operating at room temperature displays a measured forward current I = 14.5 A when subjected to an external bias of 0.820 V. Assuming ideality factor &eta; = 1.05 and thermal voltage Vt = 0.0259 V, calculate the reverse saturation current (Is) of the rectifier.
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 5: Intrinsic Carrier Sensitivity to Temperature</div>
+                    <p>
+                        Silicon has an energy band gap Eg = 1.12 eV. Neglecting the minor T^(3/2) pre-exponential temperature dependence, evaluate the ratio by which the exponential generation term exp(-Eg / (2 &times; kB &times; T)) increases when lattice temperature rises from 300 K to 400 K.
+                    </p>
+                </div>
+
+                <!-- Collapsible Solutions -->
+                <details>
+                    <summary>Click to Reveal Solutions and Step-by-Step Proofs</summary>
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 1:</strong></p>
+                        <p>1. Under complete ionization, electron density in an n-type semiconductor is dominated by donors: n &approx; Nd = 3.0 &times; 10^16 cm^-3.</p>
+                        <p>2. Applying the Law of Mass Action in thermal equilibrium: n &times; p = ni&sup2;.</p>
+                        <p>3. p = ni&sup2; / n = (1.5 &times; 10^10)&sup2; / (3.0 &times; 10^16) = (2.25 &times; 10^20) / (3.0 &times; 10^16) = 7500 cm^-3.</p>
+                        <p>Final Answer: <strong>p = 7.50 &times; 10^3 cm^-3</strong> (or 7500 holes/cm&sup3;).</p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 2:</strong></p>
+                        <p>1. For forward bias where V &gt;&gt; Vt, the diode equation simplifies to I &approx; Is &times; exp(V / Vt).</p>
+                        <p>2. The current ratio between two bias points V1 and V2 is: I2 / I1 = exp((V2 &minus; V1) / Vt).</p>
+                        <p>3. &Delta;V = 0.702 V &minus; 0.650 V = 0.0518 V.</p>
+                        <p>4. &Delta;V / Vt = 0.0518 / 0.0259 = 2.00.</p>
+                        <p>5. I2 = I1 &times; exp(2.00) = 2.0 mA &times; 7.389 = 14.78 mA.</p>
+                        <p>Final Answer: <strong>I2 = 14.78 mA</strong>.</p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 3:</strong></p>
+                        <p>1. Built-in potential formula: Vbi = Vt &times; ln((Na &times; Nd) / ni&sup2;).</p>
+                        <p>2. Numerator: Na &times; Nd = (2.0 &times; 10^17) &times; (5.0 &times; 10^15) = 1.0 &times; 10^33 cm^-6.</p>
+                        <p>3. Denominator: ni&sup2; = (1.5 &times; 10^10)&sup2; = 2.25 &times; 10^20 cm^-6.</p>
+                        <p>4. Ratio: (1.0 &times; 10^33) / (2.25 &times; 10^20) = 4.444 &times; 10^12.</p>
+                        <p>5. Natural logarithm: ln(4.444 &times; 10^12) = 29.122.</p>
+                        <p>6. Vbi = 0.0259 V &times; 29.122 = 0.754 V.</p>
+                        <p>Final Answer: <strong>Vbi = 0.754 V</strong>.</p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 4:</strong></p>
+                        <p>1. Diode equation under strong forward bias: I = Is &times; exp(V / (&eta; &times; Vt)).</p>
+                        <p>2. Effective thermal term: &eta; &times; Vt = 1.05 &times; 0.0259 V = 0.027195 V.</p>
+                        <p>3. Exponent argument: V / (&eta; &times; Vt) = 0.820 / 0.027195 = 30.1526.</p>
+                        <p>4. exp(30.1526) = 1.2447 &times; 10^13.</p>
+                        <p>5. Is = I / exp(30.1526) = 14.5 A / (1.2447 &times; 10^13) = 1.165 &times; 10^-12 A.</p>
+                        <p>Final Answer: <strong>Is = 1.165 pA (1.165 &times; 10^-12 A)</strong>.</p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 5:</strong></p>
+                        <p>1. At T1 = 300 K: 2 &times; kB &times; T1 = 2 &times; (8.617 &times; 10^-5) &times; 300 = 0.05170 eV. Argument = -1.12 / 0.05170 = -21.663. exp(-21.663) = 3.90 &times; 10^-10.</p>
+                        <p>2. At T2 = 400 K: 2 &times; kB &times; T2 = 2 &times; (8.617 &times; 10^-5) &times; 400 = 0.06894 eV. Argument = -1.12 / 0.06894 = -16.246. exp(-16.246) = 8.799 &times; 10^-8.</p>
+                        <p>3. Multiplication ratio: (8.799 &times; 10^-8) / (3.90 &times; 10^-10) &approx; 225.6.</p>
+                        <p>Final Answer: <strong>Thermal generation factor increases by approximately 226 times</strong>.</p>
+                    </div>
+                </details>
+            </section>
+        </article>
+    </main>
+
+    <!-- 5. SYNCHRONIZED COMPLIANCE FOOTER -->
+    <footer>
+        <nav class="footer-nav">
+            <a href="../index.html">Home</a>
+            <a href="../index.html#about-section">About Us</a>
+            <button type="button" class="footer-modal-trigger" onclick="openSimModal('simPrivacyModal')">Privacy Policy</button>
+            <button type="button" class="footer-modal-trigger" onclick="openSimModal('simTermsModal')">Terms of Service</button>
+            <a href="../index.html#contact-section">Contact Us</a>
+            <a href="https://forms.gle/fYxxaNKAh21dPUoBA" target="_blank" rel="noopener noreferrer">Simulator Suggestions</a>
+        </nav>
+        <p>&copy; 2026 LuyaliSims | Engineered by Click &amp; Draft | Dedicated to Open STEM Education</p>
+    </footer>
+
+    <!-- 6. IDENTICAL PRIVACY POLICY MODAL -->
+    <div id="simPrivacyModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="privacyTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeSimModal('simPrivacyModal')">Close [&times;]</button>
+            <h2 id="privacyTitle">Privacy Policy</h2>
+            <p class="modal-date">Last Updated: September 2026</p>
+            <p>Welcome to LuyaliSims. We respect your privacy and are committed to protecting your personal data. This privacy policy explains how we treat information when you interact with our educational simulators.</p>
+            
+            <h3>1. Educational Purpose &amp; Information Collection</h3>
+            <p>LuyaliSims is a free educational portal. We do not require account registration, passwords, or personal login information to run any simulation. All simulation calculations occur locally within your browser using client-side JavaScript.</p>
+
+            <h3>2. Google AdSense &amp; Third-Party Cookies</h3>
+            <p>We may display advertisements served by Google AdSense to fund our free educational tools. Google, as a third-party vendor, uses cookies to serve ads on our site based on users' visits to this and other sites on the Internet.</p>
+            <ul>
+                <li>Google's use of advertising cookies enables it and its partners to serve ads based on your visit to LuyaliSims and other sites.</li>
+                <li>Users may opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" style="color: var(--neon-cyan);">Google Ads Settings</a>.</li>
+            </ul>
+
+            <h3>3. Log Files &amp; Analytics</h3>
+            <p>Like standard websites, our hosting servers collect anonymous log records (including IP addresses, browser types, and timestamp references) to monitor server uptime, fix script errors, and optimize simulator performance.</p>
+
+            <h3>4. Children's Online Privacy (COPPA Compliance)</h3>
+            <p>Our educational simulators are built for students and educators of all ages. We do not knowingly solicit or collect personally identifiable information from children under 13.</p>
+
+            <h3>5. Contact Regarding Privacy</h3>
+            <p>If you have any questions regarding this policy, contact us at: <a href="mailto:luyashliz@gmail.com" style="color: var(--neon-cyan);">luyashliz@gmail.com</a>.</p>
+        </div>
+    </div>
+
+    <!-- 7. IDENTICAL TERMS OF SERVICE MODAL -->
+    <div id="simTermsModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="termsTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeSimModal('simTermsModal')">Close [&times;]</button>
+            <h2 id="termsTitle">Terms of Service</h2>
+            <p class="modal-date">Effective Date: September 2026</p>
+
+            <h3>1. Permitted Educational Use</h3>
+            <p>All interactive models, simulations, practice problems, and laboratory worksheets on LuyaliSims are made freely available for classroom demonstrations, academic study, tutoring, and self-paced individual learning.</p>
+
+            <h3>2. Intellectual Property</h3>
+            <p>The code architecture, layout designs, and custom interactive engines are the intellectual property of Ian Luyali and Click &amp; Draft. You may use our simulators online in academic settings, but mirroring or re-hosting our code for commercial resale without permission is prohibited.</p>
+
+            <h3>3. Disclaimer of Scientific Warranty</h3>
+            <p>While simulations are engineered to accurately replicate classical mechanics, thermodynamics, and electronics, they are provided as conceptual learning aids. LuyaliSims is not liable for outcomes in real-world high-voltage or hazardous laboratory environments constructed without professional teacher supervision.</p>
+
+            <h3>4. Updates to Terms</h3>
+            <p>We reserve the right to refine these terms as new laboratory modules and features are introduced.</p>
+        </div>
+    </div>
+
+    <!-- 8. SIMULATOR CORE SCRIPT & MODAL LOGIC -->
+    <script>
+        /* GLOBAL SIMULATOR STATE */
+        const State = {
+            material: 'Si',
+            pedagogicalMode: 'BANDS',
+            temperature: 300,
+            biasVoltage: 0.0,
+            dopingType: 'intrinsic',
+            dopingLevel: 2,
+            isPaused: false,
+            speedFactor: 1.0,
+
+            cbElectrons: 0,
+            vbHolesCount: 0,
+            ammeterCurrent: 0.0,
+            statusMessage: 'Thermal Equilibrium',
+            isLatticeDestroyed: false,
+
+            // Energy Band Dynamics
+            cbParticles: [],
+            vbSlots: [],             // Discrete valence bonding states
+            activeExcitations: [],   // Upward electrons (VB/Donor -> CB)
+            recombFlashes: [],       // Photon burst when CB electron recombines
+            intraVbHops: [],         // Lateral valence-electron hopping animations
+
+            // 2D Microscopic Lattice
+            latticeGrid: [],
+            latticeRows: 4,
+            latticeCols: 6,
+
+            // P-N Diode Active Mobile Carriers
+            diodeHoles: [],          
+            diodeElectrons: [],      
+            avalancheSparks: [],     
+
+            lastTime: performance.now(),
+            simTime: 0
+        };
+
+        const CANVAS_WIDTH = 1120;
+        const CANVAS_HEIGHT = 700;
+        const TOTAL_VB_STATES = 26;
+        const V_BI = 0.70;
+        const V_BREAKDOWN = -10.0;
+        const KB_EV = 8.617333e-5;
+
+        let canvas, ctx;
+
+        const MATERIALS = {
+            'Si': { name: 'Silicon', eg: 1.12, isConductor: false, isInsulator: false, breakTemp: 1680 },
+            'Cu': { name: 'Copper', eg: 0.0, isConductor: true, isInsulator: false, breakTemp: 1350 },
+            'SiO2': { name: 'SiO2', eg: 9.0, isConductor: false, isInsulator: true, breakTemp: 1850 }
+        };
+
+        function drawRoundRect(c, x, y, w, h, r) {
+            if (typeof c.roundRect === 'function') {
+                c.beginPath(); c.roundRect(x, y, w, h, r);
+            } else {
+                c.beginPath(); c.moveTo(x + r, y); c.lineTo(x + w - r, y); c.quadraticCurveTo(x + w, y, x + w, y + r);
+                c.lineTo(x + w, y + h - r); c.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+                c.lineTo(x + r, y + h); c.quadraticCurveTo(x, y + h, x, y + h - r);
+                c.lineTo(x, y + r); c.quadraticCurveTo(x, y, x + r, y); c.closePath();
+            }
+        }
+
+        /* INITIALIZATION */
+        window.addEventListener('DOMContentLoaded', () => {
+            canvas = document.getElementById('simCanvas');
+            ctx = canvas.getContext('2d');
+
+            initValenceBandStates();
+            initLatticeGrid();
+            initDiodeMobileCarriers();
+            reconcileCarriersWithPhysics();
+
+            setupModalsAndControls();
+            requestAnimationFrame(simLoop);
+        });
+
+        function setupModalsAndControls() {
+            // Fullscreen Implementation
+            const simContainer = document.getElementById('simulator-container');
+            const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+            fullscreenBtn.addEventListener('click', () => {
+                if (!document.fullscreenElement) {
+                    if (simContainer.requestFullscreen) simContainer.requestFullscreen();
+                    else if (simContainer.webkitRequestFullscreen) simContainer.webkitRequestFullscreen();
+                    fullscreenBtn.innerHTML = 'Exit Screen';
+                } else {
+                    if (document.exitFullscreen) document.exitFullscreen();
+                    fullscreenBtn.innerHTML = `
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                        </svg> Fullscreen`;
+                }
+            });
+
+            document.addEventListener('fullscreenchange', () => {
+                if (!document.fullscreenElement) {
+                    fullscreenBtn.innerHTML = `
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                        </svg> Fullscreen`;
+                }
+            });
+
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' || e.key === 'Esc') {
+                    closeSimModal('simPrivacyModal');
+                    closeSimModal('simTermsModal');
+                }
+            });
+
+            document.querySelectorAll('.policy-modal').forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) modal.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                });
+            });
+        }
+
+        function openSimModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeSimModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        function initValenceBandStates() {
+            State.vbSlots = [];
+            State.activeExcitations = [];
+            State.recombFlashes = [];
+            State.intraVbHops = [];
+            for (let i = 0; i < TOTAL_VB_STATES; i++) {
+                State.vbSlots.push({
+                    id: i,
+                    x: (i + 0.5) / TOTAL_VB_STATES,
+                    isOccupied: true
+                });
+            }
+        }
+
+        function initDiodeMobileCarriers() {
+            State.diodeHoles = [];
+            State.diodeElectrons = [];
+            State.avalancheSparks = [];
+
+            for (let i = 0; i < 36; i++) {
+                State.diodeHoles.push({
+                    x: 0.05 + Math.random() * 0.38,
+                    y: 0.15 + Math.random() * 0.7,
+                    vx: (Math.random() - 0.5) * 0.2,
+                    vy: (Math.random() - 0.5) * 0.2
+                });
+            }
+            for (let i = 0; i < 36; i++) {
+                State.diodeElectrons.push({
+                    x: 0.57 + Math.random() * 0.38,
+                    y: 0.15 + Math.random() * 0.7,
+                    vx: (Math.random() - 0.5) * 0.2,
+                    vy: (Math.random() - 0.5) * 0.2
+                });
+            }
+        }
+
+        function initLatticeGrid() {
+            State.latticeGrid = [];
+            for (let r = 0; r < State.latticeRows; r++) {
+                for (let c = 0; c < State.latticeCols; c++) {
+                    let atomType = State.material === 'Cu' ? 'Cu' : 'Si';
+                    if (State.material === 'Si' && State.dopingType !== 'intrinsic') {
+                        let targetType = State.dopingType === 'pentavalent' ? 'As' : 'Al';
+                        if (State.dopingLevel >= 1 && r === 1 && c === 2) atomType = targetType;
+                        if (State.dopingLevel >= 2 && r === 2 && c === 4) atomType = targetType;
+                        if (State.dopingLevel === 3 && r === 2 && c === 1) atomType = targetType;
+                    }
+                    State.latticeGrid.push({
+                        r, c, type: atomType,
+                        baseX: (c + 0.5) / State.latticeCols,
+                        baseY: (r + 0.5) / State.latticeRows,
+                        jitterX: 0, jitterY: 0, shatteredOffset: {x:0, y:0}
+                    });
+                }
+            }
+        }
+
+        /* CARRIER POPULATION DYNAMICS & MASS ACTION LAW */
+        function reconcileCarriersWithPhysics() {
+            const mat = MATERIALS[State.material];
+
+            if (State.isLatticeDestroyed) {
+                State.cbParticles = [];
+                State.vbSlots.forEach(s => s.isOccupied = false);
+                State.activeExcitations = [];
+                return;
+            }
+
+            if (mat.isConductor) {
+                while (State.cbParticles.length < 52) {
+                    State.cbParticles.push({ x: Math.random(), y: Math.random(), vx: (Math.random()-0.5)*0.4, vy: (Math.random()-0.5)*0.2 });
+                }
+                State.vbSlots.forEach(s => s.isOccupied = true);
+                return;
+            }
+
+            if (mat.isInsulator) {
+                State.cbParticles = [];
+                State.activeExcitations = [];
+                State.vbSlots.forEach(s => s.isOccupied = true);
+                return;
+            }
+
+            // SEMICONDUCTOR (SILICON)
+            const T = State.temperature;
+            const ni = Math.round(Math.min(10, Math.max(0, (T - 250) / 100)));
+
+            if (State.dopingType === 'pentavalent') {
+                // N-TYPE: Electrons dominate (Majority), minority holes remain via mass action
+                const donorElectrons = State.dopingLevel * 7;
+                const totalCB = donorElectrons + ni;
+                const minorityHoles = Math.max(1, Math.round(ni * 0.4));
+
+                while (State.cbParticles.length < totalCB) {
+                    State.cbParticles.push({ x: Math.random(), y: 0.15 + Math.random() * 0.7, vx: (Math.random()-0.5)*0.3, vy: (Math.random()-0.5)*0.2 });
+                }
+                while (State.cbParticles.length > totalCB) State.cbParticles.pop();
+
+                State.vbSlots.forEach((s, idx) => {
+                    s.isOccupied = (idx >= minorityHoles);
+                });
+
+            } else if (State.dopingType === 'trivalent') {
+                // P-TYPE: Holes dominate (Majority), minority electrons remain in CB
+                const acceptorHoles = State.dopingLevel * 5;
+                const totalHoles = Math.min(TOTAL_VB_STATES - 2, acceptorHoles + ni);
+                const minorityElectrons = Math.max(1, Math.round(ni * 0.4));
+
+                while (State.cbParticles.length < minorityElectrons) {
+                    State.cbParticles.push({ x: Math.random(), y: 0.15 + Math.random() * 0.7, vx: (Math.random()-0.5)*0.3, vy: (Math.random()-0.5)*0.2 });
+                }
+                while (State.cbParticles.length > minorityElectrons) State.cbParticles.pop();
+
+                State.vbSlots.forEach((s, idx) => {
+                    s.isOccupied = (idx >= totalHoles);
+                });
+
+            } else {
+                // INTRINSIC: n = p
+                const pairCount = Math.max(0, ni);
+                while (State.cbParticles.length < pairCount) {
+                    State.cbParticles.push({ x: Math.random(), y: 0.15 + Math.random() * 0.7, vx: (Math.random()-0.5)*0.3, vy: (Math.random()-0.5)*0.2 });
+                }
+                while (State.cbParticles.length > pairCount) State.cbParticles.pop();
+
+                State.vbSlots.forEach((s, idx) => {
+                    s.isOccupied = (idx >= pairCount);
+                });
+            }
+        }
+
+        /* THERMAL GENERATION (VB -> CB) & INTRA-VALENCE HOLE HOPPING */
+        function updateGenerationAndRecombination(dt) {
+            const mat = MATERIALS[State.material];
+            if (mat.isConductor || mat.isInsulator || State.isLatticeDestroyed) return;
+
+            const T = State.temperature;
+            const thermalFactor = Math.sqrt(Math.max(1, T) / 300);
+
+            // Thermal excitation rate
+            const thermProb = (T > 0) ? Math.exp(-mat.eg / (2 * KB_EV * Math.max(T, 1))) : 0;
+            const genRate = thermProb * 2.2e10 * (T / 300);
+
+            // 1. Upward Thermal Excitation: VB -> CB
+            if (Math.random() < genRate * dt) {
+                const occupied = State.vbSlots.filter(s => s.isOccupied);
+                const maxCB = State.dopingType === 'pentavalent' ? 34 : (State.dopingType === 'trivalent' ? 12 : 24);
+
+                if (occupied.length > 3 && State.cbParticles.length < maxCB) {
+                    const slot = occupied[Math.floor(Math.random() * occupied.length)];
+                    slot.isOccupied = false; // Hole created
+
+                    State.activeExcitations.push({
+                        fromX: slot.x,
+                        currX: slot.x,
+                        progress: 0.0,
+                        speed: (2.4 + Math.random() * 1.5) * thermalFactor,
+                        isDonorOrigin: false
+                    });
+                }
+            }
+
+            // Upward ionization from Donor Level Ed for Pentavalent N-Type
+            if (State.dopingType === 'pentavalent' && T > 100 && Math.random() < 3.5 * dt) {
+                if (State.cbParticles.length < (State.dopingLevel * 8 + 8)) {
+                    State.activeExcitations.push({
+                        fromX: 0.1 + Math.random() * 0.8,
+                        currX: 0.1 + Math.random() * 0.8,
+                        progress: 0.0,
+                        speed: (3.0 + Math.random() * 1.5) * thermalFactor,
+                        isDonorOrigin: true
+                    });
+                }
+            }
+
+            // Update Upward Excitations
+            for (let i = State.activeExcitations.length - 1; i >= 0; i--) {
+                const tr = State.activeExcitations[i];
+                tr.progress += tr.speed * dt;
+                tr.currX += (Math.random() - 0.5) * 0.03 * dt * thermalFactor;
+
+                if (tr.progress >= 1.0) {
+                    State.cbParticles.push({
+                        x: Math.max(0.04, Math.min(0.96, tr.currX)),
+                        y: 0.15 + Math.random() * 0.7,
+                        vx: (Math.random() - 0.5) * 0.3 * thermalFactor,
+                        vy: (Math.random() - 0.5) * 0.18 * thermalFactor
+                    });
+                    State.activeExcitations.splice(i, 1);
+                }
+            }
+
+            // 2. Intra-Valence Band Hopping (Valence electron hopping into empty hole)
+            const hopProbability = (0.8 + 0.6 * (T / 300)) * thermalFactor * dt;
+            if (Math.random() < hopProbability) {
+                for (let i = 0; i < State.vbSlots.length - 1; i++) {
+                    if (!State.vbSlots[i].isOccupied && State.vbSlots[i+1].isOccupied) {
+                        State.vbSlots[i].isOccupied = true;
+                        State.vbSlots[i+1].isOccupied = false;
+                        State.intraVbHops.push({
+                            fromX: State.vbSlots[i+1].x,
+                            toX: State.vbSlots[i].x,
+                            progress: 0.0,
+                            speed: 4.5 * thermalFactor
+                        });
+                        break;
+                    }
+                }
+            }
+
+            // Progress Intra-VB Hopping Animations
+            for (let i = State.intraVbHops.length - 1; i >= 0; i--) {
+                State.intraVbHops[i].progress += State.intraVbHops[i].speed * dt;
+                if (State.intraVbHops[i].progress >= 1.0) State.intraVbHops.splice(i, 1);
+            }
+
+            // 3. Recombination: CB electron annihilates hole, releasing photon (h*nu)
+            const vacantSlots = State.vbSlots.filter(s => !s.isOccupied);
+            if (State.cbParticles.length > 2 && vacantSlots.length > 2) {
+                const recombRate = 0.08 * State.cbParticles.length * vacantSlots.length * dt * thermalFactor;
+                if (Math.random() < recombRate) {
+                    State.cbParticles.pop();
+                    const targetSlot = vacantSlots[Math.floor(Math.random() * vacantSlots.length)];
+                    targetSlot.isOccupied = true;
+
+                    State.recombFlashes.push({
+                        x: targetSlot.x,
+                        radius: 3,
+                        maxRadius: 18,
+                        alpha: 1.0
+                    });
+                }
+            }
+
+            // Progress Recombination Photons
+            for (let i = State.recombFlashes.length - 1; i >= 0; i--) {
+                const rf = State.recombFlashes[i];
+                rf.radius += 35 * dt;
+                rf.alpha -= 2.8 * dt;
+                if (rf.alpha <= 0) State.recombFlashes.splice(i, 1);
+            }
+
+            State.cbElectrons = State.cbParticles.length;
+            State.vbHolesCount = State.vbSlots.filter(s => !s.isOccupied).length;
+        }
+
+        /* DIODE SHOCKLEY EQUATION & REGIME SOLVER */
+        function calculateDiodeState(V) {
+            let mode, current, depWidthRatio, barrierHeight;
+
+            if (V >= 0) {
+                mode = 'FORWARD';
+                const effectiveBarrier = Math.max(0.02, V_BI - V);
+                depWidthRatio = Math.sqrt(effectiveBarrier / V_BI);
+                barrierHeight = effectiveBarrier;
+
+                if (V < 0.60) {
+                    current = 0.002 * (Math.exp(V / 0.12) - 1);
+                } else {
+                    current = (V - 0.60) * 58.0 + 0.18;
+                }
+            } else if (V > V_BREAKDOWN) {
+                mode = 'REVERSE';
+                depWidthRatio = Math.min(2.5, Math.sqrt((V_BI + Math.abs(V)) / V_BI));
+                barrierHeight = V_BI + Math.abs(V);
+                current = -0.003;
+            } else {
+                mode = 'BREAKDOWN';
+                depWidthRatio = 0.35;
+                barrierHeight = 0.05;
+                current = -18.0 - Math.pow(Math.abs(V) - Math.abs(V_BREAKDOWN), 1.8) * 11.5;
+            }
+
+            return { mode, current, depWidthRatio, barrierHeight };
+        }
+
+        /* DIODE CARRIERS DYNAMICS */
+        function updateDiodeCarriers(dt, diode) {
+            const V = State.biasVoltage;
+            const isFwd = V >= 0;
+            const isBkd = V <= V_BREAKDOWN;
+
+            if (isBkd) {
+                for (let k = 0; k < 4; k++) {
+                    State.avalancheSparks.push({
+                        x: 0.42 + Math.random() * 0.16,
+                        y: 0.1 + Math.random() * 0.8,
+                        vx: (Math.random() - 0.5) * 1.6,
+                        vy: (Math.random() - 0.5) * 1.6,
+                        life: 0.25 + Math.random() * 0.25
+                    });
+                }
+            }
+            for (let i = State.avalancheSparks.length - 1; i >= 0; i--) {
+                const sp = State.avalancheSparks[i];
+                sp.x += sp.vx * dt;
+                sp.y += sp.vy * dt;
+                sp.life -= dt;
+                if (sp.life <= 0) State.avalancheSparks.splice(i, 1);
+            }
+
+            let driftSpeed = 0;
+            if (isBkd) driftSpeed = 2.4;
+            else if (isFwd && V > 0.65) driftSpeed = 0.4 + (V - 0.65) * 1.2;
+            else if (isFwd) driftSpeed = 0.1;
+            else driftSpeed = -0.25;
+
+            State.diodeHoles.forEach(h => {
+                h.x += (h.vx * 0.05 + driftSpeed * dt * 0.35);
+                h.y += h.vy * dt * 0.2;
+                if (h.y < 0.1) h.y = 0.1; if (h.y > 0.9) h.y = 0.9;
+                if (isFwd || isBkd) {
+                    if (h.x > 0.95) h.x = 0.02;
+                } else {
+                    if (h.x > 0.40) h.x = 0.38 + (Math.random() - 0.5) * 0.05;
+                    if (h.x < 0.02) h.x = 0.04;
+                }
+            });
+
+            State.diodeElectrons.forEach(e => {
+                e.x -= (e.vx * 0.05 + driftSpeed * dt * 0.35);
+                e.y += e.vy * dt * 0.2;
+                if (e.y < 0.1) e.y = 0.1; if (e.y > 0.9) e.y = 0.9;
+                if (isFwd || isBkd) {
+                    if (e.x < 0.05) e.x = 0.98;
+                } else {
+                    if (e.x < 0.60) e.x = 0.62 + (Math.random() - 0.5) * 0.05;
+                    if (e.x > 0.98) e.x = 0.96;
+                }
+            });
+        }
+
+        /* MAIN SIMULATION LOOP */
+        function simLoop(timestamp) {
+            const dt = Math.min((timestamp - State.lastTime) / 1000, 0.1);
+            State.lastTime = timestamp;
+            if (!State.isPaused) { 
+                State.simTime += dt * State.speedFactor; 
+                updatePhysics(dt * State.speedFactor); 
+            }
+            renderCanvas();
+            updateTelemetryUI();
+            requestAnimationFrame(simLoop);
+        }
+
+        /* PHYSICS ENGINE */
+        function updatePhysics(dt) {
+            const mat = MATERIALS[State.material];
+            const T = State.temperature;
+            const V = State.biasVoltage;
+
+            // 1. Structural Breakdown
+            if (T >= mat.breakTemp) {
+                if (!State.isLatticeDestroyed) {
+                    State.latticeGrid.forEach(atom => {
+                        atom.shatteredVx = (Math.random() - 0.5) * 2.2;
+                        atom.shatteredVy = (Math.random() - 0.5) * 2.2;
+                    });
+                }
+                State.isLatticeDestroyed = true;
+            } else {
+                State.isLatticeDestroyed = false;
+                State.latticeGrid.forEach(atom => { atom.shatteredOffset = {x:0, y:0}; });
+            }
+
+            // 2. Active Band Generation & Hopping
+            updateGenerationAndRecombination(dt);
+
+            // 3. Current & Transport State
+            let driftSpeed = 0;
+            if (State.isLatticeDestroyed) {
+                State.ammeterCurrent = (Math.random() * 0.04);
+                State.statusMessage = 'STRUCTURAL BREAKDOWN - LATTICE DESTROYED';
+            } else if (mat.isConductor) {
+                const alpha = 0.00393;
+                const R = 1.0 * (1 + alpha * Math.max(0, T - 100));
+                const effectiveVoltage = (V !== 0) ? Math.abs(V) : 2.0;
+                State.ammeterCurrent = (effectiveVoltage / R) * 12.0;
+                driftSpeed = (State.ammeterCurrent / 25.0) * 0.45;
+                State.statusMessage = `Metal Drift: Resistance ${(R).toFixed(2)} &Omega; (Increases with T)`;
+            } else if (mat.isInsulator) {
+                State.ammeterCurrent = 0.0; 
+                State.statusMessage = 'Zero Conduction: Eg = 9.0 eV';
+            } else if (State.pedagogicalMode === 'DIODE') {
+                const diode = calculateDiodeState(V);
+                State.ammeterCurrent = diode.current;
+                updateDiodeCarriers(dt, diode);
+
+                if (diode.mode === 'FORWARD') {
+                    State.statusMessage = (V >= 0.70) ? 'Forward Bias: Active Conduction (V > Cut-in)' : 'Forward Bias: Sub-Threshold (V < Cut-in)';
+                } else if (diode.mode === 'REVERSE') {
+                    State.statusMessage = 'Reverse Bias: Wide Depletion Layer (Negligible Leakage)';
+                } else {
+                    State.statusMessage = 'AVALANCHE BREAKDOWN: Impact Ionization Surge';
+                }
+            } else {
+                const baseCurrent = (State.dopingType !== 'intrinsic') ? 2.2 : 0.8;
+                State.ammeterCurrent = ((State.cbElectrons + State.vbHolesCount) * 0.22) * baseCurrent;
+                driftSpeed = Math.min(State.ammeterCurrent * 0.04, 0.85);
+                
+                if (State.dopingType === 'pentavalent') {
+                    State.statusMessage = `N-Type: Electron Majority (${State.cbElectrons}), Hole Minority (${State.vbHolesCount})`;
+                } else if (State.dopingType === 'trivalent') {
+                    State.statusMessage = `P-Type: Hole Majority (${State.vbHolesCount}), Electron Minority (${State.cbElectrons})`;
+                } else {
+                    State.statusMessage = `Intrinsic Silicon: Thermal Equilibrium (n = p)`;
+                }
+            }
+
+            // 4. Conduction Band Speeds
+            const thermalFactor = Math.sqrt(Math.max(1, T) / 300);
+            State.cbParticles.forEach(p => {
+                p.x = (p.x + (p.vx * thermalFactor * 0.01 + driftSpeed * dt * 0.3) + 1) % 1;
+                p.y = Math.max(0.05, Math.min(0.95, p.y + p.vy * thermalFactor * dt));
+                if (p.y <= 0.05 || p.y >= 0.95) p.vy *= -1;
+            });
+
+            // 5. Lattice Jitter
+            const jitterAmplitude = (Math.sqrt(T) * 0.002);
+            State.latticeGrid.forEach(atom => {
+                if (State.isLatticeDestroyed) {
+                    atom.shatteredOffset.x += atom.shatteredVx * dt;
+                    atom.shatteredOffset.y += atom.shatteredVy * dt;
+                } else {
+                    atom.jitterX = (Math.random() - 0.5) * jitterAmplitude;
+                    atom.jitterY = (Math.random() - 0.5) * jitterAmplitude;
+                }
+            });
+        }
+
+        /* CANVAS ROUTING */
+        function renderCanvas() {
+            ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+            ctx.fillStyle = '#050813'; 
+            ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+            
+            if (State.pedagogicalMode === 'DIODE') {
+                drawPNJunctionDiagram(30, 20, CANVAS_WIDTH - 60, 655);
+            } else {
+                drawEnergyBandDiagram(30, 20, CANVAS_WIDTH - 60, 290);
+                drawMicroscopicLattice(30, 325, CANVAS_WIDTH - 60, 355);
+            }
+        }
+
+        /* ENERGY BAND DIAGRAM RENDERER */
+        function drawEnergyBandDiagram(x, y, w, h) {
+            const mat = MATERIALS[State.material];
+            const isCond = mat.isConductor;
+            const isIns = mat.isInsulator;
+
+            ctx.fillStyle = 'rgba(8, 14, 32, 0.85)'; 
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.35)'; 
+            ctx.lineWidth = 1.5;
+            drawRoundRect(ctx, x, y, w, h, 10); 
+            ctx.fill(); ctx.stroke();
+
+            const axisX = x + 50; 
+            const bandLeft = x + 90; 
+            const bandWidth = w - 130;
+
+            // Energy Axis
+            ctx.strokeStyle = '#475569'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(axisX, y + h - 25); ctx.lineTo(axisX, y + 25); ctx.stroke();
+            ctx.fillStyle = '#475569'; ctx.beginPath(); ctx.moveTo(axisX - 5, y + 25); ctx.lineTo(axisX + 5, y + 25); ctx.lineTo(axisX, y + 15); ctx.fill();
+            ctx.font = '11px Share Tech Mono, monospace'; ctx.fillText("ENERGY (E)", axisX - 35, y + 18);
+
+            let cbTop = y + 40, cbBottom = y + 120, vbTop = y + 180, vbBottom = y + h - 20;
+            if (isCond) { cbBottom = y + 180; vbTop = y + 120; }
+            else if (isIns) { cbBottom = y + 70; vbTop = y + 230; }
+
+            // Conduction Band
+            ctx.fillStyle = 'rgba(0, 243, 255, 0.12)'; ctx.fillRect(bandLeft, cbTop, bandWidth, cbBottom - cbTop);
+            ctx.strokeStyle = '#00f3ff'; ctx.lineWidth = 2; ctx.strokeRect(bandLeft, cbTop, bandWidth, cbBottom - cbTop);
+            ctx.fillStyle = '#00f3ff'; ctx.font = 'bold 12px Share Tech Mono, monospace'; ctx.fillText(`CONDUCTION BAND (CB) - Free Electron States`, bandLeft + 15, cbTop + 20);
+
+            // Valence Band
+            ctx.fillStyle = 'rgba(255, 170, 0, 0.08)'; ctx.fillRect(bandLeft, vbTop, bandWidth, vbBottom - vbTop);
+            ctx.strokeStyle = '#ffaa00'; ctx.lineWidth = 2; ctx.strokeRect(bandLeft, vbTop, bandWidth, vbBottom - vbTop);
+            ctx.fillStyle = '#ffaa00'; ctx.fillText("VALENCE BAND (VB) - Covalent Bonding States", bandLeft + 15, vbBottom - 10);
+
+            // Forbidden Gap Notation
+            if (!isCond) {
+                const gapCenterY = (cbBottom + vbTop) / 2;
+                ctx.fillStyle = '#ff3366'; 
+                ctx.fillText(`Forbidden Gap (Eg = ${mat.eg.toFixed(2)} eV)`, bandLeft + 25, gapCenterY + 4);
+            } else {
+                ctx.fillStyle = 'rgba(0, 255, 136, 0.15)'; ctx.fillRect(bandLeft, vbTop, bandWidth, cbBottom - vbTop);
+                ctx.fillStyle = '#00ff88'; ctx.fillText("OVERLAPPING ENERGY BANDS", bandLeft + 25, (vbTop + cbBottom) / 2 + 4);
+            }
+
+            // Donor / Acceptor discrete energy levels
+            if (State.material === 'Si' && !isCond && !isIns) {
+                if (State.dopingType === 'pentavalent') {
+                    const edY = cbBottom + 14; 
+                    ctx.setLineDash([4, 4]); ctx.strokeStyle = '#00ff88'; ctx.beginPath(); ctx.moveTo(bandLeft, edY); ctx.lineTo(bandLeft + bandWidth, edY); ctx.stroke(); ctx.setLineDash([]);
+                    ctx.fillStyle = '#00ff88'; ctx.font = '10px Share Tech Mono, monospace'; ctx.fillText("Donor Level (Ed = Ec - 0.045 eV)", bandLeft + bandWidth - 210, edY - 4);
+                }
+                if (State.dopingType === 'trivalent') {
+                    const eaY = vbTop - 14; 
+                    ctx.setLineDash([4, 4]); ctx.strokeStyle = '#bc13fe'; ctx.beginPath(); ctx.moveTo(bandLeft, eaY); ctx.lineTo(bandLeft + bandWidth, eaY); ctx.stroke(); ctx.setLineDash([]);
+                    ctx.fillStyle = '#bc13fe'; ctx.font = '10px Share Tech Mono, monospace'; ctx.fillText("Acceptor Level (Ea = Ev + 0.045 eV)", bandLeft + bandWidth - 225, eaY + 12);
+                }
+            }
+
+            if (State.isLatticeDestroyed) return;
+
+            const slotY = vbTop + 35;
+
+            // Discrete Valence Band Slots
+            State.vbSlots.forEach(slot => {
+                const sx = bandLeft + slot.x * bandWidth;
+                if (slot.isOccupied) {
+                    ctx.fillStyle = '#ffaa00';
+                    ctx.beginPath(); ctx.arc(sx, slotY, 4.5, 0, Math.PI * 2); ctx.fill();
+                } else {
+                    ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2.2;
+                    ctx.beginPath(); ctx.arc(sx, slotY, 5.5, 0, Math.PI * 2); ctx.stroke();
+                }
+            });
+
+            // Intra-Valence Electron Hopping
+            State.intraVbHops.forEach(hop => {
+                const curX = bandLeft + (hop.fromX + (hop.toX - hop.fromX) * hop.progress) * bandWidth;
+                const curY = slotY - Math.sin(hop.progress * Math.PI) * 10;
+                ctx.fillStyle = '#ffd700'; ctx.shadowColor = '#ffaa00'; ctx.shadowBlur = 6;
+                ctx.beginPath(); ctx.arc(curX, curY, 3.5, 0, Math.PI * 2); ctx.fill();
+                ctx.shadowBlur = 0;
+            });
+
+            // Upward Thermal Excitations
+            State.activeExcitations.forEach(tr => {
+                const tx = bandLeft + tr.currX * bandWidth;
+                const startY = tr.isDonorOrigin ? (cbBottom + 14) : slotY;
+                const targetY = cbBottom - 15;
+                const ty = startY - tr.progress * (startY - targetY);
+
+                ctx.strokeStyle = tr.isDonorOrigin ? 'rgba(0, 255, 136, 0.5)' : 'rgba(0, 243, 255, 0.45)';
+                ctx.lineWidth = 1.8;
+                ctx.beginPath(); ctx.moveTo(tx, startY); ctx.lineTo(tx, ty); ctx.stroke();
+
+                ctx.fillStyle = '#00f3ff';
+                ctx.beginPath();
+                ctx.moveTo(tx - 3, ty + 5); ctx.lineTo(tx + 3, ty + 5); ctx.lineTo(tx, ty); ctx.fill();
+
+                ctx.fillStyle = '#ffffff'; ctx.shadowColor = '#00f3ff'; ctx.shadowBlur = 8;
+                ctx.beginPath(); ctx.arc(tx, ty, 4, 0, Math.PI * 2); ctx.fill();
+                ctx.shadowBlur = 0;
+            });
+
+            // Recombination Flash
+            State.recombFlashes.forEach(rf => {
+                const rx = bandLeft + rf.x * bandWidth;
+                ctx.strokeStyle = `rgba(0, 243, 255, ${rf.alpha})`; ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.arc(rx, slotY, rf.radius, 0, Math.PI * 2); ctx.stroke();
+                ctx.fillStyle = `rgba(255, 255, 255, ${rf.alpha})`;
+                ctx.font = '9px Share Tech Mono, monospace'; ctx.fillText("h\u03BD", rx + rf.radius, slotY - 4);
+            });
+
+            // Conduction Band Mobile Electrons
+            ctx.fillStyle = '#00f3ff'; ctx.shadowColor = '#00f3ff'; ctx.shadowBlur = 6;
+            State.cbParticles.forEach(p => {
+                ctx.beginPath(); ctx.arc(bandLeft + p.x * bandWidth, cbTop + 10 + p.y * (cbBottom - cbTop - 20), 4.5, 0, Math.PI * 2); ctx.fill();
+            });
+            ctx.shadowBlur = 0;
+        }
+
+        /* P-N JUNCTION BIASING VIEW */
+        function drawPNJunctionDiagram(x, y, w, h) {
+            const diode = calculateDiodeState(State.biasVoltage);
+            State.ammeterCurrent = diode.current;
+
+            ctx.fillStyle = 'rgba(8, 14, 32, 0.9)'; 
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.35)'; 
+            ctx.lineWidth = 1.5;
+            drawRoundRect(ctx, x, y, w, h, 12); 
+            ctx.fill(); ctx.stroke();
+
+            const isFwd = State.biasVoltage >= 0;
+            const isBkd = State.biasVoltage <= V_BREAKDOWN;
+
+            ctx.font = 'bold 17px Orbitron, sans-serif'; 
+            ctx.textAlign = 'center';
+            if (isBkd) {
+                ctx.fillStyle = '#ff3366';
+                ctx.fillText("AVALANCHE BREAKDOWN REGIME (Conducting Channel Open)", x + w/2, y + 35);
+            } else if (isFwd) {
+                ctx.fillStyle = '#00ff88';
+                ctx.fillText("FORWARD BIAS: NARROW DEPLETION LAYER (Active Diffusion)", x + w/2, y + 35);
+            } else {
+                ctx.fillStyle = '#ffaa00';
+                ctx.fillText("REVERSE BIAS: WIDE DEPLETION LAYER (Carriers Swept Back)", x + w/2, y + 35);
+            }
+            ctx.textAlign = 'left';
+
+            const slabX = x + 70;
+            const slabY = y + 70;
+            const slabW = w - 140;
+            const slabH = 240;
+            const midX = slabX + slabW / 2;
+
+            const baseDepW = 85;
+            const depW = Math.max(16, Math.min(slabW * 0.46, baseDepW * diode.depWidthRatio));
+            const depLeft = midX - depW / 2;
+            const depRight = midX + depW / 2;
+
+            // P-Region
+            ctx.fillStyle = '#8fad88'; ctx.fillRect(slabX, slabY, depLeft - slabX, slabH);
+            ctx.strokeStyle = '#4e7246'; ctx.lineWidth = 2; ctx.strokeRect(slabX, slabY, depLeft - slabX, slabH);
+
+            // N-Region
+            ctx.fillStyle = '#edd39d'; ctx.fillRect(depRight, slabY, slabX + slabW - depRight, slabH);
+            ctx.strokeStyle = '#a6854b'; ctx.lineWidth = 2; ctx.strokeRect(depRight, slabY, slabX + slabW - depRight, slabH);
+
+            // Depletion Layer
+            if (isBkd) {
+                ctx.fillStyle = Math.sin(State.simTime * 25) > 0 ? 'rgba(255, 51, 102, 0.4)' : 'rgba(0, 243, 255, 0.35)';
+            } else {
+                ctx.fillStyle = '#9e4436';
+            }
+            ctx.fillRect(depLeft, slabY, depW, slabH);
+            ctx.strokeStyle = isBkd ? '#ff3366' : '#5a2219'; ctx.lineWidth = 2;
+            ctx.strokeRect(depLeft, slabY, depW, slabH);
+
+            ctx.font = 'bold 15px Rajdhani, sans-serif';
+            ctx.fillStyle = '#112211';
+            ctx.fillText("p-type (Holes)", slabX + (depLeft - slabX)/2 - 40, slabY - 12);
+            ctx.fillStyle = isBkd ? '#ff3366' : '#ff4444';
+            ctx.fillText(isBkd ? "Conducting Channel" : (isFwd ? "Narrow Depletion" : "Wide Depletion"), midX - 60, slabY - 12);
+            ctx.fillStyle = '#332200';
+            ctx.fillText("n-type (Electrons)", depRight + (slabX + slabW - depRight)/2 - 50, slabY - 12);
+
+            if (!isBkd) {
+                const ionCols = Math.max(1, Math.round(depW / 28));
+                const ionRows = 5;
+                for (let r = 0; r < ionRows; r++) {
+                    const iy = slabY + ((r + 0.5) / ionRows) * slabH;
+                    for (let c = 0; c < ionCols / 2; c++) {
+                        const ix = depLeft + ((c + 0.5) / (ionCols / 2)) * (depW / 2);
+                        drawImmobileIon(ix, iy, 11, '-', '#ffffff', '#801b1b');
+                    }
+                    for (let c = 0; c < ionCols / 2; c++) {
+                        const ix = midX + ((c + 0.5) / (ionCols / 2)) * (depW / 2);
+                        drawImmobileIon(ix, iy, 11, '+', '#ffffff', '#801b1b');
+                    }
+                }
+            }
+
+            State.diodeHoles.forEach(h => {
+                const hx = slabX + h.x * slabW;
+                const hy = slabY + h.y * slabH;
+                ctx.fillStyle = '#ffaa00'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.5;
+                ctx.beginPath(); ctx.arc(hx, hy, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = '#000000'; ctx.font = 'bold 9px monospace'; ctx.fillText('+', hx - 3, hy + 3);
+            });
+
+            State.diodeElectrons.forEach(e => {
+                const ex = slabX + e.x * slabW;
+                const ey = slabY + e.y * slabH;
+                ctx.fillStyle = '#00f3ff'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.5;
+                ctx.beginPath(); ctx.arc(ex, ey, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = '#000000'; ctx.font = 'bold 11px monospace'; ctx.fillText('-', ex - 3, ey + 3);
+            });
+
+            State.avalancheSparks.forEach(sp => {
+                const sx = slabX + sp.x * slabW;
+                const sy = slabY + sp.y * slabH;
+                ctx.fillStyle = '#ffffff'; ctx.shadowColor = '#ff3366'; ctx.shadowBlur = 10;
+                ctx.beginPath(); ctx.arc(sx, sy, 4.5, 0, Math.PI * 2); ctx.fill();
+                ctx.shadowBlur = 0;
+            });
+
+            drawExternalCircuit(slabX, slabY, slabW, slabH, isFwd, diode.current);
+            drawBarrierCurve(x + 70, y + 440, w - 140, 160, diode.barrierHeight, isFwd);
+        }
+
+        function drawImmobileIon(cx, cy, r, sign, textColor, circleBg) {
+            ctx.fillStyle = circleBg; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.5;
+            ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = textColor; ctx.font = 'bold 14px monospace';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(sign, cx, cy);
+            ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+        }
+
+        function drawExternalCircuit(sx, sy, sw, sh, isFwd, current) {
+            const wireY = sy + sh + 55;
+            const pContactX = sx;
+            const nContactX = sx + sw;
+            const midX = sx + sw / 2;
+
+            ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(pContactX, sy + sh/2);
+            ctx.lineTo(pContactX - 35, sy + sh/2);
+            ctx.lineTo(pContactX - 35, wireY);
+            ctx.lineTo(midX - 70, wireY);
+
+            ctx.moveTo(nContactX, sy + sh/2);
+            ctx.lineTo(nContactX + 35, sy + sh/2);
+            ctx.lineTo(nContactX + 35, wireY);
+            ctx.lineTo(midX + 70, wireY);
+            ctx.stroke();
+
+            const longPlate = 35;
+            const shortPlate = 18;
+            ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 3;
+
+            if (isFwd) {
+                ctx.beginPath();
+                ctx.moveTo(midX - 35, wireY - longPlate/2); ctx.lineTo(midX - 35, wireY + longPlate/2);
+                ctx.moveTo(midX - 25, wireY - shortPlate/2); ctx.lineTo(midX - 25, wireY + shortPlate/2);
+                ctx.stroke();
+                ctx.fillStyle = '#00ff88'; ctx.font = 'bold 15px Share Tech Mono, monospace';
+                ctx.fillText("+", midX - 50, wireY + 22);
+                ctx.fillText("-", midX - 20, wireY + 22);
+            } else {
+                ctx.beginPath();
+                ctx.moveTo(midX - 35, wireY - shortPlate/2); ctx.lineTo(midX - 35, wireY + shortPlate/2);
+                ctx.moveTo(midX - 25, wireY - longPlate/2); ctx.lineTo(midX - 25, wireY + longPlate/2);
+                ctx.stroke();
+                ctx.fillStyle = '#ffaa00'; ctx.font = 'bold 15px Share Tech Mono, monospace';
+                ctx.fillText("-", midX - 50, wireY + 22);
+                ctx.fillText("+", midX - 20, wireY + 22);
+            }
+
+            const ammeterX = midX + 30;
+            drawAnalogAmmeter(ammeterX, wireY, 32, current, "mA");
+
+            ctx.fillStyle = '#f59e0b'; ctx.font = 'bold 12px Share Tech Mono, monospace';
+            ctx.textAlign = 'center';
+            if (Math.abs(current) > 0.05) {
+                ctx.fillText(current > 0 ? "Current Flow (I) \u25BA" : "\u25C4 Breakdown Surge (I)", midX, wireY - 26);
+            } else {
+                ctx.fillText("Negligible Current (I \u2248 0)", midX, wireY - 26);
+            }
+            ctx.textAlign = 'left';
+        }
+
+        function drawBarrierCurve(bx, by, bw, bh, barrierHeight, isFwd) {
+            ctx.fillStyle = '#050a18'; ctx.strokeStyle = 'rgba(0, 243, 255, 0.25)'; ctx.lineWidth = 1;
+            drawRoundRect(ctx, bx, by, bw, bh, 8); ctx.fill(); ctx.stroke();
+
+            ctx.fillStyle = '#00f3ff'; ctx.font = 'bold 11px Share Tech Mono, monospace';
+            ctx.fillText(`POTENTIAL ENERGY BARRIER PROFILE: q(Vbi - V) = ${barrierHeight.toFixed(2)} eV`, bx + 15, by + 20);
+
+            const pLevel = by + 120;
+            const nLevel = by + 40 + Math.min(80, barrierHeight * 35);
+
+            ctx.strokeStyle = isFwd ? '#00ff88' : '#ffaa00'; ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(bx + 40, pLevel);
+            ctx.lineTo(bx + bw * 0.4, pLevel);
+            ctx.bezierCurveTo(bx + bw * 0.48, pLevel, bx + bw * 0.52, nLevel, bx + bw * 0.6, nLevel);
+            ctx.lineTo(bx + bw - 40, nLevel);
+            ctx.stroke();
+
+            ctx.strokeStyle = '#ff3366'; ctx.setLineDash([3, 3]);
+            ctx.beginPath();
+            ctx.moveTo(bx + bw * 0.65, pLevel); ctx.lineTo(bx + bw * 0.65, nLevel); ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.fillStyle = '#ff3366';
+            ctx.fillText(`Barrier: ${barrierHeight.toFixed(2)} V`, bx + bw * 0.67, (pLevel + nLevel)/2);
+        }
+
+        /* 2D ATOMIC LATTICE VIEW */
+        function drawMicroscopicLattice(x, y, w, h) {
+            ctx.fillStyle = 'rgba(8, 14, 32, 0.85)'; ctx.strokeStyle = 'rgba(0, 243, 255, 0.3)'; ctx.lineWidth = 1.5;
+            drawRoundRect(ctx, x, y, w, h, 10); ctx.fill(); ctx.stroke();
+
+            const meterCX = x + 85;
+            const meterCY = y + h / 2 + 10;
+            drawAnalogAmmeter(meterCX, meterCY, 50, State.ammeterCurrent, "mA");
+
+            const legendW = 150;
+            const latX = x + 180;
+            const latY = y + 45;
+            const latW = w - 200 - legendW;
+            const latH = h - 75;
+
+            ctx.fillStyle = '#060a17'; ctx.strokeStyle = '#00f3ff'; ctx.lineWidth = 1.5;
+            drawRoundRect(ctx, latX, latY, latW, latH, 8); ctx.fill(); ctx.stroke();
+
+            ctx.fillStyle = '#00f3ff'; ctx.font = 'bold 12px Share Tech Mono, monospace';
+            ctx.fillText("REAL-SPACE MICROSCOPIC VIEW: 2D Atomic Lattice", latX + 15, latY - 12);
+
+            if (State.material !== 'Cu' && !State.isLatticeDestroyed) {
+                ctx.strokeStyle = '#475569'; ctx.lineWidth = 4;
+                for (let r = 0; r < State.latticeRows; r++) {
+                    const py = latY + ((r + 0.5) / State.latticeRows) * latH;
+                    ctx.beginPath();
+                    ctx.moveTo(latX + (0.5/State.latticeCols)*latW, py);
+                    ctx.lineTo(latX + ((State.latticeCols-0.5)/State.latticeCols)*latW, py);
+                    ctx.stroke();
+                }
+                for (let c = 0; c < State.latticeCols; c++) {
+                    const px = latX + ((c + 0.5) / State.latticeCols) * latW;
+                    ctx.beginPath();
+                    ctx.moveTo(px, latY + (0.5/State.latticeRows)*latH);
+                    ctx.lineTo(px, latY + ((State.latticeRows-0.5)/State.latticeRows)*latH);
+                    ctx.stroke();
+                }
+            }
+
+            const atomRadius = 14;
+            State.latticeGrid.forEach(atom => {
+                const ax = latX + atom.baseX * latW + atom.jitterX * latW + atom.shatteredOffset.x * latW;
+                const ay = latY + atom.baseY * latH + atom.jitterY * latH + atom.shatteredOffset.y * latH;
+
+                let innerC, outerC, label;
+                if (atom.type === 'Si') { innerC = '#ffdca8'; outerC = '#f5a65b'; label = 'Si'; }
+                else if (atom.type === 'Cu') { innerC = '#ffc8a8'; outerC = '#d97c45'; label = 'Cu+'; }
+                else if (atom.type === 'As') { innerC = '#e9b5f5'; outerC = '#a871b9'; label = 'As'; }
+                else if (atom.type === 'Al') { innerC = '#e6c8c8'; outerC = '#b88a94'; label = 'Al'; }
+                
+                const grad = ctx.createRadialGradient(ax - 4, ay - 4, 2, ax, ay, atomRadius);
+                grad.addColorStop(0, innerC); grad.addColorStop(1, outerC);
+                
+                ctx.fillStyle = grad;
+                ctx.beginPath(); ctx.arc(ax, ay, atomRadius, 0, Math.PI * 2); ctx.fill();
+                
+                ctx.fillStyle = '#111'; ctx.font = 'bold 10px Rajdhani, sans-serif'; ctx.textAlign = 'center';
+                ctx.fillText(label, ax, ay + 3); ctx.textAlign = 'left';
+            });
+
+            if (!State.isLatticeDestroyed) {
+                // Mobile Holes in Lattice
+                ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 3;
+                State.vbSlots.filter(s => !s.isOccupied).forEach((h, idx) => {
+                    const hx = latX + ((idx * 0.17 + 0.1) % 0.8) * latW;
+                    const hy = latY + ((idx * 0.23 + 0.15) % 0.7) * latH;
+                    ctx.beginPath(); ctx.arc(hx, hy, 5, 0, Math.PI * 2); ctx.stroke();
+                });
+
+                // Free Electrons
+                ctx.fillStyle = '#38bdf8'; ctx.shadowColor = '#38bdf8'; ctx.shadowBlur = 8;
+                State.cbParticles.forEach(p => {
+                    const px = latX + p.x * latW;
+                    const py = latY + p.y * latH;
+                    ctx.beginPath(); ctx.arc(px, py, 4.5, 0, Math.PI * 2); ctx.fill();
+                });
+                ctx.shadowBlur = 0;
+            }
+
+            // Legend
+            const legX = latX + latW + 20;
+            const legY = latY + 10;
+            ctx.fillStyle = '#00f3ff'; ctx.font = 'bold 12px Share Tech Mono, monospace';
+            ctx.fillText("VISUAL KEY", legX, legY);
+
+            const legendItems = [
+                { type: 'atom', label: 'Silicon (Si)', inner: '#ffdca8', outer: '#f5a65b' },
+                { type: 'atom', label: 'Arsenic (N-type)', inner: '#e9b5f5', outer: '#a871b9' },
+                { type: 'atom', label: 'Alum/Boron (P-type)', inner: '#e6c8c8', outer: '#b88a94' },
+                { type: 'electron', label: 'Free Electron' },
+                { type: 'hole', label: 'Mobile Hole' }
+            ];
+
+            legendItems.forEach((item, idx) => {
+                const itemY = legY + 30 + idx * 35;
+                if (item.type === 'atom') {
+                    const grad = ctx.createRadialGradient(legX + 5, itemY - 4, 1, legX + 10, itemY, 10);
+                    grad.addColorStop(0, item.inner); grad.addColorStop(1, item.outer);
+                    ctx.fillStyle = grad;
+                    ctx.beginPath(); ctx.arc(legX + 10, itemY, 10, 0, Math.PI * 2); ctx.fill();
+                } else if (item.type === 'electron') {
+                    ctx.fillStyle = '#38bdf8'; ctx.beginPath(); ctx.arc(legX + 10, itemY, 4.5, 0, Math.PI * 2); ctx.fill();
+                } else if (item.type === 'hole') {
+                    ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(legX + 10, itemY, 5, 0, Math.PI * 2); ctx.stroke();
+                }
+                ctx.fillStyle = '#d8e6ff'; ctx.font = '11px Rajdhani, sans-serif';
+                ctx.fillText(item.label, legX + 28, itemY + 4);
+            });
+        }
+
+        /* ANALOG AMMETER INSTRUMENT */
+        function drawAnalogAmmeter(cx, cy, r, val, unit) {
+            ctx.fillStyle = '#070c1a'; ctx.strokeStyle = '#00f3ff'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            
+            for (let a = -Math.PI * 0.75; a <= Math.PI * 0.75; a += Math.PI * 0.25) {
+                ctx.strokeStyle = 'rgba(0, 243, 255, 0.5)'; ctx.beginPath();
+                ctx.moveTo(cx + Math.cos(a)*(r-8), cy + Math.sin(a)*(r-8)); ctx.lineTo(cx + Math.cos(a)*(r-2), cy + Math.sin(a)*(r-2)); ctx.stroke();
+            }
+
+            const clamped = Math.max(-50, Math.min(val, 80));
+            const angle = -Math.PI * 0.5 + (clamped / 80) * (Math.PI * 0.65);
+            
+            ctx.strokeStyle = '#ff3366'; ctx.lineWidth = 2.2; ctx.beginPath(); ctx.moveTo(cx, cy);
+            ctx.lineTo(cx + Math.cos(angle)*(r-7), cy + Math.sin(angle)*(r-7)); ctx.stroke();
+            
+            ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(cx, cy, 3.5, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = '#00f3ff'; ctx.font = 'bold 10px Share Tech Mono, monospace'; ctx.textAlign = 'center';
+            ctx.fillText(`${val.toFixed(2)} ${unit}`, cx, cy + r - 10); ctx.textAlign = 'left';
+        }
+
+        /* TELEMETRY UI READOUTS */
+        function updateTelemetryUI() {
+            document.getElementById('cbCountDisp').innerText = State.cbElectrons;
+            document.getElementById('vbCountDisp').innerText = State.vbHolesCount;
+            document.getElementById('ammeterDisp').innerText = `${State.ammeterCurrent.toFixed(2)} mA`;
+            const statElem = document.getElementById('stateDisp'); 
+            statElem.innerText = State.statusMessage;
+            if (State.statusMessage.includes('BREAKDOWN')) statElem.style.color = 'var(--neon-red)';
+            else if (State.statusMessage.includes('Active') || State.statusMessage.includes('Metal') || State.statusMessage.includes('Forward')) statElem.style.color = 'var(--neon-green)';
+            else statElem.style.color = 'var(--neon-cyan)';
+        }
+
+        /* CONTROLS HANDLING */
+        function selectMaterial(matKey) {
+            State.material = matKey;
+            document.getElementById('materialSelect').value = matKey;
+
+            const dopPod = document.getElementById('dopConcPod'); 
+            const dopSel = document.getElementById('dopingSelect');
+            if (matKey !== 'Si') { 
+                dopPod.style.opacity = '0.35'; dopSel.disabled = true; 
+            } else { 
+                dopPod.style.opacity = '1.0'; dopSel.disabled = false; 
+            }
+            initValenceBandStates();
+            initLatticeGrid(); 
+            reconcileCarriersWithPhysics();
+        }
+
+        function onTempChange(val) { 
+            State.temperature = parseFloat(val); 
+            document.getElementById('tempDisp').innerText = `${val} K`; 
+            reconcileCarriersWithPhysics();
+        }
+        
+        function onBiasChange(val) { 
+            State.biasVoltage = parseFloat(val); 
+            document.getElementById('biasDisp').innerText = `${parseFloat(val).toFixed(2)} V`; 
+        }
+        
+        function onDopingChange(val) {
+            State.dopingType = val; 
+            initValenceBandStates();
+            initLatticeGrid(); 
+            reconcileCarriersWithPhysics();
+        }
+        
+        function onDopConcChange(val) {
+            State.dopingLevel = parseInt(val, 10);
+            let t = "Low"; if (val == 2) t = "Moderate"; if (val == 3) t = "High";
+            document.getElementById('dopConcDisp').innerText = t;
+            initValenceBandStates();
+            initLatticeGrid(); 
+            reconcileCarriersWithPhysics();
+        }
+
+        function setBiasPreset(type) {
+            const slider = document.getElementById('biasSlider');
+            if (type === 'FWD') slider.value = 0.80;
+            else if (type === 'REV') slider.value = -4.00;
+            else if (type === 'BKD') slider.value = -12.00;
+
+            onBiasChange(slider.value);
+
+            document.getElementById('btnBiasFwd').classList.toggle('active', type === 'FWD');
+            document.getElementById('btnBiasRev').classList.toggle('active', type === 'REV');
+            document.getElementById('btnBiasBkd').classList.toggle('active', type === 'BKD');
+        }
+
+        function setPedagogicalMode(mode) {
+            State.pedagogicalMode = mode;
+            document.querySelectorAll('.mod-tab-btn').forEach(btn => btn.classList.remove('active'));
+            
+            const diodeSec = document.getElementById('diodeControlSection');
+            const dopHeader = document.getElementById('dopingHeaderTitle');
+            const dopTypePod = document.getElementById('dopingTypePod');
+            const dopConcPod = document.getElementById('dopConcPod');
+
+            if (mode === 'BANDS') {
+                document.getElementById('tabMod1').classList.add('active');
+                diodeSec.style.display = 'none';
+                dopHeader.style.display = 'block'; dopTypePod.style.display = 'flex'; dopConcPod.style.display = 'flex';
+            }
+            if (mode === 'DOPING') {
+                document.getElementById('tabMod2').classList.add('active');
+                diodeSec.style.display = 'none';
+                dopHeader.style.display = 'block'; dopTypePod.style.display = 'flex'; dopConcPod.style.display = 'flex';
+                if (State.material !== 'Si') selectMaterial('Si');
+                document.getElementById('dopingSelect').value = 'pentavalent'; 
+                State.dopingType = 'pentavalent';
+            }
+            if (mode === 'THERMAL') { 
+                document.getElementById('tabMod3').classList.add('active'); 
+                diodeSec.style.display = 'none';
+                dopHeader.style.display = 'block'; dopTypePod.style.display = 'flex'; dopConcPod.style.display = 'flex';
+                selectMaterial('SiO2'); 
+            }
+            if (mode === 'DIODE') {
+                document.getElementById('tabMod4').classList.add('active');
+                diodeSec.style.display = 'block';
+                dopHeader.style.display = 'none'; dopTypePod.style.display = 'none'; dopConcPod.style.display = 'none';
+                if (State.material !== 'Si') selectMaterial('Si');
+                setBiasPreset('FWD');
+            }
+            initValenceBandStates();
+            initLatticeGrid(); 
+            initDiodeMobileCarriers();
+            reconcileCarriersWithPhysics();
+        }
+
+        function togglePause() { 
+            State.isPaused = !State.isPaused; 
+            const txt = State.isPaused ? "▶ Resume" : "⏸ Pause";
+            document.getElementById('pauseText').innerText = txt;
+            document.getElementById('btnSecondaryPauseText').innerText = State.isPaused ? "Resume Run" : "Pause Run";
+        }
+        
+        function toggleSlowMo() {
+            if (State.speedFactor === 1.0) { 
+                State.speedFactor = 0.2; 
+                document.getElementById('slowMoText').innerText = "0.2x Slow-Mo"; 
+            } else { 
+                State.speedFactor = 1.0; 
+                document.getElementById('slowMoText').innerText = "1.0x Speed"; 
+            }
+        }
+        
+        function resetSimulator() {
+            State.temperature = 300; 
+            State.biasVoltage = 0.0; 
+            State.dopingType = 'intrinsic'; 
+            State.dopingLevel = 2; 
+            State.isPaused = false; 
+            State.speedFactor = 1.0;
+
+            document.getElementById('tempSlider').value = 300; 
+            document.getElementById('tempDisp').innerText = '300 K';
+            document.getElementById('biasSlider').value = 0; 
+            document.getElementById('biasDisp').innerText = '0.00 V';
+            document.getElementById('dopingSelect').value = 'intrinsic'; 
+            document.getElementById('dopConcSlider').value = 2; 
+            document.getElementById('dopConcDisp').innerText = 'Moderate';
+            document.getElementById('pauseText').innerText = "⏸ Pause"; 
+            document.getElementById('btnSecondaryPauseText').innerText = "Pause Run";
+            document.getElementById('slowMoText').innerText = "1.0x Speed";
+
+            selectMaterial('Si'); 
+            setPedagogicalMode('BANDS');
+        }
+    </script>
+</body>
+</html>

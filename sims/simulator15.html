@@ -1,0 +1,2315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Interactive Electrostatics Physics Laboratory: Simulate the Gold-Leaf Electroscope, Conductive Spheres Induction and Contact, and Electric Field Streamlines with Coulomb Force Vectors - LuyaliSims STEM Labs.">
+    <title>Electrostatic Physics Simulator & Laboratory - LuyaliSims</title>
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    
+    <!-- Futuristic Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Base Reset & Variables */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        :root {
+            --neon-cyan: #00f3ff;
+            --neon-magenta: #bc13fe;
+            --neon-green: #00ff88;
+            --neon-amber: #f59e0b;
+            --bg-dark: #070a12;
+            --panel-bg: rgba(16, 24, 43, 0.88);
+            --border-glow: rgba(0, 243, 255, 0.35);
+            --pos-charge: #ef4444;
+            --neg-charge: #3b82f6;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 85% 15%, rgba(0, 243, 255, 0.08), transparent 45%),
+                radial-gradient(circle at 15% 85%, rgba(188, 19, 254, 0.08), transparent 45%),
+                linear-gradient(180deg, #05070e 0%, #0a0e1a 100%);
+            color: #e2e8f0;
+            margin: 0;
+            padding: 16px 20px;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* 1. HEADER & TOP NAVIGATION */
+        header {
+            max-width: 1240px;
+            margin: 0 auto 15px auto;
+        }
+
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 18px;
+            background: rgba(16, 24, 43, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(188, 19, 254, 0.5);
+            color: #e580ff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(188, 19, 254, 0.2);
+            border-color: var(--neon-magenta);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
+            transform: translateX(-3px);
+        }
+
+        .mod-badge {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--neon-cyan);
+            background: rgba(0, 243, 255, 0.08);
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(0, 243, 255, 0.25);
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+            margin: 6px 0 10px 0;
+            font-size: clamp(1.4rem, 3.6vw, 2.2rem);
+            letter-spacing: 1.5px;
+            text-align: center;
+        }
+
+        .lead-summary {
+            max-width: 960px;
+            margin: 0 auto 20px auto;
+            text-align: center;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: #cbd5e1;
+            user-select: text;
+        }
+
+        main {
+            max-width: 1240px;
+            margin: 0 auto;
+        }
+
+        /* 2. SIMULATOR WORKSPACE */
+        #simulator-container {
+            background: linear-gradient(135deg, rgba(16, 24, 43, 0.9) 0%, rgba(8, 12, 22, 0.94) 100%);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-glow);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 25px rgba(0, 243, 255, 0.12);
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .lab-mode-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .lab-tab {
+            flex: 1;
+            min-width: 180px;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            color: #94a3b8;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.82rem;
+            padding: 10px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            letter-spacing: 1px;
+            transition: all 0.25s ease;
+        }
+
+        .lab-tab:hover {
+            border-color: var(--neon-cyan);
+            color: #ffffff;
+            background: rgba(0, 243, 255, 0.15);
+        }
+
+        .lab-tab.active {
+            background: linear-gradient(180deg, rgba(0, 243, 255, 0.28) 0%, rgba(16, 28, 54, 0.9) 100%);
+            border-color: var(--neon-cyan);
+            color: #ffffff;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+            font-weight: 700;
+        }
+
+        .hud-telemetry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(4, 8, 16, 0.85);
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            border-radius: 10px;
+            padding: 10px 16px;
+            margin-bottom: 16px;
+            font-family: 'Share Tech Mono', monospace;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .telemetry-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.92rem;
+        }
+
+        .tele-label {
+            color: #8da4be;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .tele-val {
+            color: var(--neon-cyan);
+            font-weight: 700;
+        }
+
+        .tele-val.pink { color: #ff55bb; }
+        .tele-val.green { color: var(--neon-green); }
+        .tele-val.amber { color: var(--neon-amber); }
+
+        .sim-layout {
+            display: grid;
+            grid-template-columns: 1.8fr 1fr;
+            gap: 18px;
+            align-items: stretch;
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            width: 100%;
+            background: radial-gradient(circle at 50% 50%, #0d1a2d 0%, #030710 100%);
+            border-radius: 12px;
+            overflow: hidden;
+            touch-action: none;
+            border: 3px solid #1e293b;
+            box-shadow: 
+                0 0 0 2px rgba(0, 243, 255, 0.35),
+                0 15px 35px rgba(0, 0, 0, 0.8),
+                inset 0 0 35px rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .canvas-wrapper::before {
+            content: " ";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: 
+                linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, transparent 50%),
+                repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.15) 0px, rgba(0, 0, 0, 0.15) 1px, transparent 1px, transparent 3px);
+            pointer-events: none;
+            z-index: 4;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16 / 10;
+            cursor: crosshair;
+        }
+
+        /* Viewport Navigation Ribbon (Pan & Zoom) */
+        .viewport-ribbon {
+            background: rgba(8, 14, 26, 0.95);
+            border-top: 1px solid rgba(0, 243, 255, 0.2);
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 0.82rem;
+            z-index: 6;
+        }
+
+        .view-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .view-btn {
+            background: #1e293b;
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            color: #cbd5e1;
+            padding: 4px 9px;
+            border-radius: 4px;
+            font-family: 'Share Tech Mono', monospace;
+            cursor: pointer;
+            font-size: 0.82rem;
+            transition: all 0.15s ease;
+        }
+
+        .view-btn:hover {
+            background: var(--neon-cyan);
+            color: #050b14;
+            border-color: var(--neon-cyan);
+        }
+
+        .view-btn.active {
+            background: var(--neon-amber);
+            color: #000;
+            font-weight: bold;
+            border-color: #f59e0b;
+        }
+
+        .controls-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: linear-gradient(145deg, rgba(11, 17, 30, 0.92) 0%, rgba(6, 9, 16, 0.96) 100%);
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            max-height: 560px;
+            overflow-y: auto;
+        }
+
+        .controls-panel::-webkit-scrollbar {
+            width: 6px;
+        }
+        .controls-panel::-webkit-scrollbar-thumb {
+            background: rgba(0, 243, 255, 0.3);
+            border-radius: 3px;
+        }
+
+        .panel-heading {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.82rem;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            border-bottom: 1px solid rgba(0, 243, 255, 0.25);
+            padding-bottom: 5px;
+            margin: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .step-banner {
+            background: rgba(14, 28, 54, 0.7);
+            border-left: 3px solid var(--neon-cyan);
+            padding: 8px 10px;
+            border-radius: 0 6px 6px 0;
+            font-size: 0.82rem;
+            line-height: 1.45;
+            color: #e2e8f0;
+        }
+        .step-banner b { color: var(--neon-cyan); }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .control-group label {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #cbd5e1;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .control-group label span {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--neon-green);
+        }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .btn-grid.full {
+            grid-template-columns: 1fr;
+        }
+
+        .sim-btn {
+            background: linear-gradient(180deg, rgba(16, 28, 54, 0.9) 0%, rgba(8, 14, 28, 0.95) 100%);
+            border: 1px solid rgba(0, 243, 255, 0.35);
+            color: var(--neon-cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.76rem;
+            font-weight: 700;
+            padding: 8px 10px;
+            min-height: 38px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            text-align: center;
+        }
+
+        .sim-btn:hover {
+            border-color: var(--neon-cyan);
+            color: #fff;
+            box-shadow: 0 0 12px rgba(0, 243, 255, 0.5);
+            transform: translateY(-1px);
+        }
+
+        .sim-btn.active {
+            background: var(--neon-cyan);
+            color: #030712;
+            border-color: #ffffff;
+            box-shadow: 0 0 14px rgba(0, 243, 255, 0.6);
+        }
+
+        .sim-btn.secondary {
+            border-color: rgba(188, 19, 254, 0.5);
+            color: #e580ff;
+        }
+
+        .sim-btn.secondary:hover {
+            border-color: var(--neon-magenta);
+            color: #fff;
+            box-shadow: 0 0 12px rgba(188, 19, 254, 0.6);
+        }
+
+        .sim-btn.danger {
+            border-color: rgba(239, 68, 68, 0.5);
+            color: #f87171;
+        }
+        .sim-btn.danger:hover {
+            border-color: #ef4444;
+            color: #fff;
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.6);
+        }
+
+        .scroll-control-box {
+            background: rgba(4, 9, 20, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 6px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            background: #0c1527;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            height: 6px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin: 4px 0;
+            width: 100%;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #00f3ff 30%, #0088aa 100%);
+            border: 2px solid #fff;
+            box-shadow: 0 0 8px rgba(0, 243, 255, 0.8);
+            cursor: pointer;
+        }
+
+        /* 3. POLICY-COMPLIANT AD CONTAINER */
+        .ad-slot-wrapper {
+            margin: 30px auto;
+            text-align: center;
+            clear: both;
+        }
+
+        .ad-disclaimer {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            margin-bottom: 6px;
+        }
+
+        .ad-box-placeholder {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            min-height: 90px;
+            max-width: 970px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #475569;
+            font-size: 0.85rem;
+            border-radius: 8px;
+        }
+
+        /* 4. EDUCATIONAL CONTENT SECTION */
+        .educational-content {
+            line-height: 1.75;
+            font-size: 1.05rem;
+            color: #cbd5e1;
+            background: rgba(10, 14, 23, 0.88);
+            padding: 30px;
+            border-radius: 16px;
+            border-left: 4px solid var(--neon-cyan);
+            border-top: 1px solid rgba(0, 243, 255, 0.2);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin-bottom: 35px;
+            user-select: text;
+        }
+
+        .educational-content h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-magenta);
+            border-bottom: 1px solid rgba(188, 19, 254, 0.3);
+            padding-bottom: 8px;
+            margin-top: 1.8em;
+            margin-bottom: 0.6em;
+            font-size: 1.45rem;
+        }
+
+        .educational-content h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: #38bdf8;
+            margin-top: 1.4em;
+            margin-bottom: 0.4em;
+            font-size: 1.15rem;
+        }
+
+        .formula-box {
+            background: rgba(4, 9, 20, 0.75);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-left: 3px solid var(--neon-green);
+            padding: 14px 18px;
+            margin: 14px 0;
+            border-radius: 6px;
+            font-family: 'Share Tech Mono', monospace;
+            color: #a7f3d0;
+            font-size: 1.05rem;
+            user-select: text;
+        }
+
+        .task-card {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 18px 20px;
+            margin-bottom: 20px;
+            user-select: text;
+        }
+
+        .task-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            color: var(--neon-cyan);
+            margin-bottom: 8px;
+        }
+
+        details {
+            margin-top: 25px;
+            background: rgba(5, 10, 20, 0.85);
+            border: 1px solid rgba(188, 19, 254, 0.4);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+
+        summary {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            color: #e580ff;
+            cursor: pointer;
+            padding: 6px 0;
+            user-select: none;
+            outline: none;
+        }
+
+        .solution-step {
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+            padding: 14px 0;
+            user-select: text;
+        }
+
+        .solution-step:last-child {
+            border-bottom: none;
+        }
+
+        /* 5. FOOTER & ACCURATE ALIGNED LINKS */
+        footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px 20px 20px 20px;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .footer-nav {
+            display: flex;
+            justify-content: center;
+            gap: 22px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .footer-nav a, .footer-modal-trigger {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.2s, text-shadow 0.2s;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .footer-nav a:hover, .footer-modal-trigger:hover {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
+        }
+
+        /* 6. SELF-CONTAINED POLICY MODALS */
+        .policy-modal {
+            position: fixed !important;
+            top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
+            width: 100vw !important; height: 100vh !important;
+            background: rgba(4, 7, 15, 0.92) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 99999 !important;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-body {
+            background: linear-gradient(145deg, #0b111e 0%, #060913 100%);
+            border: 2px solid var(--neon-cyan);
+            border-radius: 16px;
+            max-width: 820px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 35px 30px;
+            color: #cbd5e1;
+            box-shadow: 0 0 40px rgba(0, 243, 255, 0.25);
+            line-height: 1.75;
+            position: relative;
+            text-align: left;
+            user-select: text;
+        }
+
+        .modal-body h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-cyan);
+            margin-top: 0;
+            font-size: 1.6rem;
+        }
+
+        .modal-body h3 {
+            color: var(--neon-magenta);
+            font-family: 'Orbitron', sans-serif;
+            margin-top: 24px;
+            margin-bottom: 8px;
+            font-size: 1.15rem;
+        }
+
+        .modal-date {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--neon-green);
+            font-size: 0.9rem;
+            margin-top: -6px;
+            margin-bottom: 16px;
+        }
+
+        .modal-close-btn {
+            background: linear-gradient(180deg, rgba(188, 19, 254, 0.4), rgba(188, 19, 254, 0.15));
+            border: 1px solid var(--neon-magenta);
+            color: #fff;
+            padding: 8px 18px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            float: right;
+            margin-bottom: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close-btn:hover {
+            background: var(--neon-magenta);
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.8);
+        }
+
+        @media (max-width: 860px) {
+            body { padding: 10px; }
+            #simulator-container, .educational-content { padding: 14px; }
+            .sim-layout { grid-template-columns: 1fr; }
+            .hud-telemetry { flex-direction: column; align-items: flex-start; }
+            .modal-body { padding: 22px 18px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. HEADER & TOP NAVIGATION -->
+    <header>
+        <nav class="top-nav">
+            <a href="../index.html" class="back-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Back to LuyaliSims
+            </a>
+            <span class="mod-badge">MODULE ID: PHYS-ELEC-04</span>
+        </nav>
+        
+        <h1>ELECTROSTATIC PHYSICS LABORATORY</h1>
+        
+        <p class="lead-summary">
+            Investigate electrostatic charge accumulation, polarization, earthing, and Coulomb interactions across three core modules: the Gold-Leaf Electroscope, Conductive Spheres (Induction and Contact), and the Electric Field Sandbox with Runge-Kutta streamline integration and component force vector probing.
+        </p>
+    </header>
+
+    <main>
+        <!-- 2. SIMULATOR WORKSPACE -->
+        <section id="simulator-container" aria-label="Interactive Electrostatics Workspace">
+            
+            <!-- Module Switcher Tabs -->
+            <div class="lab-mode-bar">
+                <button class="lab-tab active" id="tab-electroscope" onclick="switchMode('electroscope')">1. Gold-Leaf Electroscope</button>
+                <button class="lab-tab" id="tab-spheres" onclick="switchMode('spheres')">2. Conductive Spheres Lab</button>
+                <button class="lab-tab" id="tab-fields" onclick="switchMode('fields')">3. Electric Field Sandbox</button>
+            </div>
+
+            <!-- Telemetry Status Bar -->
+            <div class="hud-telemetry">
+                <div class="telemetry-item">
+                    <span class="tele-label">Active State:</span>
+                    <span id="tele-status" class="tele-val">READY</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label" id="label-tele-1">Cap Charge:</span>
+                    <span id="readout-1" class="tele-val">0.0 nC</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label" id="label-tele-2">Leaf Divergence:</span>
+                    <span id="readout-2" class="tele-val pink">0.0 deg</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label" id="label-tele-3">Rod Polarity:</span>
+                    <span id="readout-3" class="tele-val amber">0.0 nC</span>
+                </div>
+            </div>
+
+            <div class="sim-layout">
+                <!-- Canvas Display & Viewport Ribbon -->
+                <div class="canvas-wrapper" id="canvasFrame">
+                    <canvas id="simCanvas" width="880" height="550"></canvas>
+                    
+                    <!-- Integrated Pan, Scroll & Zoom Controls -->
+                    <div class="viewport-ribbon">
+                        <div class="view-group">
+                            <span style="color:#8da4be; font-size:0.75rem; text-transform:uppercase;">View:</span>
+                            <button class="view-btn" id="panToggleBtn" onclick="togglePanMode()" title="Toggle Canvas Drag Panning">✋ Pan Mode</button>
+                            <button class="view-btn" onclick="panNudge(-30, 0)">◄</button>
+                            <button class="view-btn" onclick="panNudge(30, 0)">►</button>
+                            <button class="view-btn" onclick="panNudge(0, -30)">▲</button>
+                            <button class="view-btn" onclick="panNudge(0, 30)">▼</button>
+                            <button class="view-btn" onclick="resetView()">Center</button>
+                        </div>
+                        <div class="view-group">
+                            <span style="color:#8da4be; font-size:0.75rem; text-transform:uppercase;">Zoom:</span>
+                            <button class="view-btn" onclick="adjustZoom(-0.1)">–</button>
+                            <span id="zoom-readout" style="font-family:'Share Tech Mono', monospace; color:var(--neon-cyan); min-width:38px; text-align:center;">100%</span>
+                            <button class="view-btn" onclick="adjustZoom(0.1)">+</button>
+                            <button class="view-btn" onclick="resetZoom()">Fit</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Controls Console -->
+                <div class="controls-panel" id="controlsPanel">
+                    <!-- Dynamic Controls Populated by JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. POLICY-COMPLIANT AD CONTAINER -->
+        <div class="ad-slot-wrapper">
+            <div class="ad-disclaimer">Advertisement</div>
+            <div class="ad-box-placeholder">
+                <span>[Google AdSense Responsive Display Unit]</span>
+            </div>
+        </div>
+
+        <!-- 4. EDUCATIONAL REFERENCE ARTICLE -->
+        <article class="educational-content">
+            <section>
+                <h2>How to Operate the Simulator</h2>
+                <p>
+                    This laboratory is organized into three distinct electrostatics modules, selectable via the top navigation tabs:
+                </p>
+                <ul>
+                    <li>
+                        <strong>1. Gold-Leaf Electroscope:</strong> Electrify the charging rod using the preparation buttons (positive glass/silk or negative ebonite/fur). Drag the rod towards the top brass cap to observe electrostatic charge separation and leaf divergence. Test both <em>Charging by Induction</em> (approach cap, ground cap to earth, disconnect ground, remove rod) and <em>Charging by Contact</em> (touch rod directly to cap to transfer charge).
+                    </li>
+                    <li>
+                        <strong>2. Conductive Spheres Lab:</strong> Explore charge redistribution between conducting metal spheres mounted on insulating stands. Test single-sphere induction with earthing, two-sphere separation in an external electrostatic field, and direct contact charge sharing between Sphere A and Sphere B.
+                    </li>
+                    <li>
+                        <strong>3. Electric Field Sandbox:</strong> Select classic field configurations including electric dipoles, equal like charges, unequal like charges (+2q, +q), unequal dipoles (+2q, -q), and a charged sphere facing an earthed conducting plane. Drag the yellow test sensor probe (+q) across the field to inspect component Coulomb force vectors (dashed crimson lines) and the net resultant electric field vector (solid green arrow).
+                    </li>
+                    <li>
+                        <strong>Canvas Repositioning & Fullscreen:</strong> Click <em>Pan Mode</em> or use the directional nudge buttons (◄, ►, ▲, ▼) to translate objects on screen. Use the sliders under Viewport Scrollbars in the control panel to adjust horizontal and vertical coordinates directly. Click <em>Fullscreen</em> for a distraction-free presentation experience.
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Scientific Theory & Working Principles</h2>
+                <p>
+                    Electrostatics deals with electric charges at rest, governed by Coulomb's law, the conservation of electric charge, and the principle of electrostatic equilibrium in conductors.
+                </p>
+                <h3>1. Triboelectric Electrification</h3>
+                <p>
+                    When two chemically distinct dielectric insulators are rubbed together, mechanical friction promotes intimate surface contact, allowing electron transfer driven by their relative electron affinities. A glass rod rubbed with silk sheds electrons to become positively electrified, while an ebonite or polythene rod rubbed with animal fur captures surplus electrons, gaining a net negative charge.
+                </p>
+                <h3>2. Electrostatic Induction</h3>
+                <p>
+                    In an isolated metallic conductor, conduction electrons move freely through the positive ionic lattice. When an external positive rod approaches, mobile conduction electrons are pulled toward the proximate face (forming an induced negative bound charge), leaving behind unshielded positive lattice ions at the far end (induced positive charge). If the far end is momentarily connected to Earth (a massive charge reservoir), electrons flow from ground into the conductor to neutralize the exposed positive charge. Once the ground connection is severed and the external rod removed, the excess negative electrons redistribute uniformly across the conductor's outer surface.
+                </p>
+                <h3>3. Conductors in Electrostatic Equilibrium</h3>
+                <p>
+                    Under static conditions, mobile electrons rearrange within picoseconds until the net electric field inside the metallic conductor is identically zero. Consequently, all excess static charge resides entirely on the exterior surface, the interior electrostatic potential is constant throughout, and external electric field lines emerge strictly perpendicular to the conducting boundary.
+                </p>
+                <h3>4. Method of Image Charges</h3>
+                <p>
+                    When an isolated charge +q sits near a grounded infinite conducting plane, free electrons in the plate accumulate directly opposite the charge, ensuring that the tangential electric field along the metal surface vanishes. By uniqueness theorems of Poisson's and Laplace's equations, the resulting field in front of the plate is mathematically identical to replacing the plate with a virtual "image charge" of opposite sign (-q) located at an equal mirror distance behind the boundary.
+                </p>
+            </section>
+
+            <section>
+                <h2>Mathematical Foundations & Formulas</h2>
+                <p>
+                    Quantitative electrostatic behavior in this simulator is modeled via classical electrodynamic formulas:
+                </p>
+                <div class="formula-box">
+                    Coulomb's Law: F = (1 / (4 * pi * epsilon_0)) * (|q_1 * q_2| / r^2)<br>
+                    Electric Field of a Point Charge: E = (1 / (4 * pi * epsilon_0)) * (q / r^2)<br>
+                    Principle of Superposition: E_net = Sum(E_i) = E_1 + E_2 + ... + E_n<br>
+                    Neutral Point Location (Two Like Charges q_1 and q_2 separated by distance d):<br>
+                    x_neutral = d / (1 + sqrt(q_2 / q_1))<br>
+                    Conductor Charge Equipartition (Two Identical Touching Spheres):<br>
+                    q_final = (q_A + q_B) / 2
+                </div>
+                <p>
+                    The divergence angle of the gold leaf reflects a balance between the repulsive electrostatic torque and the restoring gravitational torque:
+                </p>
+                <div class="formula-box">
+                    Electrostatic Torque = Restoring Gravitational Torque<br>
+                    Tau_electric is proportional to (q_leaf)^2 / (sin(theta / 2))^2<br>
+                    Tau_gravity = m * g * (L / 2) * sin(theta)
+                </div>
+            </section>
+
+            <section>
+                <h2>Real-World Engineering & Industrial Applications</h2>
+                <p>
+                    Electrostatic forces are leveraged across numerous modern industrial and environmental systems:
+                </p>
+                <ul>
+                    <li>
+                        <strong>Electrostatic Precipitators (ESP):</strong> Coal-fired power stations, cement kilns, and metal smelters use high-voltage corona discharge wires (-50 kV) to ionize incoming exhaust gas. Flying fly-ash particulates capture free electrons and are swept under high electric fields toward grounded collection plates, capturing over 99% of particulate pollutants.
+                    </li>
+                    <li>
+                        <strong>Laser Printing and Xerography:</strong> Photoreceptor drums coated with photoconductive selenium are uniformly charged in darkness by a corona wire. Laser diodes discharge selected regions, creating an electrostatic latent image. Positively charged dry toner particles adhere strictly to the discharged areas before being electrostatically transferred and heat-fused onto paper.
+                    </li>
+                    <li>
+                        <strong>Automotive Electrostatic Spray Painting:</strong> Liquid paint droplets expelled from high-speed atomizers receive a negative charge (typically -60 kV), while the vehicle body is grounded. Strong electrostatic attraction pulls mist droplets onto all vehicle contours—including recessed joints and rear surfaces—slashing paint overspray waste from 60% down to less than 10%.
+                    </li>
+                    <li>
+                        <strong>ESD Protection in Semiconductor Manufacturing:</strong> Sub-nanometer transistor gates in modern microprocessors can be permanently ruptured by electrostatic discharge sparks as small as 50 volts. Cleanrooms utilize conductive flooring, wrist grounding straps, ionizers, and dissipative packaging materials to continuously neutralize static buildup.
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Practice Problems & Diagnostic Tasks</h2>
+                <p>Test your quantitative comprehension using the five laboratory exercises below:</p>
+
+                <div class="task-card">
+                    <div class="task-title">Task 1: Direct Coulomb Force Calculation</div>
+                    <p>
+                        Two identical small conducting spheres in vacuum carry net charges of +6.0 nC and -2.0 nC and are separated by a center-to-center distance of 0.050 meters. Determine the magnitude and nature (attractive or repulsive) of the electrostatic force between them. (Use Coulomb's constant k = 8.99 x 10^9 N m^2 / C^2).
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 2: Contact Charge Redistribution and Separation Force</div>
+                    <p>
+                        The two conducting spheres from Task 1 are brought into direct electrical contact, allowed to reach electrostatic equilibrium, and then returned to their original separation distance of 0.050 meters. Calculate the new net charge on each sphere and the magnitude and nature of the resulting electrostatic force.
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 3: Analytical Neutral Point Position (E = 0)</div>
+                    <p>
+                        Two point charges q_1 = +8.0 nC and q_2 = +2.0 nC are fixed along the x-axis separated by a distance d = 0.30 meters. Find the exact position along the line connecting them where the net electric field is zero, measuring from charge q_1.
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 4: Gold-Leaf Electroscope Induction Troubleshooting</div>
+                    <p>
+                        A senior physics student approaches the neutral brass cap of a gold-leaf electroscope with an ebonite rod rubbed with fur (-4.0 nC). With the rod held 3 cm above the cap, the cap is momentarily touched with an earth lead and released. Next, the rod is removed far away. State the final net charge sign on the electroscope, explain the electron flow during grounding, and predict whether leaf divergence increases, decreases, or remains unchanged when another negatively charged rod subsequently approaches the cap.
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 5: Electric Field and Acceleration of a Particulate in an ESP</div>
+                    <p>
+                        In an electrostatic precipitator, a uniform electric field of magnitude 4.5 x 10^5 N/C is maintained between parallel plates separated by 0.12 meters. A spherical dust particle of mass 2.0 x 10^-11 kg acquires a net negative charge of 500 excess electrons. Calculate the electrostatic force exerted on the particle and determine its instantaneous acceleration toward the grounded collector plate. (Fundamental electron charge e = 1.60 x 10^-19 C).
+                    </p>
+                </div>
+
+                <!-- Collapsible Solutions -->
+                <details>
+                    <summary>Click to Reveal Solutions and Step-by-Step Proofs</summary>
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 1:</strong></p>
+                        <p>
+                            Formula: F = k * (|q_1 * q_2|) / r^2<br>
+                            Convert units: q_1 = 6.0 x 10^-9 C, q_2 = 2.0 x 10^-9 C, r = 0.050 m.<br>
+                            F = (8.99 x 10^9) * (6.0 x 10^-9 * 2.0 x 10^-9) / (0.050)^2<br>
+                            F = (8.99 x 10^9 * 1.20 x 10^-17) / 0.0025 = 1.079 x 10^-7 / 0.0025 = <strong>4.32 x 10^-5 N</strong>.<br>
+                            Because the charges possess opposite algebraic signs, the force is <strong>attractive</strong>.
+                        </p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 2:</strong></p>
+                        <p>
+                            By conservation of charge, when two identical conductive spheres touch, total charge is shared equally:<br>
+                            q_total = q_1 + q_2 = (+6.0 nC) + (-2.0 nC) = +4.0 nC.<br>
+                            Each sphere receives: q_final = q_total / 2 = <strong>+2.0 nC</strong> (or +2.0 x 10^-9 C).<br>
+                            New electrostatic force at r = 0.050 m:<br>
+                            F_new = (8.99 x 10^9) * (2.0 x 10^-9 * 2.0 x 10^-9) / (0.050)^2<br>
+                            F_new = (8.99 x 10^9 * 4.0 x 10^-18) / 0.0025 = 3.596 x 10^-8 / 0.0025 = <strong>1.44 x 10^-5 N</strong>.<br>
+                            Since both spheres now possess like positive charges, the force is <strong>repulsive</strong>.
+                        </p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 3:</strong></p>
+                        <p>
+                            Let x be the distance from charge q_1 along the line connecting the two charges (0 < x < d). At the neutral point, the electric fields produced by q_1 and q_2 have equal magnitudes and opposite directions:<br>
+                            k * q_1 / x^2 = k * q_2 / (d - x)^2<br>
+                            sqrt(q_1) / x = sqrt(q_2) / (d - x)<br>
+                            sqrt(8.0 x 10^-9) / x = sqrt(2.0 x 10^-9) / (0.30 - x)<br>
+                            Dividing through by sqrt(2.0 x 10^-9) gives: sqrt(4.0) / x = 1 / (0.30 - x)<br>
+                            2 / x = 1 / (0.30 - x) => 2 * (0.30 - x) = x => 0.60 - 2x = x => 3x = 0.60<br>
+                            x = <strong>0.20 meters</strong> from charge q_1 (and 0.10 meters from charge q_2).
+                        </p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 4:</strong></p>
+                        <p>
+                            1. <em>Sign of final charge:</em> The electroscope is left with a <strong>positive net charge</strong>. The negative rod repels free conduction electrons away from the cap down into the leaves. Grounding provides an escape path, causing electrons to flow from the electroscope into Earth. Severing the ground and removing the rod leaves a permanent deficiency of electrons.<br>
+                            2. <em>Electron motion during grounding:</em> Conduction electrons flow <strong>from the electroscope into the Earth</strong>.<br>
+                            3. <em>Effect of approaching another negative rod:</em> The external negative rod will repel electrons from the cap back down into the positively charged gold leaf, reducing the leaf's net positive charge density. Consequently, the gold leaf divergence will <strong>decrease</strong>.
+                        </p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 5:</strong></p>
+                        <p>
+                            1. Calculate net charge on dust particle:<br>
+                            q = 500 * (-1.60 x 10^-19 C) = -8.0 x 10^-17 C.<br>
+                            2. Magnitude of electrostatic force:<br>
+                            F = |q| * E = (8.0 x 10^-17 C) * (4.5 x 10^5 N/C) = <strong>3.60 x 10^-11 N</strong>.<br>
+                            3. Instantaneous acceleration using Newton's second law (a = F / m):<br>
+                            a = (3.60 x 10^-11 N) / (2.0 x 10^-11 kg) = <strong>1.80 m/s^2</strong> directed toward the positively biased collection plate.
+                        </p>
+                    </div>
+                </details>
+            </section>
+        </article>
+    </main>
+
+    <!-- 5. SYNCHRONIZED COMPLIANCE FOOTER -->
+    <footer>
+        <nav class="footer-nav">
+            <a href="../index.html">Home</a>
+            <a href="../index.html#about-section">About Us</a>
+            <button type="button" class="footer-modal-trigger" onclick="openSimModal('simPrivacyModal')">Privacy Policy</button>
+            <button type="button" class="footer-modal-trigger" onclick="openSimModal('simTermsModal')">Terms of Service</button>
+            <a href="../index.html#contact-section">Contact Us</a>
+            <a href="https://forms.gle/fYxxaNKAh21dPUoBA" target="_blank" rel="noopener noreferrer">Simulator Suggestions</a>
+        </nav>
+        <p>&copy; 2026 LuyaliSims | Engineered by Click & Draft | Dedicated to Open STEM Education</p>
+    </footer>
+
+    <!-- 6. SELF-CONTAINED PRIVACY POLICY MODAL -->
+    <div id="simPrivacyModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="privacyTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeSimModal('simPrivacyModal')">Close [X]</button>
+            <h2 id="privacyTitle">Privacy Policy</h2>
+            <p class="modal-date">Last Updated: September 2026</p>
+            <p>Welcome to LuyaliSims. We respect your privacy and are committed to protecting your personal data. This privacy policy explains how we treat information when you interact with our educational simulators.</p>
+            
+            <h3>1. Educational Purpose & Information Collection</h3>
+            <p>LuyaliSims is a free educational portal. We do not require account registration, passwords, or personal login information to run any simulation. All simulation calculations occur locally within your browser using client-side JavaScript.</p>
+
+            <h3>2. Google AdSense & Third-Party Cookies</h3>
+            <p>We may display advertisements served by Google AdSense to fund our free educational tools. Google, as a third-party vendor, uses cookies to serve ads on our site based on users' visits to this and other sites on the Internet.</p>
+            <ul>
+                <li>Google's use of advertising cookies enables it and its partners to serve ads based on your visit to LuyaliSims and other sites.</li>
+                <li>Users may opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" style="color: var(--neon-cyan);">Google Ads Settings</a>.</li>
+            </ul>
+
+            <h3>3. Log Files & Analytics</h3>
+            <p>Like standard websites, our hosting servers collect anonymous log records (including IP addresses, browser types, and timestamp references) to monitor server uptime, fix script errors, and optimize simulator performance.</p>
+
+            <h3>4. Children's Online Privacy (COPPA Compliance)</h3>
+            <p>Our educational simulators are built for students and educators of all ages. We do not knowingly solicit or collect personally identifiable information from children under 13.</p>
+
+            <h3>5. Contact Regarding Privacy</h3>
+            <p>If you have any questions regarding this policy, contact us at: <a href="mailto:luyashliz@gmail.com" style="color: var(--neon-cyan);">luyashliz@gmail.com</a>.</p>
+        </div>
+    </div>
+
+    <!-- 7. SELF-CONTAINED TERMS OF SERVICE MODAL -->
+    <div id="simTermsModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="termsTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeSimModal('simTermsModal')">Close [X]</button>
+            <h2 id="termsTitle">Terms of Service</h2>
+            <p class="modal-date">Effective Date: September 2026</p>
+
+            <h3>1. Permitted Educational Use</h3>
+            <p>All interactive models, simulations, practice problems, and laboratory worksheets on LuyaliSims are made freely available for classroom demonstrations, academic study, tutoring, and self-paced individual learning.</p>
+
+            <h3>2. Intellectual Property</h3>
+            <p>The code architecture, layout designs, and custom interactive engines are the intellectual property of Ian Luyali and Click & Draft. You may use our simulators online in academic settings, but mirroring or re-hosting our code for commercial resale without permission is prohibited.</p>
+
+            <h3>3. Disclaimer of Scientific Warranty</h3>
+            <p>While simulations are engineered to accurately replicate classical electrodynamics, mechanics, and electronics, they are provided as conceptual learning aids. LuyaliSims is not liable for outcomes in real-world high-voltage or hazardous laboratory environments constructed without professional teacher supervision.</p>
+
+            <h3>4. Updates to Terms</h3>
+            <p>We reserve the right to refine these terms as new laboratory modules and features are introduced.</p>
+        </div>
+    </div>
+
+    <!-- 8. CORE ENGINE SCRIPT -->
+    <script>
+        // Modal Controls
+        function openSimModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeSimModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('policy-modal')) {
+                closeSimModal(e.target.id);
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' || e.key === 'Esc') {
+                document.querySelectorAll('.policy-modal').forEach(m => {
+                    m.style.display = 'none';
+                });
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // =========================================================================
+        // SIMULATION STATE & VARIABLES
+        // =========================================================================
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        const controlsPanel = document.getElementById('controlsPanel');
+        const zoomReadout = document.getElementById('zoom-readout');
+        const panToggleBtn = document.getElementById('panToggleBtn');
+
+        let currentMode = 'electroscope';
+        let zoom = 1.0;
+        let panOffset = { x: 0, y: 0 };
+        let panModeEnabled = false;
+        let showMethodSteps = true;
+
+        // Charging Rod
+        const rod = {
+            restX: 180,
+            restY: 220,
+            x: 180,
+            y: 220,
+            width: 170,
+            height: 32,
+            charge: 6.0,
+            isDragging: false
+        };
+
+        // Mode 1: Electroscope
+        const electroscope = {
+            cx: 560,
+            cy: 190,
+            capRadius: 65,
+            stemLength: 175,
+            leafLength: 95,
+            leafAngle: 0.0,
+            netCharge: 0.0,
+            inducedCapCharge: 0.0,
+            inducedLeafCharge: 0.0,
+            isGrounded: false,
+            chargeMethod: 'induction'
+        };
+
+        // Mode 2: Conductive Spheres
+        const spheres = {
+            subMethod: 'single_induction',
+            s1: { x: 470, y: 310, r: 55, netCharge: 0.0, isGrounded: false, isDragging: false },
+            s2: { x: 590, y: 310, r: 55, netCharge: 0.0, isDragging: false }
+        };
+
+        // Mode 3: Electric Field Sandbox
+        let fieldPreset = 'dipole';
+        let fieldCharges = [];
+        let plate = { active: false, x: 640, qSign: -1 };
+        let probe = { x: 440, y: 240, isDragging: false };
+
+        function initFieldPreset(type) {
+            fieldPreset = type;
+            const cx = 450, cy = 275;
+            plate.active = false;
+
+            if (type === 'dipole') {
+                fieldCharges = [
+                    { x: cx - 130, y: cy, q: 2.0, r: 22, isDragging: false },
+                    { x: cx + 130, y: cy, q: -2.0, r: 22, isDragging: false }
+                ];
+            } else if (type === 'like_equal') {
+                fieldCharges = [
+                    { x: cx - 130, y: cy, q: 2.0, r: 22, isDragging: false },
+                    { x: cx + 130, y: cy, q: 2.0, r: 22, isDragging: false }
+                ];
+            } else if (type === 'like_unequal') {
+                fieldCharges = [
+                    { x: cx - 130, y: cy, q: 4.0, r: 28, isDragging: false },
+                    { x: cx + 130, y: cy, q: 2.0, r: 20, isDragging: false }
+                ];
+            } else if (type === 'unequal_dipole') {
+                fieldCharges = [
+                    { x: cx - 120, y: cy, q: 4.0, r: 26, isDragging: false },
+                    { x: cx + 100, y: cy, q: -2.0, r: 20, isDragging: false }
+                ];
+            } else if (type === 'plate') {
+                plate.active = true;
+                plate.x = cx + 160;
+                plate.qSign = -1;
+                fieldCharges = [
+                    { x: cx - 80, y: cy, q: 2.5, r: 22, isDragging: false }
+                ];
+            } else {
+                fieldCharges = [
+                    { x: cx - 100, y: cy, q: 2.0, r: 22, isDragging: false },
+                    { x: cx + 100, y: cy, q: -2.0, r: 22, isDragging: false }
+                ];
+            }
+        }
+
+        // =========================================================================
+        // VIEWPORT, PANNING, ZOOMING & FULLSCREEN
+        // =========================================================================
+        function adjustZoom(delta) {
+            zoom = Math.max(0.6, Math.min(2.0, zoom + delta));
+            zoomReadout.innerText = Math.round(zoom * 100) + '%';
+        }
+
+        function resetZoom() {
+            zoom = 1.0;
+            zoomReadout.innerText = '100%';
+        }
+
+        function panNudge(dx, dy) {
+            panOffset.x += dx;
+            panOffset.y += dy;
+            syncPanSliders();
+        }
+
+        function resetView() {
+            zoom = 1.0;
+            panOffset.x = 0;
+            panOffset.y = 0;
+            zoomReadout.innerText = '100%';
+            syncPanSliders();
+        }
+
+        function togglePanMode() {
+            panModeEnabled = !panModeEnabled;
+            panToggleBtn.classList.toggle('active', panModeEnabled);
+            canvas.style.cursor = panModeEnabled ? 'grab' : 'crosshair';
+        }
+
+        function onPanSliderChange() {
+            const sx = document.getElementById('pan-slider-x');
+            const sy = document.getElementById('pan-slider-y');
+            if (sx && sy) {
+                panOffset.x = parseFloat(sx.value);
+                panOffset.y = parseFloat(sy.value);
+            }
+        }
+
+        function syncPanSliders() {
+            const sx = document.getElementById('pan-slider-x');
+            const sy = document.getElementById('pan-slider-y');
+            if (sx) sx.value = panOffset.x;
+            if (sy) sy.value = panOffset.y;
+        }
+
+        function toggleFullscreen() {
+            const container = document.getElementById('simulator-container');
+            if (!document.fullscreenElement) {
+                if (container.requestFullscreen) container.requestFullscreen();
+                else if (container.webkitRequestFullscreen) container.webkitRequestFullscreen();
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+            }
+        }
+
+        // =========================================================================
+        // MODE SWITCHING & TOOLBOX UI BUILDER
+        // =========================================================================
+        function switchMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.lab-tab').forEach(b => b.classList.remove('active'));
+            const tabBtn = document.getElementById('tab-' + mode);
+            if (tabBtn) tabBtn.classList.add('active');
+            masterReset();
+        }
+
+        function masterReset() {
+            rod.charge = 0.0;
+            rod.x = rod.restX;
+            rod.y = rod.restY;
+
+            electroscope.netCharge = 0.0;
+            electroscope.inducedCapCharge = 0.0;
+            electroscope.inducedLeafCharge = 0.0;
+            electroscope.leafAngle = 0.0;
+            electroscope.isGrounded = false;
+
+            spheres.s1.netCharge = 0.0;
+            spheres.s2.netCharge = 0.0;
+            spheres.s1.isGrounded = false;
+            spheres.s1.x = 470;
+            spheres.s2.x = 590;
+
+            if (currentMode === 'fields') {
+                initFieldPreset(fieldPreset);
+            }
+            renderControls();
+        }
+
+        function electrifyRod(val) {
+            rod.charge = val;
+            renderControls();
+        }
+
+        function setScopeMethod(m) {
+            electroscope.chargeMethod = m;
+            masterReset();
+        }
+
+        function toggleScopeGround() {
+            electroscope.isGrounded = !electroscope.isGrounded;
+            renderControls();
+        }
+
+        function setSphereSubMethod(m) {
+            spheres.subMethod = m;
+            if (m === 'single_induction') {
+                spheres.s1.x = 510;
+            } else {
+                spheres.s1.x = 470;
+                spheres.s2.x = 590;
+            }
+            masterReset();
+        }
+
+        function toggleSphereGround() {
+            spheres.s1.isGrounded = !spheres.s1.isGrounded;
+            renderControls();
+        }
+
+        function touchSpheres() {
+            spheres.s2.x = spheres.s1.x + spheres.s1.r + spheres.s2.r;
+        }
+
+        function separateSpheres() {
+            spheres.s2.x = spheres.s1.x + spheres.s1.r + spheres.s2.r + 90;
+        }
+
+        function moveRodFar() {
+            rod.x = rod.restX;
+            rod.y = rod.restY;
+            renderControls();
+        }
+
+        function toggleMethodSteps() {
+            showMethodSteps = !showMethodSteps;
+            renderControls();
+        }
+
+        function renderControls() {
+            let html = '';
+
+            // Common 1: Charging Rod (Modes 1 and 2)
+            if (currentMode !== 'fields') {
+                html += `
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <h3 class="panel-heading">1. Charging Rod Preparation</h3>
+                        <button class="view-btn" onclick="toggleMethodSteps()" style="font-size:0.7rem;">
+                            ${showMethodSteps ? 'Hide Guide' : 'Show Guide'}
+                        </button>
+                    </div>
+
+                    <div class="control-group">
+                        <label>Electrified Rod Polarity: 
+                            <span style="color:${rod.charge > 0 ? 'var(--pos-charge)' : (rod.charge < 0 ? 'var(--neg-charge)' : '#8da4be')}">
+                                ${rod.charge > 0 ? '+' : ''}${rod.charge.toFixed(1)} nC ${rod.charge !== 0 ? '(Charged)' : '(Neutral)'}
+                            </span>
+                        </label>
+                        <div class="btn-grid">
+                            <button class="sim-btn ${rod.charge > 0 ? 'active' : ''}" onclick="electrifyRod(6.0)">Glass + Silk (+)</button>
+                            <button class="sim-btn ${rod.charge < 0 ? 'active' : ''}" onclick="electrifyRod(-6.0)">Ebonite + Fur (–)</button>
+                        </div>
+                        <button class="sim-btn secondary" style="margin-top:4px;" onclick="electrifyRod(0.0)">Discharge Rod (0 nC)</button>
+                    </div>
+                `;
+            }
+
+            // Mode 1: Electroscope Controls
+            if (currentMode === 'electroscope') {
+                html += `
+                    <h3 class="panel-heading" style="margin-top:6px;">2. Electroscope Method</h3>
+                    <div class="btn-grid">
+                        <button class="sim-btn ${electroscope.chargeMethod === 'induction' ? 'active' : ''}" onclick="setScopeMethod('induction')">By Induction</button>
+                        <button class="sim-btn ${electroscope.chargeMethod === 'contact' ? 'active' : ''}" onclick="setScopeMethod('contact')">By Contact</button>
+                    </div>
+
+                    ${showMethodSteps ? (electroscope.chargeMethod === 'induction' ? `
+                        <div class="step-banner">
+                            <b>Induction Steps:</b><br>
+                            1. Bring charged rod near brass cap.<br>
+                            2. Tap cap with earthing tool.<br>
+                            3. Disconnect ground lead.<br>
+                            4. Withdraw charging rod away.
+                        </div>
+                    ` : `
+                        <div class="step-banner">
+                            <b>Contact Method:</b><br>
+                            Drag the electrified rod to touch the top brass cap to transfer charge directly.
+                        </div>
+                    `) : ''}
+
+                    ${electroscope.chargeMethod === 'induction' ? `
+                        <div class="btn-grid" style="margin-top:6px;">
+                            <button class="sim-btn ${electroscope.isGrounded ? 'active' : ''}" onclick="toggleScopeGround()">
+                                ${electroscope.isGrounded ? 'Disconnect Ground' : 'Earth Brass Cap ✋'}
+                            </button>
+                            <button class="sim-btn" onclick="moveRodFar()">Withdraw Rod</button>
+                        </div>
+                    ` : ''}
+
+                    <button class="sim-btn danger" style="margin-top:6px;" onclick="masterReset()">Discharge Electroscope (0 nC)</button>
+                `;
+            }
+            // Mode 2: Conductive Spheres Controls
+            else if (currentMode === 'spheres') {
+                html += `
+                    <h3 class="panel-heading" style="margin-top:6px;">2. Conductor Configuration</h3>
+                    <div class="btn-grid" style="margin-bottom:6px;">
+                        <button class="sim-btn ${spheres.subMethod === 'single_induction' ? 'active' : ''}" onclick="setSphereSubMethod('single_induction')">Single Sphere</button>
+                        <button class="sim-btn ${spheres.subMethod === 'two_separation' ? 'active' : ''}" onclick="setSphereSubMethod('two_separation')">Two Spheres (Sep)</button>
+                    </div>
+                    <button class="sim-btn ${spheres.subMethod === 'contact' ? 'active' : ''}" style="width:100%; margin-bottom:6px;" onclick="setSphereSubMethod('contact')">Direct Contact Transfer</button>
+
+                    ${showMethodSteps ? (spheres.subMethod === 'single_induction' ? `
+                        <div class="step-banner">
+                            <b>Single Sphere Induction:</b> Bring rod near left face &rarr; Connect ground on far face &rarr; Break Ground &rarr; Remove Rod.
+                        </div>
+                    ` : spheres.subMethod === 'two_separation' ? `
+                        <div class="step-banner">
+                            <b>Two-Sphere Separation:</b> Touch Spheres &rarr; Bring rod near Sphere A &rarr; Separate Spheres &rarr; Remove rod.
+                        </div>
+                    ` : `
+                        <div class="step-banner">
+                            <b>Direct Contact:</b> Touch rod to Sphere A. Then touch Sphere B to Sphere A to share charge equally.
+                        </div>
+                    `) : ''}
+
+                    ${spheres.subMethod === 'single_induction' ? `
+                        <div class="btn-grid" style="margin-top:6px;">
+                            <button class="sim-btn ${spheres.s1.isGrounded ? 'active' : ''}" onclick="toggleSphereGround()">
+                                ${spheres.s1.isGrounded ? 'Disconnect Ground' : 'Connect Ground Wire ⏚'}
+                            </button>
+                            <button class="sim-btn" onclick="moveRodFar()">Withdraw Rod</button>
+                        </div>
+                    ` : spheres.subMethod === 'two_separation' ? `
+                        <div class="btn-grid" style="margin-top:6px;">
+                            <button class="sim-btn" onclick="touchSpheres()">1. Touch A & B</button>
+                            <button class="sim-btn" onclick="separateSpheres()">2. Separate</button>
+                        </div>
+                        <button class="sim-btn" style="width:100%; margin-top:4px;" onclick="moveRodFar()">3. Withdraw Rod</button>
+                    ` : `
+                        <div class="btn-grid" style="margin-top:6px;">
+                            <button class="sim-btn" onclick="touchSpheres()">Touch A & B</button>
+                            <button class="sim-btn" onclick="separateSpheres()">Separate A & B</button>
+                        </div>
+                    `}
+
+                    <button class="sim-btn danger" style="margin-top:6px;" onclick="masterReset()">Discharge Spheres (0 nC)</button>
+                `;
+            }
+            // Mode 3: Electric Field Controls
+            else if (currentMode === 'fields') {
+                html += `
+                    <h3 class="panel-heading">1. Field Configurations</h3>
+                    <div class="btn-grid">
+                        <button class="sim-btn ${fieldPreset === 'dipole' ? 'active' : ''}" onclick="initFieldPreset('dipole'); renderControls();">Dipole (+ –)</button>
+                        <button class="sim-btn ${fieldPreset === 'like_equal' ? 'active' : ''}" onclick="initFieldPreset('like_equal'); renderControls();">Like (+ +)</button>
+                        <button class="sim-btn ${fieldPreset === 'like_unequal' ? 'active' : ''}" onclick="initFieldPreset('like_unequal'); renderControls();">Unequal (+2q, +q)</button>
+                        <button class="sim-btn ${fieldPreset === 'unequal_dipole' ? 'active' : ''}" onclick="initFieldPreset('unequal_dipole'); renderControls();">Dipole (+2q, –q)</button>
+                        <button class="sim-btn ${fieldPreset === 'plate' ? 'active' : ''}" onclick="initFieldPreset('plate'); renderControls();">Charge & Plate</button>
+                        <button class="sim-btn ${fieldPreset === 'free' ? 'active' : ''}" onclick="initFieldPreset('free'); renderControls();">Free Sandbox</button>
+                    </div>
+
+                    ${fieldPreset === 'free' ? `
+                        <div class="btn-grid" style="margin-top:6px;">
+                            <button class="sim-btn" onclick="fieldCharges.push({x:380, y:275, q:2.0, r:22, isDragging:false})">+ Charge</button>
+                            <button class="sim-btn" onclick="fieldCharges.push({x:520, y:275, q:-2.0, r:22, isDragging:false})">– Charge</button>
+                        </div>
+                        <button class="sim-btn secondary" style="width:100%; margin-top:4px;" onclick="fieldCharges=[]">Clear Sandbox Charges</button>
+                    ` : ''}
+
+                    <div class="step-banner" style="margin-top:8px;">
+                        <b>Sensor Probe Inspector:</b><br>
+                        Drag the yellow test probe (+q) across the field lines to visualize individual Coulomb vectors (dashed red) and the resultant field vector (solid green).
+                    </div>
+
+                    <button class="sim-btn danger" style="margin-top:6px;" onclick="masterReset()">Reset Electric Field</button>
+                `;
+            }
+
+            // Reposition / Pan Sliders & Fullscreen Tooling
+            html += `
+                <h3 class="panel-heading" style="margin-top:8px;">Viewport & Screen Adjust</h3>
+                <div class="scroll-control-box">
+                    <label style="font-size:0.75rem; color:#8da4be; display:flex; justify-content:space-between;">
+                        Horizontal Pan (X): <span id="val-pan-x" style="color:var(--neon-cyan);">${Math.round(panOffset.x)} px</span>
+                    </label>
+                    <input type="range" id="pan-slider-x" min="-350" max="350" value="${panOffset.x}" oninput="onPanSliderChange(); document.getElementById('val-pan-x').innerText=this.value+' px';">
+
+                    <label style="font-size:0.75rem; color:#8da4be; display:flex; justify-content:space-between; margin-top:4px;">
+                        Vertical Pan (Y): <span id="val-pan-y" style="color:var(--neon-cyan);">${Math.round(panOffset.y)} px</span>
+                    </label>
+                    <input type="range" id="pan-slider-y" min="-250" max="250" value="${panOffset.y}" oninput="onPanSliderChange(); document.getElementById('val-pan-y').innerText=this.value+' px';">
+                </div>
+
+                <div class="btn-grid full" style="margin-top:6px;">
+                    <button class="sim-btn secondary" onclick="toggleFullscreen()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                        </svg> Toggle Fullscreen
+                    </button>
+                </div>
+            `;
+
+            controlsPanel.innerHTML = html;
+        }
+
+        // =========================================================================
+        // PHYSICS ENGINE
+        // =========================================================================
+        function updatePhysics() {
+            const teleStatus = document.getElementById('tele-status');
+            const tele1Label = document.getElementById('label-tele-1');
+            const tele2Label = document.getElementById('label-tele-2');
+            const tele3Label = document.getElementById('label-tele-3');
+            const read1 = document.getElementById('readout-1');
+            const read2 = document.getElementById('readout-2');
+            const read3 = document.getElementById('readout-3');
+
+            if (teleStatus) teleStatus.innerText = 'SIMULATING';
+
+            if (currentMode === 'electroscope') {
+                if (tele1Label) tele1Label.innerText = 'Brass Cap:';
+                if (tele2Label) tele2Label.innerText = 'Leaf Angle:';
+                if (tele3Label) tele3Label.innerText = 'Rod Polarity:';
+
+                const rodTipX = rod.x + rod.width / 2;
+                const dx = electroscope.cx - rodTipX;
+                const dy = (electroscope.cy + 30) - rod.y;
+                const dist = Math.hypot(dx, dy);
+
+                const maxDist = 240;
+                let proximity = dist < maxDist ? Math.pow((maxDist - dist) / maxDist, 1.25) : 0;
+
+                if (electroscope.chargeMethod === 'contact') {
+                    const isTouching = dist < (electroscope.capRadius + 15);
+                    if (isTouching && rod.charge !== 0 && electroscope.netCharge === 0) {
+                        electroscope.netCharge = rod.charge > 0 ? 4.0 : -4.0;
+                    }
+                    electroscope.inducedCapCharge = electroscope.netCharge / 2;
+                    electroscope.inducedLeafCharge = electroscope.netCharge / 2;
+                } else {
+                    const inducedQ = rod.charge * proximity * 0.95;
+                    if (electroscope.isGrounded) {
+                        electroscope.inducedCapCharge = -inducedQ;
+                        electroscope.inducedLeafCharge = 0.0;
+                        electroscope.netCharge = -inducedQ;
+                    } else {
+                        if (proximity > 0.05) {
+                            electroscope.inducedCapCharge = (electroscope.netCharge / 2) - inducedQ;
+                            electroscope.inducedLeafCharge = (electroscope.netCharge / 2) + inducedQ;
+                        } else {
+                            electroscope.inducedCapCharge = electroscope.netCharge / 2;
+                            electroscope.inducedLeafCharge = electroscope.netCharge / 2;
+                        }
+                    }
+                }
+
+                const targetAngle = Math.min(Math.PI / 3.2, Math.abs(electroscope.inducedLeafCharge) * 0.16);
+                electroscope.leafAngle += (targetAngle - electroscope.leafAngle) * 0.14;
+
+                if (read1) read1.innerText = (electroscope.inducedCapCharge > 0 ? '+' : '') + electroscope.inducedCapCharge.toFixed(1) + ' nC';
+                if (read2) read2.innerText = (electroscope.leafAngle * 180 / Math.PI).toFixed(1) + ' deg';
+                if (read3) read3.innerText = (rod.charge > 0 ? '+' : '') + rod.charge.toFixed(1) + ' nC';
+            }
+            else if (currentMode === 'spheres') {
+                if (tele1Label) tele1Label.innerText = 'Sphere A:';
+                if (tele2Label) tele2Label.innerText = spheres.subMethod === 'single_induction' ? 'Earthing:' : 'Sphere B:';
+                if (tele3Label) tele3Label.innerText = 'Rod Polarity:';
+
+                const rodTipX = rod.x + rod.width / 2;
+                const rDist = Math.hypot(spheres.s1.x - rodTipX, spheres.s1.y - rod.y);
+                const prox = rDist < 240 ? Math.pow((240 - rDist) / 240, 1.25) * rod.charge : 0;
+
+                if (spheres.subMethod === 'single_induction') {
+                    if (spheres.s1.isGrounded) {
+                        spheres.s1.netCharge = -prox * 0.85;
+                    }
+                    if (read2) read2.innerText = spheres.s1.isGrounded ? 'GROUNDED' : 'OPEN';
+                } else if (spheres.subMethod === 'two_separation') {
+                    const sDist = Math.abs(spheres.s2.x - spheres.s1.x);
+                    const inContact = sDist <= (spheres.s1.r + spheres.s2.r + 3);
+
+                    if (inContact) {
+                        spheres.s1.netCharge = -prox * 0.8;
+                        spheres.s2.netCharge = prox * 0.8;
+                    }
+                    if (read2) read2.innerText = (spheres.s2.netCharge > 0 ? '+' : '') + spheres.s2.netCharge.toFixed(1) + ' nC';
+                } else if (spheres.subMethod === 'contact') {
+                    if (rDist < (spheres.s1.r + 15) && rod.charge !== 0 && spheres.s1.netCharge === 0) {
+                        spheres.s1.netCharge = rod.charge > 0 ? 3.5 : -3.5;
+                    }
+                    const sDist = Math.abs(spheres.s2.x - spheres.s1.x);
+                    if (sDist <= (spheres.s1.r + spheres.s2.r + 3)) {
+                        const shared = (spheres.s1.netCharge + spheres.s2.netCharge) / 2;
+                        spheres.s1.netCharge = shared;
+                        spheres.s2.netCharge = shared;
+                    }
+                    if (read2) read2.innerText = (spheres.s2.netCharge > 0 ? '+' : '') + spheres.s2.netCharge.toFixed(1) + ' nC';
+                }
+
+                if (read1) read1.innerText = (spheres.s1.netCharge > 0 ? '+' : '') + spheres.s1.netCharge.toFixed(1) + ' nC';
+                if (read3) read3.innerText = (rod.charge > 0 ? '+' : '') + rod.charge.toFixed(1) + ' nC';
+            }
+            else if (currentMode === 'fields') {
+                if (tele1Label) tele1Label.innerText = 'Probe |E|:';
+                if (tele2Label) tele2Label.innerText = 'Active Charges:';
+                if (tele3Label) tele3Label.innerText = 'Plate Mode:';
+
+                const probeField = getElectricField(probe.x, probe.y);
+                if (read1) read1.innerText = probeField.mag.toFixed(1) + ' N/C';
+                if (read2) read2.innerText = fieldCharges.length + ' points';
+                if (read3) read3.innerText = plate.active ? 'ACTIVE' : 'OFF';
+            }
+        }
+
+        // =========================================================================
+        // RENDERING: ELECTROSCOPE LAB
+        // =========================================================================
+        function drawTextbookElectroscope() {
+            const cx = electroscope.cx, cy = electroscope.cy;
+
+            // Shielded Glass / Metal Enclosure
+            ctx.fillStyle = '#0f172a';
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 4;
+            ctx.strokeRect(cx - 105, cy + 50, 210, 240);
+            ctx.fillRect(cx - 105, cy + 50, 210, 240);
+
+            // Reflection highlights
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.04)';
+            ctx.beginPath();
+            ctx.moveTo(cx - 100, cy + 55);
+            ctx.lineTo(cx + 40, cy + 55);
+            ctx.lineTo(cx - 100, cy + 220);
+            ctx.fill();
+
+            // Grounding base line
+            ctx.strokeStyle = '#64748b';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(cx - 105, cy + 270);
+            ctx.lineTo(cx - 140, cy + 270);
+            ctx.stroke();
+            drawGroundSymbol(cx - 140, cy + 270);
+
+            // Insulating Collar (Ebonite/Amber)
+            ctx.fillStyle = '#b45309';
+            ctx.fillRect(cx - 24, cy + 40, 48, 20);
+
+            // Brass Stem
+            const brassGrad = ctx.createLinearGradient(cx - 5, 0, cx + 5, 0);
+            brassGrad.addColorStop(0, '#ca8a04');
+            brassGrad.addColorStop(0.5, '#fde047');
+            brassGrad.addColorStop(1, '#a16207');
+            ctx.fillStyle = brassGrad;
+            ctx.fillRect(cx - 4, cy + 45, 8, electroscope.stemLength);
+
+            // Fixed Plate / Leaf Carrier
+            const hingeY = cy + 45 + electroscope.stemLength;
+            ctx.fillRect(cx - 4, hingeY, 8, electroscope.leafLength);
+
+            // Gold Leaf (Diverging)
+            ctx.save();
+            ctx.translate(cx + 4, hingeY);
+            ctx.rotate(electroscope.leafAngle);
+            const goldGrad = ctx.createLinearGradient(0, 0, 4, electroscope.leafLength);
+            goldGrad.addColorStop(0, '#fef08a');
+            goldGrad.addColorStop(1, '#eab308');
+            ctx.fillStyle = goldGrad;
+            ctx.fillRect(0, 0, 4, electroscope.leafLength);
+            ctx.restore();
+
+            // Leaf Charges Signs
+            if (Math.abs(electroscope.inducedLeafCharge) > 0.4) {
+                ctx.fillStyle = electroscope.inducedLeafCharge > 0 ? '#ef4444' : '#38bdf8';
+                ctx.font = 'bold 15px sans-serif';
+                const sign = electroscope.inducedLeafCharge > 0 ? '+' : '–';
+                for (let i = 0; i < 4; i++) {
+                    ctx.fillText(sign, cx - 16, hingeY + 16 + i * 22);
+                    ctx.fillText(sign, cx + 18 + i * 5 * Math.sin(electroscope.leafAngle), hingeY + 16 + i * 22);
+                }
+            }
+
+            // Brass Disc / Cap
+            ctx.save();
+            ctx.beginPath();
+            ctx.ellipse(cx, cy + 30, electroscope.capRadius, 20, 0, 0, Math.PI * 2);
+            const capGrad = ctx.createRadialGradient(cx, cy + 20, 5, cx, cy + 30, electroscope.capRadius);
+            capGrad.addColorStop(0, '#fef08a');
+            capGrad.addColorStop(0.7, '#eab308');
+            capGrad.addColorStop(1, '#a16207');
+            ctx.fillStyle = capGrad;
+            ctx.fill();
+            ctx.strokeStyle = '#713f12';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.restore();
+
+            // Cap Charge Markers
+            if (Math.abs(electroscope.inducedCapCharge) > 0.4) {
+                ctx.fillStyle = electroscope.inducedCapCharge > 0 ? '#ef4444' : '#38bdf8';
+                ctx.font = 'bold 16px sans-serif';
+                ctx.textAlign = 'center';
+                const sign = electroscope.inducedCapCharge > 0 ? '+' : '–';
+                for (let i = 0; i < 5; i++) {
+                    const angle = (i / 5) * Math.PI * 2;
+                    ctx.fillText(sign, cx + Math.cos(angle) * (electroscope.capRadius - 18), cy + 30 + Math.sin(angle) * 10);
+                }
+            }
+
+            // Earthing Indicator
+            if (electroscope.isGrounded) {
+                ctx.strokeStyle = '#00ff88';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(cx + electroscope.capRadius - 4, cy + 30);
+                ctx.lineTo(cx + 140, cy - 15);
+                ctx.stroke();
+                drawGroundSymbol(cx + 140, cy - 15);
+                ctx.fillStyle = '#00ff88';
+                ctx.font = 'bold 12px sans-serif';
+                ctx.textAlign = 'left';
+                ctx.fillText('Ground / Earthing ✋', cx + 148, cy - 15);
+            }
+        }
+
+        // =========================================================================
+        // RENDERING: CONDUCTIVE SPHERES
+        // =========================================================================
+        function drawPhysicalSphere(sphere, label) {
+            const x = sphere.x, y = sphere.y, r = sphere.r;
+
+            // Insulating Stand Base
+            ctx.fillStyle = '#475569';
+            ctx.fillRect(x - 32, y + r + 75, 64, 10);
+            ctx.fillStyle = '#64748b';
+            ctx.fillRect(x - 26, y + r + 70, 52, 5);
+
+            // Insulating Pillar
+            const gradStand = ctx.createLinearGradient(x - 12, 0, x + 12, 0);
+            gradStand.addColorStop(0, '#94a3b8');
+            gradStand.addColorStop(0.5, '#e2e8f0');
+            gradStand.addColorStop(1, '#64748b');
+            ctx.fillStyle = gradStand;
+            ctx.fillRect(x - 10, y + r, 20, 70);
+
+            // Highly Reflective Metallic Sphere
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(x, y, r, 0, Math.PI * 2);
+            const sphereGrad = ctx.createRadialGradient(x - r * 0.35, y - r * 0.35, r * 0.05, x, y, r);
+            sphereGrad.addColorStop(0, '#ffffff');
+            sphereGrad.addColorStop(0.3, '#dbeafe');
+            sphereGrad.addColorStop(0.75, '#60a5fa');
+            sphereGrad.addColorStop(1, '#1e293b');
+            ctx.fillStyle = sphereGrad;
+            ctx.fill();
+            ctx.lineWidth = 1.5;
+            ctx.strokeStyle = '#334155';
+            ctx.stroke();
+            ctx.restore();
+
+            // Label
+            ctx.font = 'bold 13px sans-serif';
+            ctx.fillStyle = '#f8fafc';
+            ctx.textAlign = 'center';
+            ctx.fillText(label, x, y + r + 30);
+
+            // Induced Charge Distribution Calculation
+            const rodTipX = rod.x + rod.width / 2;
+            const rDist = Math.hypot(x - rodTipX, y - rod.y);
+            const isInfluenced = rod.charge !== 0 && rDist < 250;
+            const isTouchingRod = rDist < (r + 20);
+
+            let qNear = 0, qFar = 0, qUniform = 0;
+
+            if (isInfluenced) {
+                if (isTouchingRod && spheres.subMethod === 'contact') {
+                    qFar = sphere.netCharge;
+                } else {
+                    const inducedSep = Math.abs(rod.charge) * (1 - rDist / 250);
+                    const signNear = rod.charge > 0 ? -1 : 1;
+                    const signFar = rod.charge > 0 ? 1 : -1;
+
+                    if (sphere.isGrounded) {
+                        qNear = signNear * Math.max(Math.abs(sphere.netCharge), inducedSep * 0.85);
+                        qFar = 0;
+                    } else {
+                        qNear = signNear * inducedSep * 0.8;
+                        qFar = signFar * inducedSep * 0.8;
+                        if (Math.abs(sphere.netCharge) > 0.1) {
+                            qNear += (sphere.netCharge / 2);
+                            qFar += (sphere.netCharge / 2);
+                        }
+                    }
+                }
+            } else {
+                qUniform = sphere.netCharge;
+            }
+
+            ctx.font = 'bold 16px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            // Draw Near Surface Charges
+            if (Math.abs(qNear) > 0.4) {
+                ctx.fillStyle = qNear > 0 ? '#ef4444' : '#38bdf8';
+                const sign = qNear > 0 ? '+' : '–';
+                const count = Math.min(5, Math.ceil(Math.abs(qNear) * 1.5));
+                for (let i = 0; i < count; i++) {
+                    const theta = Math.PI * 0.72 + (i / (count - 1 || 1)) * (Math.PI * 0.56);
+                    ctx.fillText(sign, x + Math.cos(theta) * (r - 14), y + Math.sin(theta) * (r - 14));
+                }
+            }
+
+            // Draw Far Surface Charges
+            if (Math.abs(qFar) > 0.4) {
+                ctx.fillStyle = qFar > 0 ? '#ef4444' : '#38bdf8';
+                const sign = qFar > 0 ? '+' : '–';
+                const count = Math.min(5, Math.ceil(Math.abs(qFar) * 1.5));
+                for (let i = 0; i < count; i++) {
+                    const theta = -Math.PI * 0.28 + (i / (count - 1 || 1)) * (Math.PI * 0.56);
+                    ctx.fillText(sign, x + Math.cos(theta) * (r - 14), y + Math.sin(theta) * (r - 14));
+                }
+            }
+
+            // Draw Uniform Charges (Isolated)
+            if (Math.abs(qUniform) > 0.4) {
+                ctx.fillStyle = qUniform > 0 ? '#ef4444' : '#38bdf8';
+                const sign = qUniform > 0 ? '+' : '–';
+                const count = 6;
+                for (let i = 0; i < count; i++) {
+                    const theta = (i / count) * Math.PI * 2;
+                    ctx.fillText(sign, x + Math.cos(theta) * (r - 14), y + Math.sin(theta) * (r - 14));
+                }
+            }
+
+            // Earthing wire indicator
+            if (sphere.isGrounded) {
+                ctx.strokeStyle = '#00ff88';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(x + r, y);
+                ctx.lineTo(x + r + 55, y);
+                ctx.stroke();
+                drawGroundSymbol(x + r + 55, y);
+                ctx.fillStyle = '#00ff88';
+                ctx.font = 'bold 11px sans-serif';
+                ctx.fillText('Ground Wire', x + r + 35, y - 10);
+            }
+        }
+
+        // =========================================================================
+        // RENDERING: CHARGING ROD & GROUND SYMBOL
+        // =========================================================================
+        function drawTextbookRod() {
+            ctx.save();
+            ctx.translate(rod.x, rod.y);
+
+            const grad = ctx.createLinearGradient(0, -rod.height / 2, 0, rod.height / 2);
+            if (rod.charge > 0) {
+                grad.addColorStop(0, '#fed7aa');
+                grad.addColorStop(0.4, '#ffffff');
+                grad.addColorStop(1, '#fdba74');
+            } else if (rod.charge < 0) {
+                grad.addColorStop(0, '#1e3a8a');
+                grad.addColorStop(0.4, '#60a5fa');
+                grad.addColorStop(1, '#1e293b');
+            } else {
+                grad.addColorStop(0, '#94a3b8');
+                grad.addColorStop(1, '#475569');
+            }
+
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.roundRect(-rod.width / 2, -rod.height / 2, rod.width, rod.height, 14);
+            ctx.fill();
+            ctx.strokeStyle = rod.isDragging ? '#00f3ff' : '#ffffff';
+            ctx.lineWidth = rod.isDragging ? 2.5 : 1;
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.ellipse(rod.width / 2 - 2, 0, 7, rod.height / 2 - 2, 0, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+            ctx.fill();
+
+            if (rod.charge !== 0) {
+                ctx.fillStyle = rod.charge > 0 ? '#dc2626' : '#1e3a8a';
+                ctx.font = 'bold 16px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                const sign = rod.charge > 0 ? '+' : '–';
+                for (let i = -rod.width / 2 + 25; i < rod.width / 2 - 15; i += 24) {
+                    ctx.fillText(sign, i, 0);
+                }
+            }
+
+            ctx.restore();
+        }
+
+        function drawGroundSymbol(x, y) {
+            ctx.strokeStyle = '#94a3b8';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(x, y); ctx.lineTo(x + 22, y);
+            ctx.moveTo(x + 4, y + 5); ctx.lineTo(x + 18, y + 5);
+            ctx.moveTo(x + 8, y + 10); ctx.lineTo(x + 14, y + 10);
+            ctx.stroke();
+        }
+
+        // =========================================================================
+        // RUNGE-KUTTA ELECTRIC FIELD STREAMLINES ENGINE
+        // =========================================================================
+        function getElectricField(x, y) {
+            let ex = 0, ey = 0;
+
+            for (let c of fieldCharges) {
+                const dx = x - c.x;
+                const dy = y - c.y;
+                const r2 = dx * dx + dy * dy;
+                const r = Math.sqrt(r2);
+                if (r > 3) {
+                    const E = (c.q * 1250) / r2;
+                    ex += E * (dx / r);
+                    ey += E * (dy / r);
+                }
+            }
+
+            // Method of Images for Conducting Plate
+            if (plate.active && fieldCharges.length > 0) {
+                const c = fieldCharges[0];
+                const xImg = 2 * plate.x - c.x;
+                const yImg = c.y;
+                const qImg = -c.q;
+
+                const dx = x - xImg;
+                const dy = y - yImg;
+                const r2 = dx * dx + dy * dy;
+                const r = Math.sqrt(r2);
+                if (r > 3) {
+                    const E = (qImg * 1250) / r2;
+                    ex += E * (dx / r);
+                    ey += E * (dy / r);
+                }
+            }
+
+            const mag = Math.hypot(ex, ey);
+            return { ex, ey, mag };
+        }
+
+        function drawElectricFieldLines() {
+            const ds = 3.2;
+            const maxSteps = 450;
+            let seedPoints = [];
+
+            // Generate Seed Points
+            for (let c of fieldCharges) {
+                const numLines = Math.round(16 * Math.abs(c.q));
+                const rSeed = c.r + 2;
+
+                if (c.q > 0) {
+                    for (let i = 0; i < numLines; i++) {
+                        const theta = (i / numLines) * Math.PI * 2;
+                        seedPoints.push({
+                            x: c.x + Math.cos(theta) * rSeed,
+                            y: c.y + Math.sin(theta) * rSeed,
+                            dir: 1
+                        });
+                    }
+                } else if (fieldCharges.every(ch => ch.q <= 0)) {
+                    for (let i = 0; i < numLines; i++) {
+                        const theta = (i / numLines) * Math.PI * 2;
+                        seedPoints.push({
+                            x: c.x + Math.cos(theta) * rSeed,
+                            y: c.y + Math.sin(theta) * rSeed,
+                            dir: -1
+                        });
+                    }
+                }
+            }
+
+            ctx.strokeStyle = '#dc2626';
+            ctx.lineWidth = 1.6;
+
+            for (let seed of seedPoints) {
+                let curX = seed.x;
+                let curY = seed.y;
+                let path = [{ x: curX, y: curY }];
+
+                for (let step = 0; step < maxSteps; step++) {
+                    const f1 = getElectricField(curX, curY);
+                    if (f1.mag < 0.005) break;
+
+                    const dx1 = (f1.ex / f1.mag) * ds * seed.dir;
+                    const dy1 = (f1.ey / f1.mag) * ds * seed.dir;
+
+                    const fMid = getElectricField(curX + 0.5 * dx1, curY + 0.5 * dy1);
+                    if (fMid.mag < 0.005) break;
+
+                    const dx2 = (fMid.ex / fMid.mag) * ds * seed.dir;
+                    const dy2 = (fMid.ey / fMid.mag) * ds * seed.dir;
+
+                    curX += dx2;
+                    curY += dy2;
+                    path.push({ x: curX, y: curY });
+
+                    let hitCharge = false;
+                    for (let c of fieldCharges) {
+                        if (Math.hypot(curX - c.x, curY - c.y) < c.r) { hitCharge = true; break; }
+                    }
+                    if (hitCharge) break;
+
+                    if (plate.active && curX >= plate.x) break;
+                    if (curX < -80 || curX > canvas.width + 80 || curY < -80 || curY > canvas.height + 80) break;
+                }
+
+                if (path.length > 2) {
+                    ctx.beginPath();
+                    ctx.moveTo(path[0].x, path[0].y);
+                    for (let i = 1; i < path.length; i++) {
+                        ctx.lineTo(path[i].x, path[i].y);
+                    }
+                    ctx.stroke();
+
+                    let totalLen = 0;
+                    let lens = [0];
+                    for (let i = 1; i < path.length; i++) {
+                        totalLen += Math.hypot(path[i].x - path[i - 1].x, path[i].y - path[i - 1].y);
+                        lens.push(totalLen);
+                    }
+
+                    if (totalLen > 35) {
+                        const targetLen = totalLen * 0.48;
+                        let arrowIdx = 1;
+                        for (let i = 1; i < lens.length; i++) {
+                            if (lens[i] >= targetLen) { arrowIdx = i; break; }
+                        }
+
+                        const pPrev = path[arrowIdx - 1];
+                        const pNext = path[arrowIdx];
+                        const angle = Math.atan2((pNext.y - pPrev.y) * seed.dir, (pNext.x - pPrev.x) * seed.dir);
+                        drawCleanArrowHead(pNext.x, pNext.y, angle, '#dc2626');
+                    }
+                }
+            }
+
+            // Draw Conducting Plate
+            if (plate.active) {
+                ctx.fillStyle = '#1e293b';
+                ctx.strokeStyle = '#00f3ff';
+                ctx.lineWidth = 3;
+                const plateTop = canvas.height / 2 - 170;
+                ctx.strokeRect(plate.x, plateTop, 22, 340);
+                ctx.fillRect(plate.x, plateTop, 22, 340);
+
+                ctx.fillStyle = plate.qSign > 0 ? '#ef4444' : '#38bdf8';
+                ctx.font = 'bold 15px sans-serif';
+                ctx.textAlign = 'center';
+                for (let y = plateTop + 22; y <= plateTop + 320; y += 26) {
+                    ctx.fillText(plate.qSign > 0 ? '+' : '–', plate.x + 11, y);
+                }
+            }
+
+            // Draw Point Charges
+            for (let c of fieldCharges) {
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
+                const grad = ctx.createRadialGradient(c.x - c.r * 0.35, c.y - c.r * 0.35, 2, c.x, c.y, c.r);
+                if (c.q > 0) {
+                    grad.addColorStop(0, '#fca5a5'); grad.addColorStop(0.5, '#ef4444'); grad.addColorStop(1, '#991b1b');
+                } else {
+                    grad.addColorStop(0, '#93c5fd'); grad.addColorStop(0.5, '#3b82f6'); grad.addColorStop(1, '#1e3a8a');
+                }
+                ctx.fillStyle = grad;
+                ctx.fill();
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2.5;
+                ctx.stroke();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.font = `bold ${Math.round(c.r * 0.8)}px sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                const label = Math.abs(c.q) >= 3 ? (c.q > 0 ? '+2q' : '–2q') : (c.q > 0 ? '+' : '–');
+                ctx.fillText(label, c.x, c.y);
+                ctx.restore();
+            }
+
+            // Neutral Point Marker
+            if (fieldCharges.length === 2 && fieldCharges[0].q > 0 && fieldCharges[1].q > 0) {
+                const c1 = fieldCharges[0];
+                const c2 = fieldCharges[1];
+                const q1 = c1.q;
+                const q2 = c2.q;
+
+                const xNull = (c1.x * Math.sqrt(q2) + c2.x * Math.sqrt(q1)) / (Math.sqrt(q1) + Math.sqrt(q2));
+                const yNull = c1.y;
+
+                ctx.fillStyle = '#f59e0b';
+                ctx.beginPath();
+                ctx.arc(xNull, yNull, 5.5, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#f59e0b';
+                ctx.font = 'bold 13px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('E = 0', xNull, yNull - 14);
+                ctx.font = '11px sans-serif';
+                ctx.fillText('(Neutral Point)', xNull, yNull + 18);
+            }
+
+            drawProbeWithCoulombForces();
+        }
+
+        function drawCleanArrowHead(x, y, angle, color) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angle);
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(-9, -4.5);
+            ctx.lineTo(-7, 0);
+            ctx.lineTo(-9, 4.5);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function drawProbeWithCoulombForces() {
+            const f = getElectricField(probe.x, probe.y);
+
+            // Sensor body
+            ctx.beginPath();
+            ctx.arc(probe.x, probe.y, 9.5, 0, Math.PI * 2);
+            ctx.fillStyle = '#facc15';
+            ctx.fill();
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Component vectors (Dashed red)
+            for (let c of fieldCharges) {
+                const dx = probe.x - c.x;
+                const dy = probe.y - c.y;
+                const r = Math.hypot(dx, dy);
+                if (r > 6) {
+                    const compE = (c.q * 1050) / (r * r);
+                    const compLen = Math.min(65, Math.abs(compE) * 2.5);
+                    const compAngle = Math.atan2(dy * Math.sign(c.q), dx * Math.sign(c.q));
+
+                    ctx.strokeStyle = 'rgba(239, 68, 68, 0.75)';
+                    ctx.lineWidth = 1.5;
+                    ctx.setLineDash([3, 3]);
+                    ctx.beginPath();
+                    ctx.moveTo(probe.x, probe.y);
+                    ctx.lineTo(probe.x + Math.cos(compAngle) * compLen, probe.y + Math.sin(compAngle) * compLen);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                }
+            }
+
+            // Resultant vector (Solid Green)
+            if (f.mag > 0.05) {
+                const netLen = Math.min(85, f.mag * 2.8);
+                const netAngle = Math.atan2(f.ey, f.ex);
+                ctx.strokeStyle = '#00ff88';
+                ctx.lineWidth = 3.5;
+                ctx.beginPath();
+                ctx.moveTo(probe.x, probe.y);
+                ctx.lineTo(probe.x + Math.cos(netAngle) * netLen, probe.y + Math.sin(netAngle) * netLen);
+                ctx.stroke();
+
+                drawCleanArrowHead(probe.x + Math.cos(netAngle) * netLen, probe.y + Math.sin(netAngle) * netLen, netAngle, '#00ff88');
+            }
+        }
+
+        // =========================================================================
+        // INTERACTIVE POINTER EVENTS (OBJECT DRAGGING & VIEW PANNING)
+        // =========================================================================
+        let dragTarget = null;
+        let dragOffset = { x: 0, y: 0 };
+        let isPanDragging = false;
+        let panStart = { x: 0, y: 0 };
+
+        function getCanvasCoords(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            return {
+                x: ((clientX - rect.left) * scaleX - panOffset.x) / zoom,
+                y: ((clientY - rect.top) * scaleY - panOffset.y) / zoom,
+                rawX: (clientX - rect.left) * scaleX,
+                rawY: (clientY - rect.top) * scaleY
+            };
+        }
+
+        function onPointerDown(e) {
+            const p = getCanvasCoords(e);
+
+            if (panModeEnabled || e.button === 1) {
+                isPanDragging = true;
+                panStart.x = p.rawX - panOffset.x;
+                panStart.y = p.rawY - panOffset.y;
+                return;
+            }
+
+            // Mode 1 and 2: Rod drag
+            if (currentMode === 'electroscope' || currentMode === 'spheres') {
+                if (Math.abs(p.x - rod.x) < rod.width / 2 && Math.abs(p.y - rod.y) < rod.height / 2) {
+                    dragTarget = rod;
+                    dragOffset.x = p.x - rod.x;
+                    dragOffset.y = p.y - rod.y;
+                    rod.isDragging = true;
+                    return;
+                }
+            }
+
+            // Mode 2: Sphere Drag
+            if (currentMode === 'spheres') {
+                if (Math.hypot(p.x - spheres.s1.x, p.y - spheres.s1.y) < spheres.s1.r) {
+                    dragTarget = spheres.s1;
+                    dragOffset.x = p.x - spheres.s1.x;
+                    return;
+                }
+                if (spheres.subMethod !== 'single_induction' && Math.hypot(p.x - spheres.s2.x, p.y - spheres.s2.y) < spheres.s2.r) {
+                    dragTarget = spheres.s2;
+                    dragOffset.x = p.x - spheres.s2.x;
+                    return;
+                }
+            }
+
+            // Mode 3: Electric Field Charges & Probe
+            if (currentMode === 'fields') {
+                for (let c of fieldCharges) {
+                    if (Math.hypot(p.x - c.x, p.y - c.y) < c.r + 4) {
+                        dragTarget = c;
+                        c.isDragging = true;
+                        return;
+                    }
+                }
+                if (Math.hypot(p.x - probe.x, p.y - probe.y) < 22) {
+                    dragTarget = probe;
+                    return;
+                }
+            }
+        }
+
+        function onPointerMove(e) {
+            const p = getCanvasCoords(e);
+
+            if (isPanDragging) {
+                panOffset.x = p.rawX - panStart.x;
+                panOffset.y = p.rawY - panStart.y;
+                syncPanSliders();
+                return;
+            }
+
+            if (!dragTarget) return;
+
+            if (dragTarget === rod) {
+                rod.x = p.x - dragOffset.x;
+                rod.y = p.y - dragOffset.y;
+            } else if (dragTarget === spheres.s1 || dragTarget === spheres.s2) {
+                dragTarget.x = p.x - dragOffset.x;
+            } else if (dragTarget === probe) {
+                probe.x = p.x;
+                probe.y = p.y;
+            } else if (currentMode === 'fields') {
+                dragTarget.x = p.x;
+                dragTarget.y = p.y;
+            }
+        }
+
+        function onPointerUp() {
+            isPanDragging = false;
+            if (dragTarget) {
+                if (dragTarget.isDragging !== undefined) dragTarget.isDragging = false;
+                dragTarget = null;
+            }
+        }
+
+        canvas.addEventListener('mousedown', onPointerDown);
+        window.addEventListener('mousemove', onPointerMove);
+        window.addEventListener('mouseup', onPointerUp);
+
+        canvas.addEventListener('touchstart', onPointerDown, { passive: false });
+        window.addEventListener('touchmove', onPointerMove, { passive: false });
+        window.addEventListener('touchend', onPointerUp);
+
+        // =========================================================================
+        // MAIN SIMULATION ANIMATION LOOP
+        // =========================================================================
+        function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.save();
+            ctx.translate(panOffset.x, panOffset.y);
+            ctx.scale(zoom, zoom);
+
+            updatePhysics();
+
+            if (currentMode === 'electroscope') {
+                drawTextbookElectroscope();
+                drawTextbookRod();
+            } else if (currentMode === 'spheres') {
+                if (spheres.subMethod === 'single_induction') {
+                    drawPhysicalSphere(spheres.s1, 'Conductive Sphere');
+                } else {
+                    drawPhysicalSphere(spheres.s1, 'Sphere A');
+                    drawPhysicalSphere(spheres.s2, 'Sphere B');
+                }
+                drawTextbookRod();
+            } else if (currentMode === 'fields') {
+                drawElectricFieldLines();
+            }
+
+            ctx.restore();
+            requestAnimationFrame(render);
+        }
+
+        // Initialize Simulator
+        switchMode('electroscope');
+        render();
+    </script>
+</body>
+</html>

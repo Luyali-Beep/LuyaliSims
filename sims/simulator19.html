@@ -1,0 +1,2800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Interactive Gas Laws and Graham's Diffusion Virtual Laboratory - Explore Boyle's Law, Charles's Law, and Molecular Effusion with Real-Time Kinetics - LuyaliSims STEM Labs.">
+    <title>Advanced Gas Laws & Diffusion Laboratory - LuyaliSims</title>
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    
+    <!-- Import Futuristic & Scientific Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* Base Reset & Variables */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --neon-cyan: #00f3ff;
+            --neon-magenta: #bc13fe;
+            --neon-green: #00ff88;
+            --neon-amber: #f59e0b;
+            --neon-red: #ef4444;
+            --bg-dark: #070a12;
+            --panel-bg: rgba(16, 24, 43, 0.85);
+            --border-glow: rgba(0, 243, 255, 0.35);
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 85% 15%, rgba(0, 243, 255, 0.08), transparent 45%),
+                radial-gradient(circle at 15% 85%, rgba(188, 19, 254, 0.08), transparent 45%),
+                linear-gradient(180deg, #05070e 0%, #0a0e1a 100%);
+            color: #e2e8f0;
+            margin: 0;
+            padding: 16px 20px;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* 1. HEADER & TOP NAVIGATION */
+        header {
+            max-width: 1300px;
+            margin: 0 auto 15px auto;
+        }
+
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 18px;
+            background: rgba(16, 24, 43, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(188, 19, 254, 0.5);
+            color: #e580ff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(188, 19, 254, 0.2);
+            border-color: var(--neon-magenta);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
+            transform: translateX(-3px);
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+            margin: 6px 0 10px 0;
+            font-size: clamp(1.4rem, 3.6vw, 2.3rem);
+            letter-spacing: 1.5px;
+            text-align: center;
+        }
+
+        .lead-summary {
+            max-width: 1000px;
+            margin: 0 auto 20px auto;
+            text-align: center;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: #cbd5e1;
+        }
+
+        main {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        /* 2. SIMULATOR WORKSPACE */
+        #simulator-container {
+            background: linear-gradient(135deg, rgba(16, 24, 43, 0.85) 0%, rgba(8, 12, 22, 0.9) 100%);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-glow);
+            border-radius: 16px;
+            padding: 22px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 25px rgba(0, 243, 255, 0.12);
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        /* Lab Selector Switcher Tabs */
+        .lab-mode-nav {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+
+        .mode-tab-btn {
+            background: rgba(10, 16, 30, 0.8);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            color: #94a3b8;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            letter-spacing: 1px;
+            transition: all 0.25s ease;
+            text-transform: uppercase;
+        }
+
+        .mode-tab-btn:hover {
+            color: #ffffff;
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 12px rgba(0, 243, 255, 0.4);
+        }
+
+        .mode-tab-btn.active {
+            background: linear-gradient(180deg, rgba(0, 243, 255, 0.25) 0%, rgba(16, 24, 43, 0.9) 100%);
+            border-color: var(--neon-cyan);
+            color: var(--neon-cyan);
+            box-shadow: 0 0 18px rgba(0, 243, 255, 0.5), inset 0 0 10px rgba(0, 243, 255, 0.2);
+        }
+
+        /* HUD Telemetry Status Bar */
+        .hud-telemetry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(4, 8, 16, 0.85);
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            border-radius: 10px;
+            padding: 10px 16px;
+            margin-bottom: 18px;
+            font-family: 'Share Tech Mono', monospace;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .telemetry-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.95rem;
+        }
+
+        .tele-label {
+            color: #8da4be;
+            font-size: 0.82rem;
+            text-transform: uppercase;
+        }
+
+        .tele-val {
+            color: var(--neon-cyan);
+            font-weight: 700;
+        }
+
+        .tele-val.pink {
+            color: #ff55bb;
+        }
+
+        .tele-val.green {
+            color: var(--neon-green);
+        }
+
+        .tele-val.amber {
+            color: var(--neon-amber);
+        }
+
+        /* Core Simulation Workspace Grid */
+        .sim-layout {
+            display: grid;
+            grid-template-columns: 1.6fr 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            width: 100%;
+            background: radial-gradient(circle at 50% 50%, #08171a 0%, #02070a 100%);
+            border-radius: 12px;
+            overflow: hidden;
+            touch-action: none;
+            border: 3px solid #1e293b;
+            box-shadow: 
+                0 0 0 2px rgba(0, 243, 255, 0.4),
+                0 15px 35px rgba(0, 0, 0, 0.8),
+                inset 0 0 35px rgba(0, 0, 0, 0.95);
+        }
+
+        canvas#labCanvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16 / 9;
+        }
+
+        .canvas-tip {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            text-align: center;
+            margin-top: 8px;
+            font-family: 'Rajdhani', sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        /* Controls Console */
+        .controls-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            background: linear-gradient(145deg, rgba(11, 17, 30, 0.9) 0%, rgba(6, 9, 16, 0.95) 100%);
+            padding: 18px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        }
+
+        .panel-heading {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border-bottom: 1px solid rgba(0, 243, 255, 0.25);
+            padding-bottom: 6px;
+            margin: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .control-group label {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #cbd5e1;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .control-group label span {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--neon-green);
+        }
+
+        select, input[type="range"] {
+            min-height: 40px;
+        }
+
+        select {
+            background: #060c18;
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            color: #e2e8f0;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding: 8px 12px;
+            border-radius: 8px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            background: #0c1527;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            height: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 6px 0;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #00f3ff 30%, #0088aa 100%);
+            border: 2px solid #fff;
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.8);
+            cursor: pointer;
+        }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .sim-btn {
+            background: linear-gradient(180deg, rgba(16, 28, 54, 0.9) 0%, rgba(8, 14, 28, 0.95) 100%);
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            color: var(--neon-cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 10px 8px;
+            min-height: 44px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .sim-btn:hover {
+            border-color: var(--neon-cyan);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .sim-btn.secondary {
+            border-color: rgba(188, 19, 254, 0.5);
+            color: #e580ff;
+        }
+
+        .sim-btn.secondary:hover {
+            border-color: var(--neon-magenta);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
+        }
+
+        .sim-btn.success {
+            border-color: rgba(0, 255, 136, 0.5);
+            color: var(--neon-green);
+        }
+
+        .sim-btn.success:hover {
+            border-color: var(--neon-green);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.6);
+        }
+
+        .sim-btn.danger {
+            border-color: rgba(239, 68, 68, 0.5);
+            color: #fca5a5;
+        }
+
+        .sim-btn.danger:hover {
+            border-color: var(--neon-red);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.6);
+        }
+
+        /* Meters Display Grid */
+        .hud-meters-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .hud-meter-card {
+            background: rgba(4, 9, 20, 0.85);
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            border-radius: 8px;
+            padding: 10px 8px;
+            text-align: center;
+        }
+
+        .hud-meter-card .lbl {
+            font-size: 0.76rem;
+            color: #8da4be;
+            font-family: 'Share Tech Mono', monospace;
+            text-transform: uppercase;
+        }
+
+        .hud-meter-card .val {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--neon-cyan);
+            font-family: 'Orbitron', sans-serif;
+            margin-top: 4px;
+        }
+
+        /* Live Breakdown Box */
+        .formula-calc-box {
+            background: rgba(4, 9, 20, 0.75);
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            border-left: 4px solid var(--neon-cyan);
+            padding: 14px 18px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            color: #cbd5e1;
+            line-height: 1.6;
+            margin-top: 18px;
+        }
+
+        .formula-calc-box strong {
+            color: var(--neon-cyan);
+        }
+
+        /* Analytics & Plotter Section inside Simulator Container */
+        .analysis-section {
+            margin-top: 22px;
+            padding-top: 18px;
+            border-top: 1px solid rgba(0, 243, 255, 0.25);
+            display: grid;
+            grid-template-columns: 1.35fr 1fr;
+            gap: 18px;
+        }
+
+        .plotter-panel {
+            background: rgba(8, 13, 25, 0.85);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .plotter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .plotter-title {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-cyan);
+            font-size: 0.95rem;
+            letter-spacing: 1px;
+            margin: 0;
+        }
+
+        .chart-box {
+            position: relative;
+            height: 240px;
+            width: 100%;
+            cursor: zoom-in;
+            border-radius: 6px;
+            padding: 4px;
+            background: rgba(4, 7, 14, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.2s ease;
+        }
+
+        .chart-box:hover {
+            border-color: rgba(0, 243, 255, 0.4);
+        }
+
+        .chart-enlarge-hint {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            font-size: 0.72rem;
+            background: rgba(0, 243, 255, 0.15);
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            color: var(--neon-cyan);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-family: 'Share Tech Mono', monospace;
+            pointer-events: none;
+        }
+
+        /* Observation Data Table */
+        .table-panel {
+            background: rgba(8, 13, 25, 0.85);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .table-title {
+            font-family: 'Orbitron', sans-serif;
+            color: #e580ff;
+            font-size: 0.95rem;
+            letter-spacing: 1px;
+            margin: 0 0 10px 0;
+        }
+
+        .table-scroll {
+            flex: 1;
+            max-height: 240px;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+        }
+
+        table.sim-data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            text-align: center;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        table.sim-data-table th {
+            background: rgba(16, 24, 43, 0.95);
+            color: var(--neon-cyan);
+            padding: 8px 6px;
+            position: sticky;
+            top: 0;
+            border-bottom: 1px solid rgba(0, 243, 255, 0.3);
+            font-size: 0.8rem;
+        }
+
+        table.sim-data-table td {
+            padding: 6px 4px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: #e2e8f0;
+        }
+
+        table.sim-data-table tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* 3. POLICY-COMPLIANT AD CONTAINER */
+        .ad-slot-wrapper {
+            margin: 30px auto;
+            text-align: center;
+            clear: both;
+        }
+
+        .ad-disclaimer {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            margin-bottom: 6px;
+        }
+
+        .ad-box-placeholder {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            min-height: 90px;
+            max-width: 970px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #475569;
+            font-size: 0.85rem;
+            border-radius: 8px;
+        }
+
+        /* 4. EDUCATIONAL CONTENT SECTION */
+        .educational-content {
+            line-height: 1.75;
+            font-size: 1.05rem;
+            color: #94a3b8;
+            background: rgba(10, 14, 23, 0.85);
+            padding: 30px;
+            border-radius: 16px;
+            border-left: 4px solid var(--neon-cyan);
+            border-top: 1px solid rgba(0, 243, 255, 0.2);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin-bottom: 35px;
+        }
+
+        .educational-content h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-magenta);
+            border-bottom: 1px solid rgba(188, 19, 254, 0.3);
+            padding-bottom: 8px;
+            margin-top: 1.8em;
+            margin-bottom: 0.6em;
+            font-size: 1.45rem;
+        }
+
+        .educational-content h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: #38bdf8;
+            margin-top: 1.4em;
+            margin-bottom: 0.4em;
+            font-size: 1.15rem;
+        }
+
+        .formula-box {
+            background: rgba(4, 9, 20, 0.7);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-left: 3px solid var(--neon-green);
+            padding: 14px 18px;
+            margin: 14px 0;
+            border-radius: 6px;
+            font-family: 'Share Tech Mono', monospace;
+            color: #a7f3d0;
+            font-size: 1.02rem;
+            line-height: 1.7;
+        }
+
+        .task-card {
+            background: rgba(15, 23, 42, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 18px 22px;
+            margin-bottom: 18px;
+        }
+
+        .task-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.05rem;
+            color: var(--neon-cyan);
+            margin-bottom: 8px;
+        }
+
+        details {
+            margin-top: 25px;
+            background: rgba(5, 10, 20, 0.8);
+            border: 1px solid rgba(188, 19, 254, 0.4);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+
+        summary {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            color: #e580ff;
+            cursor: pointer;
+            padding: 6px 0;
+            user-select: none;
+            letter-spacing: 0.8px;
+        }
+
+        .solution-step {
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.12);
+            padding: 14px 0;
+            font-size: 0.98rem;
+        }
+
+        .solution-step:last-child {
+            border-bottom: none;
+        }
+
+        /* 5. FOOTER & ALIGNED LINKS */
+        footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px 20px 20px 20px;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .footer-nav {
+            display: flex;
+            justify-content: center;
+            gap: 22px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .footer-nav a, .footer-modal-trigger {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.2s, text-shadow 0.2s;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .footer-nav a:hover, .footer-modal-trigger:hover {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
+        }
+
+        /* 6. MODALS: GRAPH POP-OUT & POLICY MODALS */
+        .policy-modal {
+            position: fixed !important;
+            top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
+            width: 100vw !important; height: 100vh !important;
+            background: rgba(4, 7, 15, 0.92) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 99999 !important;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-body {
+            background: linear-gradient(145deg, #0b111e 0%, #060913 100%);
+            border: 2px solid var(--neon-cyan);
+            border-radius: 16px;
+            max-width: 840px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 35px 30px;
+            color: #cbd5e1;
+            box-shadow: 0 0 40px rgba(0, 243, 255, 0.25);
+            line-height: 1.75;
+            position: relative;
+            text-align: left;
+        }
+
+        .modal-body h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-cyan);
+            margin-top: 0;
+            font-size: 1.6rem;
+        }
+
+        .modal-body h3 {
+            color: var(--neon-magenta);
+            font-family: 'Orbitron', sans-serif;
+            margin-top: 24px;
+            margin-bottom: 8px;
+            font-size: 1.15rem;
+        }
+
+        .modal-date {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--neon-green);
+            font-size: 0.9rem;
+            margin-top: -6px;
+            margin-bottom: 16px;
+        }
+
+        .modal-close-btn {
+            background: linear-gradient(180deg, rgba(188, 19, 254, 0.4), rgba(188, 19, 254, 0.15));
+            border: 1px solid var(--neon-magenta);
+            color: #fff;
+            padding: 8px 18px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            float: right;
+            margin-bottom: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close-btn:hover {
+            background: var(--neon-magenta);
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.8);
+        }
+
+        /* Large Pop-Out Graph Modal */
+        #graphPopoutModal .modal-body {
+            max-width: 960px;
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (max-width: 900px) {
+            body { padding: 10px; }
+            #simulator-container, .educational-content { padding: 14px; }
+            .sim-layout { grid-template-columns: 1fr; }
+            .analysis-section { grid-template-columns: 1fr; }
+            .btn-grid { grid-template-columns: 1fr; }
+            .hud-meters-grid { grid-template-columns: 1fr 1fr; }
+            .modal-body { padding: 22px 18px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. HEADER & TOP NAVIGATION -->
+    <header>
+        <nav class="top-nav">
+            <a href="../index.html" class="back-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Back to LuyaliSims
+            </a>
+            <span style="font-family: 'Share Tech Mono', monospace; font-size: 0.85rem; color: #8da4be;">
+                MODULE ID: CHEM-GAS-005
+            </span>
+        </nav>
+        
+        <h1>Advanced Gas Laws & Molecular Diffusion Virtual Lab</h1>
+        
+        <p class="lead-summary">
+            Investigate macroscopic ideal gas thermodynamic states and microscopic kinetic behaviors through precision calibrated simulations. Seamlessly transition between Boyle's isobaric/isothermal compression cylinder, Charles's absolute zero isobaric expansion chamber, and Graham's calibrated 30 cm dual-gas diffusion tube with real-time ammonium chloride precipitate kinetics.
+        </p>
+    </header>
+
+    <main>
+        <!-- 2. SIMULATOR APP WORKSPACE -->
+        <section id="simulator-container" aria-label="Interactive Gas Laws Laboratory Workspace">
+            
+            <!-- Module Switcher Tabs -->
+            <div class="lab-mode-nav">
+                <button class="mode-tab-btn active" id="tab-boyle" onclick="switchLab('boyle')">1. Boyle's Law (P vs V)</button>
+                <button class="mode-tab-btn" id="tab-charles" onclick="switchLab('charles')">2. Charles's Law (V vs T)</button>
+                <button class="mode-tab-btn" id="tab-graham" onclick="switchLab('graham')">3. Graham's Law Diffusion</button>
+            </div>
+
+            <!-- Telemetry Status Bar -->
+            <div class="hud-telemetry">
+                <div class="telemetry-item">
+                    <span class="tele-label">Active State:</span>
+                    <span id="tele-status" class="tele-val">BOYLE COMPRESSION</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Primary Metric:</span>
+                    <span id="readout-1" class="tele-val green">P = 1.00 atm</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Conjugate State:</span>
+                    <span id="readout-2" class="tele-val pink">V = 4.00 L</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Kinetic Temp:</span>
+                    <span id="readout-3" class="tele-val amber">T = 300.0 K</span>
+                </div>
+            </div>
+
+            <div class="sim-layout">
+                <!-- Calibrated Visual Simulation Canvas Viewport -->
+                <div>
+                    <div class="canvas-wrapper" id="canvasFrame">
+                        <canvas id="labCanvas" width="860" height="460"></canvas>
+                    </div>
+                    <p class="canvas-tip" id="canvas-help-text">
+                        Tip: Drag the plunger rod directly inside the visual cylinder or adjust the slider!
+                    </p>
+                </div>
+
+                <!-- Simulation Controls Console -->
+                <div class="controls-panel">
+                    <h3 class="panel-heading">
+                        <span>Apparatus Controls</span>
+                        <span id="panel-badge" style="font-size:0.7rem; color:var(--neon-green); font-family:'Share Tech Mono', monospace;">ONLINE</span>
+                    </h3>
+
+                    <!-- Dynamic Input Elements -->
+                    <div id="dynamic-controls">
+                        <!-- Populated via JavaScript according to selected lab module -->
+                    </div>
+
+                    <!-- Action Commands Grid -->
+                    <div class="btn-grid">
+                        <button class="sim-btn" onclick="recordObservation()">
+                            <span>📝</span> Record Point
+                        </button>
+                        <button class="sim-btn success" onclick="downloadCSVData()">
+                            <span>📥</span> Export CSV
+                        </button>
+                        <button class="sim-btn secondary" onclick="resetExperimentState()">
+                            <span>🔄</span> Reset State
+                        </button>
+                        <button class="sim-btn danger" onclick="clearRecordedData()">
+                            <span>🗑️</span> Clear Plot
+                        </button>
+                    </div>
+
+                    <!-- Fullscreen & Popout Controls -->
+                    <div class="btn-grid" style="margin-top: 4px;">
+                        <button id="fullscreenBtn" class="sim-btn secondary" style="grid-column: span 2;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                            </svg>
+                            Fullscreen Simulator
+                        </button>
+                    </div>
+
+                    <!-- Live Real-Time Readings Grid -->
+                    <div class="hud-meters-grid" id="meters-container">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mathematical Principles & Live Calculation Breakdown -->
+            <div class="formula-calc-box" id="formula-breakdown">
+                <!-- Dynamically populated physics derivation -->
+            </div>
+
+            <!-- Plotter & Observation Records Section -->
+            <div class="analysis-section">
+                <!-- Experimental Plotter -->
+                <div class="plotter-panel">
+                    <div class="plotter-header">
+                        <h4 class="plotter-title">📈 Real-Time Data Plotter</h4>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <div id="chart-extra-controls"></div>
+                            <button class="sim-btn" style="min-height:30px; padding:4px 10px; font-size:0.75rem;" onclick="openGraphModal()">
+                                ⛶ Pop-out Graph
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="chart-box" onclick="openGraphModal()" title="Click to pop out enlarged view">
+                        <span class="chart-enlarge-hint">🔍 Expand</span>
+                        <canvas id="analysisChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Observations Table -->
+                <div class="table-panel">
+                    <h4 class="table-title">📋 Calibrated Observations Table</h4>
+                    <div class="table-scroll">
+                        <table class="sim-data-table" id="dataTable">
+                            <thead id="tableHead"></thead>
+                            <tbody id="tableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. SAFE AD PLACEMENT SLOT -->
+        <div class="ad-slot-wrapper">
+            <div class="ad-disclaimer">Advertisement</div>
+            <div class="ad-box-placeholder">
+                <!-- Google AdSense Responsive Unit Goes Here -->
+                <span>[AdSense Responsive Display Unit]</span>
+            </div>
+        </div>
+
+        <!-- 4. EDUCATIONAL REFERENCE ARTICLE -->
+        <article class="educational-content">
+            <section>
+                <h2>How to Operate the Simulator</h2>
+                <p>
+                    This virtual laboratory enables quantitative experimentation across classical gas laws. Begin by selecting an experimental module using the top mode switchers:
+                </p>
+                <ul>
+                    <li>
+                        <strong>Boyle's Law Module:</strong> Drag the plunger handle inside the cylinder directly or use the Volume slider. Observe how compression increases molecular collision frequency against the cylinder walls, raising the dial pressure reading. Use the plotter dropdown to toggle between the non-linear curved <em>P vs V</em> curve and the linearized <em>P vs 1/V</em> verification line. Check <em>Extrapolate to Origin</em> to observe the theoretical zero-intercept.
+                    </li>
+                    <li>
+                        <strong>Charles's Law Module:</strong> Adjust the Bunsen burner flame intensity or the Temperature slider. The floating isobaric piston will lift as thermal kinetic energy increases gas volume at a constant 1.00 atm. Check <em>Extrapolate to -273.15 °C</em> to view the straight trendline cutting through the vertical volume axis at 0 °C and intersecting the horizontal baseline precisely at absolute zero.
+                    </li>
+                    <li>
+                        <strong>Graham's Law Module:</strong> Click <em>Start Diffusion Reaction Process</em> to release concentrated ammonia (NH3) vapor from the left swab (2.0 cm mark) and hydrochloric acid (HCl) vapor from the right swab (28.0 cm mark). Observe continuous molecular motion and record the precise formation position of the dense white ammonium chloride precipitate ring at approximately 18.0 cm along the 30 cm ruler.
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Scientific Theory & Working Principles</h2>
+                <p>
+                    The physical behavior of gases is described macroscopically by thermodynamic state variables and microscopically by the Kinetic Molecular Theory (KMT).
+                </p>
+                <h3>1. Kinetic Interpretation of Boyle's Law</h3>
+                <p>
+                    Robert Boyle established in 1662 that for a fixed quantity of gas kept at constant temperature, pressure is inversely proportional to volume. At constant thermal speed, reducing cylinder volume shortens the mean free path between molecule-wall impacts. Because molecules collide with boundary walls more frequently per unit surface area per second, the time-averaged normal force per unit area increases proportionately.
+                </p>
+
+                <h3>2. Thermal Expansion and Charles's Law</h3>
+                <p>
+                    Jacques Charles (1787) observed that heating a fixed mass of gas at constant external pressure causes its volume to expand linearly with temperature. Translating this behavior to the absolute thermodynamic Kelvin scale reveals that volume is directly proportional to temperature. When plotted against Celsius temperature, the extrapolated isobaric volume intercepts zero at -273.15 °C, establishing the fundamental physical lower bound where classical translational kinetic energy vanishes.
+                </p>
+
+                <h3>3. Molecular Effusion, Diffusion, and Graham's Law</h3>
+                <p>
+                    Thomas Graham formulated in 1848 that the relative rate of diffusion or effusion of a gas is inversely proportional to the square root of its molar mass. In thermal equilibrium, distinct gas species share the same average kinetic energy:
+                </p>
+                <div class="formula-box">
+                    Average Kinetic Energy: KE = (1/2) x m1 x (v1)^2 = (1/2) x m2 x (v2)^2<br>
+                    Velocity Ratio: v1 / v2 = sqrt( m2 / m1 ) = sqrt( M2 / M1 )
+                </div>
+                <p>
+                    When volatile NH3 (molar mass 17.03 g/mol) and HCl (molar mass 36.46 g/mol) diffuse simultaneously through an enclosed glass tube, the lighter ammonia molecules travel approximately 1.46 times faster than the heavier hydrochloric acid molecules. Upon meeting, gas-phase neutralization produces solid ammonium chloride micro-crystals:
+                </p>
+                <div class="formula-box">
+                    Neutralization Reaction: NH3(g) + HCl(g) -> NH4Cl(s)  [Dense White Smoke Ring]
+                </div>
+            </section>
+
+            <section>
+                <h2>Mathematical Foundations & Formulas</h2>
+                <p>
+                    Use the following standardized formulations for calculating quantitative gas properties during practical experiments:
+                </p>
+                <div class="formula-box">
+                    Formula 1 (Boyle's Law): P1 x V1 = P2 x V2 = k1  (at constant T, n)<br>
+                    Formula 2 (Charles's Law): V1 / T1 = V2 / T2 = k2  (T in Kelvin: K = °C + 273.15)<br>
+                    Formula 3 (Charles's Celsius Extrapolation): V(t) = V0 x (1 + t / 273.15)<br>
+                    Formula 4 (Ideal Gas Law): P x V = n x R x T  (R = 0.08206 L·atm / (mol·K))<br>
+                    Formula 5 (Graham's Law): Rate1 / Rate2 = Distance1 / Distance2 = sqrt( Molar Mass 2 / Molar Mass 1 )
+                </div>
+            </section>
+
+            <section>
+                <h2>Real-World Engineering & Industrial Applications</h2>
+                <p>
+                    Gas law dynamics and diffusion ratios underpin major industrial and environmental systems:
+                </p>
+                <ul>
+                    <li>
+                        <strong>Internal Combustion & Compressor Cycles:</strong> High-pressure reciprocal piston compressors rely on Boyle's and adiabatic compression formulas to charge compressed natural gas (CNG) storage tanks and pneumatic brake systems safely.
+                    </li>
+                    <li>
+                        <strong>Cryogenics & Gas Liquefaction:</strong> Understanding Charles's thermal contraction limits and the Joule-Thomson throttling effect enables industrial liquefaction of nitrogen (-195.8 °C) and oxygen (-183.0 °C) for medical delivery and aerospace propellants.
+                    </li>
+                    <li>
+                        <strong>Gaseous Diffusion Isotope Separation:</strong> Graham's law is applied on an industrial scale using semi-permeable barrier cascades to separate uranium-235 hexafluoride (molar mass 349 g/mol) from uranium-238 hexafluoride (molar mass 352 g/mol) based on subtle molecular velocity differences.
+                    </li>
+                    <li>
+                        <strong>High-Altitude Aerostat Mechanics:</strong> Meteorological sounding balloons use Charles's law calculations to calibrate envelope elastic expansion tolerances as atmospheric temperatures drop to -55 °C in the stratosphere.
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Practice Problems & Diagnostic Tasks</h2>
+                <p>
+                    Test your quantitative problem-solving skills using the five senior secondary level laboratory exercises below:
+                </p>
+
+                <div class="task-card">
+                    <div class="task-title">Task 1: Syringe Gas Compression (Boyle's Law)</div>
+                    <p>
+                        A calibrated gas-tight laboratory syringe contains 60.0 cm³ of dry air at an ambient room pressure of 101.3 kPa. An experimenter slowly pushes the piston under isothermal conditions until the enclosed volume is reduced to 24.0 cm³. Assuming ideal gas behavior and no temperature change, calculate the resulting pressure inside the syringe in kPa.
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 2: Weather Balloon Temperature Drop (Charles's Law)</div>
+                    <p>
+                        A flexible weather research balloon is inflated at ground level to a volume of 4.50 m³ at a surface temperature of 27.0 °C. It ascends to an altitude where the temperature plummets to -43.0 °C. Assuming external atmospheric pressure is kept constant across the envelope by internal balance, determine the new volume of the balloon in cubic meters.
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 3: Molecular Identification via Diffusion (Graham's Law)</div>
+                    <p>
+                        In a calibrated 100.0 cm diffusion tube experiment identical to Graham's apparatus, pure sulfur dioxide (SO2, molar mass = 64.06 g/mol) and an unknown volatile hydrocarbon gas (CxHy) are released simultaneously from opposite ends. The sulfur dioxide gas diffuses 40.0 cm from its source at the exact moment the unknown gas diffuses 60.0 cm. Calculate the relative rate ratio and determine the molar mass of the unknown hydrocarbon.
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 4: Charles's Law Volume Intercept Calculation</div>
+                    <p>
+                        An isobaric gas thermometer apparatus holds a volume of 3.20 L at 100.0 °C. Using Charles's law, calculate its theoretical volume at 0.0 °C (V0). Then show mathematically why the volume extrapolates to zero at -273.15 °C.
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 5: Multi-Step Graham's Chamber Ring Location</div>
+                    <p>
+                        In an enclosed laboratory diffusion tube with a total length between cotton swabs of exactly 40.0 cm, concentrated ammonia vapor (NH3, molar mass 17.03 g/mol) and hydrogen bromide vapor (HBr, molar mass 80.91 g/mol) diffuse toward one another. Calculate the theoretical distance from the ammonia swab where the solid ammonium bromide (NH4Br) precipitate ring will first appear.
+                    </p>
+                </div>
+
+                <!-- Collapsible Step-by-Step Solutions -->
+                <details>
+                    <summary>Click to Reveal Solutions and Step-by-Step Proofs</summary>
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 1:</strong></p>
+                        <p>1. Identify the given parameters: Initial pressure P1 = 101.3 kPa, Initial volume V1 = 60.0 cm³, Final volume V2 = 24.0 cm³.</p>
+                        <p>2. Apply Boyle's Law: P1 x V1 = P2 x V2.</p>
+                        <p>3. Rearrange to solve for P2: P2 = (P1 x V1) / V2.</p>
+                        <p>4. Compute: P2 = (101.3 kPa x 60.0 cm³) / 24.0 cm³ = 6078 / 24.0 = <strong>253.25 kPa</strong>.</p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 2:</strong></p>
+                        <p>1. Convert all temperatures from Celsius to thermodynamic Kelvin:</p>
+                        <p>T1 = 27.0 + 273.15 = 300.15 K.</p>
+                        <p>T2 = -43.0 + 273.15 = 230.15 K.</p>
+                        <p>2. Apply Charles's Law: V1 / T1 = V2 / T2.</p>
+                        <p>3. Rearrange for final volume: V2 = V1 x (T2 / T1).</p>
+                        <p>4. Compute: V2 = 4.50 m³ x (230.15 K / 300.15 K) = 4.50 x 0.76678 = <strong>3.45 m³</strong>.</p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 3:</strong></p>
+                        <p>1. Determine the diffusion distance ratio: Rate(unknown) / Rate(SO2) = Distance(unknown) / Distance(SO2) = 60.0 cm / 40.0 cm = 1.50.</p>
+                        <p>2. Apply Graham's Law: Rate(unknown) / Rate(SO2) = sqrt( M(SO2) / M(unknown) ).</p>
+                        <p>3. Equate: 1.50 = sqrt( 64.06 / M(unknown) ).</p>
+                        <p>4. Square both sides: 1.50^2 = 2.25 = 64.06 / M(unknown).</p>
+                        <p>5. Solve for M(unknown): M(unknown) = 64.06 / 2.25 = <strong>28.47 g/mol</strong> (consistent with ethylene, C2H4, molar mass 28.05 g/mol).</p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 4:</strong></p>
+                        <p>1. Given: V1 = 3.20 L, T1 = 100.0 °C = 373.15 K.</p>
+                        <p>2. Calculate volume at 0 °C (T0 = 273.15 K): V0 = V1 x (T0 / T1) = 3.20 L x (273.15 / 373.15) = <strong>2.34 L</strong>.</p>
+                        <p>3. Show absolute zero intersection: V(t) = V0 x (1 + t / 273.15). Setting V(t) = 0 requires (1 + t / 273.15) = 0, which yields t = <strong>-273.15 °C</strong>.</p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 5:</strong></p>
+                        <p>1. Calculate the Graham diffusion velocity ratio between NH3 and HBr:</p>
+                        <p>Rate(NH3) / Rate(HBr) = sqrt( M(HBr) / M(NH3) ) = sqrt( 80.91 / 17.03 ) = sqrt( 4.751 ) = 2.180.</p>
+                        <p>2. Set up the distance relation over the 40.0 cm span: d(NH3) + d(HBr) = 40.0 cm, and d(NH3) / d(HBr) = 2.180.</p>
+                        <p>3. Substitute d(HBr) = d(NH3) / 2.180: d(NH3) + d(NH3) / 2.180 = 40.0 cm.</p>
+                        <p>4. Factor: d(NH3) x (1 + 1 / 2.180) = d(NH3) x (1.4587) = 40.0 cm.</p>
+                        <p>5. Compute: d(NH3) = 40.0 / 1.4587 = <strong>27.42 cm from the NH3 cotton swab</strong> (12.58 cm from the HBr cotton swab).</p>
+                    </div>
+                </details>
+            </section>
+        </article>
+    </main>
+
+    <!-- 5. SYNCHRONIZED COMPLIANCE FOOTER -->
+    <footer>
+        <nav class="footer-nav">
+            <a href="../index.html">Home</a>
+            <a href="../index.html#about-section">About Us</a>
+            <button type="button" class="footer-modal-trigger" onclick="openSimModal('simPrivacyModal')">Privacy Policy</button>
+            <button type="button" class="footer-modal-trigger" onclick="openSimModal('simTermsModal')">Terms of Service</button>
+            <a href="../index.html#contact-section">Contact Us</a>
+            <a href="https://forms.gle/fYxxaNKAh21dPUoBA" target="_blank" rel="noopener noreferrer">Simulator Suggestions</a>
+        </nav>
+        <p>&copy; 2026 LuyaliSims | Engineered by Click & Draft | Dedicated to Open STEM Education</p>
+    </footer>
+
+    <!-- 6. IDENTICAL PRIVACY POLICY MODAL -->
+    <div id="simPrivacyModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="privacyTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeSimModal('simPrivacyModal')">Close [✕]</button>
+            <h2 id="privacyTitle">Privacy Policy</h2>
+            <p class="modal-date">Last Updated: September 2026</p>
+            <p>Welcome to LuyaliSims. We respect your privacy and are committed to protecting your personal data. This privacy policy explains how we treat information when you interact with our educational simulators.</p>
+            
+            <h3>1. Educational Purpose & Information Collection</h3>
+            <p>LuyaliSims is a free educational portal. We do not require account registration, passwords, or personal login information to run any simulation. All simulation calculations occur locally within your browser using client-side JavaScript.</p>
+
+            <h3>2. Google AdSense & Third-Party Cookies</h3>
+            <p>We may display advertisements served by Google AdSense to fund our free educational tools. Google, as a third-party vendor, uses cookies to serve ads on our site based on users' visits to this and other sites on the Internet.</p>
+            <ul>
+                <li>Google's use of advertising cookies enables it and its partners to serve ads based on your visit to LuyaliSims and other sites.</li>
+                <li>Users may opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" style="color: var(--neon-cyan);">Google Ads Settings</a>.</li>
+            </ul>
+
+            <h3>3. Log Files & Analytics</h3>
+            <p>Like standard websites, our hosting servers collect anonymous log records (including IP addresses, browser types, and timestamp references) to monitor server uptime, fix script errors, and optimize simulator performance.</p>
+
+            <h3>4. Children's Online Privacy (COPPA Compliance)</h3>
+            <p>Our educational simulators are built for students and educators of all ages. We do not knowingly solicit or collect personally identifiable information from children under 13.</p>
+
+            <h3>5. Contact Regarding Privacy</h3>
+            <p>If you have any questions regarding this policy, contact us at: <a href="mailto:luyashliz@gmail.com" style="color: var(--neon-cyan);">luyashliz@gmail.com</a>.</p>
+        </div>
+    </div>
+
+    <!-- 7. IDENTICAL TERMS OF SERVICE MODAL -->
+    <div id="simTermsModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="termsTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeSimModal('simTermsModal')">Close [✕]</button>
+            <h2 id="termsTitle">Terms of Service</h2>
+            <p class="modal-date">Effective Date: September 2026</p>
+
+            <h3>1. Permitted Educational Use</h3>
+            <p>All interactive models, simulations, practice problems, and laboratory worksheets on LuyaliSims are made freely available for classroom demonstrations, academic study, tutoring, and self-paced individual learning.</p>
+
+            <h3>2. Intellectual Property</h3>
+            <p>The code architecture, layout designs, and custom interactive engines are the intellectual property of Ian Luyali and Click & Draft. You may use our simulators online in academic settings, but mirroring or re-hosting our code for commercial resale without permission is prohibited.</p>
+
+            <h3>3. Disclaimer of Scientific Warranty</h3>
+            <p>While simulations are engineered to accurately replicate classical mechanics, thermodynamics, and electronics, they are provided as conceptual learning aids. LuyaliSims is not liable for outcomes in real-world high-voltage or hazardous laboratory environments constructed without professional teacher supervision.</p>
+
+            <h3>4. Updates to Terms</h3>
+            <p>We reserve the right to refine these terms as new laboratory modules and features are introduced.</p>
+        </div>
+    </div>
+
+    <!-- 8. EXPANDED GRAPH MODAL (POP-OUT) -->
+    <div id="graphPopoutModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="graphModalTitle">
+        <div class="modal-body">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0, 243, 255, 0.3); padding-bottom: 10px; margin-bottom: 14px;">
+                <h2 id="graphModalTitle" style="margin: 0; font-size: 1.3rem;">Expanded Experimental Graph Analysis</h2>
+                <button class="modal-close-btn" style="float: none; margin: 0;" onclick="closeSimModal('graphPopoutModal')">Close [✕]</button>
+            </div>
+            <div style="flex: 1; position: relative; min-height: 380px;">
+                <canvas id="modalChartCanvas"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- 9. SIMULATOR CORE SCRIPT & INTERACTIVE LOGIC -->
+    <script>
+        /* ==========================================================================
+           PHYSICS CONSTANTS & SYSTEM STATE
+           ========================================================================== */
+        let currentLab = 'boyle';
+        const R_GAS = 0.08206; // L*atm/(mol*K)
+
+        let boyleState = {
+            V: 4.0,
+            n: 0.1625,
+            T: 300.0,
+            P: 1.0,
+            isDragging: false,
+            plungerHovered: false,
+            extrapolate: false
+        };
+
+        let charlesState = {
+            T: 298.15,
+            P: 1.0,
+            n: 0.10,
+            V: 2.45,
+            extrapolate: false,
+            burnerFlame: 1.0
+        };
+
+        let grahamState = {
+            running: false,
+            timeElapsed: 0,
+            tubeLengthCm: 30.0,
+            swabLeftCm: 2.0,   // NH3 Cotton Swab
+            swabRightCm: 28.0, // HCl Cotton Swab
+            M_NH3: 17.03,      // g/mol
+            M_HCl: 36.46,      // g/mol
+            reactionCm: 18.0,  // Stoichiometric precipitate meeting location
+            ringCloudOpacity: 0.0,
+            ringFormed: false
+        };
+
+        let particles = [];
+        let smokeRingParticles = [];
+
+        const canvas = document.getElementById('labCanvas');
+        const ctx = canvas.getContext('2d');
+        let chartInstance = null;
+        let modalChartInstance = null;
+        let recordedData = [];
+        let activeBoyleGraphType = 'linear';
+
+        /* ==========================================================================
+           MODAL LOGIC & FULLSCREEN CONTROLS
+           ========================================================================== */
+        function openSimModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeSimModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+            if (id === 'graphPopoutModal' && modalChartInstance) {
+                modalChartInstance.destroy();
+                modalChartInstance = null;
+            }
+        }
+
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('policy-modal')) {
+                closeSimModal(e.target.id);
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' || e.key === 'Esc') {
+                document.querySelectorAll('.policy-modal').forEach(m => {
+                    m.style.display = 'none';
+                });
+                document.body.style.overflow = 'auto';
+                if (modalChartInstance) {
+                    modalChartInstance.destroy();
+                    modalChartInstance = null;
+                }
+            }
+        });
+
+        // Fullscreen Implementation for simulator container
+        const simContainer = document.getElementById('simulator-container');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                if (simContainer.requestFullscreen) {
+                    simContainer.requestFullscreen();
+                } else if (simContainer.webkitRequestFullscreen) {
+                    simContainer.webkitRequestFullscreen();
+                }
+                fullscreenBtn.innerHTML = 'Exit Fullscreen';
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                }
+                fullscreenBtn.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                    </svg> Fullscreen Simulator`;
+            }
+        });
+
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                fullscreenBtn.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                    </svg> Fullscreen Simulator`;
+            }
+        });
+
+        /* ==========================================================================
+           PARTICLE PHYSICS ENGINE
+           ========================================================================== */
+        class Molecule {
+            constructor(x, y, vx, vy, type, color, radius, mass) {
+                this.x = x; this.y = y;
+                this.vx = vx; this.vy = vy;
+                this.type = type; // 'NH3' | 'HCl' | 'generic'
+                this.color = color;
+                this.radius = radius;
+                this.mass = mass;
+            }
+            update(minX, maxX, minY, maxY) {
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // X wall reflection
+                if (this.x - this.radius <= minX) {
+                    this.x = minX + this.radius;
+                    this.vx = Math.abs(this.vx);
+                } else if (this.x + this.radius >= maxX) {
+                    this.x = maxX - this.radius;
+                    this.vx = -Math.abs(this.vx);
+                }
+                // Y wall reflection
+                if (this.y - this.radius <= minY) {
+                    this.y = minY + this.radius;
+                    this.vy = Math.abs(this.vy);
+                } else if (this.y + this.radius >= maxY) {
+                    this.y = maxY - this.radius;
+                    this.vy = -Math.abs(this.vy);
+                }
+            }
+            draw(ctx) {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.shadowColor = this.color;
+                ctx.shadowBlur = 4;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+        }
+
+        class SmokeRingParticle {
+            constructor(cx, minY, maxY) {
+                this.cx = cx;
+                this.x = cx + (Math.random() - 0.5) * 14;
+                this.y = minY + 4 + Math.random() * (maxY - minY - 8);
+                this.vx = (Math.random() - 0.5) * 0.4;
+                this.vy = (Math.random() - 0.5) * 0.8;
+                this.radius = 2.5 + Math.random() * 4.5;
+                this.alpha = 0.4 + Math.random() * 0.5;
+            }
+            update(minY, maxY) {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (Math.abs(this.x - this.cx) > 12) this.vx *= -1;
+                if (this.y <= minY + 4 || this.y >= maxY - 4) this.vy *= -1;
+            }
+            draw(ctx, intensity) {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${this.alpha * intensity})`;
+                ctx.fill();
+            }
+        }
+
+        function initGasParticles(count, minX, maxX, minY, maxY, tempK, color, mass) {
+            particles = [];
+            const baseSpeed = Math.sqrt(tempK / mass) * 0.55;
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const spd = baseSpeed * (0.8 + Math.random() * 0.4);
+                particles.push(new Molecule(
+                    minX + Math.random() * (maxX - minX),
+                    minY + Math.random() * (maxY - minY),
+                    Math.cos(angle) * spd,
+                    Math.sin(angle) * spd,
+                    'generic', color, 4, mass
+                ));
+            }
+        }
+
+        /* ==========================================================================
+           INSTRUMENT GRAPHICS ON CANVAS
+           ========================================================================== */
+        function drawDial(ctx, cx, cy, radius, val, minVal, maxVal, title, unit, needleColor = '#00f3ff') {
+            ctx.save();
+            const grad = ctx.createLinearGradient(cx - radius, cy - radius, cx + radius, cy + radius);
+            grad.addColorStop(0, '#1e293b');
+            grad.addColorStop(0.5, '#0f172a');
+            grad.addColorStop(1, '#020617');
+
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+            ctx.fillStyle = grad;
+            ctx.fill();
+            ctx.lineWidth = 2.5;
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.5)';
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius - 5, 0, Math.PI * 2);
+            ctx.fillStyle = '#060b18';
+            ctx.fill();
+
+            const startAng = Math.PI * 0.75;
+            const totalAng = Math.PI * 1.5;
+            const ticks = 8;
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = 'bold 9px "Share Tech Mono", monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            for (let i = 0; i <= ticks; i++) {
+                const ang = startAng + (i / ticks) * totalAng;
+                const x1 = cx + Math.cos(ang) * (radius - 8);
+                const y1 = cy + Math.sin(ang) * (radius - 8);
+                const x2 = cx + Math.cos(ang) * (radius - 14);
+                const y2 = cy + Math.sin(ang) * (radius - 14);
+
+                ctx.lineWidth = 1.5;
+                ctx.strokeStyle = 'rgba(0, 243, 255, 0.4)';
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.stroke();
+
+                const tickNum = (minVal + (i / ticks) * (maxVal - minVal)).toFixed(minVal >= 10 ? 0 : 1);
+                const tx = cx + Math.cos(ang) * (radius - 20);
+                const ty = cy + Math.sin(ang) * (radius - 20);
+                ctx.fillText(tickNum, tx, ty);
+            }
+
+            ctx.fillStyle = '#e2e8f0';
+            ctx.font = 'bold 9.5px "Orbitron", sans-serif';
+            ctx.fillText(title, cx, cy - 9);
+            ctx.fillStyle = 'var(--neon-green)';
+            ctx.font = '8.5px "Share Tech Mono", monospace';
+            ctx.fillText(unit, cx, cy + 18);
+
+            const clamped = Math.min(Math.max(val, minVal), maxVal);
+            const frac = (clamped - minVal) / (maxVal - minVal);
+            const needleAng = startAng + frac * totalAng;
+
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(needleAng);
+            ctx.beginPath();
+            ctx.moveTo(-3, 0);
+            ctx.lineTo(0, -(radius - 13));
+            ctx.lineTo(3, 0);
+            ctx.closePath();
+            ctx.fillStyle = needleColor;
+            ctx.shadowColor = needleColor;
+            ctx.shadowBlur = 6;
+            ctx.fill();
+            ctx.restore();
+
+            ctx.beginPath();
+            ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+            ctx.fillStyle = '#00f3ff';
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function drawThermometer(ctx, x, y, w, h, tempK) {
+            ctx.save();
+            const tempC = tempK - 273.15;
+            const minC = -30, maxC = 170;
+            const frac = Math.min(Math.max((tempC - minC) / (maxC - minC), 0), 1);
+
+            ctx.fillStyle = '#0b1329';
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.4)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.roundRect(x, y, w, h - 22, 6);
+            ctx.fill();
+            ctx.stroke();
+
+            const bulbR = w + 4;
+            const bulbY = y + h - 12;
+            ctx.beginPath();
+            ctx.arc(x + w / 2, bulbY, bulbR, 0, Math.PI * 2);
+            ctx.fillStyle = '#ef4444';
+            ctx.shadowColor = '#ef4444';
+            ctx.shadowBlur = 8;
+            ctx.fill();
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+
+            const columnH = (h - 40) * frac;
+            const topY = (y + h - 25) - columnH;
+            ctx.fillStyle = '#ef4444';
+            ctx.fillRect(x + w / 2 - 3, topY, 6, columnH + 5);
+
+            ctx.fillStyle = '#8da4be';
+            ctx.font = '8px "Share Tech Mono", monospace';
+            ctx.textAlign = 'left';
+            for (let i = 0; i <= 5; i++) {
+                const gy = (y + 12) + i * ((h - 45) / 5);
+                ctx.fillRect(x + w - 4, gy, 4, 1);
+                const deg = Math.round(maxC - i * ((maxC - minC) / 5));
+                ctx.fillText(`${deg}°`, x + w + 4, gy + 3);
+            }
+            ctx.fillText('°C', x + 2, y - 6);
+            ctx.restore();
+        }
+
+        function drawFlame(ctx, cx, cy, intensity) {
+            if (intensity <= 0) return;
+            ctx.save();
+            const h = 24 + intensity * 18;
+            const w = 15 + intensity * 7;
+
+            const grad = ctx.createRadialGradient(cx, cy - h / 2, 2, cx, cy - h / 3, w);
+            grad.addColorStop(0, '#fef08a');
+            grad.addColorStop(0.3, '#f97316');
+            grad.addColorStop(0.85, '#dc2626');
+            grad.addColorStop(1, 'transparent');
+
+            ctx.beginPath();
+            ctx.moveTo(cx - w / 2, cy);
+            ctx.quadraticCurveTo(cx - w, cy - h * 0.7, cx, cy - h);
+            ctx.quadraticCurveTo(cx + w, cy - h * 0.7, cx + w / 2, cy);
+            ctx.closePath();
+            ctx.fillStyle = grad;
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(cx - w / 4, cy);
+            ctx.quadraticCurveTo(cx - w / 4, cy - h * 0.4, cx, cy - h * 0.5);
+            ctx.quadraticCurveTo(cx + w / 4, cy - h * 0.4, cx + w / 4, cy);
+            ctx.closePath();
+            ctx.fillStyle = 'rgba(0, 243, 255, 0.85)';
+            ctx.fill();
+            ctx.restore();
+        }
+
+        /* ==========================================================================
+           RENDER APPARATUS 1: BOYLE'S LAW
+           ========================================================================== */
+        function renderBoyle() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#050914';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const cylX = 160, cylY = 60, cylW = 200, cylH = 310;
+
+            // Heat reservoir base
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(100, cylY + cylH, 320, 45);
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.3)';
+            ctx.strokeRect(100, cylY + cylH, 320, 45);
+
+            drawFlame(ctx, 260, cylY + cylH + 32, 0.65);
+            ctx.fillStyle = '#cbd5e1';
+            ctx.font = 'bold 11px "Orbitron", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText("Constant Heat Reservoir (T = 300 K)", 260, cylY + cylH + 38);
+
+            const volFraction = (boyleState.V - 1.0) / 5.0;
+            const gasHeight = 45 + volFraction * (cylH - 85);
+            const plungerY = (cylY + cylH) - gasHeight;
+
+            // Cylinder chamber interior
+            const glassGrad = ctx.createLinearGradient(cylX, 0, cylX + cylW, 0);
+            glassGrad.addColorStop(0, 'rgba(0, 243, 255, 0.15)');
+            glassGrad.addColorStop(0.5, 'rgba(0, 243, 255, 0.05)');
+            glassGrad.addColorStop(1, 'rgba(0, 243, 255, 0.15)');
+            ctx.fillStyle = glassGrad;
+            ctx.fillRect(cylX, cylY, cylW, cylH);
+
+            // Confined molecules
+            particles.forEach(p => {
+                p.update(cylX + 4, cylX + cylW - 4, plungerY + 16, cylY + cylH - 4);
+                p.draw(ctx);
+            });
+
+            // Piston head
+            const pGrad = ctx.createLinearGradient(cylX, plungerY, cylX + cylW, plungerY);
+            pGrad.addColorStop(0, '#334155');
+            pGrad.addColorStop(0.5, '#94a3b8');
+            pGrad.addColorStop(1, '#1e293b');
+            ctx.fillStyle = pGrad;
+            ctx.fillRect(cylX, plungerY, cylW, 20);
+            ctx.strokeStyle = '#00f3ff';
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(cylX, plungerY, cylW, 20);
+
+            // Plunger shaft
+            const stemW = 18;
+            const stemX = cylX + (cylW - stemW) / 2;
+            ctx.fillStyle = '#64748b';
+            ctx.fillRect(stemX, 20, stemW, plungerY - 20);
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.3)';
+            ctx.strokeRect(stemX, 20, stemW, plungerY - 20);
+
+            // Handle
+            ctx.fillStyle = boyleState.plungerHovered ? 'var(--neon-magenta)' : '#00f3ff';
+            ctx.shadowColor = boyleState.plungerHovered ? 'var(--neon-magenta)' : '#00f3ff';
+            ctx.shadowBlur = 8;
+            ctx.beginPath();
+            ctx.roundRect(stemX - 45, 10, stemW + 90, 18, 5);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#050914';
+            ctx.font = 'bold 9px "Orbitron", sans-serif';
+            ctx.fillText('⇅ CLICK & DRAG PLUNGER', stemX + stemW / 2, 22);
+
+            // Calibrated volume ticks
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = 'bold 11px "Share Tech Mono", monospace';
+            ctx.textAlign = 'right';
+            for (let i = 1; i <= 6; i++) {
+                const frac = (i - 1.0) / 5.0;
+                const ty = (cylY + cylH) - (45 + frac * (cylH - 85)) + 12;
+                ctx.strokeStyle = '#00f3ff';
+                ctx.beginPath();
+                ctx.moveTo(cylX, ty);
+                ctx.lineTo(cylX + 20, ty);
+                ctx.stroke();
+                ctx.fillText(`${i} L`, cylX - 8, ty + 4);
+            }
+
+            // Cylinder glass walls
+            ctx.lineWidth = 3.5;
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.6)';
+            ctx.beginPath();
+            ctx.moveTo(cylX, cylY);
+            ctx.lineTo(cylX, cylY + cylH);
+            ctx.lineTo(cylX + cylW, cylY + cylH);
+            ctx.lineTo(cylX + cylW, cylY);
+            ctx.stroke();
+
+            // Connective conduit to pressure sensor
+            ctx.lineWidth = 5;
+            ctx.strokeStyle = '#334155';
+            ctx.beginPath();
+            ctx.moveTo(cylX + cylW, cylY + cylH - 30);
+            ctx.lineTo(580, cylY + cylH - 30);
+            ctx.lineTo(580, 160);
+            ctx.stroke();
+
+            drawDial(ctx, 580, 150, 75, boyleState.P, 0, 4.0, "PRESSURE", "atm", '#00f3ff');
+            drawDial(ctx, 730, 240, 65, boyleState.T, 0, 600, "TEMPERATURE", "K (Const)", '#ff55bb');
+        }
+
+        /* ==========================================================================
+           RENDER APPARATUS 2: CHARLES'S LAW
+           ========================================================================== */
+        function renderCharles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#050914';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const cylX = 260, cylY = 60, cylW = 220, cylH = 290;
+
+            const volFraction = Math.min(Math.max((charlesState.V - 1.2) / 3.2, 0), 1);
+            const gasHeight = 55 + volFraction * (cylH - 95);
+            const pistonY = (cylY + cylH) - gasHeight;
+
+            // Thermal chamber gradient
+            const heatGrad = ctx.createLinearGradient(cylX, cylY, cylX, cylY + cylH);
+            heatGrad.addColorStop(0, 'rgba(249, 115, 22, 0.1)');
+            heatGrad.addColorStop(1, 'rgba(239, 68, 68, 0.25)');
+            ctx.fillStyle = heatGrad;
+            ctx.fillRect(cylX, cylY, cylW, cylH);
+
+            particles.forEach(p => {
+                p.update(cylX + 4, cylX + cylW - 4, pistonY + 16, cylY + cylH - 4);
+                p.draw(ctx);
+            });
+
+            // Floating piston
+            const pGrad = ctx.createLinearGradient(cylX, pistonY, cylX + cylW, pistonY);
+            pGrad.addColorStop(0, '#1e293b');
+            pGrad.addColorStop(0.5, '#64748b');
+            pGrad.addColorStop(1, '#0f172a');
+            ctx.fillStyle = pGrad;
+            ctx.fillRect(cylX, pistonY, cylW, 22);
+            ctx.strokeStyle = '#f59e0b';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(cylX, pistonY, cylW, 22);
+
+            // Floating shaft
+            ctx.fillStyle = '#475569';
+            ctx.fillRect(cylX + cylW / 2 - 9, 20, 18, pistonY - 20);
+
+            // Burner assembly
+            const bx = cylX + cylW / 2;
+            const by = cylY + cylH + 65;
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(bx - 16, by - 30, 32, 30);
+            ctx.fillRect(bx - 42, by, 84, 12);
+
+            ctx.strokeStyle = '#64748b';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(cylX - 10, cylY + cylH + 70);
+            ctx.lineTo(cylX + 20, cylY + cylH);
+            ctx.lineTo(cylX + cylW - 20, cylY + cylH);
+            ctx.lineTo(cylX + cylW + 10, cylY + cylH + 70);
+            ctx.stroke();
+
+            drawFlame(ctx, bx, by - 30, charlesState.burnerFlame);
+
+            // Volume marks
+            ctx.fillStyle = '#cbd5e1';
+            ctx.font = '11px "Share Tech Mono", monospace';
+            ctx.textAlign = 'left';
+            for (let v = 1; v <= 4; v++) {
+                const frac = (v - 1.2) / 3.2;
+                const ty = (cylY + cylH) - (55 + frac * (cylH - 95)) + 12;
+                if (ty >= cylY && ty <= cylY + cylH) {
+                    ctx.fillStyle = '#f97316';
+                    ctx.fillRect(cylX + cylW - 18, ty, 18, 2);
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillText(`${v.toFixed(1)} L`, cylX + cylW - 48, ty + 4);
+                }
+            }
+
+            // Glass walls
+            ctx.lineWidth = 3.5;
+            ctx.strokeStyle = 'rgba(249, 115, 22, 0.7)';
+            ctx.beginPath();
+            ctx.moveTo(cylX, cylY);
+            ctx.lineTo(cylX, cylY + cylH);
+            ctx.lineTo(cylX + cylW, cylY + cylH);
+            ctx.lineTo(cylX + cylW, cylY);
+            ctx.stroke();
+
+            drawThermometer(ctx, 120, 90, 20, 270, charlesState.T);
+            drawDial(ctx, 620, 180, 70, charlesState.P, 0, 2.5, "PRESSURE", "atm (Const)", '#00ff88');
+        }
+
+        /* ==========================================================================
+           RENDER APPARATUS 3: GRAHAM'S LAW DIFFUSION
+           ========================================================================== */
+        function renderGraham() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#050914';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const tubeX = 110;
+            const tubeY = 175;
+            const tubeW = 640;
+            const tubeH = 65;
+
+            // Optical Bench Base
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(50, tubeY + 160, 760, 30);
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.3)';
+            ctx.strokeRect(50, tubeY + 160, 760, 30);
+
+            // Metal Clamps
+            const clamp1X = tubeX + 80;
+            const clamp2X = tubeX + tubeW - 80;
+            ctx.lineWidth = 5;
+            ctx.strokeStyle = '#475569';
+            ctx.beginPath();
+            ctx.moveTo(clamp1X, tubeY + tubeH);
+            ctx.lineTo(clamp1X, tubeY + 160);
+            ctx.moveTo(clamp2X, tubeY + tubeH);
+            ctx.lineTo(clamp2X, tubeY + 160);
+            ctx.stroke();
+
+            // Glass Diffusion Tube
+            const tubeGrad = ctx.createLinearGradient(0, tubeY, 0, tubeY + tubeH);
+            tubeGrad.addColorStop(0, 'rgba(255, 255, 255, 0.15)');
+            tubeGrad.addColorStop(0.3, 'rgba(15, 23, 42, 0.35)');
+            tubeGrad.addColorStop(0.7, 'rgba(15, 23, 42, 0.35)');
+            tubeGrad.addColorStop(1, 'rgba(255, 255, 255, 0.12)');
+            ctx.fillStyle = tubeGrad;
+            ctx.fillRect(tubeX, tubeY, tubeW, tubeH);
+
+            function drawFluffyCotton(x, y, w, h, baseColor) {
+                ctx.save();
+                ctx.fillStyle = baseColor;
+                ctx.shadowColor = '#ffffff';
+                ctx.shadowBlur = 6;
+                for (let i = 0; i < 7; i++) {
+                    ctx.beginPath();
+                    const cx = x + (i * (w / 6));
+                    const cy = y + (h / 2) + ((i % 2 === 0 ? -1 : 1) * 6);
+                    ctx.arc(cx, cy, 14, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.restore();
+            }
+
+            // Left Swab: NH3
+            drawFluffyCotton(tubeX + 8, tubeY + 6, 32, tubeH - 12, '#ffffff');
+            ctx.fillStyle = '#b45309';
+            ctx.fillRect(tubeX - 20, tubeY - 5, 20, tubeH + 10);
+
+            // Right Swab: HCl
+            drawFluffyCotton(tubeX + tubeW - 42, tubeY + 6, 32, tubeH - 12, '#cbd5e1');
+            ctx.fillStyle = '#b45309';
+            ctx.fillRect(tubeX + tubeW, tubeY - 5, 20, tubeH + 10);
+
+            // Callout Headings
+            ctx.textAlign = 'center';
+            ctx.font = 'bold 12px "Orbitron", sans-serif';
+            ctx.fillStyle = '#00f3ff';
+            ctx.fillText("Concentrated Ammonia (NH3)", tubeX + 50, tubeY - 60);
+            ctx.font = '11px "Share Tech Mono", monospace';
+            ctx.fillStyle = '#94a3b8';
+            ctx.fillText("M = 17.03 g/mol (Light Gas)", tubeX + 50, tubeY - 45);
+
+            ctx.strokeStyle = '#00f3ff';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(tubeX + 40, tubeY - 38);
+            ctx.lineTo(tubeX + 40, tubeY - 8);
+            ctx.stroke();
+
+            ctx.font = 'bold 12px "Orbitron", sans-serif';
+            ctx.fillStyle = '#00ff88';
+            ctx.fillText("Concentrated Hydrochloric Acid (HCl)", tubeX + tubeW - 50, tubeY - 60);
+            ctx.font = '11px "Share Tech Mono", monospace';
+            ctx.fillStyle = '#94a3b8';
+            ctx.fillText("M = 36.46 g/mol (Heavy Gas)", tubeX + tubeW - 50, tubeY - 45);
+
+            ctx.strokeStyle = '#00ff88';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(tubeX + tubeW - 40, tubeY - 38);
+            ctx.lineTo(tubeX + tubeW - 40, tubeY - 8);
+            ctx.stroke();
+
+            // Calibrated 30 cm Metric Scale
+            const rulerY = tubeY + tubeH + 4;
+            ctx.fillStyle = '#0c1527';
+            ctx.fillRect(tubeX, rulerY, tubeW, 26);
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.4)';
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(tubeX, rulerY, tubeW, 26);
+
+            ctx.fillStyle = '#cbd5e1';
+            ctx.font = 'bold 9px "Share Tech Mono", monospace';
+            for (let cm = 0; cm <= 30; cm++) {
+                const px = tubeX + (cm / 30.0) * tubeW;
+                const isMajor = (cm % 5 === 0);
+                const tickLen = isMajor ? 12 : 6;
+                ctx.beginPath();
+                ctx.moveTo(px, rulerY);
+                ctx.lineTo(px, rulerY + tickLen);
+                ctx.stroke();
+                if (isMajor) {
+                    ctx.fillText(`${cm}`, px, rulerY + 22);
+                }
+            }
+
+            const leftCottonEdge = tubeX + 44;
+            const rightCottonEdge = tubeX + tubeW - 44;
+            const reactionPx = tubeX + (grahamState.reactionCm / 30.0) * tubeW;
+
+            // Continuous diffusion kinetics
+            if (grahamState.running) {
+                grahamState.timeElapsed += 0.025;
+                const totalTravelTime = 4.0;
+                const progress = Math.min(grahamState.timeElapsed / totalTravelTime, 1.0);
+
+                const nh3Front = leftCottonEdge + (reactionPx - leftCottonEdge) * progress;
+                const hclFront = rightCottonEdge - (rightCottonEdge - reactionPx) * progress;
+
+                if (progress >= 0.98) {
+                    grahamState.ringFormed = true;
+                    grahamState.ringCloudOpacity = Math.min(grahamState.ringCloudOpacity + 0.03, 1.0);
+                }
+
+                particles.forEach(p => {
+                    if (p.type === 'NH3') {
+                        const maxBound = grahamState.ringFormed ? reactionPx - 5 : nh3Front;
+                        p.update(leftCottonEdge, maxBound, tubeY + 4, tubeY + tubeH - 4);
+                    } else if (p.type === 'HCl') {
+                        const minBound = grahamState.ringFormed ? reactionPx + 5 : hclFront;
+                        p.update(minBound, rightCottonEdge, tubeY + 4, tubeY + tubeH - 4);
+                    }
+                    p.draw(ctx);
+                });
+
+                updateTelemetryAndMeters();
+            }
+
+            // Ammonium chloride precipitate ring
+            if (grahamState.ringFormed && grahamState.ringCloudOpacity > 0.02) {
+                const opacity = grahamState.ringCloudOpacity;
+
+                smokeRingParticles.forEach(sp => {
+                    sp.update(tubeY, tubeY + tubeH);
+                    sp.draw(ctx, opacity);
+                });
+
+                const ringGrad = ctx.createRadialGradient(reactionPx, tubeY + tubeH / 2, 2, reactionPx, tubeY + tubeH / 2, 38);
+                ringGrad.addColorStop(0, `rgba(255, 255, 255, ${0.98 * opacity})`);
+                ringGrad.addColorStop(0.35, `rgba(255, 255, 255, ${0.85 * opacity})`);
+                ringGrad.addColorStop(0.7, `rgba(241, 245, 249, ${0.4 * opacity})`);
+                ringGrad.addColorStop(1, 'transparent');
+
+                ctx.fillStyle = ringGrad;
+                ctx.fillRect(reactionPx - 32, tubeY + 2, 64, tubeH - 4);
+
+                ctx.save();
+                ctx.strokeStyle = `rgba(255, 255, 255, ${opacity})`;
+                ctx.lineWidth = 5;
+                ctx.shadowColor = '#ffffff';
+                ctx.shadowBlur = 10;
+                ctx.beginPath();
+                ctx.ellipse(reactionPx, tubeY + tubeH / 2, 9, tubeH / 2 - 4, 0, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.restore();
+
+                // Callout pin
+                ctx.fillStyle = '#ef4444';
+                ctx.beginPath();
+                ctx.arc(reactionPx, tubeY - 8, 5, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.strokeStyle = '#ef4444';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(reactionPx, tubeY - 8);
+                ctx.lineTo(reactionPx, tubeY + 2);
+                ctx.stroke();
+
+                ctx.font = 'bold 11px "Orbitron", sans-serif';
+                ctx.fillStyle = '#ffffff';
+                ctx.textAlign = 'center';
+                ctx.fillText(`White Ring: NH4Cl (s) at ≈ ${grahamState.reactionCm.toFixed(1)} cm (near HCl)`, reactionPx, tubeY - 20);
+            }
+
+            // Glass perimeter
+            ctx.lineWidth = 2.5;
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.5)';
+            ctx.strokeRect(tubeX, tubeY, tubeW, tubeH);
+
+            // Stoichiometric reaction title
+            ctx.font = 'bold 14px "Share Tech Mono", monospace';
+            ctx.fillStyle = '#00f3ff';
+            ctx.textAlign = 'center';
+            ctx.fillText("NH3 (g)  +  HCl (g)  ->  NH4Cl (s)  [Precipitation Zone]", tubeX + tubeW / 2, tubeY + 125);
+        }
+
+        /* ==========================================================================
+           TRIGGER GRAHAM DIFFUSION PROCESS
+           ========================================================================== */
+        function startGrahamDiffusion() {
+            grahamState.running = true;
+            grahamState.timeElapsed = 0;
+            grahamState.ringCloudOpacity = 0.0;
+            grahamState.ringFormed = false;
+
+            const tubeX = 110;
+            const tubeY = 175;
+            const tubeW = 640;
+            const tubeH = 65;
+            const leftCottonEdge = tubeX + 44;
+            const rightCottonEdge = tubeX + tubeW - 44;
+            const reactionPx = tubeX + (grahamState.reactionCm / 30.0) * tubeW;
+
+            particles = [];
+            smokeRingParticles = [];
+
+            const speedNH3 = 2.45;
+            const speedHCl = 1.67;
+
+            for (let i = 0; i < 48; i++) {
+                const angle = (Math.random() - 0.5) * 1.5;
+                particles.push(new Molecule(
+                    leftCottonEdge + 4 + Math.random() * 25,
+                    tubeY + 8 + Math.random() * (tubeH - 16),
+                    Math.abs(Math.cos(angle)) * speedNH3 * (0.8 + Math.random() * 0.4),
+                    Math.sin(angle) * speedNH3 * 0.5,
+                    'NH3', '#00f3ff', 3.2, 17.03
+                ));
+            }
+
+            for (let i = 0; i < 48; i++) {
+                const angle = (Math.random() - 0.5) * 1.5;
+                particles.push(new Molecule(
+                    rightCottonEdge - 4 - Math.random() * 25,
+                    tubeY + 8 + Math.random() * (tubeH - 16),
+                    -Math.abs(Math.cos(angle)) * speedHCl * (0.8 + Math.random() * 0.4),
+                    Math.sin(angle) * speedHCl * 0.5,
+                    'HCl', '#00ff88', 4.5, 36.46
+                ));
+            }
+
+            for (let i = 0; i < 40; i++) {
+                smokeRingParticles.push(new SmokeRingParticle(reactionPx, tubeY, tubeY + tubeH));
+            }
+
+            updateTelemetryAndMeters();
+        }
+
+        /* ==========================================================================
+           MAIN ANIMATION DISPATCHER
+           ========================================================================== */
+        function renderApparatusLoop() {
+            if (currentLab === 'boyle') {
+                renderBoyle();
+            } else if (currentLab === 'charles') {
+                renderCharles();
+            } else if (currentLab === 'graham') {
+                renderGraham();
+            }
+            requestAnimationFrame(renderApparatusLoop);
+        }
+
+        /* ==========================================================================
+           CANVAS POINTER EVENTS (PLUNGER DRAGGING)
+           ========================================================================== */
+        canvas.addEventListener('pointerdown', (e) => {
+            if (currentLab !== 'boyle') return;
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const mx = (e.clientX - rect.left) * scaleX;
+            const my = (e.clientY - rect.top) * scaleY;
+
+            const volFraction = (boyleState.V - 1.0) / 5.0;
+            const plungerY = (60 + 310) - (45 + volFraction * 225);
+
+            if (mx >= 130 && mx <= 390 && my >= plungerY - 30 && my <= plungerY + 30) {
+                boyleState.isDragging = true;
+                canvas.setPointerCapture(e.pointerId);
+            }
+        });
+
+        canvas.addEventListener('pointerup', (e) => {
+            boyleState.isDragging = false;
+            try { canvas.releasePointerCapture(e.pointerId); } catch(err) {}
+        });
+
+        canvas.addEventListener('pointermove', (e) => {
+            if (currentLab !== 'boyle') return;
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const mx = (e.clientX - rect.left) * scaleX;
+            const my = (e.clientY - rect.top) * scaleY;
+
+            const volFraction = (boyleState.V - 1.0) / 5.0;
+            const plungerY = (60 + 310) - (45 + volFraction * 225);
+            boyleState.plungerHovered = (mx >= 130 && mx <= 390 && my >= plungerY - 30 && my <= plungerY + 30);
+
+            if (boyleState.isDragging) {
+                const gasHeight = (60 + 310) - my;
+                const newFrac = (gasHeight - 45) / 225;
+                const clamped = Math.min(Math.max(newFrac, 0), 1);
+                boyleState.V = parseFloat((1.0 + clamped * 5.0).toFixed(2));
+                updateBoylePhysics();
+            }
+        });
+
+        /* ==========================================================================
+           PHYSICS COMPUTATION & HUD SYNCHRONIZATION
+           ========================================================================== */
+        function updateBoylePhysics() {
+            boyleState.P = (boyleState.n * R_GAS * boyleState.T) / boyleState.V;
+            const vSlider = document.getElementById('boyle-v-slider');
+            if (vSlider) vSlider.value = boyleState.V;
+            const vValDisplay = document.getElementById('v-val');
+            if (vValDisplay) vValDisplay.innerText = boyleState.V.toFixed(2);
+            updateTelemetryAndMeters();
+            updateFormulaDisplay();
+        }
+
+        function updateCharlesPhysics() {
+            charlesState.V = (charlesState.n * R_GAS * charlesState.T) / charlesState.P;
+            const spd = Math.sqrt(charlesState.T / 28) * 0.55;
+            particles.forEach(p => {
+                const ang = Math.atan2(p.vy, p.vx);
+                p.vx = Math.cos(ang) * spd;
+                p.vy = Math.sin(ang) * spd;
+            });
+            const tSlider = document.getElementById('charles-t-slider');
+            if (tSlider) tSlider.value = charlesState.T;
+            const tValDisplay = document.getElementById('t-val');
+            if (tValDisplay) tValDisplay.innerText = `${charlesState.T.toFixed(1)} K (${(charlesState.T - 273.15).toFixed(1)} °C)`;
+            updateTelemetryAndMeters();
+            updateFormulaDisplay();
+        }
+
+        function updateTelemetryAndMeters() {
+            const teleStatus = document.getElementById('tele-status');
+            const readout1 = document.getElementById('readout-1');
+            const readout2 = document.getElementById('readout-2');
+            const readout3 = document.getElementById('readout-3');
+            const meterContainer = document.getElementById('meters-container');
+
+            if (currentLab === 'boyle') {
+                teleStatus.innerText = 'BOYLE COMPRESSION';
+                readout1.className = 'tele-val green';
+                readout1.innerText = `P = ${boyleState.P.toFixed(2)} atm`;
+                readout2.className = 'tele-val pink';
+                readout2.innerText = `V = ${boyleState.V.toFixed(2)} L`;
+                readout3.className = 'tele-val amber';
+                readout3.innerText = `T = ${boyleState.T.toFixed(1)} K`;
+
+                meterContainer.innerHTML = `
+                    <div class="hud-meter-card">
+                        <div class="lbl">Pressure (P)</div>
+                        <div class="val">${boyleState.P.toFixed(2)} <span style="font-size:0.75rem; color:#8da4be">atm</span></div>
+                    </div>
+                    <div class="hud-meter-card">
+                        <div class="lbl">Volume (V)</div>
+                        <div class="val">${boyleState.V.toFixed(2)} <span style="font-size:0.75rem; color:#8da4be">L</span></div>
+                    </div>
+                    <div class="hud-meter-card">
+                        <div class="lbl">Temp (T) [Const]</div>
+                        <div class="val">${boyleState.T.toFixed(0)} <span style="font-size:0.75rem; color:#8da4be">K</span></div>
+                    </div>
+                `;
+            } else if (currentLab === 'charles') {
+                teleStatus.innerText = 'ISOBARIC EXPANSION';
+                readout1.className = 'tele-val amber';
+                readout1.innerText = `T = ${charlesState.T.toFixed(1)} K`;
+                readout2.className = 'tele-val pink';
+                readout2.innerText = `V = ${charlesState.V.toFixed(2)} L`;
+                readout3.className = 'tele-val green';
+                readout3.innerText = `P = ${charlesState.P.toFixed(2)} atm`;
+
+                meterContainer.innerHTML = `
+                    <div class="hud-meter-card">
+                        <div class="lbl">Volume (V)</div>
+                        <div class="val">${charlesState.V.toFixed(2)} <span style="font-size:0.75rem; color:#8da4be">L</span></div>
+                    </div>
+                    <div class="hud-meter-card">
+                        <div class="lbl">Temperature (T)</div>
+                        <div class="val">${(charlesState.T - 273.15).toFixed(1)} <span style="font-size:0.75rem; color:#8da4be">°C</span></div>
+                    </div>
+                    <div class="hud-meter-card">
+                        <div class="lbl">Pressure [Const]</div>
+                        <div class="val">${charlesState.P.toFixed(2)} <span style="font-size:0.75rem; color:#8da4be">atm</span></div>
+                    </div>
+                `;
+            } else if (currentLab === 'graham') {
+                const ratio = Math.sqrt(grahamState.M_HCl / grahamState.M_NH3).toFixed(3);
+                const statusText = grahamState.ringFormed ? `${grahamState.reactionCm.toFixed(1)} cm (near HCl)` : (grahamState.running ? 'Diffusing...' : 'Ready');
+
+                teleStatus.innerText = 'GRAHAM DIFFUSION';
+                readout1.className = 'tele-val green';
+                readout1.innerText = `Timer = ${grahamState.timeElapsed.toFixed(1)} s`;
+                readout2.className = 'tele-val pink';
+                readout2.innerText = `Ratio = ${ratio}`;
+                readout3.className = 'tele-val amber';
+                readout3.innerText = `Status = ${statusText}`;
+
+                meterContainer.innerHTML = `
+                    <div class="hud-meter-card">
+                        <div class="lbl">Reaction Timer</div>
+                        <div class="val">${grahamState.timeElapsed.toFixed(1)} <span style="font-size:0.75rem; color:#8da4be">s</span></div>
+                    </div>
+                    <div class="hud-meter-card">
+                        <div class="lbl">Predicted Ratio</div>
+                        <div class="val">${ratio}</div>
+                    </div>
+                    <div class="hud-meter-card">
+                        <div class="lbl">Precipitate Zone</div>
+                        <div class="val" style="font-size:0.95rem; line-height:1.4;">${statusText}</div>
+                    </div>
+                `;
+            }
+        }
+
+        function updateFormulaDisplay() {
+            const box = document.getElementById('formula-breakdown');
+            if (currentLab === 'boyle') {
+                const k = (boyleState.P * boyleState.V).toFixed(3);
+                const invV = (1 / boyleState.V).toFixed(3);
+                box.innerHTML = `
+                    <strong>Boyle's Law Derivation:</strong> P1 x V1 = P2 x V2 = k (at constant temperature and molar quantity)<br>
+                    • Current Constant Product: <strong>P x V = k</strong> -> ${boyleState.P.toFixed(2)} atm x ${boyleState.V.toFixed(2)} L = <strong>${k} L·atm</strong><br>
+                    • Linear Reciprocal Volume: <strong>1 / V</strong> = 1 / ${boyleState.V.toFixed(2)} = <strong>${invV} 1/L</strong><br>
+                    • Scientific Verification: Pressure is strictly inversely proportional to volume. Plotting <strong>P vs 1/V</strong> yields a direct proportional straight line intersecting the coordinate origin (0, 0).
+                `;
+            } else if (currentLab === 'charles') {
+                const k = (charlesState.V / charlesState.T).toFixed(5);
+                const tempC = (charlesState.T - 273.15).toFixed(1);
+                box.innerHTML = `
+                    <strong>Charles's Law Derivation:</strong> V1 / T1 = V2 / T2 = k (at constant isobaric pressure)<br>
+                    • Isobaric Ratio: <strong>V / T = k</strong> -> ${charlesState.V.toFixed(2)} L / ${charlesState.T.toFixed(1)} K = <strong>${k} L/K</strong><br>
+                    • Absolute Temperature Conversion: ${tempC} °C + 273.15 = <strong>${charlesState.T.toFixed(1)} K</strong><br>
+                    • Scientific Verification: Plotting Volume vs Celsius Temperature (°C) intercepts the vertical volume axis at 0 °C and projects linearly back to the horizontal axis intercept at exactly <strong>-273.15 °C (Absolute Zero)</strong>.
+                `;
+            } else if (currentLab === 'graham') {
+                const M1 = grahamState.M_NH3;
+                const M2 = grahamState.M_HCl;
+                const ratio = Math.sqrt(M2 / M1).toFixed(3);
+                box.innerHTML = `
+                    <strong>Graham's Law Molecular Diffusion Derivation:</strong><br>
+                    Rate1 / Rate2 = sqrt( Molar Mass 2 / Molar Mass 1 ) = Distance(NH3) / Distance(HCl)<br>
+                    • Standard Gas Molecular Masses: <strong>M(NH3)</strong> = 17.03 g/mol, <strong>M(HCl)</strong> = 36.46 g/mol<br>
+                    • Relative Kinetic Velocity: sqrt( 36.46 / 17.03 ) = sqrt( 2.141 ) = <strong>${ratio}</strong> (Ammonia diffuses ${ratio}x faster than HCl)<br>
+                    • Stoichiometric Meeting Location: Across a 26.0 cm cotton span (from 2.0 cm to 28.0 cm), NH3 traverses <strong>16.0 cm</strong> while HCl travels <strong>10.0 cm</strong>, producing ammonium chloride precipitate at <strong>${grahamState.reactionCm.toFixed(1)} cm</strong>.
+                `;
+            }
+        }
+
+        /* ==========================================================================
+           TAB MODULE CONTROLLER
+           ========================================================================== */
+        function switchLab(key) {
+            currentLab = key;
+
+            document.getElementById('tab-boyle').classList.toggle('active', key === 'boyle');
+            document.getElementById('tab-charles').classList.toggle('active', key === 'charles');
+            document.getElementById('tab-graham').classList.toggle('active', key === 'graham');
+
+            const controlsDiv = document.getElementById('dynamic-controls');
+            const extraChartControls = document.getElementById('chart-extra-controls');
+            const helpText = document.getElementById('canvas-help-text');
+            recordedData = [];
+
+            if (key === 'boyle') {
+                helpText.innerHTML = "💡 <em>Tip: Drag the plunger handle directly inside the cylinder or use the slider!</em>";
+                controlsDiv.innerHTML = `
+                    <div class="control-group">
+                        <label for="boyle-v-slider">Plunger Volume: <span id="v-val">${boyleState.V.toFixed(2)}</span> L</label>
+                        <input type="range" id="boyle-v-slider" min="1.0" max="6.0" step="0.1" value="${boyleState.V}" oninput="onBoyleSlider(this.value)">
+                    </div>
+                `;
+                extraChartControls.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <select onchange="toggleBoyleGraph(this.value)" style="padding:3px 8px; font-size:0.8rem; min-height:30px;">
+                            <option value="linear" ${activeBoyleGraphType === 'linear' ? 'selected' : ''}>P vs 1/V (Linear Verification)</option>
+                            <option value="standard" ${activeBoyleGraphType === 'standard' ? 'selected' : ''}>P vs V (Curved Plot)</option>
+                        </select>
+                        <label id="boyle-extrap-label" style="font-size:0.8rem; font-weight:600; cursor:pointer; display:${activeBoyleGraphType === 'linear' ? 'inline-flex' : 'none'}; align-items:center; gap:4px; color:#cbd5e1;">
+                            <input type="checkbox" id="boyle-extrap-check" onchange="toggleBoyleExtrapolation(this.checked)"> Extrapolate to (0,0)
+                        </label>
+                    </div>
+                `;
+                initGasParticles(80, 160 + 4, 160 + 200 - 4, 180, 60 + 310 - 4, boyleState.T, '#00f3ff', 28);
+                setupChart('boyle');
+                updateBoylePhysics();
+            } else if (key === 'charles') {
+                helpText.innerHTML = "💡 <em>Tip: Adjust the Bunsen burner flame or temperature slider to observe isobaric expansion!</em>";
+                controlsDiv.innerHTML = `
+                    <div class="control-group">
+                        <label for="charles-t-slider">Kinetic Temperature: <span id="t-val">${charlesState.T.toFixed(1)} K (${(charlesState.T - 273.15).toFixed(1)} °C)</span></label>
+                        <input type="range" id="charles-t-slider" min="150" max="480" step="5" value="${charlesState.T}" oninput="onCharlesSlider(this.value)">
+                    </div>
+                    <div class="control-group">
+                        <label>Bunsen Burner Flame Intensity:</label>
+                        <div class="btn-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                            <button class="sim-btn secondary" style="min-height:36px; font-size:0.7rem;" onclick="setFlame(0)">Off (Cold)</button>
+                            <button class="sim-btn" style="min-height:36px; font-size:0.7rem;" onclick="setFlame(1)">Normal Heat</button>
+                            <button class="sim-btn success" style="min-height:36px; font-size:0.7rem;" onclick="setFlame(2.2)">High Heat</button>
+                        </div>
+                    </div>
+                `;
+                extraChartControls.innerHTML = `
+                    <label style="font-size:0.8rem; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:4px; color:#cbd5e1;">
+                        <input type="checkbox" id="extrapolate-check" onchange="toggleCharlesExtrapolation(this.checked)"> Extrapolate to -273.15 °C
+                    </label>
+                `;
+                initGasParticles(70, 260 + 4, 260 + 220 - 4, 190, 60 + 290 - 4, charlesState.T, '#f97316', 28);
+                setupChart('charles');
+                updateCharlesPhysics();
+            } else if (key === 'graham') {
+                helpText.innerHTML = "💡 <em>Tip: Click 'Start Diffusion Reaction Process' to observe gas travel along the calibrated 30 cm ruler!</em>";
+                controlsDiv.innerHTML = `
+                    <p style="font-size: 0.9rem; margin-bottom: 10px; color: #cbd5e1;">
+                        Simulate counter-current molecular diffusion of ammonia (NH3) and hydrochloric acid (HCl) in a 30 cm closed glass chamber.
+                    </p>
+                    <button class="sim-btn" style="width:100%; min-height:46px;" onclick="startGrahamDiffusion()">
+                        ▶ Start Diffusion Reaction Process
+                    </button>
+                `;
+                extraChartControls.innerHTML = '';
+                particles = [];
+                smokeRingParticles = [];
+                setupChart('graham');
+                updateTelemetryAndMeters();
+                updateFormulaDisplay();
+            }
+            renderTable();
+        }
+
+        function onBoyleSlider(val) {
+            boyleState.V = parseFloat(val);
+            document.getElementById('v-val').innerText = boyleState.V.toFixed(2);
+            updateBoylePhysics();
+        }
+
+        function onCharlesSlider(val) {
+            charlesState.T = parseFloat(val);
+            document.getElementById('t-val').innerText = `${charlesState.T.toFixed(1)} K (${(charlesState.T - 273.15).toFixed(1)} °C)`;
+            updateCharlesPhysics();
+        }
+
+        function setFlame(intensity) {
+            charlesState.burnerFlame = intensity;
+            if (intensity === 0) charlesState.T = 180;
+            else if (intensity === 1) charlesState.T = 298.15;
+            else charlesState.T = 450;
+            document.getElementById('charles-t-slider').value = charlesState.T;
+            document.getElementById('t-val').innerText = `${charlesState.T.toFixed(1)} K (${(charlesState.T - 273.15).toFixed(1)} °C)`;
+            updateCharlesPhysics();
+        }
+
+        function resetExperimentState() {
+            if (currentLab === 'boyle') {
+                boyleState.V = 4.0;
+                updateBoylePhysics();
+            } else if (currentLab === 'charles') {
+                charlesState.T = 298.15;
+                charlesState.burnerFlame = 1.0;
+                updateCharlesPhysics();
+            } else {
+                grahamState.running = false;
+                grahamState.timeElapsed = 0;
+                grahamState.ringCloudOpacity = 0.0;
+                grahamState.ringFormed = false;
+                particles = [];
+                smokeRingParticles = [];
+                updateTelemetryAndMeters();
+                updateFormulaDisplay();
+            }
+        }
+
+        /* ==========================================================================
+           CHART.JS ZERO-AXIS PLUGIN (FOR PROMINENT CHARLES'S INTERCEPTS)
+           ========================================================================== */
+        const charlesZeroAxisPlugin = {
+            id: 'charlesZeroAxis',
+            afterDraw(chart) {
+                if (currentLab !== 'charles') return;
+                const xScale = chart.scales.x;
+                const yScale = chart.scales.y;
+                if (!xScale || !yScale) return;
+
+                const xZeroPx = xScale.getPixelForValue(0);
+                const yZeroPx = yScale.getPixelForValue(0);
+
+                if (xZeroPx < xScale.left || xZeroPx > xScale.right) return;
+
+                const c = chart.ctx;
+                c.save();
+
+                // Vertical Y-axis at x = 0 °C
+                c.strokeStyle = '#00f3ff';
+                c.lineWidth = 2.5;
+                c.beginPath();
+                c.moveTo(xZeroPx, yScale.top - 8);
+                c.lineTo(xZeroPx, yZeroPx);
+                c.stroke();
+
+                // Arrowhead at top
+                c.fillStyle = '#00f3ff';
+                c.beginPath();
+                c.moveTo(xZeroPx, yScale.top - 12);
+                c.lineTo(xZeroPx - 5, yScale.top - 4);
+                c.lineTo(xZeroPx + 5, yScale.top - 4);
+                c.closePath();
+                c.fill();
+
+                // Axis label
+                c.font = 'bold 10px "Orbitron", sans-serif';
+                c.textAlign = 'center';
+                c.fillText('Volume (L)', xZeroPx, yScale.top - 18);
+
+                // Extrapolation markers
+                if (charlesState.extrapolate) {
+                    const slope = (charlesState.n * R_GAS) / charlesState.P;
+                    const vAtZero = slope * 273.15;
+                    const yInterceptPx = yScale.getPixelForValue(vAtZero);
+
+                    // Y intercept: (0 °C, V0)
+                    c.fillStyle = '#ef4444';
+                    c.shadowColor = '#ef4444';
+                    c.shadowBlur = 8;
+                    c.beginPath();
+                    c.arc(xZeroPx, yInterceptPx, 5, 0, Math.PI * 2);
+                    c.fill();
+                    c.shadowBlur = 0;
+
+                    c.font = 'bold 10px "Share Tech Mono", monospace';
+                    c.fillStyle = '#e2e8f0';
+                    c.textAlign = 'left';
+                    c.fillText(` V0 = ${vAtZero.toFixed(2)} L (at 0 °C)`, xZeroPx + 8, yInterceptPx - 4);
+
+                    // X intercept: (-273.15 °C, 0 L)
+                    const xAbsZeroPx = xScale.getPixelForValue(-273.15);
+                    c.fillStyle = '#ef4444';
+                    c.shadowColor = '#ef4444';
+                    c.shadowBlur = 8;
+                    c.beginPath();
+                    c.arc(xAbsZeroPx, yZeroPx, 5, 0, Math.PI * 2);
+                    c.fill();
+                    c.shadowBlur = 0;
+
+                    c.textAlign = 'center';
+                    c.fillText('-273.15 °C (Absolute Zero)', xAbsZeroPx, yZeroPx + 18);
+                }
+
+                c.restore();
+            }
+        };
+
+        Chart.register(charlesZeroAxisPlugin);
+
+        /* ==========================================================================
+           CHART INITIALIZATION & PLOTTER
+           ========================================================================== */
+        function setupChart(type) {
+            const ctxChart = document.getElementById('analysisChart').getContext('2d');
+            if (chartInstance) chartInstance.destroy();
+
+            if (type === 'boyle') {
+                const isLinear = activeBoyleGraphType === 'linear';
+                const slope = boyleState.n * R_GAS * boyleState.T;
+
+                const datasets = [{
+                    label: isLinear ? 'Experimental Points (P vs 1/V)' : 'Pressure vs Volume',
+                    data: [],
+                    borderColor: '#00f3ff',
+                    backgroundColor: 'rgba(0, 243, 255, 0.15)',
+                    pointBackgroundColor: '#ff55bb',
+                    pointBorderColor: '#fff',
+                    pointRadius: 5,
+                    fill: !isLinear,
+                    tension: isLinear ? 0 : 0.3
+                }];
+
+                if (isLinear && boyleState.extrapolate) {
+                    datasets.push({
+                        label: 'Extrapolation to Origin (0, 0)',
+                        data: [{ x: 0, y: 0 }, { x: 1.0, y: slope * 1.0 }],
+                        borderColor: '#ef4444',
+                        borderDash: [6, 6],
+                        pointRadius: 4,
+                        pointBackgroundColor: '#ef4444',
+                        fill: false,
+                        tension: 0
+                    });
+                }
+
+                chartInstance = new Chart(ctxChart, {
+                    type: 'line',
+                    data: { datasets: datasets },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { labels: { color: '#cbd5e1', font: { family: 'Rajdhani' } } }
+                        },
+                        scales: {
+                            x: {
+                                type: 'linear',
+                                title: { display: true, text: isLinear ? '1 / Volume (1/L)' : 'Volume (L)', color: '#00f3ff', font: { weight: 'bold' } },
+                                min: 0,
+                                max: isLinear ? 1.05 : 6.5,
+                                ticks: { color: '#94a3b8', stepSize: isLinear ? 0.1 : 1.0 },
+                                grid: { color: 'rgba(255, 255, 255, 0.08)' }
+                            },
+                            y: {
+                                title: { display: true, text: 'Pressure (atm)', color: '#00f3ff', font: { weight: 'bold' } },
+                                min: 0,
+                                max: 4.2,
+                                ticks: { color: '#94a3b8' },
+                                grid: { color: 'rgba(255, 255, 255, 0.08)' }
+                            }
+                        }
+                    }
+                });
+
+            } else if (type === 'charles') {
+                const slope = (charlesState.n * R_GAS) / charlesState.P;
+                const vAtZeroC = slope * 273.15;
+
+                const datasets = [{
+                    label: 'Isobaric Observations',
+                    data: [],
+                    borderColor: '#f59e0b',
+                    backgroundColor: 'rgba(245, 158, 11, 0.15)',
+                    pointBackgroundColor: '#bc13fe',
+                    pointBorderColor: '#fff',
+                    pointRadius: 5,
+                    fill: false,
+                    tension: 0
+                }];
+
+                if (charlesState.extrapolate) {
+                    datasets.push({
+                        label: 'Absolute Zero Extrapolation (-273.15 °C)',
+                        data: [
+                            { x: -273.15, y: 0 },
+                            { x: 0, y: parseFloat(vAtZeroC.toFixed(3)) },
+                            { x: 220, y: parseFloat((slope * (220 + 273.15)).toFixed(3)) }
+                        ],
+                        borderColor: '#ef4444',
+                        borderDash: [6, 6],
+                        pointRadius: 0,
+                        fill: false,
+                        tension: 0
+                    });
+                }
+
+                chartInstance = new Chart(ctxChart, {
+                    type: 'line',
+                    data: { datasets: datasets },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { labels: { color: '#cbd5e1', font: { family: 'Rajdhani' } } }
+                        },
+                        scales: {
+                            x: {
+                                type: 'linear',
+                                title: { display: true, text: 'Temperature (°C)', color: '#00f3ff', font: { weight: 'bold' } },
+                                min: charlesState.extrapolate ? -300 : -130,
+                                max: 220,
+                                grid: {
+                                    color: (c) => (c.tick && c.tick.value === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.08)')
+                                },
+                                ticks: {
+                                    color: '#94a3b8',
+                                    stepSize: charlesState.extrapolate ? 50 : 25
+                                }
+                            },
+                            y: {
+                                title: { display: false },
+                                min: 0,
+                                max: 4.5,
+                                ticks: { color: '#94a3b8' },
+                                grid: {
+                                    color: (c) => (c.tick && c.tick.value === 0 ? '#00f3ff' : 'rgba(255, 255, 255, 0.08)'),
+                                    lineWidth: (c) => (c.tick && c.tick.value === 0 ? 2 : 1)
+                                }
+                            }
+                        }
+                    }
+                });
+
+            } else if (type === 'graham') {
+                chartInstance = new Chart(ctxChart, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Ammonia (NH3)', 'Hydrochloric Acid (HCl)'],
+                        datasets: [{
+                            label: 'Distance Traveled in 30 cm Tube (cm)',
+                            data: [0, 0],
+                            backgroundColor: ['rgba(0, 243, 255, 0.65)', 'rgba(0, 255, 136, 0.65)'],
+                            borderColor: ['#00f3ff', '#00ff88'],
+                            borderWidth: 1.5
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { labels: { color: '#cbd5e1', font: { family: 'Rajdhani' } } }
+                        },
+                        scales: {
+                            x: { ticks: { color: '#cbd5e1' }, grid: { display: false } },
+                            y: {
+                                title: { display: true, text: 'Distance (cm)', color: '#00f3ff', font: { weight: 'bold' } },
+                                max: 30,
+                                min: 0,
+                                ticks: { color: '#94a3b8' },
+                                grid: { color: 'rgba(255, 255, 255, 0.08)' }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        function toggleBoyleGraph(val) {
+            activeBoyleGraphType = val;
+            const checkLabel = document.getElementById('boyle-extrap-label');
+            if (checkLabel) checkLabel.style.display = (val === 'linear') ? 'inline-flex' : 'none';
+            
+            setupChart('boyle');
+            recordedData.forEach(d => {
+                const xVal = activeBoyleGraphType === 'linear' ? d.invV : d.V;
+                chartInstance.data.datasets[0].data.push({ x: xVal, y: d.P });
+            });
+            chartInstance.data.datasets[0].data.sort((a,b) => a.x - b.x);
+            chartInstance.update();
+        }
+
+        function toggleBoyleExtrapolation(enabled) {
+            boyleState.extrapolate = enabled;
+            setupChart('boyle');
+            recordedData.forEach(d => {
+                const xVal = activeBoyleGraphType === 'linear' ? d.invV : d.V;
+                chartInstance.data.datasets[0].data.push({ x: xVal, y: d.P });
+            });
+            chartInstance.data.datasets[0].data.sort((a,b) => a.x - b.x);
+            chartInstance.update();
+        }
+
+        function toggleCharlesExtrapolation(enabled) {
+            charlesState.extrapolate = enabled;
+            setupChart('charles');
+            recordedData.forEach(d => {
+                chartInstance.data.datasets[0].data.push({ x: d.TC, y: d.V });
+            });
+            chartInstance.data.datasets[0].data.sort((a,b) => a.x - b.x);
+            chartInstance.update();
+        }
+
+        function recordObservation() {
+            if (currentLab === 'boyle') {
+                const row = {
+                    P: parseFloat(boyleState.P.toFixed(2)),
+                    V: parseFloat(boyleState.V.toFixed(2)),
+                    invV: parseFloat((1 / boyleState.V).toFixed(3)),
+                    PV: parseFloat((boyleState.P * boyleState.V).toFixed(2))
+                };
+                recordedData.push(row);
+                const xVal = activeBoyleGraphType === 'linear' ? row.invV : row.V;
+                chartInstance.data.datasets[0].data.push({ x: xVal, y: row.P });
+                chartInstance.data.datasets[0].data.sort((a,b) => a.x - b.x);
+                chartInstance.update();
+            } else if (currentLab === 'charles') {
+                const row = {
+                    T: parseFloat(charlesState.T.toFixed(1)),
+                    TC: parseFloat((charlesState.T - 273.15).toFixed(1)),
+                    V: parseFloat(charlesState.V.toFixed(2)),
+                    VT: parseFloat((charlesState.V / charlesState.T).toFixed(5))
+                };
+                recordedData.push(row);
+                chartInstance.data.datasets[0].data.push({ x: row.TC, y: row.V });
+                chartInstance.data.datasets[0].data.sort((a,b) => a.x - b.x);
+                chartInstance.update();
+            } else if (currentLab === 'graham') {
+                const dNH3 = grahamState.reactionCm - grahamState.swabLeftCm; // 16.0 cm
+                const dHCl = grahamState.swabRightCm - grahamState.reactionCm; // 10.0 cm
+                const row = {
+                    d1: dNH3.toFixed(2),
+                    d2: dHCl.toFixed(2),
+                    ratioExp: (dNH3 / dHCl).toFixed(3),
+                    ratioTheo: Math.sqrt(grahamState.M_HCl / grahamState.M_NH3).toFixed(3)
+                };
+                recordedData.push(row);
+                chartInstance.data.datasets[0].data = [parseFloat(dNH3.toFixed(2)), parseFloat(dHCl.toFixed(2))];
+                chartInstance.update();
+            }
+            renderTable();
+        }
+
+        function renderTable() {
+            const thead = document.getElementById('tableHead');
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            if (currentLab === 'boyle') {
+                thead.innerHTML = `<tr><th>#</th><th>P (atm)</th><th>V (L)</th><th>1/V (1/L)</th><th>P x V (L·atm)</th></tr>`;
+                recordedData.forEach((r, idx) => {
+                    tbody.innerHTML += `<tr><td>${idx+1}</td><td>${r.P}</td><td>${r.V}</td><td>${r.invV}</td><td>${r.PV}</td></tr>`;
+                });
+            } else if (currentLab === 'charles') {
+                thead.innerHTML = `<tr><th>#</th><th>Temp (K)</th><th>Temp (°C)</th><th>Vol (L)</th><th>V/T (L/K)</th></tr>`;
+                recordedData.forEach((r, idx) => {
+                    tbody.innerHTML += `<tr><td>${idx+1}</td><td>${r.T}</td><td>${r.TC}</td><td>${r.V}</td><td>${r.VT}</td></tr>`;
+                });
+            } else if (currentLab === 'graham') {
+                thead.innerHTML = `<tr><th>#</th><th>NH3 Dist (cm)</th><th>HCl Dist (cm)</th><th>Obs Ratio</th><th>Theo Ratio</th></tr>`;
+                recordedData.forEach((r, idx) => {
+                    tbody.innerHTML += `<tr><td>${idx+1}</td><td>${r.d1}</td><td>${r.d2}</td><td>${r.ratioExp}</td><td>${r.ratioTheo}</td></tr>`;
+                });
+            }
+        }
+
+        function clearRecordedData() {
+            recordedData = [];
+            if (chartInstance) {
+                if (currentLab === 'graham') chartInstance.data.datasets[0].data = [0, 0];
+                else chartInstance.data.datasets[0].data = [];
+                chartInstance.update();
+            }
+            renderTable();
+        }
+
+        function downloadCSVData() {
+            if (recordedData.length === 0) {
+                alert("No recorded observations to export! Click 'Record Point' first.");
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,";
+            let fileName = "";
+
+            if (currentLab === 'boyle') {
+                fileName = "Boyles_Law_Experimental_Data.csv";
+                csvContent += "Point_Number,Pressure_atm,Volume_L,Inverse_Volume_L-1,PV_Constant\n";
+                recordedData.forEach((r, idx) => {
+                    csvContent += `${idx+1},${r.P},${r.V},${r.invV},${r.PV}\n`;
+                });
+            } else if (currentLab === 'charles') {
+                fileName = "Charles_Law_Experimental_Data.csv";
+                csvContent += "Point_Number,Temperature_Kelvin,Temperature_Celsius,Volume_L,VT_Constant\n";
+                recordedData.forEach((r, idx) => {
+                    csvContent += `${idx+1},${r.T},${r.TC},${r.V},${r.VT}\n`;
+                });
+            } else if (currentLab === 'graham') {
+                fileName = "Grahams_Law_Diffusion_Data.csv";
+                csvContent += "Trial_Number,NH3_Distance_cm,HCl_Distance_cm,Experimental_Ratio,Theoretical_Ratio\n";
+                recordedData.forEach((r, idx) => {
+                    csvContent += `${idx+1},${r.d1},${r.d2},${r.ratioExp},${r.ratioTheo}\n`;
+                });
+            }
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", fileName);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function openGraphModal() {
+            const modal = document.getElementById('graphPopoutModal');
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+
+            const modalCtx = document.getElementById('modalChartCanvas').getContext('2d');
+            if (modalChartInstance) modalChartInstance.destroy();
+
+            const cloneConfig = JSON.parse(JSON.stringify({
+                type: chartInstance.config.type,
+                data: chartInstance.config.data,
+                options: chartInstance.config.options
+            }));
+
+            cloneConfig.options.maintainAspectRatio = false;
+            cloneConfig.options.plugins = {
+                legend: { labels: { color: '#cbd5e1', font: { size: 14, family: 'Rajdhani' } } }
+            };
+
+            modalChartInstance = new Chart(modalCtx, cloneConfig);
+        }
+
+        /* ==========================================================================
+           INITIALIZATION TRIGGER
+           ========================================================================== */
+        window.addEventListener('DOMContentLoaded', () => {
+            switchLab('boyle');
+            renderApparatusLoop();
+        });
+    </script>
+</body>
+</html>

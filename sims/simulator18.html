@@ -1,0 +1,2720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Interactive Flame Emission Spectroscopy and Organic Ignition Qualitative Analysis Laboratory Simulator - LuyaliSims STEM Labs.">
+    <title>Flame Test & Organic Ignition Laboratory Simulator - LuyaliSims</title>
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    
+    <!-- Import Futuristic Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Base Reset & Variables */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --neon-cyan: #00f3ff;
+            --neon-magenta: #bc13fe;
+            --neon-green: #00ff88;
+            --neon-amber: #f59e0b;
+            --neon-red: #ef4444;
+            --bg-dark: #070a12;
+            --panel-bg: rgba(16, 24, 43, 0.85);
+            --border-glow: rgba(0, 243, 255, 0.35);
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 85% 15%, rgba(0, 243, 255, 0.08), transparent 45%),
+                radial-gradient(circle at 15% 85%, rgba(188, 19, 254, 0.08), transparent 45%),
+                linear-gradient(180deg, #05070e 0%, #0a0e1a 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 16px 20px;
+            overflow-x: hidden;
+            user-select: none;
+        }
+
+        /* 1. HEADER & TOP NAVIGATION */
+        header {
+            max-width: 1280px;
+            margin: 0 auto 15px auto;
+        }
+
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 18px;
+            background: rgba(16, 24, 43, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(188, 19, 254, 0.5);
+            color: #e580ff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(188, 19, 254, 0.2);
+            border-color: var(--neon-magenta);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
+            transform: translateX(-3px);
+        }
+
+        .module-id {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+            margin: 6px 0 10px 0;
+            font-size: clamp(1.4rem, 3.8vw, 2.3rem);
+            letter-spacing: 1.5px;
+            text-align: center;
+        }
+
+        .lead-summary {
+            max-width: 950px;
+            margin: 0 auto 20px auto;
+            text-align: center;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: #cbd5e1;
+        }
+
+        main {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        /* 2. SIMULATOR WORKSPACE */
+        #simulator-container {
+            background: linear-gradient(135deg, rgba(16, 24, 43, 0.9) 0%, rgba(8, 12, 22, 0.95) 100%);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-glow);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 25px rgba(0, 243, 255, 0.12);
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .hud-telemetry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(4, 8, 16, 0.85);
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            border-radius: 10px;
+            padding: 10px 16px;
+            margin-bottom: 18px;
+            font-family: 'Share Tech Mono', monospace;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .telemetry-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.92rem;
+        }
+
+        .tele-label {
+            color: #8da4be;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .tele-val {
+            color: var(--neon-cyan);
+            font-weight: 700;
+        }
+
+        .tele-val.pink { color: #ff55bb; }
+        .tele-val.green { color: var(--neon-green); }
+        .tele-val.amber { color: var(--neon-amber); }
+
+        .sim-layout {
+            display: grid;
+            grid-template-columns: 1.8fr 1fr;
+            gap: 20px;
+            align-items: stretch;
+        }
+
+        /* Interactive Virtual Workbench Viewport */
+        .canvas-wrapper {
+            position: relative;
+            width: 100%;
+            height: 520px;
+            background: radial-gradient(circle at 50% 35%, #151e32 0%, #060911 100%);
+            border-radius: 12px;
+            overflow: hidden;
+            touch-action: none;
+            border: 4px solid #1e293b;
+            box-shadow: 
+                0 0 0 2px rgba(0, 243, 255, 0.4),
+                0 15px 35px rgba(0, 0, 0, 0.8),
+                inset 0 0 35px rgba(0, 0, 0, 0.95);
+            cursor: grab;
+        }
+
+        .canvas-wrapper.panning {
+            cursor: grabbing;
+        }
+
+        .workbench-world {
+            position: absolute;
+            width: 2000px;
+            height: 1200px;
+            left: 0;
+            top: 0;
+            transform-origin: 0 0;
+            touch-action: none;
+        }
+
+        .bench-surface {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 2000px;
+            height: 420px;
+            background: linear-gradient(to bottom, #475569 0%, #1e293b 25%, #0b1329 100%);
+            border-top: 4px solid #94a3b8;
+            box-shadow: inset 0 10px 24px rgba(0, 0, 0, 0.7);
+        }
+
+        .bench-surface::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 3px;
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Bunsen Burner Assembly */
+        .burner-station {
+            position: absolute;
+            bottom: 270px;
+            left: 820px;
+            width: 170px;
+            height: 380px;
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        #flameCanvas {
+            position: absolute;
+            top: -300px;
+            left: -85px;
+            width: 340px;
+            height: 410px;
+            pointer-events: none;
+            z-index: 35;
+        }
+
+        #sparkCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 75;
+        }
+
+        /* Movable Laboratory Apparatus */
+        .lab-item {
+            position: absolute;
+            touch-action: none;
+            cursor: grab;
+            z-index: 25;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: filter 0.15s ease;
+        }
+
+        .lab-item:active {
+            cursor: grabbing;
+            z-index: 60;
+        }
+
+        .lab-item.highlight {
+            filter: drop-shadow(0 0 14px rgba(0, 243, 255, 0.85));
+        }
+
+        .item-label {
+            margin-top: 4px;
+            background: rgba(15, 23, 42, 0.9);
+            color: #f8fafc;
+            font-size: 0.75rem;
+            font-family: 'Share Tech Mono', monospace;
+            padding: 3px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+            pointer-events: none;
+            border: 1px solid rgba(0, 243, 255, 0.3);
+        }
+
+        .item-toolbar {
+            position: absolute;
+            top: -26px;
+            display: flex;
+            gap: 4px;
+            z-index: 40;
+        }
+
+        .tool-btn {
+            background: #0f172a;
+            color: var(--neon-cyan);
+            border: 1px solid var(--neon-cyan);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tool-btn:hover {
+            background: var(--neon-cyan);
+            color: #060913;
+        }
+
+        /* HUD Overlays */
+        .observation-hud {
+            position: absolute;
+            top: 16px;
+            right: 20px;
+            background: rgba(11, 17, 30, 0.95);
+            border: 2px solid var(--neon-cyan);
+            color: #f8fafc;
+            border-radius: 10px;
+            padding: 10px 16px;
+            z-index: 150;
+            display: none;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
+            text-align: right;
+            min-width: 260px;
+        }
+
+        .hud-timer {
+            font-size: 1.15rem;
+            font-weight: bold;
+            color: var(--neon-cyan);
+            font-family: 'Share Tech Mono', monospace;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 6px;
+        }
+
+        .hud-msg {
+            font-size: 0.78rem;
+            color: #94a3b8;
+            margin: 4px 0 8px 0;
+        }
+
+        .hud-skip-btn {
+            padding: 5px 12px;
+            background: linear-gradient(180deg, #0284c7 0%, #0369a1 100%);
+            color: white;
+            font-size: 0.75rem;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            font-weight: 700;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .hud-skip-btn:hover {
+            background: #0284c7;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+        }
+
+        .toast-alert {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(30, 10, 16, 0.95);
+            color: #fca5a5;
+            border: 2px solid var(--neon-red);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.88rem;
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.8);
+            z-index: 200;
+            display: none;
+            max-width: 85%;
+            text-align: center;
+        }
+
+        .view-controls {
+            position: absolute;
+            bottom: 14px;
+            right: 16px;
+            background: rgba(11, 17, 30, 0.9);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            padding: 4px 10px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 100;
+        }
+
+        .view-controls button {
+            width: 28px;
+            height: 28px;
+            padding: 0;
+            font-size: 0.95rem;
+            line-height: 1;
+            border-radius: 50%;
+            background: #1e293b;
+            color: #f8fafc;
+            border: 1px solid #475569;
+            cursor: pointer;
+        }
+
+        .view-controls button:hover {
+            background: var(--neon-cyan);
+            color: #060913;
+        }
+
+        .view-controls span {
+            color: #94a3b8;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.78rem;
+            font-weight: bold;
+            min-width: 44px;
+            text-align: center;
+        }
+
+        /* Controls Panel */
+        .controls-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: linear-gradient(145deg, rgba(11, 17, 30, 0.92) 0%, rgba(6, 9, 16, 0.97) 100%);
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            max-height: 520px;
+            overflow-y: auto;
+        }
+
+        .panel-heading {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border-bottom: 1px solid rgba(0, 243, 255, 0.25);
+            padding-bottom: 6px;
+            margin: 0;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .control-group label {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #cbd5e1;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        select {
+            min-height: 40px;
+            background: #060c18;
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            color: #e2e8f0;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 600;
+            font-size: 0.92rem;
+            padding: 6px 10px;
+            border-radius: 8px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        select:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.4);
+        }
+
+        .protocol-box {
+            background: rgba(15, 23, 42, 0.65);
+            border-radius: 6px;
+            padding: 8px 10px;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            color: #cbd5e1;
+            border-left: 3px solid var(--neon-cyan);
+        }
+
+        .hazard-box {
+            background: rgba(30, 10, 16, 0.7);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            border-radius: 6px;
+            padding: 6px 8px;
+            font-size: 0.75rem;
+            color: #fca5a5;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            line-height: 1.35;
+        }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .sim-btn {
+            background: linear-gradient(180deg, rgba(16, 28, 54, 0.9) 0%, rgba(8, 14, 28, 0.95) 100%);
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            color: var(--neon-cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 8px;
+            min-height: 42px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .sim-btn:hover {
+            border-color: var(--neon-cyan);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .sim-btn.secondary {
+            border-color: rgba(188, 19, 254, 0.5);
+            color: #e580ff;
+        }
+
+        .sim-btn.secondary:hover {
+            border-color: var(--neon-magenta);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
+        }
+
+        .sim-btn.amber {
+            border-color: rgba(245, 158, 11, 0.5);
+            color: var(--neon-amber);
+        }
+
+        .sim-btn.amber:hover {
+            border-color: var(--neon-amber);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.6);
+        }
+
+        .sim-btn.green {
+            border-color: rgba(0, 255, 136, 0.5);
+            color: var(--neon-green);
+        }
+
+        .sim-btn.green:hover {
+            border-color: var(--neon-green);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.6);
+        }
+
+        /* 3. POLICY-COMPLIANT AD CONTAINER */
+        .ad-slot-wrapper {
+            margin: 30px auto;
+            text-align: center;
+            clear: both;
+        }
+
+        .ad-disclaimer {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            margin-bottom: 6px;
+        }
+
+        .ad-box-placeholder {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            min-height: 90px;
+            max-width: 970px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #475569;
+            font-size: 0.85rem;
+            border-radius: 8px;
+        }
+
+        /* 4. EDUCATIONAL CONTENT SECTION */
+        .educational-content {
+            line-height: 1.75;
+            font-size: 1.05rem;
+            color: #94a3b8;
+            background: rgba(10, 14, 23, 0.85);
+            padding: 30px;
+            border-radius: 16px;
+            border-left: 4px solid var(--neon-cyan);
+            border-top: 1px solid rgba(0, 243, 255, 0.2);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin-bottom: 35px;
+        }
+
+        .educational-content h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-magenta);
+            border-bottom: 1px solid rgba(188, 19, 254, 0.3);
+            padding-bottom: 8px;
+            margin-top: 1.8em;
+            margin-bottom: 0.6em;
+            font-size: 1.45rem;
+        }
+
+        .educational-content h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: #38bdf8;
+            margin-top: 1.4em;
+            margin-bottom: 0.4em;
+            font-size: 1.15rem;
+        }
+
+        .formula-box {
+            background: rgba(4, 9, 20, 0.7);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-left: 3px solid var(--neon-green);
+            padding: 14px 18px;
+            margin: 14px 0;
+            border-radius: 6px;
+            font-family: 'Share Tech Mono', monospace;
+            color: #a7f3d0;
+            font-size: 1.02rem;
+            line-height: 1.6;
+        }
+
+        .task-card {
+            background: rgba(15, 23, 42, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 18px 20px;
+            margin-bottom: 18px;
+        }
+
+        .task-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            color: var(--neon-cyan);
+            margin-bottom: 8px;
+        }
+
+        details {
+            margin-top: 25px;
+            background: rgba(5, 10, 20, 0.8);
+            border: 1px solid rgba(188, 19, 254, 0.4);
+            border-radius: 10px;
+            padding: 15px 20px;
+        }
+
+        summary {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            color: #e580ff;
+            cursor: pointer;
+            padding: 6px 0;
+            user-select: none;
+        }
+
+        .solution-step {
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+            padding: 12px 0;
+        }
+
+        .solution-step:last-child {
+            border-bottom: none;
+        }
+
+        /* 5. FOOTER & COMPLIANCE MODALS */
+        footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px 20px 20px 20px;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .footer-nav {
+            display: flex;
+            justify-content: center;
+            gap: 22px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .footer-nav a, .footer-modal-trigger {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.2s, text-shadow 0.2s;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .footer-nav a:hover, .footer-modal-trigger:hover {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
+        }
+
+        .policy-modal {
+            position: fixed !important;
+            top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
+            width: 100vw !important; height: 100vh !important;
+            background: rgba(4, 7, 15, 0.92) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 99999 !important;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-body {
+            background: linear-gradient(145deg, #0b111e 0%, #060913 100%);
+            border: 2px solid var(--neon-cyan);
+            border-radius: 16px;
+            max-width: 820px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 35px 30px;
+            color: #cbd5e1;
+            box-shadow: 0 0 40px rgba(0, 243, 255, 0.25);
+            line-height: 1.75;
+            position: relative;
+            text-align: left;
+        }
+
+        .modal-body h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-cyan);
+            margin-top: 0;
+            font-size: 1.6rem;
+        }
+
+        .modal-body h3 {
+            color: var(--neon-magenta);
+            font-family: 'Orbitron', sans-serif;
+            margin-top: 24px;
+            margin-bottom: 8px;
+            font-size: 1.15rem;
+        }
+
+        .modal-date {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--neon-green);
+            font-size: 0.9rem;
+            margin-top: -6px;
+            margin-bottom: 16px;
+        }
+
+        .modal-close-btn {
+            background: linear-gradient(180deg, rgba(188, 19, 254, 0.4), rgba(188, 19, 254, 0.15));
+            border: 1px solid var(--neon-magenta);
+            color: #fff;
+            padding: 8px 18px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            float: right;
+            margin-bottom: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close-btn:hover {
+            background: var(--neon-magenta);
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.8);
+        }
+
+        /* 6. PRACTICAL EVALUATION EXAM MODAL */
+        .eval-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(4, 7, 15, 0.9);
+            backdrop-filter: blur(8px);
+            z-index: 10000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+
+        .eval-card {
+            background: linear-gradient(145deg, #0e172a 0%, #060913 100%);
+            border: 2px solid var(--neon-cyan);
+            border-radius: 14px;
+            padding: 24px 28px;
+            max-width: 580px;
+            width: 100%;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8), 0 0 25px rgba(0, 243, 255, 0.3);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .eval-badge {
+            background: rgba(0, 243, 255, 0.15);
+            color: var(--neon-cyan);
+            border: 1px solid var(--neon-cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.72rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .eval-card h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.25rem;
+            color: #fff;
+            margin-bottom: 14px;
+        }
+
+        .eval-item {
+            margin-top: 14px;
+        }
+
+        .eval-item p {
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: #cbd5e1;
+            margin-bottom: 6px;
+        }
+
+        .feedback-box {
+            margin-top: 16px;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            display: none;
+        }
+
+        .feedback-box.correct {
+            background: rgba(6, 78, 59, 0.5);
+            border-left: 4px solid var(--neon-green);
+            color: #a7f3d0;
+        }
+
+        .feedback-box.incorrect {
+            background: rgba(127, 29, 29, 0.5);
+            border-left: 4px solid var(--neon-red);
+            color: #fecaca;
+        }
+
+        @media (max-width: 860px) {
+            body { padding: 10px; }
+            #simulator-container, .educational-content { padding: 14px; }
+            .sim-layout { grid-template-columns: 1fr; }
+            .btn-grid { grid-template-columns: 1fr; }
+            .hud-telemetry { flex-direction: column; align-items: flex-start; }
+            .modal-body { padding: 22px 18px; }
+            .canvas-wrapper { height: 440px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. HEADER & TOP NAVIGATION -->
+    <header>
+        <nav class="top-nav">
+            <a href="../index.html" class="back-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Back to LuyaliSims
+            </a>
+            <span class="module-id">MODULE ID: CHEM-FLAME-06</span>
+        </nav>
+        
+        <h1>FLAME EMISSION & COMBUSTION LABORATORY</h1>
+        
+        <!-- Contextual Summary Above the Fold -->
+        <p class="lead-summary">
+            Investigate characteristic atomic emission wavelengths and organic combustion pyrolyses in an interactive qualitative chemistry environment. Manipulate the Bunsen air collar, mount analyte samples onto borosilicate rods or stainless steel spatulas, observe photoluminescent cone reactions, and quantify unknown cations and hydrocarbons.
+        </p>
+    </header>
+
+    <main>
+        <!-- 2. SIMULATOR APP WORKSPACE -->
+        <section id="simulator-container" aria-label="Interactive Flame Test Workspace">
+            
+            <!-- Telemetry Status Bar -->
+            <div class="hud-telemetry">
+                <div class="telemetry-item">
+                    <span class="tele-label">Flame Status:</span>
+                    <span id="readout-flame-mode" class="tele-val">NON-LUMINOUS (AIR HOLE OPEN)</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Excitation / Temp:</span>
+                    <span id="readout-temp" class="tele-val pink">~1450 °C (Oxidizing Zone)</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Assessed Score:</span>
+                    <span id="readout-score" class="tele-val green">0 / 0 Marks</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Audio Synth:</span>
+                    <button id="btnAudioToggle" class="tool-btn" onclick="toggleAudioEngine()">SOUND: ON</button>
+                </div>
+            </div>
+
+            <div class="sim-layout">
+                <!-- Interactive Workbench Canvas -->
+                <div class="canvas-wrapper" id="canvasFrame">
+                    <div class="toast-alert" id="toastBox"></div>
+
+                    <div class="observation-hud" id="obsHud">
+                        <div class="hud-timer">OBSERVING: <span id="hudSeconds">30</span>s</div>
+                        <p class="hud-msg">Inspect atomic emission tint, charring, residue, or soot generation.</p>
+                        <button class="hud-skip-btn" onclick="skipCountdownToEvaluation()">Evaluate Now ⏩</button>
+                    </div>
+
+                    <div class="workbench-world" id="workbenchWorld">
+                        <div class="bench-surface"></div>
+                        <canvas id="sparkCanvas" width="2000" height="1200"></canvas>
+
+                        <!-- Bunsen Burner Rig -->
+                        <div class="burner-station" id="burnerStation" style="display:none;">
+                            <canvas id="flameCanvas" width="340" height="410"></canvas>
+                            <svg viewBox="0 0 170 380" width="170" height="380" style="position:absolute; bottom:0; left:0;">
+                                <defs>
+                                    <linearGradient id="chromeGrad" x1="0" y1="0" x2="1" y2="0">
+                                        <stop offset="0%" stop-color="#475569"/>
+                                        <stop offset="25%" stop-color="#94a3b8"/>
+                                        <stop offset="50%" stop-color="#f8fafc"/>
+                                        <stop offset="75%" stop-color="#94a3b8"/>
+                                        <stop offset="100%" stop-color="#334155"/>
+                                    </linearGradient>
+                                    <linearGradient id="brassGrad" x1="0" y1="0" x2="1" y2="0">
+                                        <stop offset="0%" stop-color="#854d0e"/>
+                                        <stop offset="35%" stop-color="#ca8a04"/>
+                                        <stop offset="60%" stop-color="#fef08a"/>
+                                        <stop offset="100%" stop-color="#713f12"/>
+                                    </linearGradient>
+                                    <linearGradient id="castIronBase" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stop-color="#334155"/>
+                                        <stop offset="50%" stop-color="#1e293b"/>
+                                        <stop offset="100%" stop-color="#0f172a"/>
+                                    </linearGradient>
+                                </defs>
+                                <ellipse cx="85" cy="365" rx="75" ry="14" fill="#000" opacity="0.45"/>
+                                <polygon points="20,362 150,362 135,335 35,335" fill="url(#castIronBase)" stroke="#0f172a" stroke-width="2"/>
+                                <rect x="75" y="325" width="20" height="15" fill="#475569" stroke="#1e293b"/>
+                                <path d="M40 348 C10 348 -10 365 -40 370" fill="none" stroke="#e2e8f0" stroke-width="9" stroke-linecap="round"/>
+                                <path d="M40 348 C10 348 -10 365 -40 370" fill="none" stroke="#f97316" stroke-width="6" stroke-linecap="round"/>
+                                <rect x="72" y="260" width="26" height="66" rx="2" fill="url(#brassGrad)" stroke="#713f12" stroke-width="1.2"/>
+                                <circle id="collarHole" cx="85" cy="285" r="7" fill="#0f172a" stroke="#854d0e" stroke-width="1"/>
+                                <rect x="96" y="282" width="28" height="6" rx="2" fill="url(#chromeGrad)" stroke="#334155"/>
+                                <rect x="74" y="115" width="22" height="148" fill="url(#chromeGrad)" stroke="#1e293b" stroke-width="1.5"/>
+                                <rect x="71" y="107" width="28" height="10" rx="2" fill="url(#chromeGrad)" stroke="#334155" stroke-width="1.2"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="view-controls">
+                        <button onclick="zoomStep(-0.2)">−</button>
+                        <span id="lblZoomLevel">115%</span>
+                        <button onclick="zoomStep(0.2)">+</button>
+                        <button style="width: auto; padding: 0 8px; border-radius: 12px; font-size: 0.72rem;" onclick="resetViewport()">Center</button>
+                    </div>
+                </div>
+
+                <!-- Simulation Controls Console -->
+                <div class="controls-panel">
+                    <h3 class="panel-heading">Qualitative Test Setup</h3>
+
+                    <div class="control-group">
+                        <label for="categorySelect">Test Classification:</label>
+                        <select id="categorySelect" onchange="onCategoryChanged()">
+                            <option value="inorganic">Inorganic Qualitative Analysis (Metal Cations)</option>
+                            <option value="organic">Organic Qualitative Analysis (Ignition Tests)</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="sampleSelect">Unknown Substance Under Test:</label>
+                        <select id="sampleSelect" onchange="loadCurrentSample()"></select>
+                    </div>
+
+                    <div class="protocol-box" id="procedureContent">
+                        Select analyte to view protocol.
+                    </div>
+
+                    <div class="hazard-box" id="hazardWarningText">
+                        <span>⚠️</span> Safety First: Hot glassware and metal remain hazardous after testing.
+                    </div>
+
+                    <div class="control-group">
+                        <label for="apparatusSelect">Place Apparatus on Bench:</label>
+                        <select id="apparatusSelect">
+                            <option value="">-- Choose Equipment --</option>
+                            <option value="burner">Bunsen Burner (Stationary)</option>
+                            <option value="glass_rod">Borosilicate Glass Rod (For Cation Solutions)</option>
+                            <option value="spatula">Stainless Steel Spatula (For Organic Solids)</option>
+                            <option value="lighter">Lab Gas Igniter / Piezo Spark Lighter</option>
+                            <option value="sample_container">Substance Container (Beaker / Watch Glass)</option>
+                        </select>
+                    </div>
+
+                    <button class="sim-btn" onclick="addApparatusToDesk()">Deploy Apparatus to Bench</button>
+
+                    <div class="btn-grid">
+                        <button id="btnToggleCollar" class="sim-btn amber" onclick="toggleBurnerFlameMode()">Toggle Air Hole</button>
+                        <button class="sim-btn" onclick="loadSampleOntoActiveTool()">Moisten / Load Tool</button>
+                    </div>
+
+                    <div class="btn-grid">
+                        <button class="sim-btn secondary" onclick="clearCurrentDesk()">Clear Bench</button>
+                        <button id="fullscreenBtn" class="sim-btn secondary">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                            </svg>
+                            Fullscreen
+                        </button>
+                    </div>
+
+                    <button class="sim-btn green" onclick="handleReportButtonClick()">Export Practical Report (.CSV)</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. SAFE AD PLACEMENT SLOT -->
+        <div class="ad-slot-wrapper">
+            <div class="ad-disclaimer">Advertisement</div>
+            <div class="ad-box-placeholder">
+                <span>[AdSense Responsive Display Unit]</span>
+            </div>
+        </div>
+
+        <!-- 4. EDUCATIONAL REFERENCE ARTICLE -->
+        <article class="educational-content">
+            <section>
+                <h2>How to Operate the Simulator</h2>
+                <p>
+                    1. <strong>Select Test Division:</strong> Choose between Inorganic Qualitative Analysis (Metal Cation emission) and Organic Qualitative Analysis (Combustion and charring behaviour).<br>
+                    2. <strong>Inspect Unknown Analyte:</strong> Review the prescribed protocol, safety warnings, and thermal requirements in the control console.<br>
+                    3. <strong>Deploy Workbench Equipment:</strong> Add the Bunsen burner, container, and appropriate sampling apparatus (Borosilicate Glass Rod for solutions; Stainless Steel Spatula for organic solids/oils; Lab Gas Igniter for volatile pools on watch glasses).<br>
+                    4. <strong>Load and Introduce:</strong> Click <em>Moisten / Load Tool</em>, then drag the tool directly into the non-luminous flame cone. Observe the photoluminescent spectrum or charring progression for 30 seconds (or skip to evaluate immediately).<br>
+                    5. <strong>Formal Evaluation:</strong> Complete the observation and chemical inference queries to log scores, evaluate diagnostic feedback, and generate an analytical CSV report.
+                </p>
+            </section>
+
+            <section>
+                <h2>Scientific Theory & Working Principles</h2>
+                <p>
+                    The qualitative flame test relies on optical atomic emission spectroscopy. When metal salts are introduced into the high-temperature zone (approximately 1400 °C to 1500 °C) of a non-luminous Bunsen flame, thermal energy vaporizes and dissociates the ionic matrix into gaseous atoms or mono-cationic radicals:
+                </p>
+                <div class="formula-box">
+                    M+(aq) + Cl-(aq) -> M+(g) + Cl-(g) -> M*(g)<br>
+                    M*(g) -> M(g) + Photon (hv)
+                </div>
+                <p>
+                    Thermal kinetic collisions promote ground-state valence electrons into higher, unstable quantum orbitals. When these excited electrons relax back to lower energy levels or their ground state, they release discrete packets of electromagnetic energy (photons). The frequency and wavelength of the emitted photon are defined by the quantized electronic gap separating the two energy states.
+                </p>
+                <p>
+                    In organic qualitative analysis, ignition on a spatula or watch glass reveals unsaturation and structural constitution. Complete combustion of saturated molecules with low carbon-to-hydrogen ratios produces a clean, pale-blue flame. Conversely, compounds with high carbon-to-hydrogen ratios (such as alkenes, alkynes, or aromatics) fail to combust completely under ambient air entrainment; unburned carbon micro-particles incandesce at golden-yellow temperatures and aggregate into visible black smoke (soot). Carbohydrates undergo pyrolytic dehydration, stripping hydroxyl groups as water vapor and leaving an expanded, porous carbonaceous char.
+                </p>
+            </section>
+
+            <section>
+                <h2>Mathematical Foundations & Formulas</h2>
+                <p>
+                    The energy of the emitted photon and its corresponding spectral wavelength are governed by the Planck-Einstein relation and the wave equation of light:
+                </p>
+                <div class="formula-box">
+                    Planck-Einstein Relation: Delta E = E_final - E_initial = h x nu<br>
+                    Wave Equation: c = nu x lambda<br>
+                    Combined Emission Equation: lambda = (h x c) / Delta E<br>
+                    Combustion Stoichiometry: C_xH_y + (x + y/4) O2 -> x CO2 + (y/2) H2O<br>
+                    Carbon-to-Hydrogen Ratio: Ratio_CH = x / y
+                </div>
+                <p>
+                    Where <em>h</em> represents Planck's constant (6.626 x 10^-34 J·s), <em>c</em> is the speed of light in a vacuum (3.00 x 10^8 m/s), <em>nu</em> is the photon frequency in Hertz (Hz), and <em>lambda</em> is the wavelength in meters.
+                </p>
+            </section>
+
+            <section>
+                <h2>Real-World Engineering & Industrial Applications</h2>
+                <p>
+                    1. <strong>Pyrotechnic and Flare Engineering:</strong> Fireworks and signaling flares rely on metal salt excitation. Strontium and calcium compounds yield deep reds, barium produces vivid green illuminations, and sodium imparts high-intensity amber safety light.<br>
+                    2. <strong>Inductively Coupled Plasma Optical Emission Spectrometry (ICP-OES):</strong> Modern environmental and metallurgical laboratories utilize high-energy argon plasmas (6000 K to 10000 K) to atomize samples and measure trace heavy metals down to parts-per-billion tolerances using emission spectra.<br>
+                    3. <strong>Petrochemical & Flare Stack Monitoring:</strong> Refineries deploy automated photometric and optical emission detectors to measure unburned hydrocarbon fractions and combustion efficiency in exhaust stacks, ensuring compliance with environmental soot limits.<br>
+                    4. <strong>Forensic Arson Investigations:</strong> Forensic scientists analyze charring patterns, soot density, and chemical residues from fire scenes to deduce whether accelerants containing high aromatic carbon fractions were used.
+                </p>
+            </section>
+
+            <section>
+                <h2>Practice Problems & Diagnostic Tasks</h2>
+                <p>Test your quantitative and analytical comprehension with the senior secondary exercises below:</p>
+
+                <div class="task-card">
+                    <div class="task-title">Task 1: Photon Energy from Sodium D-Line Emission</div>
+                    <p>During a flame test on Substance A, a bright golden-yellow emission is observed at a wavelength of 589 nm. Given Planck's constant h = 6.626 x 10^-34 J·s and the speed of light c = 3.00 x 10^8 m/s, calculate the energy of a single emitted photon in Joules and determine the energy emitted per mole of sodium atoms in kJ/mol (Avogadro constant N_A = 6.022 x 10^23 mol^-1).</p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 2: Spectral Differentiation of Potassium vs. Copper</div>
+                    <p>An unknown salt yields an electronic transition energy Delta E of 4.92 x 10^-19 J, while a second unknown yields Delta E = 3.82 x 10^-19 J. Determine the emitted wavelength of each in nanometers. Classify which transition corresponds to the lilac flame of potassium (approx. 404 nm) and which corresponds to the blue-green emission of copper (approx. 520 nm).</p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 3: Carbon-to-Hydrogen Ratio & Soot Prediction</div>
+                    <p>Compare ethanol (C2H5OH, or C2H6O) and toluene (C7H8). Calculate the elemental carbon-to-hydrogen molar ratio (C:H) for each molecule. Using combustion principles, explain why toluene produces dense black soot on ignition while ethanol burns with a clean, non-luminous pale blue flame.</p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 4: Theoretical Combustion Oxygen Requirement</div>
+                    <p>Using the general stoichiometric combustion equation C_xH_y + (x + y/4) O2 -> x CO2 + (y/2) H2O, calculate the moles of molecular oxygen (O2) required for the complete combustion of 1.00 mole of hexane (C6H14) versus 1.00 mole of benzene (C6H6). Explain how oxygen deprivation causes benzene to burn with a luminous, sooty flame under normal open-air conditions.</p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 5: Carbohydrate Pyrolytic Dehydration Stoichiometry</div>
+                    <p>When sucrose (C12H22O11) is heated strongly on a metal spatula, it melts, caramelizes, and chars into an expanded black mass of elemental carbon while giving off steam. Write the balanced equation for the complete thermal dehydration of sucrose, and calculate the maximum theoretical mass of pure carbon residue obtainable from heating 3.42 grams of sucrose (Molar mass of sucrose = 342.3 g/mol, Atomic mass of carbon = 12.01 g/mol).</p>
+                </div>
+
+                <!-- Collapsible Solutions -->
+                <details>
+                    <summary>Click to Reveal Solutions and Step-by-Step Proofs</summary>
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 1:</strong></p>
+                        <p>1. Convert wavelength to meters: lambda = 589 nm = 589 x 10^-9 m.<br>
+                        2. Calculate single photon energy: E = (h x c) / lambda = (6.626 x 10^-34 x 3.00 x 10^8) / (589 x 10^-9) = <strong>3.375 x 10^-19 J</strong>.<br>
+                        3. Calculate molar energy: E_mol = E x N_A = (3.375 x 10^-19 J) x (6.022 x 10^23 mol^-1) = 203,243 J/mol = <strong>203.2 kJ/mol</strong>.</p>
+                    </div>
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 2:</strong></p>
+                        <p>1. First sample: lambda_1 = (h x c) / Delta E_1 = (6.626 x 10^-34 x 3.00 x 10^8) / (4.92 x 10^-19) = 4.04 x 10^-7 m = <strong>404 nm</strong>. This corresponds to the <strong>lilac emission of Potassium (K+)</strong>.<br>
+                        2. Second sample: lambda_2 = (h x c) / Delta E_2 = (6.626 x 10^-34 x 3.00 x 10^8) / (3.82 x 10^-19) = 5.20 x 10^-7 m = <strong>520 nm</strong>. This corresponds to the <strong>blue-green emission of Copper (Cu2+)</strong>.</p>
+                    </div>
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 3:</strong></p>
+                        <p>1. For ethanol (C2H6O): C:H ratio = 2 / 6 = <strong>0.333</strong>.<br>
+                        2. For toluene (C7H8): C:H ratio = 7 / 8 = <strong>0.875</strong>.<br>
+                        3. <strong>Conclusion:</strong> Toluene possesses an elevated C:H ratio (over 2.6 times higher than ethanol). In unforced atmospheric combustion, the rate of oxygen diffusion is insufficient to oxidize all carbon atoms to CO2. Unburned elemental carbon forms solid particulates that incandesce yellow and produce dense black smoke.</p>
+                    </div>
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 4:</strong></p>
+                        <p>1. For hexane (C6H14): x = 6, y = 14. O2 required = 6 + 14/4 = <strong>9.5 moles O2</strong>.<br>
+                        2. For benzene (C6H6): x = 6, y = 6. O2 required = 6 + 6/4 = <strong>7.5 moles O2</strong>.<br>
+                        3. Although benzene requires fewer total moles of oxygen per mole of fuel, its carbon percentage by mass is 92.3% (compared to 83.7% in hexane). Because benzene vaporizes rapidly while its aromatic ring requires high activation energy to cleave, the localized carbon-to-oxygen ratio in the flame zone becomes excessively high, triggering soot condensation.</p>
+                    </div>
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 5:</strong></p>
+                        <p>1. Balanced dehydration equation: C12H22O11(s) -> 12 C(s) + 11 H2O(g).<br>
+                        2. Moles of sucrose heated = 3.42 g / 342.3 g/mol = 0.00999 mol (approx. 0.0100 mol).<br>
+                        3. Moles of carbon produced = 12 x 0.00999 mol = 0.1199 mol.<br>
+                        4. Mass of carbon residue = 0.1199 mol x 12.01 g/mol = <strong>1.44 grams</strong>.</p>
+                    </div>
+                </details>
+            </section>
+        </article>
+    </main>
+
+    <!-- 5. SYNCHRONIZED COMPLIANCE FOOTER -->
+    <footer>
+        <nav class="footer-nav">
+            <a href="../index.html">Home</a>
+            <a href="../index.html#about-section">About Us</a>
+            <button type="button" class="footer-modal-trigger" onclick="openSimModal('simPrivacyModal')">Privacy Policy</button>
+            <button type="button" class="footer-modal-trigger" onclick="openSimModal('simTermsModal')">Terms of Service</button>
+            <a href="../index.html#contact-section">Contact Us</a>
+            <a href="https://forms.gle/fYxxaNKAh21dPUoBA" target="_blank" rel="noopener noreferrer">Simulator Suggestions</a>
+        </nav>
+        <p>&copy; 2026 LuyaliSims | Engineered by Click & Draft | Dedicated to Open STEM Education</p>
+    </footer>
+
+    <!-- 6. IDENTICAL PRIVACY POLICY MODAL -->
+    <div id="simPrivacyModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="privacyTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeSimModal('simPrivacyModal')">Close [✕]</button>
+            <h2 id="privacyTitle">Privacy Policy</h2>
+            <p class="modal-date">Last Updated: September 2026</p>
+            <p>Welcome to LuyaliSims. We respect your privacy and are committed to protecting your personal data. This privacy policy explains how we treat information when you interact with our educational simulators.</p>
+            
+            <h3>1. Educational Purpose & Information Collection</h3>
+            <p>LuyaliSims is a free educational portal. We do not require account registration, passwords, or personal login information to run any simulation. All simulation calculations occur locally within your browser using client-side JavaScript.</p>
+
+            <h3>2. Google AdSense & Third-Party Cookies</h3>
+            <p>We may display advertisements served by Google AdSense to fund our free educational tools. Google, as a third-party vendor, uses cookies to serve ads on our site based on users' visits to this and other sites on the Internet.</p>
+            <ul>
+                <li>Google's use of advertising cookies enables it and its partners to serve ads based on your visit to LuyaliSims and other sites.</li>
+                <li>Users may opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" style="color: var(--neon-cyan);">Google Ads Settings</a>.</li>
+            </ul>
+
+            <h3>3. Log Files & Analytics</h3>
+            <p>Like standard websites, our hosting servers collect anonymous log records (including IP addresses, browser types, and timestamp references) to monitor server uptime, fix script errors, and optimize simulator performance.</p>
+
+            <h3>4. Children's Online Privacy (COPPA Compliance)</h3>
+            <p>Our educational simulators are built for students and educators of all ages. We do not knowingly solicit or collect personally identifiable information from children under 13.</p>
+
+            <h3>5. Contact Regarding Privacy</h3>
+            <p>If you have any questions regarding this policy, contact us at: <a href="mailto:luyashliz@gmail.com" style="color: var(--neon-cyan);">luyashliz@gmail.com</a>.</p>
+        </div>
+    </div>
+
+    <!-- 7. IDENTICAL TERMS OF SERVICE MODAL -->
+    <div id="simTermsModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="termsTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeSimModal('simTermsModal')">Close [✕]</button>
+            <h2 id="termsTitle">Terms of Service</h2>
+            <p class="modal-date">Effective Date: September 2026</p>
+
+            <h3>1. Permitted Educational Use</h3>
+            <p>All interactive models, simulations, practice problems, and laboratory worksheets on LuyaliSims are made freely available for classroom demonstrations, academic study, tutoring, and self-paced individual learning.</p>
+
+            <h3>2. Intellectual Property</h3>
+            <p>The code architecture, layout designs, and custom interactive engines are the intellectual property of Ian Luyali and Click & Draft. You may use our simulators online in academic settings, but mirroring or re-hosting our code for commercial resale without permission is prohibited.</p>
+
+            <h3>3. Disclaimer of Scientific Warranty</h3>
+            <p>While simulations are engineered to accurately replicate classical mechanics, thermodynamics, and electronics, they are provided as conceptual learning aids. LuyaliSims is not liable for outcomes in real-world high-voltage or hazardous laboratory environments constructed without professional teacher supervision.</p>
+
+            <h3>4. Updates to Terms</h3>
+            <p>We reserve the right to refine these terms as new laboratory modules and features are introduced.</p>
+        </div>
+    </div>
+
+    <!-- 8. PRACTICAL EVALUATION MODAL -->
+    <div class="eval-modal-overlay" id="examModal" role="dialog" aria-modal="true">
+        <div class="eval-card">
+            <span class="eval-badge">QUALITATIVE ANALYSIS MARKING RUBRIC</span>
+            <h2 id="evalSubstanceName">Practical Examination</h2>
+
+            <div class="eval-item">
+                <p>1. Recorded Flame / Pyrolysis Observation:</p>
+                <select id="selObservation"></select>
+            </div>
+
+            <div class="eval-item">
+                <p>2. Deductive Chemical Inference:</p>
+                <select id="selInference"></select>
+            </div>
+
+            <button id="btnSubmitEval" class="sim-btn" style="width:100%; margin-top:16px;" onclick="gradeStudentSubmission()">Submit for Marking</button>
+
+            <div class="feedback-box" id="feedbackContainer">
+                <h4 id="evalResultTitle" style="font-weight:700; margin-bottom:4px;"></h4>
+                <p id="evalDetailsText" style="margin-bottom:8px;"></p>
+                <p id="evalScientificReason" style="font-size:0.8rem; border-top:1px dashed rgba(255,255,255,0.2); padding-top:6px; color:#cbd5e1;"></p>
+                <button class="sim-btn secondary" style="width:100%; margin-top:12px;" onclick="closeModalAndAdvance()">Proceed to Next Substance</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 9. SIMULATOR CORE JAVASCRIPT ENGINE -->
+    <script>
+        /* =========================================================================
+           MODAL & FULLSCREEN LOGIC
+        ========================================================================= */
+        function openSimModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeSimModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('policy-modal')) {
+                closeSimModal(e.target.id);
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' || e.key === 'Esc') {
+                document.querySelectorAll('.policy-modal').forEach(m => m.style.display = 'none');
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // Functional Fullscreen Engine
+        const simContainer = document.getElementById('simulator-container');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                if (simContainer.requestFullscreen) simContainer.requestFullscreen();
+                else if (simContainer.webkitRequestFullscreen) simContainer.webkitRequestFullscreen();
+                fullscreenBtn.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg> Exit Screen`;
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+                fullscreenBtn.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                    </svg> Fullscreen`;
+            }
+        });
+
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                fullscreenBtn.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                    </svg> Fullscreen`;
+            }
+        });
+
+        /* =========================================================================
+           SYNTHESIZED WEB AUDIO API ENGINE
+        ========================================================================= */
+        let audioCtx = null;
+        let soundEnabled = true;
+        let hissNoiseNode = null;
+        let hissFilterNode = null;
+        let hissGainNode = null;
+        let crackleTimer = null;
+
+        function initAudioEngine() {
+            if (audioCtx) return;
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContextClass();
+        }
+
+        function toggleAudioEngine() {
+            soundEnabled = !soundEnabled;
+            const btn = document.getElementById("btnAudioToggle");
+            if (soundEnabled) {
+                btn.textContent = "SOUND: ON";
+                btn.style.color = "var(--neon-cyan)";
+                if (audioCtx && audioCtx.state === "suspended") audioCtx.resume();
+                if (benchItems.has("burner")) startBunsenAudio(currentBurnerFlameMode);
+            } else {
+                btn.textContent = "SOUND: OFF";
+                btn.style.color = "#64748b";
+                stopBunsenAudio();
+                stopCrackleAudio();
+            }
+        }
+
+        function startBunsenAudio(mode = "non-luminous") {
+            if (!soundEnabled) return;
+            initAudioEngine();
+            if (audioCtx.state === "suspended") audioCtx.resume();
+            if (hissNoiseNode) stopBunsenAudio();
+
+            const bufferSize = audioCtx.sampleRate * 2;
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = Math.random() * 2 - 1;
+            }
+
+            hissNoiseNode = audioCtx.createBufferSource();
+            hissNoiseNode.buffer = buffer;
+            hissNoiseNode.loop = true;
+
+            hissFilterNode = audioCtx.createBiquadFilter();
+            hissGainNode = audioCtx.createGain();
+
+            if (mode === "non-luminous") {
+                hissFilterNode.type = "bandpass";
+                hissFilterNode.frequency.setValueAtTime(1200, audioCtx.currentTime);
+                hissFilterNode.Q.setValueAtTime(1.8, audioCtx.currentTime);
+                hissGainNode.gain.setValueAtTime(0.045, audioCtx.currentTime);
+            } else {
+                hissFilterNode.type = "lowpass";
+                hissFilterNode.frequency.setValueAtTime(450, audioCtx.currentTime);
+                hissGainNode.gain.setValueAtTime(0.02, audioCtx.currentTime);
+            }
+
+            hissNoiseNode.connect(hissFilterNode);
+            hissFilterNode.connect(hissGainNode);
+            hissGainNode.connect(audioCtx.destination);
+            hissNoiseNode.start();
+        }
+
+        function stopBunsenAudio() {
+            if (hissNoiseNode) {
+                try { hissNoiseNode.stop(); } catch(e){}
+                hissNoiseNode.disconnect();
+                hissNoiseNode = null;
+            }
+        }
+
+        function playIgniterClickAudio() {
+            if (!soundEnabled) return;
+            initAudioEngine();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = "triangle";
+            osc.frequency.setValueAtTime(3200, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(120, audioCtx.currentTime + 0.04);
+
+            gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.04);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.04);
+        }
+
+        function startCrackleAudio(intensity = "moderate") {
+            if (!soundEnabled) return;
+            initAudioEngine();
+            stopCrackleAudio();
+
+            const freq = intensity === "vigorous" ? 70 : 140;
+            crackleTimer = setInterval(() => {
+                if (!soundEnabled || Math.random() > 0.6) return;
+                const osc = audioCtx.createOscillator();
+                const g = audioCtx.createGain();
+                osc.type = "sawtooth";
+                osc.frequency.setValueAtTime(400 + Math.random() * 2500, audioCtx.currentTime);
+                const vol = 0.015 + Math.random() * 0.04;
+                g.gain.setValueAtTime(vol, audioCtx.currentTime);
+                g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.025);
+                osc.connect(g);
+                g.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.025);
+            }, freq);
+        }
+
+        function stopCrackleAudio() {
+            if (crackleTimer) {
+                clearInterval(crackleTimer);
+                crackleTimer = null;
+            }
+        }
+
+        /* =========================================================================
+           DATABASE: INORGANIC CATIONS & ORGANIC COMBUSTION
+        ========================================================================= */
+        const EXPERIMENTS = {
+            inorganic: [
+                {
+                    id: "inorg_A",
+                    pseudonym: "Substance A (Colourless Solution)",
+                    actualIdentity: "Sodium ions (Na+)",
+                    color: "rgba(240, 249, 255, 0.6)",
+                    form: "solution",
+                    toolRequired: "glass_rod",
+                    ignitionMethod: "burner",
+                    flameModeNeeded: "non-luminous",
+                    procedure: "Dip a clean borosilicate glass rod into Solution A. Introduce the moistened tip into the non-luminous Bunsen flame and record the characteristic flame coloration.",
+                    hazard: "Burn Hazard: Heated glass looks identical to cold glass. Place on insulating bench mat.",
+                    flame: { r: 255, g: 195, b: 15, label: "Golden Yellow" },
+                    sooty: false,
+                    mcqObs: [
+                        { text: "Persistent intense golden yellow flame", ok: true },
+                        { text: "Lilac / pale violet flame", ok: false },
+                        { text: "Brick-red flame", ok: false },
+                        { text: "Peacock blue-green flame", ok: false }
+                    ],
+                    mcqInf: [
+                        { text: "Sodium ions (Na+) confirmed", ok: true },
+                        { text: "Potassium ions (K+) present", ok: false },
+                        { text: "Calcium ions (Ca2+) present", ok: false },
+                        { text: "Copper(II) ions (Cu2+) present", ok: false }
+                    ],
+                    reason: "Thermal excitation of sodium 3s valence electrons promotes them to 3p orbitals; relaxation radiates light predominantly at the 589 nm doublet.",
+                    tip: "Analytical Note: The golden yellow emission is intense and persistent, readily masking trace impurities."
+                },
+                {
+                    id: "inorg_B",
+                    pseudonym: "Substance B (Colourless Solution)",
+                    actualIdentity: "Potassium ions (K+)",
+                    color: "rgba(240, 249, 255, 0.6)",
+                    form: "solution",
+                    toolRequired: "glass_rod",
+                    ignitionMethod: "burner",
+                    flameModeNeeded: "non-luminous",
+                    procedure: "Dip a clean borosilicate glass rod into Solution B. Introduce the moistened tip into the hottest zone of the non-luminous flame.",
+                    hazard: "Thermal Shock: Avoid quenching red-hot glass rods directly into cold reagent bottles.",
+                    flame: { r: 215, g: 135, b: 235, label: "Lilac" },
+                    sooty: false,
+                    mcqObs: [
+                        { text: "Lilac (pale violet) flame", ok: true },
+                        { text: "Persistent golden yellow flame", ok: false },
+                        { text: "Apple-green flame", ok: false },
+                        { text: "Brick-red flame", ok: false }
+                    ],
+                    mcqInf: [
+                        { text: "Potassium ions (K+) confirmed", ok: true },
+                        { text: "Sodium ions (Na+) present", ok: false },
+                        { text: "Barium ions (Ba2+) present", ok: false },
+                        { text: "Calcium ions (Ca2+) present", ok: false }
+                    ],
+                    reason: "Potassium electronic de-excitation radiates at violet wavelengths (principally 404 nm and 766 nm).",
+                    tip: "Analytical Note: Cobalt blue glass is traditionally used in examinations to absorb masking sodium yellow rays."
+                },
+                {
+                    id: "inorg_C",
+                    pseudonym: "Substance C (Colourless Solution)",
+                    actualIdentity: "Calcium ions (Ca2+)",
+                    color: "rgba(240, 249, 255, 0.6)",
+                    form: "solution",
+                    toolRequired: "glass_rod",
+                    ignitionMethod: "burner",
+                    flameModeNeeded: "non-luminous",
+                    procedure: "Dip a clean glass rod into Solution C and hold it directly in the non-luminous flame.",
+                    hazard: "Hot Apparatus: Allow testing tip to cool before laying flat on bench surface.",
+                    flame: { r: 250, g: 85, b: 25, label: "Brick-Red" },
+                    sooty: false,
+                    mcqObs: [
+                        { text: "Brick-red (orange-red) flame", ok: true },
+                        { text: "Persistent golden yellow flame", ok: false },
+                        { text: "Lilac flame", ok: false },
+                        { text: "Bright green flame", ok: false }
+                    ],
+                    mcqInf: [
+                        { text: "Calcium ions (Ca2+) confirmed", ok: true },
+                        { text: "Sodium ions (Na+) present", ok: false },
+                        { text: "Iron(III) ions (Fe3+) present", ok: false },
+                        { text: "Lead(II) ions (Pb2+) present", ok: false }
+                    ],
+                    reason: "Calcium emission bands at 622 nm impart a distinct brick-red / orange-red coloration.",
+                    tip: "Analytical Note: Distinguish carefully between calcium brick-red and strontium crimson."
+                },
+                {
+                    id: "inorg_D",
+                    pseudonym: "Substance D (Pale Blue Solution)",
+                    actualIdentity: "Copper(II) ions (Cu2+)",
+                    color: "rgba(59, 130, 246, 0.7)",
+                    form: "solution",
+                    toolRequired: "glass_rod",
+                    ignitionMethod: "burner",
+                    flameModeNeeded: "non-luminous",
+                    procedure: "Dip a clean glass rod into pale blue Solution D and place into the non-luminous flame.",
+                    hazard: "Chemical Toxicity: Copper solutions are harmful if ingested. Avoid skin exposure.",
+                    flame: { r: 35, g: 215, b: 175, label: "Blue-Green" },
+                    sooty: false,
+                    mcqObs: [
+                        { text: "Peacock blue-green / bright green flame", ok: true },
+                        { text: "Brick-red flame", ok: false },
+                        { text: "Lilac flame", ok: false },
+                        { text: "Persistent golden yellow flame", ok: false }
+                    ],
+                    mcqInf: [
+                        { text: "Copper(II) ions (Cu2+) confirmed", ok: true },
+                        { text: "Barium ions (Ba2+) present", ok: false },
+                        { text: "Iron(II) ions (Fe2+) present", ok: false },
+                        { text: "Zinc ions (Zn2+) present", ok: false }
+                    ],
+                    reason: "Electronic transitions in excited copper mono-halide and atomic copper vapor emit strongly across 510 to 535 nm.",
+                    tip: "Analytical Note: The vivid turquoise/blue-green hue is unmistakable in qualitative identification."
+                },
+                {
+                    id: "inorg_E",
+                    pseudonym: "Substance E (Colourless Solution)",
+                    actualIdentity: "Barium ions (Ba2+)",
+                    color: "rgba(240, 249, 255, 0.6)",
+                    form: "solution",
+                    toolRequired: "glass_rod",
+                    ignitionMethod: "burner",
+                    flameModeNeeded: "non-luminous",
+                    procedure: "Dip a clean glass rod into Solution E and hold it in the non-luminous flame.",
+                    hazard: "Acute Toxicity: Soluble barium salts are toxic systemic poisons.",
+                    flame: { r: 155, g: 235, b: 50, label: "Apple-Green" },
+                    sooty: false,
+                    mcqObs: [
+                        { text: "Apple-green (pale yellowish-green) flame", ok: true },
+                        { text: "Peacock blue-green flame", ok: false },
+                        { text: "Golden yellow flame", ok: false },
+                        { text: "Lilac flame", ok: false }
+                    ],
+                    mcqInf: [
+                        { text: "Barium ions (Ba2+) confirmed", ok: true },
+                        { text: "Copper(II) ions (Cu2+) present", ok: false },
+                        { text: "Calcium ions (Ca2+) present", ok: false },
+                        { text: "Magnesium ions (Mg2+) present", ok: false }
+                    ],
+                    reason: "Barium spectral emission lines at 524 nm and 513 nm exhibit a pale yellowish apple-green coloration.",
+                    tip: "Analytical Note: Apple-green possesses yellow undertones compared to copper's emerald-turquoise spectrum."
+                }
+            ],
+            organic: [
+                {
+                    id: "org_1",
+                    pseudonym: "Substance 1 (Clear Volatile Liquid)",
+                    actualIdentity: "Ethanol (Saturated Alkanol)",
+                    color: "rgba(224, 242, 254, 0.8)",
+                    form: "liquid",
+                    toolRequired: "lighter",
+                    ignitionMethod: "watch_glass_lighter",
+                    flameModeNeeded: "direct_igniter",
+                    procedure: "Dispense 4-5 drops onto the Watch Glass. Bring the Lab Gas Igniter over the dish, and click '⚡ IGNITE' to spark and ignite the liquid pool directly.",
+                    hazard: "Flammable Volatile Vapor: Keep bulk solvent bottles sealed and away from sparks.",
+                    flameType: "pure_blue",
+                    sooty: false,
+                    mcqObs: [
+                        { text: "Burns with a pale-blue, non-sooty, non-luminous flame", ok: true },
+                        { text: "Burns with a luminous yellow, smoky / sooty flame", ok: false },
+                        { text: "Melts and chars leaving a black swollen residue", ok: false },
+                        { text: "Does not burn", ok: false }
+                    ],
+                    mcqInf: [
+                        { text: "Saturated organic compound / Low C:H ratio (e.g., Alkanol)", ok: true },
+                        { text: "Unsaturated organic compound / High C:H ratio (C=C or C≡C bonds present)", ok: false },
+                        { text: "Carbohydrate / high carbon skeleton", ok: false },
+                        { text: "Inorganic substance", ok: false }
+                    ],
+                    reason: "Low carbon:hydrogen ratio produces complete combustion with minimal solid unburned carbon formation.",
+                    tip: "Analytical Note: Specifying 'pale blue non-sooty flame' alongside 'saturated / low C:H ratio' is mandatory."
+                },
+                {
+                    id: "org_2",
+                    pseudonym: "Substance 2 (Yellowish Oily Liquid)",
+                    actualIdentity: "Unsaturated Hydrocarbon (e.g. Alkene / Turpentine)",
+                    color: "#fef08a",
+                    burnBehavior: "liquid_sooty_fire",
+                    form: "liquid",
+                    toolRequired: "spatula",
+                    ignitionMethod: "burner",
+                    flameModeNeeded: "non-luminous",
+                    procedure: "Scoop a portion of oily Substance 2 onto the stainless spatula blade and introduce into a non-luminous Bunsen flame.",
+                    hazard: "Dense Smoke & Carbon Soot: Generates unburned carbon particulates. Avoid inhaling combustion smoke.",
+                    flame: { r: 252, g: 186, b: 24, label: "Luminous Yellow Sooty" },
+                    flameType: "sooty_yellow",
+                    sooty: true,
+                    mcqObs: [
+                        { text: "Burns with a luminous, yellow smoky / sooty flame", ok: true },
+                        { text: "Burns with a pale-blue non-sooty flame", ok: false },
+                        { text: "Melts and chars without burning", ok: false },
+                        { text: "Does not burn", ok: false }
+                    ],
+                    mcqInf: [
+                        { text: "Unsaturated organic compound / High C:H ratio (C=C or C≡C present)", ok: true },
+                        { text: "Saturated organic compound / Low C:H ratio", ok: false },
+                        { text: "Inorganic salt", ok: false },
+                        { text: "Alkanol present", ok: false }
+                    ],
+                    reason: "High C:H ratio leads to incomplete combustion; unburned carbon particles incandesce yellow and aggregate as black soot.",
+                    tip: "Analytical Note: Always record 'sooty' or 'smoky' in tandem with luminous yellow."
+                },
+                {
+                    id: "org_3",
+                    pseudonym: "Substance 3 (White Crystalline Solid)",
+                    actualIdentity: "Carbohydrate (Sucrose / Sugar)",
+                    color: "#ffffff",
+                    burnBehavior: "sugar_charring",
+                    form: "solid",
+                    toolRequired: "spatula",
+                    ignitionMethod: "burner",
+                    flameModeNeeded: "non-luminous",
+                    procedure: "Scoop crystalline Substance 3 onto the spatula and hold over the non-luminous Bunsen flame.",
+                    hazard: "Thermal Splattering: Melts and boils rapidly before decomposing into solid char.",
+                    flame: { r: 245, g: 155, b: 30, label: "Melts and Chars" },
+                    flameType: "charring_residue",
+                    sooty: true,
+                    mcqObs: [
+                        { text: "Melts, caramelizes and chars leaving a black swollen residue", ok: true },
+                        { text: "Burns with a pale-blue non-sooty flame leaving no residue", ok: false },
+                        { text: "Imparts an intense lilac flame without melting", ok: false },
+                        { text: "Sublimes directly into dense white fumes", ok: false }
+                    ],
+                    mcqInf: [
+                        { text: "Carbohydrate / Organic compound with high carbon skeleton", ok: true },
+                        { text: "Volatile hydrocarbon", ok: false },
+                        { text: "Potassium salt present", ok: false },
+                        { text: "Saturated short-chain alcohol", ok: false }
+                    ],
+                    reason: "Thermal dehydration eliminates water, leaving an expanded elemental carbon matrix.",
+                    tip: "Analytical Note: Caramelization followed by charring is the hallmark diagnostic test for solid carbohydrates."
+                }
+            ]
+        };
+
+        /* =========================================================================
+           APPLICATION & VIEWPORT INTERACTION STATE
+        ========================================================================= */
+        let currentCategory = "inorganic";
+        let currentTestIndex = 0;
+        let benchItems = new Map();
+        let toolLoaded = false;
+        let testHistory = [];
+        let reactionActive = false;
+        let currentBurnerFlameMode = "non-luminous";
+
+        let toolRotations = { spatula: 0, glass_rod: 0, lighter: 0 };
+        let countdownTimer = null;
+        let secondsRemaining = 30;
+
+        let zoomLevel = 1.15;
+        let panX = -260;
+        let panY = -180;
+        let isPanning = false;
+        let startPanMouseX = 0, startPanMouseY = 0;
+
+        const viewportEl = document.getElementById("canvasFrame");
+        const worldEl = document.getElementById("workbenchWorld");
+
+        function updateViewportTransform() {
+            worldEl.style.transform = `translate(${panX}px, ${panY}px) scale(${zoomLevel})`;
+            document.getElementById("lblZoomLevel").textContent = Math.round(zoomLevel * 100) + "%";
+        }
+
+        function zoomStep(delta) {
+            zoomLevel = Math.min(Math.max(zoomLevel + delta, 0.7), 2.4);
+            updateViewportTransform();
+        }
+
+        function resetViewport() {
+            zoomLevel = 1.15;
+            panX = -260;
+            panY = -180;
+            updateViewportTransform();
+        }
+
+        viewportEl.addEventListener("wheel", (e) => {
+            e.preventDefault();
+            zoomStep(e.deltaY < 0 ? 0.1 : -0.1);
+        }, { passive: false });
+
+        viewportEl.addEventListener("pointerdown", (e) => {
+            if (e.target === viewportEl || e.target.classList.contains("bench-surface") || e.target === worldEl) {
+                isPanning = true;
+                startPanMouseX = e.clientX - panX;
+                startPanMouseY = e.clientY - panY;
+                viewportEl.classList.add("panning");
+            }
+        });
+
+        window.addEventListener("pointermove", (e) => {
+            if (isPanning) {
+                panX = e.clientX - startPanMouseX;
+                panY = e.clientY - startPanMouseY;
+                updateViewportTransform();
+            }
+        });
+
+        window.addEventListener("pointerup", () => {
+            if (isPanning) {
+                isPanning = false;
+                viewportEl.classList.remove("panning");
+            }
+        });
+
+        window.addEventListener("DOMContentLoaded", () => {
+            updateViewportTransform();
+            onCategoryChanged();
+            startFlameAnimationLoop();
+            startSparkRenderer();
+        });
+
+        function onCategoryChanged() {
+            currentCategory = document.getElementById("categorySelect").value;
+            const sampleSelect = document.getElementById("sampleSelect");
+            sampleSelect.innerHTML = "";
+
+            EXPERIMENTS[currentCategory].forEach((item, idx) => {
+                const opt = document.createElement("option");
+                opt.value = idx;
+                opt.textContent = item.pseudonym;
+                sampleSelect.appendChild(opt);
+            });
+
+            currentTestIndex = 0;
+            loadCurrentSample();
+        }
+
+        function loadCurrentSample() {
+            currentTestIndex = parseInt(document.getElementById("sampleSelect").value);
+            const test = EXPERIMENTS[currentCategory][currentTestIndex];
+
+            document.getElementById("procedureContent").textContent = test.procedure;
+            document.getElementById("hazardWarningText").innerHTML = `<span>⚠️</span> <strong>Safety Hazard:</strong> ${test.hazard}`;
+
+            clearCurrentDesk();
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById("toastBox");
+            toast.innerHTML = msg;
+            toast.style.display = "block";
+            setTimeout(() => { toast.style.display = "none"; }, 4800);
+        }
+
+        /* =========================================================================
+           PROCEDURAL FLAME & SPARK RENDER ENGINES
+        ========================================================================= */
+        const flameCanvas = document.getElementById("flameCanvas");
+        const flameCtx = flameCanvas.getContext("2d");
+        let particles = [];
+        let flameTime = 0;
+        let reactionSampleColor = null;
+
+        function startFlameAnimationLoop() {
+            function animate() {
+                flameTime += 0.055;
+                renderProceduralBunsenFlame();
+                renderWatchGlassRealisticFlame();
+                updateAndRenderParticles();
+                requestAnimationFrame(animate);
+            }
+            requestAnimationFrame(animate);
+        }
+
+        function renderProceduralBunsenFlame() {
+            flameCtx.clearRect(0, 0, flameCanvas.width, flameCanvas.height);
+            const burnerStation = document.getElementById("burnerStation");
+            if (burnerStation.style.display === "none") return;
+
+            const centerX = 170;
+            const baseY = 408;
+            const baseWidth = 14;
+
+            flameCtx.save();
+            const sway1 = Math.sin(flameTime * 2.8) * 5;
+            const sway2 = Math.cos(flameTime * 4.2) * 7;
+            const tipFlicker = Math.sin(flameTime * 6.5) * 10;
+
+            const curTest = EXPERIMENTS[currentCategory][currentTestIndex];
+            const isSootyOrganicBurning = reactionActive && curTest && curTest.flameType === "sooty_yellow";
+
+            if (currentBurnerFlameMode === "non-luminous" && !isSootyOrganicBurning) {
+                const totalH = 220 + tipFlicker;
+                flameCtx.globalCompositeOperation = "screen";
+                let outerGrad = flameCtx.createRadialGradient(centerX, baseY - 60, 10, centerX, baseY - 120, totalH);
+
+                if (reactionSampleColor) {
+                    const { r, g, b } = reactionSampleColor;
+                    outerGrad.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.88)`);
+                    outerGrad.addColorStop(0.5, `rgba(${Math.min(255, r + 40)}, ${Math.min(255, g + 40)}, ${Math.min(255, b + 40)}, 0.65)`);
+                    outerGrad.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
+                } else {
+                    outerGrad.addColorStop(0, "rgba(56, 189, 248, 0.45)");
+                    outerGrad.addColorStop(0.5, "rgba(37, 99, 235, 0.3)");
+                    outerGrad.addColorStop(1, "rgba(29, 78, 216, 0)");
+                }
+
+                flameCtx.fillStyle = outerGrad;
+                flameCtx.beginPath();
+                flameCtx.moveTo(centerX - baseWidth, baseY);
+                flameCtx.bezierCurveTo(centerX - baseWidth - 14, baseY - 70, centerX + sway1 - 22, baseY - totalH + 40, centerX + sway2, baseY - totalH);
+                flameCtx.bezierCurveTo(centerX + sway1 + 22, baseY - totalH + 40, centerX + baseWidth + 14, baseY - 70, centerX + baseWidth, baseY);
+                flameCtx.closePath();
+                flameCtx.fill();
+
+                // Inner Reducing Cone
+                const coneH = totalH * 0.52;
+                flameCtx.fillStyle = reactionSampleColor ? 
+                    `rgba(${Math.min(255, reactionSampleColor.r + 50)}, ${Math.min(255, reactionSampleColor.g + 50)}, ${Math.min(255, reactionSampleColor.b + 50)}, 0.95)` : 
+                    "rgba(34, 211, 238, 0.95)";
+
+                flameCtx.beginPath();
+                flameCtx.moveTo(centerX - (baseWidth * 0.7), baseY);
+                flameCtx.bezierCurveTo(centerX - 14, baseY - 40, centerX + (sway1 * 0.4) - 8, baseY - coneH + 20, centerX + (sway2 * 0.3), baseY - coneH);
+                flameCtx.bezierCurveTo(centerX + (sway1 * 0.4) + 8, baseY - coneH + 20, centerX + 14, baseY - 40, centerX + (baseWidth * 0.7), baseY);
+                flameCtx.closePath();
+                flameCtx.fill();
+
+                // Dark Inner Unburnt Gas Cone
+                const darkH = coneH * 0.44;
+                flameCtx.globalCompositeOperation = "source-over";
+                flameCtx.fillStyle = "rgba(7, 11, 20, 0.94)";
+                flameCtx.beginPath();
+                flameCtx.moveTo(centerX - 8, baseY);
+                flameCtx.lineTo(centerX, baseY - darkH);
+                flameCtx.lineTo(centerX + 8, baseY);
+                flameCtx.closePath();
+                flameCtx.fill();
+
+            } else {
+                // LUMINOUS YELLOW FLAME
+                const totalH = 245 + tipFlicker;
+                flameCtx.globalCompositeOperation = "screen";
+
+                const yellowGrad = flameCtx.createLinearGradient(centerX, baseY, centerX + sway2, baseY - totalH);
+                yellowGrad.addColorStop(0, "rgba(59, 130, 246, 0.85)");
+                yellowGrad.addColorStop(0.18, "rgba(251, 191, 36, 0.95)");
+                yellowGrad.addColorStop(0.7, "rgba(245, 158, 11, 0.95)");
+                yellowGrad.addColorStop(1, "rgba(254, 243, 199, 0)");
+
+                flameCtx.fillStyle = yellowGrad;
+                flameCtx.beginPath();
+                flameCtx.moveTo(centerX - baseWidth - 4, baseY);
+                flameCtx.bezierCurveTo(centerX - baseWidth - 20, baseY - 70, centerX + sway1 - 32, baseY - totalH + 40, centerX + sway2, baseY - totalH);
+                flameCtx.bezierCurveTo(centerX + sway1 + 32, baseY - totalH + 40, centerX + baseWidth + 20, baseY - 70, centerX + baseWidth + 4, baseY);
+                flameCtx.closePath();
+                flameCtx.fill();
+
+                if (isSootyOrganicBurning && Math.random() < 0.4) {
+                    spawnSootParticle(centerX + sway2, baseY - totalH);
+                }
+            }
+            flameCtx.restore();
+        }
+
+        function renderWatchGlassRealisticFlame() {
+            const wgCanvas = document.getElementById("watchGlassFlameCanvas");
+            if (!wgCanvas) return;
+            const ctx = wgCanvas.getContext("2d");
+            ctx.clearRect(0, 0, wgCanvas.width, wgCanvas.height);
+
+            const watchGlass = benchItems.get("sample_container");
+            if (!watchGlass || !reactionActive || currentCategory !== "organic" || currentTestIndex !== 0) return;
+
+            ctx.save();
+            ctx.globalCompositeOperation = "screen";
+
+            const centerX = 120;
+            const poolBaseY = 180;
+            const sway1 = Math.sin(flameTime * 3) * 6;
+            const sway2 = Math.cos(flameTime * 4.6) * 8;
+            const flameHeight = 110 + Math.sin(flameTime * 5) * 12;
+
+            const blueGrad = ctx.createLinearGradient(centerX, poolBaseY, centerX + sway2, poolBaseY - flameHeight);
+            blueGrad.addColorStop(0, "rgba(147, 197, 253, 0.95)");
+            blueGrad.addColorStop(0.3, "rgba(96, 165, 250, 0.85)");
+            blueGrad.addColorStop(0.7, "rgba(59, 130, 246, 0.45)");
+            blueGrad.addColorStop(1, "rgba(147, 197, 253, 0)");
+
+            ctx.fillStyle = blueGrad;
+            ctx.beginPath();
+            ctx.moveTo(centerX - 42, poolBaseY);
+            ctx.bezierCurveTo(centerX - 46 + (sway1 * 0.4), poolBaseY - 45, centerX + sway1 - 20, poolBaseY - flameHeight + 25, centerX + sway2, poolBaseY - flameHeight);
+            ctx.bezierCurveTo(centerX + sway1 + 20, poolBaseY - flameHeight + 25, centerX + 46 + (sway1 * 0.4), poolBaseY - 45, centerX + 42, poolBaseY);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.fillStyle = "rgba(224, 242, 254, 0.75)";
+            ctx.beginPath();
+            ctx.moveTo(centerX - 22, poolBaseY);
+            ctx.quadraticCurveTo(centerX + (sway2 * 0.5), poolBaseY - (flameHeight * 0.65), centerX + 22, poolBaseY);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        const sparkCanvas = document.getElementById("sparkCanvas");
+        const sparkCtx = sparkCanvas.getContext("2d");
+        let activeSparks = [];
+
+        function startSparkRenderer() {
+            function render() {
+                sparkCtx.clearRect(0, 0, sparkCanvas.width, sparkCanvas.height);
+                for (let i = activeSparks.length - 1; i >= 0; i--) {
+                    const sp = activeSparks[i];
+                    sp.x += sp.vx;
+                    sp.y += sp.vy;
+                    sp.alpha -= 0.045;
+
+                    sparkCtx.strokeStyle = `rgba(254, 240, 138, ${Math.max(0, sp.alpha)})`;
+                    sparkCtx.shadowColor = "#38bdf8";
+                    sparkCtx.shadowBlur = 8;
+                    sparkCtx.lineWidth = sp.size;
+
+                    sparkCtx.beginPath();
+                    sparkCtx.moveTo(sp.x, sp.y);
+                    sparkCtx.lineTo(sp.x - sp.vx * 2, sp.y - sp.vy * 2);
+                    sparkCtx.stroke();
+
+                    if (sp.alpha <= 0) activeSparks.splice(i, 1);
+                }
+                requestAnimationFrame(render);
+            }
+            requestAnimationFrame(render);
+        }
+
+        function triggerPiezoSpark(originX, originY, targetX, targetY) {
+            playIgniterClickAudio();
+            for (let i = 0; i < 24; i++) {
+                const angle = Math.atan2(targetY - originY, targetX - originX) + (Math.random() - 0.5) * 0.9;
+                const speed = 4 + Math.random() * 8;
+                activeSparks.push({
+                    x: originX,
+                    y: originY,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    alpha: 1,
+                    size: 1 + Math.random() * 2
+                });
+            }
+        }
+
+        function spawnSootParticle(x, y) {
+            particles.push({
+                type: "soot",
+                x: x + (Math.random() * 20 - 10),
+                y: y,
+                vx: (Math.random() - 0.5) * 1.5,
+                vy: -(2 + Math.random() * 2.5),
+                radius: 6 + Math.random() * 6,
+                alpha: 0.85,
+                growth: 0.2
+            });
+        }
+
+        function updateAndRenderParticles() {
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+
+                if (p.type === "soot") {
+                    p.radius += p.growth;
+                    p.alpha -= 0.011;
+                    flameCtx.fillStyle = `rgba(15, 23, 42, ${Math.max(0, p.alpha)})`;
+                    flameCtx.beginPath();
+                    flameCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    flameCtx.fill();
+                }
+
+                if (p.alpha <= 0 || p.y < -30) {
+                    particles.splice(i, 1);
+                }
+            }
+        }
+
+        function toggleBurnerFlameMode() {
+            const btn = document.getElementById("btnToggleCollar");
+            const hole = document.getElementById("collarHole");
+            const readout = document.getElementById("readout-flame-mode");
+            const tempReadout = document.getElementById("readout-temp");
+            
+            if (currentBurnerFlameMode === "non-luminous") {
+                currentBurnerFlameMode = "luminous";
+                btn.textContent = "Air Hole: CLOSED";
+                readout.textContent = "LUMINOUS (AIR HOLE CLOSED)";
+                readout.className = "tele-val amber";
+                tempReadout.textContent = "~900 °C (Safety / Soot Zone)";
+                if (hole) hole.setAttribute("fill", "#64748b");
+                if (benchItems.has("burner")) startBunsenAudio("luminous");
+            } else {
+                currentBurnerFlameMode = "non-luminous";
+                btn.textContent = "Air Hole: OPEN";
+                readout.textContent = "NON-LUMINOUS (AIR HOLE OPEN)";
+                readout.className = "tele-val";
+                tempReadout.textContent = "~1450 °C (Oxidizing Zone)";
+                if (hole) hole.setAttribute("fill", "#0f172a");
+                if (benchItems.has("burner")) startBunsenAudio("non-luminous");
+            }
+        }
+
+        /* =========================================================================
+           APPARATUS CREATION & DESK DEPLOYMENT
+        ========================================================================= */
+        function addApparatusToDesk() {
+            const select = document.getElementById("apparatusSelect");
+            const type = select.value;
+            if (!type) return;
+
+            const curTest = EXPERIMENTS[currentCategory][currentTestIndex];
+
+            if (type === "burner") {
+                if (curTest.ignitionMethod === "watch_glass_lighter") {
+                    showToast("⚠️ Procedural Error: Volatile pools on watch glasses must NOT be heated with a Bunsen burner. Deploy the Watch Glass and Lab Gas Igniter.");
+                    return;
+                }
+                const burner = document.getElementById("burnerStation");
+                burner.style.display = "block";
+                benchItems.set("burner", burner);
+                startBunsenAudio(currentBurnerFlameMode);
+                return;
+            }
+
+            if (type === "spatula" && curTest.toolRequired === "glass_rod") {
+                showToast("⚠️ Standard Procedure: Metal cations in solution require a <strong>Borosilicate Glass Rod</strong> (or nichrome loop) to prevent extraneous metal contamination.");
+                return;
+            }
+
+            if (type === "glass_rod" && curTest.toolRequired === "spatula") {
+                showToast("⚠️ Standard Procedure: Solid or viscous organic pyrolysis requires a <strong>Stainless Steel Spatula</strong>.");
+                return;
+            }
+
+            if (type === "lighter" && curTest.toolRequired !== "lighter") {
+                showToast("⚠️ The Lab Gas Igniter is utilized strictly for direct spark ignition of volatile solvents on the watch glass.");
+                return;
+            }
+
+            if (benchItems.has(type)) {
+                showToast("Apparatus is already deployed on the laboratory bench.");
+                return;
+            }
+
+            createEquipment(type);
+        }
+
+        function createEquipment(type) {
+            const world = document.getElementById("workbenchWorld");
+            const container = document.createElement("div");
+            container.className = "lab-item";
+            container.dataset.type = type;
+            container.id = "item_" + type;
+
+            const count = benchItems.size;
+            container.style.left = (320 + count * 130) + "px";
+            container.style.top = (420 + (count * 30)) + "px";
+
+            let svgHtml = "";
+            let labelText = "";
+            const curTest = EXPERIMENTS[currentCategory][currentTestIndex];
+
+            let toolbarHtml = "";
+            if (type === "spatula" || type === "glass_rod" || type === "lighter") {
+                toolbarHtml = `
+                    <div class="item-toolbar">
+                        <button class="tool-btn" onclick="rotateTool('${type}', event)">↻ Rotate</button>
+                    </div>`;
+            }
+
+            if (type === "spatula") {
+                labelText = "Stainless Steel Spatula";
+                svgHtml = `
+                    <div style="position:relative; width:280px; height:80px;">
+                        <svg id="svg_spatula" width="280" height="80" viewBox="0 0 280 80">
+                            <defs>
+                                <linearGradient id="bladeChrome" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stop-color="#f8fafc"/>
+                                    <stop offset="30%" stop-color="#cbd5e1"/>
+                                    <stop offset="65%" stop-color="#94a3b8"/>
+                                    <stop offset="100%" stop-color="#475569"/>
+                                </linearGradient>
+                                <linearGradient id="shankChrome" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stop-color="#cbd5e1"/>
+                                    <stop offset="50%" stop-color="#f8fafc"/>
+                                    <stop offset="100%" stop-color="#64748b"/>
+                                </linearGradient>
+                            </defs>
+                            <path d="M12 40 C12 32 50 30 85 32 L240 34 C265 34 275 37 275 40 C275 43 265 46 240 46 L85 48 C50 50 12 48 12 40 Z" fill="#000" opacity="0.35" transform="translate(4, 8)"/>
+                            <rect x="80" y="36" width="165" height="8" rx="2" fill="url(#shankChrome)" stroke="#475569" stroke-width="0.8"/>
+                            <ellipse cx="258" cy="40" rx="16" ry="7" fill="url(#bladeChrome)" stroke="#64748b" stroke-width="0.8"/>
+                            <path id="spatulaBladeBody" d="M14 40 C14 33 45 31 82 33 C85 33 85 47 82 47 C45 49 14 47 14 40 Z" fill="url(#bladeChrome)" stroke="#64748b" stroke-width="1.2"/>
+                            <g id="spatulaPayloadGroup" opacity="0">
+                                <ellipse id="spatulaPayload" cx="42" cy="40" rx="22" ry="6" fill="${curTest.color}" stroke="rgba(0,0,0,0.2)" stroke-width="0.6"/>
+                            </g>
+                        </svg>
+                    </div>`;
+            } else if (type === "glass_rod") {
+                labelText = "Borosilicate Glass Rod";
+                svgHtml = `
+                    <svg id="svg_glass_rod" width="50" height="260" viewBox="0 0 50 260">
+                        <defs>
+                            <linearGradient id="glassShine" x1="0" y1="0" x2="1" y2="0">
+                                <stop offset="0%" stop-color="#ffffff" stop-opacity="0.8"/>
+                                <stop offset="20%" stop-color="#93c5fd" stop-opacity="0.4"/>
+                                <stop offset="80%" stop-color="#38bdf8" stop-opacity="0.3"/>
+                                <stop offset="100%" stop-color="#ffffff" stop-opacity="0.7"/>
+                            </linearGradient>
+                        </defs>
+                        <rect x="25" y="25" width="8" height="220" rx="4" fill="#000" opacity="0.3"/>
+                        <rect x="21" y="20" width="8" height="220" rx="4" fill="url(#glassShine)" stroke="#60a5fa" stroke-width="1.2"/>
+                        <ellipse id="glassRodDrop" cx="25" cy="20" rx="6" ry="8" fill="${curTest.color}" opacity="0"/>
+                    </svg>`;
+            } else if (type === "lighter") {
+                labelText = "Lab Gas Igniter";
+                svgHtml = `
+                    <div style="position:relative; width:220px; height:80px;">
+                        <svg id="svg_lighter" width="220" height="80" viewBox="0 0 220 80">
+                            <defs>
+                                <linearGradient id="metalNozzle" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stop-color="#cbd5e1"/>
+                                    <stop offset="50%" stop-color="#ffffff"/>
+                                    <stop offset="100%" stop-color="#64748b"/>
+                                </linearGradient>
+                            </defs>
+                            <rect x="75" y="24" width="130" height="34" rx="8" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
+                            <rect x="80" y="28" width="120" height="26" rx="6" fill="#334155"/>
+                            <rect x="20" y="34" width="60" height="12" fill="url(#metalNozzle)" stroke="#475569" stroke-width="1"/>
+                            <polygon points="12,40 20,34 20,46" fill="#94a3b8" stroke="#334155"/>
+                        </svg>
+                        <button onclick="onLighterSparkButtonClick(event)" style="
+                            position: absolute;
+                            right: 28px;
+                            top: 25px;
+                            width: 82px;
+                            height: 30px;
+                            background: var(--neon-red);
+                            color: white;
+                            font-weight: 700;
+                            font-family: 'Orbitron', sans-serif;
+                            font-size: 0.68rem;
+                            border-radius: 6px;
+                            border: 1px solid #fecaca;
+                            cursor: pointer;
+                            box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+                            z-index: 50;
+                        ">⚡ IGNITE</button>
+                    </div>`;
+            } else if (type === "sample_container") {
+                if (curTest.form === "solution") {
+                    labelText = curTest.pseudonym;
+                    svgHtml = `
+                        <svg width="120" height="140" viewBox="0 0 120 140">
+                            <defs>
+                                <linearGradient id="beakerGlass" x1="0" y1="0" x2="1" y2="0">
+                                    <stop offset="0%" stop-color="#ffffff" stop-opacity="0.6"/>
+                                    <stop offset="25%" stop-color="#e2e8f0" stop-opacity="0.2"/>
+                                    <stop offset="80%" stop-color="#cbd5e1" stop-opacity="0.2"/>
+                                    <stop offset="100%" stop-color="#ffffff" stop-opacity="0.5"/>
+                                </linearGradient>
+                            </defs>
+                            <rect x="20" y="25" width="80" height="105" rx="6" fill="url(#beakerGlass)" stroke="#94a3b8" stroke-width="2"/>
+                            <path d="M22 65 L98 65 L98 124 C98 128 94 130 90 130 L30 130 C26 130 22 128 22 124 Z" fill="${curTest.color}" opacity="0.8"/>
+                            <ellipse cx="60" cy="65" rx="38" ry="6" fill="${curTest.color}" opacity="0.95" stroke="#94a3b8" stroke-width="0.5"/>
+                            <text x="60" y="105" font-size="9" font-weight="bold" fill="#0f172a" text-anchor="middle">Test Solution</text>
+                        </svg>`;
+                } else {
+                    labelText = curTest.pseudonym;
+                    svgHtml = `
+                        <div style="position:relative; width:240px; height:200px;">
+                            <canvas id="watchGlassFlameCanvas" width="240" height="200" style="position:absolute; top:0; left:0; pointer-events:none; z-index:30;"></canvas>
+                            <svg id="svg_watch_glass" width="240" height="80" viewBox="0 0 240 80" style="position:absolute; bottom:0; left:0; z-index:20;">
+                                <defs>
+                                    <radialGradient id="dishBodyGrad" cx="50%" cy="45%" r="55%">
+                                        <stop offset="0%" stop-color="#ffffff" stop-opacity="0.75"/>
+                                        <stop offset="40%" stop-color="#bae6fd" stop-opacity="0.2"/>
+                                        <stop offset="85%" stop-color="#64748b" stop-opacity="0.4"/>
+                                        <stop offset="97%" stop-color="#ffffff" stop-opacity="0.9"/>
+                                        <stop offset="100%" stop-color="#475569" stop-opacity="0.7"/>
+                                    </radialGradient>
+                                </defs>
+                                <ellipse cx="120" cy="55" rx="108" ry="20" fill="#000000" opacity="0.55"/>
+                                <ellipse cx="120" cy="45" rx="104" ry="20" fill="url(#dishBodyGrad)"/>
+                                <ellipse cx="120" cy="44" rx="104" ry="19" fill="none" stroke="#ffffff" stroke-width="2.5" opacity="0.8"/>
+                                <g id="dishLiquidPayload">
+                                    <ellipse id="dishPayloadEllipse" cx="120" cy="45" rx="55" ry="10" fill="${curTest.color}" opacity="0.85" stroke="rgba(255,255,255,0.6)" stroke-width="1"/>
+                                </g>
+                                <text x="120" y="72" font-size="10" font-weight="bold" fill="#f8fafc" text-anchor="middle">Watch Glass</text>
+                            </svg>
+                        </div>`;
+                }
+            }
+
+            container.innerHTML = toolbarHtml + svgHtml + `<div class="item-label">${labelText}</div>`;
+            attachPointerDrag(container);
+            world.appendChild(container);
+            benchItems.set(type, container);
+        }
+
+        function rotateTool(type, event) {
+            event.stopPropagation();
+            const el = benchItems.get(type);
+            if (!el) return;
+
+            toolRotations[type] = (toolRotations[type] + 45) % 360;
+            const svg = el.querySelector("svg");
+            if (svg) {
+                svg.style.transform = `rotate(${toolRotations[type]}deg)`;
+                svg.style.transition = "transform 0.2s ease";
+            }
+        }
+
+        function loadSampleOntoActiveTool() {
+            const curTest = EXPERIMENTS[currentCategory][currentTestIndex];
+
+            if (curTest.ignitionMethod === "watch_glass_lighter") {
+                toolLoaded = true;
+                showToast(`Substance loaded into watch glass pool. Bring the Lab Gas Igniter nozzle nearby and trigger <strong>⚡ IGNITE</strong>.`);
+                return;
+            }
+
+            const toolType = curTest.toolRequired;
+            const toolEl = benchItems.get(toolType);
+
+            if (!toolEl) {
+                showToast(`⚠️ Deploy the <strong>${toolType === 'glass_rod' ? 'Borosilicate Glass Rod' : 'Stainless Steel Spatula'}</strong> on the bench first.`);
+                return;
+            }
+
+            toolLoaded = true;
+            if (toolType === "glass_rod") {
+                const drop = toolEl.querySelector("#glassRodDrop");
+                if (drop) {
+                    drop.style.opacity = "1";
+                    drop.setAttribute("fill", curTest.color);
+                }
+                toolEl.querySelector(".item-label").textContent = "Glass Rod (Sample Wetted)";
+                showToast(`Glass rod wetted with solution sample.`);
+            } else if (toolType === "spatula") {
+                const payloadGroup = toolEl.querySelector("#spatulaPayloadGroup");
+                const payload = toolEl.querySelector("#spatulaPayload");
+                if (payloadGroup && payload) {
+                    payloadGroup.style.opacity = "1";
+                    payload.setAttribute("fill", curTest.color);
+                }
+                toolEl.querySelector(".item-label").textContent = "Spatula (Sample Loaded)";
+                showToast(`Solid/viscous analyte mounted onto spatula tip.`);
+            }
+        }
+
+        /* =========================================================================
+           LIGHTER SPARK TRIGGER
+        ========================================================================= */
+        function onLighterSparkButtonClick(e) {
+            e.stopPropagation();
+            const lighterEl = benchItems.get("lighter");
+            const watchGlassEl = benchItems.get("sample_container");
+
+            if (!lighterEl || !watchGlassEl) {
+                showToast("Deploy both the Watch Glass and the Lab Gas Igniter on the bench.");
+                return;
+            }
+
+            const lighterRect = lighterEl.getBoundingClientRect();
+            const wgRect = watchGlassEl.getBoundingClientRect();
+
+            const worldRect = worldEl.getBoundingClientRect();
+            const sparkX = (lighterRect.left - worldRect.left) / zoomLevel + 16;
+            const sparkY = (lighterRect.top - worldRect.top) / zoomLevel + 42;
+            const targetX = (wgRect.left - worldRect.left) / zoomLevel + 120;
+            const targetY = (wgRect.top - worldRect.top) / zoomLevel + 180;
+
+            triggerPiezoSpark(sparkX, sparkY, targetX, targetY);
+
+            if (isOverlapping(lighterRect, wgRect)) {
+                if (reactionActive) return;
+                showToast("⚡ Piezo spark ignition successful! Liquid ignited with a pale blue flame.");
+                setTimeout(() => {
+                    startWatchGlassReaction(lighterEl, watchGlassEl);
+                }, 280);
+            } else {
+                showToast("⚡ Spark created! Position the igniter nozzle closer to the watch glass pool.");
+            }
+        }
+
+        /* =========================================================================
+           POINTER DRAGGING WITH ZOOM / PAN NORMALIZATION
+        ========================================================================= */
+        function attachPointerDrag(element) {
+            let isDragging = false;
+            let startClientX, startClientY, origX, origY;
+
+            element.addEventListener("pointerdown", onPointerDown);
+
+            function onPointerDown(e) {
+                if (reactionActive) return;
+                if (e.target.tagName.toLowerCase() === "button") return;
+                if (e.button !== 0 && e.pointerType === "mouse") return;
+                
+                isDragging = true;
+                startClientX = e.clientX;
+                startClientY = e.clientY;
+                origX = element.offsetLeft;
+                origY = element.offsetTop;
+                element.setPointerCapture(e.pointerId);
+                element.classList.add("highlight");
+
+                element.addEventListener("pointermove", onPointerMove);
+                element.addEventListener("pointerup", onPointerUp);
+                element.addEventListener("pointercancel", onPointerUp);
+                e.stopPropagation();
+            }
+
+            function onPointerMove(e) {
+                if (!isDragging) return;
+                const dx = (e.clientX - startClientX) / zoomLevel;
+                const dy = (e.clientY - startClientY) / zoomLevel;
+                element.style.left = (origX + dx) + "px";
+                element.style.top = (origY + dy) + "px";
+
+                evaluateInstantContact(element);
+            }
+
+            function onPointerUp(e) {
+                if (!isDragging) return;
+                isDragging = false;
+                element.classList.remove("highlight");
+                element.removeEventListener("pointermove", onPointerMove);
+                element.removeEventListener("pointerup", onPointerUp);
+                element.removeEventListener("pointercancel", onPointerUp);
+            }
+        }
+
+        function evaluateInstantContact(draggedEl) {
+            if (reactionActive) return;
+            const type = draggedEl.dataset.type;
+            const curTest = EXPERIMENTS[currentCategory][currentTestIndex];
+            const draggedRect = draggedEl.getBoundingClientRect();
+
+            if (type === "glass_rod" || type === "spatula") {
+                const burner = benchItems.get("burner");
+                if (burner && burner.style.display !== "none") {
+                    const bRect = burner.getBoundingClientRect();
+                    const flameZone = {
+                        left: bRect.left + 25,
+                        right: bRect.right - 25,
+                        top: bRect.top - 60,
+                        bottom: bRect.top + 120
+                    };
+
+                    if (isOverlapping(draggedRect, flameZone)) {
+                        if (!toolLoaded) {
+                            showToast("⚠️ Tool is empty! Click 'Moisten / Load Tool' before introducing it to the flame.");
+                            return;
+                        }
+
+                        if (curTest.flameModeNeeded === "non-luminous" && currentBurnerFlameMode === "luminous") {
+                            showToast("⚠️ Air Hole Error: Luminous soot obscures emission spectra. Toggle the collar to NON-LUMINOUS.");
+                            return;
+                        }
+
+                        startBurnerReaction(draggedEl);
+                    }
+                }
+            }
+        }
+
+        function isOverlapping(r1, r2) {
+            return !(r1.right < r2.left || r1.left > r2.right || r1.bottom < r2.top || r1.top > r2.bottom);
+        }
+
+        /* =========================================================================
+           REACTION EXECUTION & OBSERVATION TIMER
+        ========================================================================= */
+        function startBurnerReaction(toolEl) {
+            reactionActive = true;
+            toolEl.style.pointerEvents = "none";
+
+            const curTest = EXPERIMENTS[currentCategory][currentTestIndex];
+            if (curTest.flame) {
+                reactionSampleColor = curTest.flame;
+            }
+
+            simulateSubstanceBurning(toolEl, curTest);
+
+            if (curTest.sooty) {
+                startCrackleAudio("vigorous");
+            } else {
+                startCrackleAudio("moderate");
+            }
+
+            startObservationCountdown(curTest);
+        }
+
+        function startWatchGlassReaction(lighterEl, watchGlassEl) {
+            reactionActive = true;
+            lighterEl.style.pointerEvents = "none";
+
+            const curTest = EXPERIMENTS[currentCategory][currentTestIndex];
+            startCrackleAudio("moderate");
+            startObservationCountdown(curTest);
+        }
+
+        function simulateSubstanceBurning(toolEl, curTest) {
+            const payload = toolEl.querySelector("#spatulaPayload");
+
+            if (curTest.flameType === "charring_residue") {
+                if (payload) {
+                    payload.style.transition = "all 5s cubic-bezier(0.2, 0.8, 0.2, 1)";
+                    setTimeout(() => { payload.setAttribute("fill", "#92400e"); }, 1500);
+                    setTimeout(() => { 
+                        payload.setAttribute("fill", "#09090b");
+                        payload.setAttribute("rx", "28");
+                        payload.setAttribute("ry", "9");
+                    }, 4800);
+                }
+            } else if (curTest.flameType === "sooty_yellow") {
+                if (payload) {
+                    payload.style.transition = "all 4s ease";
+                    setTimeout(() => { payload.setAttribute("fill", "#18181b"); }, 2500);
+                }
+            }
+        }
+
+        function startObservationCountdown(test) {
+            const hud = document.getElementById("obsHud");
+            const hudSeconds = document.getElementById("hudSeconds");
+            secondsRemaining = 30;
+            hudSeconds.textContent = secondsRemaining;
+            hud.style.display = "block";
+
+            if (countdownTimer) clearInterval(countdownTimer);
+
+            countdownTimer = setInterval(() => {
+                secondsRemaining--;
+                hudSeconds.textContent = secondsRemaining;
+
+                if (secondsRemaining <= 0) {
+                    clearInterval(countdownTimer);
+                    countdownTimer = null;
+                    hud.style.display = "none";
+                    openEvaluationModal(test);
+                }
+            }, 1000);
+        }
+
+        function skipCountdownToEvaluation() {
+            if (countdownTimer) {
+                clearInterval(countdownTimer);
+                countdownTimer = null;
+            }
+            document.getElementById("obsHud").style.display = "none";
+            const curTest = EXPERIMENTS[currentCategory][currentTestIndex];
+            openEvaluationModal(curTest);
+        }
+
+        function stopAllReactions() {
+            stopCrackleAudio();
+            reactionSampleColor = null;
+        }
+
+        /* =========================================================================
+           EXAM EVALUATION & MARKING SCHEME MODAL
+        ========================================================================= */
+        function openEvaluationModal(test) {
+            stopAllReactions();
+            const modal = document.getElementById("examModal");
+            document.getElementById("evalSubstanceName").textContent = "Evaluation: " + test.pseudonym;
+
+            const obsSelect = document.getElementById("selObservation");
+            obsSelect.innerHTML = "<option value=''>-- Select Recorded Observation --</option>";
+            shuffleArray([...test.mcqObs]).forEach(item => {
+                const opt = document.createElement("option");
+                opt.value = item.ok;
+                opt.textContent = item.text;
+                obsSelect.appendChild(opt);
+            });
+
+            const infSelect = document.getElementById("selInference");
+            infSelect.innerHTML = "<option value=''>-- Select Chemical Deduction --</option>";
+            shuffleArray([...test.mcqInf]).forEach(item => {
+                const opt = document.createElement("option");
+                opt.value = item.ok;
+                opt.textContent = item.text;
+                infSelect.appendChild(opt);
+            });
+
+            document.getElementById("feedbackContainer").style.display = "none";
+            document.getElementById("btnSubmitEval").style.display = "block";
+            modal.style.display = "flex";
+        }
+
+        function gradeStudentSubmission() {
+            const obs = document.getElementById("selObservation").value;
+            const inf = document.getElementById("selInference").value;
+
+            if (obs === "" || inf === "") {
+                alert("Please select both an observation and a deduction before submitting.");
+                return;
+            }
+
+            const isObsCorrect = (obs === "true");
+            const isInfCorrect = (inf === "true");
+            const test = EXPERIMENTS[currentCategory][currentTestIndex];
+
+            let markObs = isObsCorrect ? 1 : 0;
+            let markInf = isInfCorrect ? 1 : 0;
+            let totalMark = markObs + markInf;
+
+            const fb = document.getElementById("feedbackContainer");
+            const title = document.getElementById("evalResultTitle");
+            const details = document.getElementById("evalDetailsText");
+            const sciReason = document.getElementById("evalScientificReason");
+
+            if (totalMark === 2) {
+                fb.className = "feedback-box correct";
+                title.textContent = "Score: 2 / 2 Marks (Full Credit)";
+                details.textContent = `Correctly identified: ${test.actualIdentity}. Precise observational recording and chemical deduction aligned with qualitative standards.`;
+            } else {
+                fb.className = "feedback-box incorrect";
+                title.textContent = `Score: ${totalMark} / 2 Marks`;
+                let err = `Confirmed Identity: ${test.actualIdentity}. `;
+                if (!isObsCorrect) err += "• Observation error: Discrepancy in recorded flame hue or residue structure. ";
+                if (!isInfCorrect) err += "• Inference error: Incomplete or incorrect chemical identification.";
+                details.textContent = err;
+            }
+
+            sciReason.innerHTML = `<strong>Scientific Principle:</strong> ${test.reason}<br><br><strong>${test.tip}</strong>`;
+            fb.style.display = "block";
+            document.getElementById("btnSubmitEval").style.display = "none";
+
+            recordResult(test, markObs, markInf, totalMark);
+        }
+
+        function recordResult(test, mObs, mInf, mTot) {
+            const weakness = mTot < 2 ? (mObs === 0 ? "Flame Observation" : "Chemical Inference") : "Proficient";
+            const entry = {
+                id: test.id,
+                pseudonym: test.pseudonym,
+                identity: test.actualIdentity,
+                category: currentCategory.toUpperCase(),
+                obs: mObs,
+                inf: mInf,
+                total: mTot,
+                weakness: weakness
+            };
+
+            const idx = testHistory.findIndex(r => r.id === test.id);
+            if (idx > -1) {
+                testHistory[idx] = entry;
+            } else {
+                testHistory.push(entry);
+            }
+
+            updateScoreDisplay();
+        }
+
+        function updateScoreDisplay() {
+            const total = testHistory.reduce((a, b) => a + b.total, 0);
+            const possible = testHistory.length * 2;
+            document.getElementById("readout-score").textContent = `${total} / ${possible} Marks`;
+        }
+
+        function closeModalAndAdvance() {
+            document.getElementById("examModal").style.display = "none";
+            clearCurrentDesk();
+
+            const select = document.getElementById("sampleSelect");
+            if (currentTestIndex < EXPERIMENTS[currentCategory].length - 1) {
+                select.value = currentTestIndex + 1;
+                loadCurrentSample();
+            } else {
+                alert(`Division complete for ${currentCategory.toUpperCase()} analysis. Click 'Export Practical Report (.CSV)' to archive your lab scores.`);
+            }
+        }
+
+        /* =========================================================================
+           CSV REPORT GENERATION & EXPORT
+        ========================================================================= */
+        function handleReportButtonClick() {
+            const reqTotal = EXPERIMENTS[currentCategory].length;
+            const completedInCat = EXPERIMENTS[currentCategory].filter(t => testHistory.some(r => r.id === t.id)).length;
+            const remaining = reqTotal - completedInCat;
+
+            if (remaining > 0) {
+                alert(`Incomplete Division: You have completed ${completedInCat} of ${reqTotal} substances in the ${currentCategory.toUpperCase()} division. Complete all items to generate your certified diagnostic report.`);
+                return;
+            }
+
+            generateCSVReport();
+        }
+
+        function generateCSVReport() {
+            if (testHistory.length === 0) return;
+
+            let csv = "LUYALISIMS SENIOR SECONDARY QUALITATIVE CHEMISTRY PRACTICAL REPORT\n";
+            csv += "Division,Substance,Actual Identity,Observation Score (Max 1),Inference Score (Max 1),Total Score (Max 2),Diagnostic Proficiency\n";
+
+            let sum = 0;
+            let max = testHistory.length * 2;
+            let remedial = [];
+
+            testHistory.forEach(r => {
+                sum += r.total;
+                if (r.weakness !== "Proficient") {
+                    remedial.push(`${r.pseudonym} (${r.weakness})`);
+                }
+                csv += `"${r.category}","${r.pseudonym}","${r.identity}",${r.obs},${r.inf},${r.total},"${r.weakness}"\n`;
+            });
+
+            csv += "\n";
+            csv += `AGGREGATE SCORE,${sum} / ${max},PERCENTAGE,${((sum / max) * 100).toFixed(1)}%\n`;
+            csv += `REMEDIATION SUMMARY,"${remedial.length > 0 ? remedial.join("; ") : "Proficient across qualitative standards."}"\n`;
+
+            const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", `Qualitative_Flame_Test_Report_${currentCategory}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        /* =========================================================================
+           DESK CLEANUP & RESET
+        ========================================================================= */
+        function clearCurrentDesk() {
+            stopAllReactions();
+            stopBunsenAudio();
+            if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+            document.getElementById("obsHud").style.display = "none";
+            reactionActive = false;
+            toolLoaded = false;
+            toolRotations = { spatula: 0, glass_rod: 0, lighter: 0 };
+
+            const world = document.getElementById("workbenchWorld");
+            world.querySelectorAll(".lab-item").forEach(el => el.remove());
+            benchItems.clear();
+
+            const burner = document.getElementById("burnerStation");
+            burner.style.display = "none";
+        }
+
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+    </script>
+</body>
+</html>
