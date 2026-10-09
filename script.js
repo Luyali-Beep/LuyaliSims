@@ -2,7 +2,7 @@
 // 1. DATA REPOSITORY
 // ===================================================
 const simulatorsData = [
-   {
+  {
     id: "sim-1",
     title: "3D Monolayer Oil Drop Experiment",
     category: "Sciences",
@@ -51,62 +51,63 @@ const simulatorsData = [
     url: "sims/simulator6.html"
   },
   {
-  "id": "sim-7",
-  "title": "The Periodic Table: Elemental Rummy",
-  "category": "Sciences",
-  "description": "Chemistry: An interactive card game laboratory simulator where learners assemble chemical melds, track valence electrons, and master periodic table trends.",
-  "image": "images/elementalrummy.jpeg",
-  "url": "sims/simulator7.html"
+    id: "sim-7",
+    title: "The Periodic Table: Elemental Rummy",
+    category: "Sciences",
+    description: "Chemistry: An interactive card game laboratory simulator where learners assemble chemical melds, track valence electrons, and master periodic table trends.",
+    image: "images/elementalrummy.jpeg",
+    url: "sims/simulator7.html"
   },
   {
-  "id": "sim-8",
-  "title": "English Language: Grammar Dash",
-  "category": "Exploration & others",
-  "description": "English Games: An interactive sentence-building laboratory where students identify parts of speech, assemble phrases and sentences, and explore English grammar rules.",
-  "image": "images/grammardash.jpeg",
-  "url": "sims/simulator8.html"
+    id: "sim-8",
+    title: "English Language: Grammar Dash",
+    category: "Exploration & Others",
+    description: "English Games: An interactive sentence-building laboratory where students identify parts of speech, assemble phrases and sentences, and explore English grammar rules.",
+    image: "images/grammardash.jpeg",
+    url: "sims/simulator8.html"
   },
   {
-  "id": "sim-9",
-  "title": "AC to DC Rectification Laboratory",
-  "category": "Sciences",
-  "description": "Physics: Explore half-wave, center-tapped, and bridge rectifiers with dual-trace oscilloscope waveforms, diode biasing, and capacitor smoothing filters.",
-  "image": "images/rectification.jpeg",
-  "url": "sims/simulator9.html"
+    id: "sim-9",
+    title: "AC to DC Rectification Laboratory",
+    category: "Sciences",
+    description: "Physics: Explore half-wave, center-tapped, and bridge rectifiers with dual-trace oscilloscope waveforms, diode biasing, and capacitor smoothing filters.",
+    image: "images/rectification.jpeg",
+    url: "sims/simulator9.html"
   },
   {
-  "id": "sim-10",
-  "title": "Gas Preparation & Inorganic Synthesis",
-  "category": "Sciences",
-  "description": "Chemistry: An interactive inorganic synthesis simulator where students assemble glassware trains, test gas collection methods, and safely generate gases like Cl₂, O₂, and NH₃.",
-  "image": "images/gasprep.jpeg",
-  "url": "sims/simulator10.html"
+    id: "sim-10",
+    title: "Gas Preparation & Inorganic Synthesis",
+    category: "Sciences",
+    description: "Chemistry: An interactive inorganic synthesis simulator where students assemble glassware trains, test gas collection methods, and safely generate gases like Cl₂, O₂, and NH₃.",
+    image: "images/gasprep.jpeg",
+    url: "sims/simulator10.html"
   },
   {
-  "id": "sim-11",
-  "title": "Ultimate Physics Circuit Lab Pro",
-  "category": "Sciences",
-  "description": "Physics: An interactive circuit workbench to design AC/DC circuits, calibrate components, inspect CRO oscilloscope waveforms, and log experimental data.",
-  "image": "images/circuitlab.jpeg",
-  "url": "sims/simulator11.html"
+    id: "sim-11",
+    title: "Ultimate Physics Circuit Lab Pro",
+    category: "Sciences",
+    description: "Physics: An interactive circuit workbench to design AC/DC circuits, calibrate components, inspect CRO oscilloscope waveforms, and log experimental data.",
+    image: "images/circuitlab.jpeg",
+    url: "sims/simulator11.html"
   },
   {
-  "id": "sim-12",
-  "title": "Photoelectric Effect & Circuit Laboratory",
-  "category": "Sciences",
-  "description": "Physics: An interactive quantum physics simulator to construct circuits, illuminate metal cathodes, determine stopping potentials, and plot characteristic I-V curves.",
-  "image": "images/photoelectric.jpeg",
-  "url": "sims/simulator12.html"
+    id: "sim-12",
+    title: "Photoelectric Effect & Circuit Laboratory",
+    category: "Sciences",
+    description: "Physics: An interactive quantum physics simulator to construct circuits, illuminate metal cathodes, determine stopping potentials, and plot characteristic I-V curves.",
+    image: "images/photoelectric.jpeg",
+    url: "sims/simulator12.html"
   },
   {
-  "id": "sim-13",
-  "title": "Cathode Ray Tube & CRO Advanced Lab",
-  "category": "Sciences",
-  "description": "Physics: Explore electron beam electrodynamics inside a CRT cutaway and analyze real-time waveforms on an authentic 8×10 phosphor CRO graticule.",
-  "image": "images/cro-crt.jpeg",
-  "url": "sims/simulator13.html"
-  } 
+    id: "sim-13",
+    title: "Cathode Ray Tube & CRO Advanced Lab",
+    category: "Sciences",
+    description: "Physics: Explore electron beam electrodynamics inside a CRT cutaway and analyze real-time waveforms on an authentic 8×10 phosphor CRO graticule.",
+    image: "images/cro-crt.jpeg",
+    url: "sims/simulator13.html"
+  }
 ];
+
 // ===================================================
 // 2. PAGINATION & FILTER STATE
 // ===================================================
@@ -210,18 +211,45 @@ function closeModal(modalId) {
     }
 }
 
-// Attach globally to the window object so inline onclick attributes work 100% of the time
+// Attach globally to the window object for inline onclick triggers
 window.openModal = openModal;
 window.closeModal = closeModal;
 
 // ===================================================
-// 7. EVENT LISTENERS & INITIALIZATION
+// 7. ANNOUNCEMENT STRIP CONTROLLER (with LocalStorage)
+// ===================================================
+function setupAnnouncementStrip() {
+    const strip = document.getElementById('announcementStrip');
+    const closeBtn = document.getElementById('closeAnnouncementBtn');
+    
+    if (!strip || !closeBtn) return;
+
+    // Change this key whenever you release a new update so visitors see the new announcement
+    const CURRENT_UPDATE_KEY = 'luyalisims_dismissed_update_v2.3';
+
+    // If user previously closed this announcement, hide it immediately
+    if (localStorage.getItem(CURRENT_UPDATE_KEY) === 'true') {
+        strip.classList.add('hidden');
+    }
+
+    // Dismiss button click handler
+    closeBtn.addEventListener('click', () => {
+        strip.classList.add('hidden');
+        localStorage.setItem(CURRENT_UPDATE_KEY, 'true');
+    });
+}
+
+// ===================================================
+// 8. EVENT LISTENERS & INITIALIZATION
 // ===================================================
 document.addEventListener('DOMContentLoaded', () => {
-    // Initial Render
+    // Initialize announcement banner
+    setupAnnouncementStrip();
+
+    // Initial render of simulators
     displaySimulators(simulatorsData);
     
-    // Search & Filter Listeners
+    // Search & Filter listeners
     const searchInput = document.getElementById('searchInput');
     const categoryFilter = document.getElementById('categoryFilter');
     const loadMoreBtn = document.getElementById('loadMoreBtn');
@@ -230,14 +258,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (categoryFilter) categoryFilter.addEventListener('change', filterSims);
     if (loadMoreBtn) loadMoreBtn.addEventListener('click', loadMoreCards);
 
-    // Backdrop Click Listener for Modals
+    // Backdrop click listener for modals
     window.addEventListener('click', (e) => {
         if (e.target.classList.contains('policy-modal')) {
             closeModal(e.target.id);
         }
     });
 
-    // Keyboard ESC Key to Close Modals (Accessibility Compliance)
+    // Keyboard ESC key to close active modal
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' || e.key === 'Esc') {
             const activeModal = document.querySelector('.policy-modal.active');
