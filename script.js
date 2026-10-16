@@ -153,7 +153,47 @@ const simulatorsData = [
   "description": "Chemistry & Physics: Explore Boyle's Law, Charles's Law, and Graham's Law of diffusion with interactive molecular kinetics, live charts, and precipitate ring formation.",
   "image": "images/gaslaws.jpeg",
   "url": "sims/simulator19.html"
-  }
+  },
+  {
+  "id": "sim-20",
+  "title": "Principle of Moments & Equilibrium Simulator",
+  "category": "Sciences",
+  "description": "Physics: Explore levers, suspended beams, and toppling stability with real-time mathematical breakdowns, rotational dynamics, and static equilibrium conditions.",
+  "image": "images/moments.jpeg",
+  "url": "sims/simulator20.html"
+  },
+  {
+  "id": "sim-21",
+  "title": "Heating Effect of Electric Current, Fuse & Incandescent Bulb Simulator",
+  "category": "Sciences",
+  "description": "Physics: Investigate Joule's law of electric heating (H = I²Rt), calorimeter heat capacities, cartridge fuse protection, and incandescent tungsten lamp physics.",
+  "image": "images/heatingeffect.jpeg",
+  "url": "sims/simulator21.html"
+  },
+  {
+  "id": "sim-22",
+  "title": "Electromagnetic Mutual Induction & Transformer Laboratory",
+  "category": "Sciences",
+  "description": "Physics: Investigate Faraday's Law, mutual inductance, closed-frame laminated transformers, and Ruhmkorff high-voltage spark coils with real-time CRO waveforms.",
+  "image": "images/mutualinduction.jpeg",
+  "url": "sims/simulator22.html"
+  },
+  {
+  "id": "sim-23",
+  "title": "Hooke's Law & Materials Science Laboratory",
+  "category": "Sciences",
+  "description": "Physics & Materials Science: Explore linear spring tension, compression, ductile yield limits, series-parallel spring combinations, and elastic strain energy with live graphing.",
+  "image": "images/hookeslaw.jpeg",
+  "url": "sims/simulator23.html"
+  },
+  {
+  "id": "sim-24",
+  "title": "Precision Physics Lab: Vernier Calliper & Micrometer Screw Gauge",
+  "category": "Sciences",
+  "description": "Physics Laboratory: Explore high-precision metrology instruments interactively, measure external/internal/depth dimensions, and manage instrumental zero errors.",
+  "image": "images/precisionlab.jpeg",
+  "url": "sims/simulator24.html"
+  }  
 ];
 
 // ===================================================
