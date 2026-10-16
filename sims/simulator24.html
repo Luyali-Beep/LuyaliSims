@@ -1,0 +1,2054 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="Interactive Precision Physics Laboratory: Vernier Calliper & Micrometer Screw Gauge Simulator - LuyaliSims STEM Labs.">
+  <title>Precision Physics Lab: Vernier Calliper & Micrometer - LuyaliSims</title>
+
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  
+  <!-- Import Futuristic Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  
+  <style>
+    /* Base Reset & Variables */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #070a12;
+      --card: #151b28;
+      --border: #26334d;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --accent: #00f3ff;
+      --accent-h: #0ea5e9;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --success: #00ff88;
+      --neon-cyan: #00f3ff;
+      --neon-magenta: #bc13fe;
+      --neon-green: #00ff88;
+      --bg-dark: #070a12;
+      --panel-bg: rgba(16, 24, 43, 0.85);
+      --border-glow: rgba(0, 243, 255, 0.35);
+    }
+
+    body {
+      font-family: 'Rajdhani', sans-serif;
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 85% 15%, rgba(0, 243, 255, 0.08), transparent 45%),
+        radial-gradient(circle at 15% 85%, rgba(188, 19, 254, 0.08), transparent 45%),
+        linear-gradient(180deg, #05070e 0%, #0a0e1a 100%);
+      color: #e2e8f0;
+      padding: 16px 20px;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* 1. HEADER & TOP NAVIGATION */
+    header {
+      max-width: 1200px;
+      margin: 0 auto 15px auto;
+    }
+
+    .top-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 18px;
+      background: rgba(16, 24, 43, 0.7);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(188, 19, 254, 0.5);
+      color: #e580ff;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+    }
+
+    .back-btn:hover {
+      background: rgba(188, 19, 254, 0.2);
+      border-color: var(--neon-magenta);
+      color: #fff;
+      box-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
+      transform: translateX(-3px);
+    }
+
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      color: var(--neon-cyan);
+      text-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+      margin: 6px 0 10px 0;
+      font-size: clamp(1.4rem, 3.8vw, 2.3rem);
+      letter-spacing: 1.5px;
+      text-align: center;
+    }
+
+    .lead-summary {
+      max-width: 900px;
+      margin: 0 auto 20px auto;
+      text-align: center;
+      font-size: 1.05rem;
+      line-height: 1.6;
+      color: #cbd5e1;
+    }
+
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* 2. SIMULATOR WORKSPACE */
+    #simulator-container {
+      background: linear-gradient(135deg, rgba(16, 24, 43, 0.85) 0%, rgba(8, 12, 22, 0.9) 100%);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-glow);
+      border-radius: 16px;
+      padding: 22px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 25px rgba(0, 243, 255, 0.12);
+      margin-bottom: 25px;
+      position: relative;
+    }
+
+    .hud-telemetry {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(4, 8, 16, 0.8);
+      border: 1px solid rgba(0, 243, 255, 0.25);
+      border-radius: 10px;
+      padding: 10px 16px;
+      margin-bottom: 18px;
+      font-family: 'Share Tech Mono', monospace;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .telemetry-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.92rem;
+    }
+
+    .tele-label {
+      color: #8da4be;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+    }
+
+    .tele-val {
+      color: var(--neon-cyan);
+      font-weight: 700;
+    }
+
+    .tele-val.pink {
+      color: #ff55bb;
+    }
+
+    /* Original Simulator Layout Preserved: 1fr for viewport, 340px for sidebar */
+    .sim-layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 20px;
+      align-items: stretch;
+      height: calc(100vh - 200px);
+      min-height: 580px;
+    }
+
+    .viewport-panel {
+      position: relative;
+      background: #06090e;
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      border: 4px solid #1e293b;
+      box-shadow: 
+        0 0 0 2px rgba(0, 243, 255, 0.4),
+        0 15px 35px rgba(0, 0, 0, 0.8),
+        inset 0 0 35px rgba(0, 0, 0, 0.95);
+      touch-action: none;
+    }
+
+    canvas { 
+      width: 100%; 
+      height: 100%; 
+      touch-action: none; 
+      display: block;
+    }
+
+    .viewport-controls {
+      position: absolute;
+      bottom: 14px;
+      left: 14px;
+      display: flex;
+      gap: 6px;
+      background: rgba(16, 22, 35, 0.9);
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      z-index: 5;
+    }
+
+    .icon-btn {
+      background: #1c2436;
+      border: 1px solid #2e3e5c;
+      color: var(--text);
+      min-width: 30px;
+      height: 30px;
+      padding: 0 8px;
+      border-radius: 5px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.15s;
+    }
+    .icon-btn:hover { background: var(--accent); color: #0b1120; }
+    
+    .status-banner {
+      position: absolute;
+      top: 14px;
+      left: 16px;
+      max-width: min(280px, calc(100% - 315px));
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.74rem;
+      line-height: 1.35;
+      font-weight: 600;
+      display: none;
+      z-index: 100;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+      pointer-events: none;
+    }
+    .status-banner.danger { background: rgba(239, 68, 68, 0.95); color: white; animation: pulse 0.8s infinite alternate; }
+    .status-banner.warning { background: rgba(245, 158, 11, 0.95); color: #0b0f19; }
+    .status-banner.success { background: rgba(0, 255, 136, 0.95); color: #0b0f19; }
+    @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.02); } }
+
+    /* Tooltip Styling */
+    .part-tooltip {
+      position: absolute;
+      background: rgba(15, 23, 42, 0.97);
+      border: 1px solid var(--accent);
+      color: var(--text);
+      padding: 12px 14px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      line-height: 1.45;
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.15s ease-out;
+      max-width: 250px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+      transform: translate(0, 0);
+    }
+    .part-tooltip strong {
+      display: block;
+      color: var(--accent);
+      margin-bottom: 6px;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid rgba(56, 189, 248, 0.2);
+      padding-bottom: 4px;
+    }
+
+    .sidebar {
+      background: var(--card);
+      border-left: 1px solid var(--border);
+      border-radius: 0 12px 12px 0;
+      overflow-y: auto;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .panel-card { background: #0f141f; border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; }
+    .panel-card h3 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.75rem; 
+      text-transform: uppercase; 
+      letter-spacing: 0.8px; 
+      color: var(--muted);
+      margin-bottom: 8px; 
+      border-bottom: 1px solid #1e283d; 
+      padding-bottom: 4px; 
+      display: flex;
+      justify-content: space-between; 
+      align-items: center;
+    }
+    .control-row { display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px; }
+    .control-row:last-child { margin-bottom: 0; }
+    .control-row label { font-size: 0.72rem; font-weight: 600; color: var(--muted); display: flex; justify-content: space-between; }
+    select, input[type="range"] { width: 100%; }
+    select { background: #090d15; color: var(--text); border: 1px solid var(--border); padding: 6px; border-radius: 5px; font-size: 0.78rem; outline: none; cursor: pointer; }
+    
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      background: #0c1527;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      height: 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 8px 0;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #00f3ff 30%, #0088aa 100%);
+      border: 2px solid #fff;
+      box-shadow: 0 0 10px rgba(0, 243, 255, 0.8);
+      cursor: pointer;
+    }
+
+    .btn-group-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .btn {
+      background: #1f2738; border: 1px solid #313f5c; color: var(--text); padding: 7px 10px; border-radius: 6px;
+      font-size: 0.75rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; transition: 0.15s;
+    }
+    .btn:hover { background: #2c374f; }
+    .btn.primary { background: var(--accent); color: #090e17; border-color: var(--accent); font-weight: 700; }
+    .btn.primary:hover { background: var(--accent-h); }
+    .btn.danger { background: rgba(239, 68, 68, 0.15); border-color: #7f1d1d; color: #fca5a5; }
+    .btn.danger:hover { background: var(--danger); color: white; }
+
+    .unit-toggle { display: flex; background: #090d15; border: 1px solid var(--border); border-radius: 6px; padding: 2px; gap: 2px; }
+    .unit-btn { background: transparent; border: none; color: var(--muted); padding: 2px 10px; font-size: 0.72rem; font-weight: 700; border-radius: 4px; cursor: pointer; transition: 0.15s; }
+    .unit-btn.active { background: var(--accent); color: #0b1120; }
+
+    .readout-box { background: #070a10; border: 1px solid #1a2335; border-radius: 6px; padding: 8px 10px; font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; line-height: 1.55; }
+    .readout-box .line { display: flex; justify-content: space-between; border-bottom: 1px dashed #162033; padding: 2px 0; }
+    .readout-box .line.total { border-top: 1px solid #38bdf8; border-bottom: none; margin-top: 5px; padding-top: 3px; font-weight: bold; color: var(--accent); font-size: 0.9rem; }
+    .hidden-blur { filter: blur(5px); }
+    .fine-tune-controls { display: flex; gap: 6px; margin-top: 6px; }
+    .fine-tune-controls .btn { flex: 1; padding: 5px; font-size: 0.72rem; }
+    .guide-legend { font-size: 0.7rem; color: var(--muted); line-height: 1.4; display: flex; flex-direction: column; gap: 3px; }
+    .guide-legend li { margin-left: 14px; }
+
+    /* Tab Switcher in Header */
+    .tab-container {
+      display: flex;
+      gap: 6px;
+      background: #090d15;
+      padding: 3px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      padding: 6px 14px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .tab-btn.active { background: var(--accent); color: #0b1120; font-weight: 700; }
+
+    /* 3. POLICY-COMPLIANT AD CONTAINER */
+    .ad-slot-wrapper {
+      margin: 30px auto;
+      text-align: center;
+      clear: both;
+    }
+
+    .ad-disclaimer {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #64748b;
+      margin-bottom: 6px;
+    }
+
+    .ad-box-placeholder {
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px dashed rgba(255, 255, 255, 0.15);
+      min-height: 90px;
+      max-width: 970px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #475569;
+      font-size: 0.85rem;
+      border-radius: 8px;
+    }
+
+    /* 4. EDUCATIONAL CONTENT SECTION */
+    .educational-content {
+      line-height: 1.75;
+      font-size: 1.05rem;
+      color: #94a3b8;
+      background: rgba(10, 14, 23, 0.85);
+      padding: 30px;
+      border-radius: 16px;
+      border-left: 4px solid var(--neon-cyan);
+      border-top: 1px solid rgba(0, 243, 255, 0.2);
+      border-right: 1px solid rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      margin-bottom: 35px;
+    }
+
+    .educational-content h2 {
+      font-family: 'Orbitron', sans-serif;
+      color: var(--neon-magenta);
+      border-bottom: 1px solid rgba(188, 19, 254, 0.3);
+      padding-bottom: 8px;
+      margin-top: 1.8em;
+      margin-bottom: 0.6em;
+      font-size: 1.45rem;
+    }
+
+    .educational-content h3 {
+      font-family: 'Orbitron', sans-serif;
+      color: #38bdf8;
+      margin-top: 1.4em;
+      margin-bottom: 0.4em;
+      font-size: 1.15rem;
+    }
+
+    .formula-box {
+      background: rgba(4, 9, 20, 0.7);
+      border: 1px solid rgba(0, 243, 255, 0.3);
+      border-left: 3px solid var(--neon-green);
+      padding: 14px 18px;
+      margin: 14px 0;
+      border-radius: 6px;
+      font-family: 'Share Tech Mono', monospace;
+      color: #a7f3d0;
+      font-size: 1.05rem;
+    }
+
+    .task-card {
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 18px;
+    }
+
+    .task-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1rem;
+      color: var(--neon-cyan);
+      margin-bottom: 8px;
+    }
+
+    details {
+      margin-top: 25px;
+      background: rgba(5, 10, 20, 0.8);
+      border: 1px solid rgba(188, 19, 254, 0.4);
+      border-radius: 10px;
+      padding: 15px 20px;
+    }
+
+    summary {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
+      color: #e580ff;
+      cursor: pointer;
+      padding: 6px 0;
+      user-select: none;
+    }
+
+    .solution-step {
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+      padding: 12px 0;
+    }
+
+    .solution-step:last-child {
+      border-bottom: none;
+    }
+
+    /* 5. FOOTER & ACCURATE ALIGNED LINKS */
+    footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 30px 20px 20px 20px;
+      text-align: center;
+      color: #64748b;
+      font-size: 0.9rem;
+    }
+
+    .footer-nav {
+      display: flex;
+      justify-content: center;
+      gap: 22px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+
+    .footer-nav a, .footer-modal-trigger {
+      color: #94a3b8;
+      text-decoration: none;
+      transition: color 0.2s, text-shadow 0.2s;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .footer-nav a:hover, .footer-modal-trigger:hover {
+      color: var(--neon-cyan);
+      text-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
+    }
+
+    /* 6. POLICY MODALS */
+    .policy-modal {
+      position: fixed !important;
+      top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
+      width: 100vw !important; height: 100vh !important;
+      background: rgba(4, 7, 15, 0.92) !important;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 99999 !important;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      display: none;
+    }
+
+    .modal-body {
+      background: linear-gradient(145deg, #0b111e 0%, #060913 100%);
+      border: 2px solid var(--neon-cyan);
+      border-radius: 16px;
+      max-width: 820px;
+      width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 35px 30px;
+      color: #cbd5e1;
+      box-shadow: 0 0 40px rgba(0, 243, 255, 0.25);
+      line-height: 1.75;
+      position: relative;
+      text-align: left;
+    }
+
+    .modal-body h2 {
+      font-family: 'Orbitron', sans-serif;
+      color: var(--neon-cyan);
+      margin-top: 0;
+      font-size: 1.6rem;
+    }
+
+    .modal-body h3 {
+      color: var(--neon-magenta);
+      font-family: 'Orbitron', sans-serif;
+      margin-top: 24px;
+      margin-bottom: 8px;
+      font-size: 1.15rem;
+    }
+
+    .modal-date {
+      font-family: 'Share Tech Mono', monospace;
+      color: var(--neon-green);
+      font-size: 0.9rem;
+      margin-top: -6px;
+      margin-bottom: 16px;
+    }
+
+    .modal-close-btn {
+      background: linear-gradient(180deg, rgba(188, 19, 254, 0.4), rgba(188, 19, 254, 0.15));
+      border: 1px solid var(--neon-magenta);
+      color: #fff;
+      padding: 8px 18px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      border-radius: 8px;
+      cursor: pointer;
+      float: right;
+      margin-bottom: 15px;
+      transition: all 0.2s ease;
+    }
+
+    .modal-close-btn:hover {
+      background: var(--neon-magenta);
+      box-shadow: 0 0 15px rgba(188, 19, 254, 0.8);
+    }
+
+    @media (max-width: 900px) {
+      .sim-layout { grid-template-columns: 1fr; height: auto; }
+      .sidebar { border-radius: 0 0 12px 12px; max-height: 500px; }
+      .viewport-panel { min-height: 400px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating Hover Tooltip -->
+  <div id="partTooltip" class="part-tooltip"></div>
+
+  <!-- 1. HEADER & TOP NAVIGATION -->
+  <header>
+    <nav class="top-nav">
+      <a href="../index.html" class="back-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Back to LuyaliSims
+      </a>
+      <span style="font-family: 'Share Tech Mono', monospace; font-size: 0.85rem; color: #64748b;">
+        MODULE ID: LAB-PRECISION-01
+      </span>
+      <div class="tab-container">
+        <button class="tab-btn active" id="tabVernier" onclick="switchTool('vernier')">Vernier Calliper</button>
+        <button class="tab-btn" id="tabMicrometer" onclick="switchTool('micrometer')">Micrometer Screw Gauge</button>
+      </div>
+    </nav>
+    
+    <h1>Precision Physics Lab: Vernier Calliper &amp; Micrometer</h1>
+    
+    <p class="lead-summary">
+      Explore high-precision metrology instruments interactively. Measure external, internal, and depth dimensions with a Vernier Calliper or gauge microscopic tolerances with a Micrometer Screw Gauge while managing instrument zero errors and proper clamping torque.
+    </p>
+  </header>
+
+  <main>
+    <!-- 2. SIMULATOR WORKSPACE -->
+    <section id="simulator-container" aria-label="Interactive Simulator Workspace">
+      
+      <!-- Telemetry Status Bar -->
+      <div class="hud-telemetry">
+        <div class="telemetry-item">
+          <span class="tele-label">Status:</span>
+          <span id="tele-status" class="tele-val">ACTIVE</span>
+        </div>
+        <div class="telemetry-item">
+          <span class="tele-label">Observed Reading:</span>
+          <span id="tele-readout-obs" class="tele-val">0.00 mm</span>
+        </div>
+        <div class="telemetry-item">
+          <span class="tele-label">Corrected Result:</span>
+          <span id="tele-readout-corr" class="tele-val pink">0.00 mm</span>
+        </div>
+      </div>
+
+      <div class="sim-layout">
+        <!-- Viewport Panel with Canvas -->
+        <div class="viewport-panel" id="viewport">
+          <div class="status-banner" id="statusBanner"></div>
+
+          <div class="viewport-controls">
+            <button class="icon-btn" onclick="zoom(1.2)" title="Zoom In">+</button>
+            <button class="icon-btn" onclick="zoom(0.8)" title="Zoom Out">−</button>
+            <button class="icon-btn" onclick="resetView()" title="Fit View">⛶</button>
+            <button class="icon-btn" onclick="toggleLoupe()" id="loupeToggleBtn" title="Toggle Coincidence Magnifier">🔍 Loupe: ON</button>
+            <button class="icon-btn" onclick="toggleHoverInfo()" id="infoToggleBtn" title="Toggle Educational Part Information">ℹ️ Info: OFF</button>
+            <button class="icon-btn" id="fullscreenBtn" title="Toggle Fullscreen">⛶ Full</button>
+          </div>
+
+          <canvas id="simCanvas"></canvas>
+        </div>
+
+        <!-- Sidebar Control Panel -->
+        <aside class="sidebar">
+          <section class="panel-card">
+            <h3>Measurement Object</h3>
+            <div class="control-row">
+              <label for="objectSelect">Select Sample Target</label>
+              <select id="objectSelect" onchange="onTargetChange()"></select>
+            </div>
+
+            <div class="control-row" id="objectResizeContainer" style="display: none;">
+              <label for="objectSizeSlider">Object Dimension / Scale</label>
+              <input type="range" id="objectSizeSlider" min="30" max="60" step="0.2" value="46.2" oninput="onObjectResize(this.value)">
+              <div style="font-size: 0.68rem; color: var(--muted); margin-top: 2px;">
+                *Drag scrollbar to modify object shape and size
+              </div>
+            </div>
+
+            <div class="btn-group-grid" style="margin-top: 8px;">
+              <button class="btn primary" onclick="autoSnapObject()">Snap to Fit</button>
+              <button class="btn danger" onclick="resetApparatus()">Full Reset</button>
+            </div>
+          </section>
+
+          <section class="panel-card">
+            <h3>Systematic Error Setup</h3>
+            <div class="control-row">
+              <label for="zeroErrorSelect">Instrument Zero Error</label>
+              <select id="zeroErrorSelect" onchange="onZeroErrorChange()"></select>
+            </div>
+            <div style="font-size: 0.68rem; color: var(--muted);">
+              *Corrected = Observed − (Zero Error)
+            </div>
+          </section>
+
+          <section class="panel-card">
+            <h3>Adjustments &amp; Locks</h3>
+            <div class="control-row">
+              <label id="sliderLabel">Slider Position</label>
+              <input type="range" id="jawSlider" min="0" max="110" step="0.05" value="0" oninput="onSliderDrag(this.value)">
+            </div>
+
+            <div class="fine-tune-controls" id="micrometerRatchetControls" style="display: none;">
+              <button class="btn" onclick="stepRatchet(-1)">Ratchet ◀ (-0.01mm)</button>
+              <button class="btn" onclick="stepRatchet(1)">Ratchet ▶ (+0.01mm)</button>
+            </div>
+
+            <div class="fine-tune-controls" id="vernierNudgeControls">
+              <button class="btn" onclick="nudgeSlider(-0.1)">◀ -0.1 mm</button>
+              <button class="btn" onclick="nudgeSlider(0.1)">+0.1 mm ▶</button>
+            </div>
+
+            <div style="margin-top: 8px;">
+              <button class="btn" id="lockBtn" style="width: 100%;" onclick="toggleLock()">🔒 Lock Slider</button>
+            </div>
+          </section>
+
+          <section class="panel-card">
+            <h3>
+              Calculated Reading
+              <button class="btn" style="padding: 1px 7px; font-size: 0.68rem;" onclick="toggleReadoutReveal()" id="revealBtn">Hide</button>
+            </h3>
+            
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+              <span style="font-size: 0.72rem; color: var(--muted); font-weight: 600;">Display Unit:</span>
+              <div class="unit-toggle">
+                <button class="unit-btn active" id="unitMmBtn" onclick="setUnit('mm')">mm</button>
+                <button class="unit-btn" id="unitCmBtn" onclick="setUnit('cm')">cm</button>
+              </div>
+            </div>
+
+            <div class="readout-box" id="readoutBox">
+              <div class="line"><span>Main Scale (MSR):</span><span id="readoutMSR">0.00 mm</span></div>
+              <div class="line"><span id="readoutSubScaleLabel">Vernier Scale:</span><span id="readoutVSR">0.00 mm</span></div>
+              <div class="line"><span>Observed Total:</span><span id="readoutObs">0.00 mm</span></div>
+              <div class="line"><span>Zero Error (e):</span><span id="readoutError">0.00 mm</span></div>
+              <div class="line total"><span>Corrected:</span><span id="readoutTotal">0.00 mm</span></div>
+            </div>
+          </section>
+
+          <section class="panel-card">
+            <h3>Parts Reference</h3>
+            <ul class="guide-legend" id="partsLegend"></ul>
+          </section>
+        </aside>
+      </div>
+    </section>
+
+    <!-- 3. SAFE AD PLACEMENT SLOT -->
+    <div class="ad-slot-wrapper">
+      <div class="ad-disclaimer">Advertisement</div>
+      <div class="ad-box-placeholder">
+        <span>[AdSense Responsive Display Unit]</span>
+      </div>
+    </div>
+
+    <!-- 4. EDUCATIONAL REFERENCE ARTICLE -->
+    <article class="educational-content">
+      <section>
+        <h2>How to Operate the Simulator</h2>
+        <p>Use the interactive viewport to examine the instruments closely. You can pan by clicking and dragging anywhere on the canvas background, zoom using your mouse scroll wheel or on-screen plus/minus buttons, and manipulate the sliding jaw or micrometer thimble using either the slider control on the right or by directly dragging the moving components on the canvas. Switch between the Vernier Calliper and Micrometer Screw Gauge using the top navigation tabs.</p>
+      </section>
+
+      <section>
+        <h2>Working Principles &amp; Handling Best Practices</h2>
+        <p>Precision measurement instruments require meticulous handling to ensure accurate data collection and prevent mechanical wear:</p>
+        <ul>
+          <li><strong>Vernier Calliper Handling:</strong> Ensure external jaws are flush against object surfaces without applying excessive force that could warp flexible items. For internal measurements, use the inner nibs and expand until light contact is made. For depth, keep the main beam perpendicular to the base of the cavity.</li>
+          <li><strong>Micrometer Screw Gauge Handling:</strong> Always rotate the thimble using the <em>ratchet stop</em> rather than the direct barrel. The ratchet mechanism slips when optimal contact pressure is reached, preventing thread stripping or specimen indentation.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Managing Systematic Zero Errors</h2>
+        <p>Instruments may suffer from calibration offsets when jaws or anvils are fully closed:</p>
+        <ul>
+          <li><strong>Positive Zero Error:</strong> When the zero mark of the vernier scale lies to the right of the main scale zero (or thimble zero sits above the datum line), the reading is artificially inflated. This error must be <em>subtracted</em> from the observed reading.</li>
+          <li><strong>Negative Zero Error:</strong> When the zero mark lies to the left, the reading is understated. Negative errors are <em>added</em> (or factored algebraically: Corrected = Observed − Zero Error).</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Mathematical Foundations &amp; Formulas</h2>
+        <p>Total measurements are computed by combining macroscopic main scale divisions with fractional secondary scales:</p>
+        <div class="formula-box">
+          Vernier Calliper: Total Reading = Main Scale Reading (MSR) + [Vernier Coincidence Line (VSR) × Least Count (0.05 mm)]<br>
+          Micrometer Screw Gauge: Total Reading = Main Scale Reading (MSR) + [Circular Division Line (CSR) × Least Count (0.01 mm)]<br>
+          Corrected Reading = Observed Reading − Instrument Zero Error
+        </div>
+      </section>
+
+      <section>
+        <h2>Real-World Engineering &amp; Industrial Applications</h2>
+        <p>Precision metrology is foundational across modern engineering disciplines:</p>
+        <ul>
+          <li><strong>Aerospace Manufacturing:</strong> Turbine blades and fuselage rivets undergo strict micrometer verification to withstand extreme aerodynamic and thermal stresses.</li>
+          <li><strong>Automotive Engine Assembly:</strong> Piston diameters, cylinder bore clearances, and crankshaft journals are measured to micrometric tolerances to ensure optimal compression and lubrication.</li>
+          <li><strong>Biomedical Engineering:</strong> Orthopedic joint replacements and surgical pins require flawless dimensional precision to integrate safely with human bone tissue.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Practice Problems &amp; Diagnostic Tasks</h2>
+        <p>Test your quantitative comprehension using the five laboratory exercises below:</p>
+
+        <div class="task-card">
+          <div class="task-title">Task 1: Vernier Calliper External Measurement</div>
+          <p>A student uses a Vernier calliper (least count 0.05 mm) to measure a solid brass cylinder. The main scale reads 34.0 mm, and the 7th vernier division coincides with a main scale mark. If the instrument has a positive zero error of +0.15 mm, what is the corrected diameter?</p>
+        </div>
+
+        <div class="task-card">
+          <div class="task-title">Task 2: Micrometer Screw Gauge Wire Diameter</div>
+          <p>When measuring copper wire with a micrometer screw gauge (least count 0.01 mm), the main scale shows 2.50 mm (past the half-millimeter mark), and the 32nd thimble division aligns with the datum line. The gauge has a zero error of −0.04 mm. Calculate the corrected wire thickness.</p>
+        </div>
+
+        <div class="task-card">
+          <div class="task-title">Task 3: Zero Error Adjustment Analysis</div>
+          <p>An observed reading on a Vernier calliper is 18.65 mm. Upon inspecting the closed jaws, the zero mark of the vernier scale is situated 0.30 mm to the left of the main scale zero. Determine the true corrected dimension of the tested object.</p>
+        </div>
+
+        <div class="task-card">
+          <div class="task-title">Task 4: Reverse Calculation for Target Setting</div>
+          <p>You need to calibrate a test jig to precisely 12.75 mm using a micrometer screw gauge with zero error of +0.02 mm. What observed reading must you dial on the thimble and sleeve before locking the spindle?</p>
+        </div>
+
+        <div class="task-card">
+          <div class="task-title">Task 5: Multi-Step Beaker Wall Thickness Evaluation</div>
+          <p>A glass beaker's outer diameter is measured as 46.20 mm and its inner diameter as 41.80 mm using internal and external jaws. Calculate the average wall thickness of the beaker glass container.</p>
+        </div>
+
+        <!-- Collapsible Solutions -->
+        <details>
+          <summary>Click to Reveal Solutions and Step-by-Step Proofs</summary>
+          <div class="solution-step">
+            <p><strong>Solution to Task 1:</strong> MSR = 34.0 mm. VSR = 7 × 0.05 mm = 0.35 mm. Observed = 34.0 + 0.35 = 34.35 mm. Corrected = Observed − Zero Error = 34.35 mm − (+0.15 mm) = <strong>34.20 mm</strong>.</p>
+          </div>
+          <div class="solution-step">
+            <p><strong>Solution to Task 2:</strong> MSR = 2.50 mm. CSR = 32 × 0.01 mm = 0.32 mm. Observed = 2.50 + 0.32 = 2.82 mm. Corrected = 2.82 mm − (−0.04 mm) = 2.82 + 0.04 = <strong>2.86 mm</strong>.</p>
+          </div>
+          <div class="solution-step">
+            <p><strong>Solution to Task 3:</strong> A zero mark to the left indicates a negative zero error of −0.30 mm. Corrected = Observed − (Zero Error) = 18.65 mm − (−0.30 mm) = 18.65 + 0.30 = <strong>18.95 mm</strong>.</p>
+          </div>
+          <div class="solution-step">
+            <p><strong>Solution to Task 4:</strong> Corrected = Observed − Error. Therefore, Observed = Corrected + Error = 12.75 mm + 0.02 mm = <strong>12.77 mm</strong> on the scale.</p>
+          </div>
+          <div class="solution-step">
+            <p><strong>Solution to Task 5:</strong> Wall thickness = (Outer Diameter − Inner Diameter) / 2 = (46.20 mm − 41.80 mm) / 2 = 4.40 / 2 = <strong>2.20 mm</strong>.</p>
+          </div>
+        </details>
+      </section>
+    </article>
+  </main>
+
+  <!-- 5. SYNCHRONIZED COMPLIANCE FOOTER -->
+  <footer>
+    <nav class="footer-nav">
+      <a href="../index.html">Home</a>
+      <a href="../index.html#about-section">About Us</a>
+      <button type="button" class="footer-modal-trigger" onclick="openSimModal('simPrivacyModal')">Privacy Policy</button>
+      <button type="button" class="footer-modal-trigger" onclick="openSimModal('simTermsModal')">Terms of Service</button>
+      <a href="../index.html#contact-section">Contact Us</a>
+      <a href="https://forms.gle/fYxxaNKAh21dPUoBA" target="_blank" rel="noopener noreferrer">Simulator Suggestions</a>
+    </nav>
+    <p>&copy; 2026 LuyaliSims | Engineered by Click & Draft | Dedicated to Open STEM Education</p>
+  </footer>
+
+  <!-- 6. PRIVACY POLICY MODAL -->
+  <div id="simPrivacyModal" class="policy-modal" role="dialog" aria-modal="true" aria-labelledby="privacyTitle">
+    <div class="modal-body">
+      <button class="modal-close-btn" onclick="closeSimModal('simPrivacyModal')">Close [✕]</button>
+      <h2 id="privacyTitle">Privacy Policy</h2>
+      <p class="modal-date">Last Updated: September 2026</p>
+      <p>Welcome to LuyaliSims. We respect your privacy and are committed to protecting your personal data. This privacy policy explains how we treat information when you interact with our educational simulators.</p>
+      
+      <h3>1. Educational Purpose &amp; Information Collection</h3>
+      <p>LuyaliSims is a free educational portal. We do not require account registration, passwords, or personal login information to run any simulation. All simulation calculations occur locally within your browser using client-side JavaScript.</p>
+
+      <h3>2. Google AdSense &amp; Third-Party Cookies</h3>
+      <p>We may display advertisements served by Google AdSense to fund our free educational tools. Google, as a third-party vendor, uses cookies to serve ads on our site based on users' visits to this and other sites on the Internet.</p>
+      <ul>
+        <li>Google's use of advertising cookies enables it and its partners to serve ads based on your visit to LuyaliSims and other sites.</li>
+        <li>Users may opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" style="color: var(--neon-cyan);">Google Ads Settings</a>.</li>
+      </ul>
+
+      <h3>3. Log Files &amp; Analytics</h3>
+      <p>Like standard websites, our hosting servers collect anonymous log records (including IP addresses, browser types, and timestamp references) to monitor server uptime, fix script errors, and optimize simulator performance.</p>
+
+      <h3>4. Children's Online Privacy (COPPA Compliance)</h3>
+      <p>Our educational simulators are built for students and educators of all ages. We do not knowingly solicit or collect personally identifiable information from children under 13.</p>
+
+      <h3>5. Contact Regarding Privacy</h3>
+      <p>If you have any questions regarding this policy, contact us at: <a href="mailto:luyashliz@gmail.com" style="color: var(--neon-cyan);">luyashliz@gmail.com</a>.</p>
+    </div>
+  </div>
+
+  <!-- 7. TERMS OF SERVICE MODAL -->
+  <div id="simTermsModal" class="policy-modal" role="dialog" aria-modal="true" aria-labelledby="termsTitle">
+    <div class="modal-body">
+      <button class="modal-close-btn" onclick="closeSimModal('simTermsModal')">Close [✕]</button>
+      <h2 id="termsTitle">Terms of Service</h2>
+      <p class="modal-date">Effective Date: September 2026</p>
+
+      <h3>1. Permitted Educational Use</h3>
+      <p>All interactive models, simulations, practice problems, and laboratory worksheets on LuyaliSims are made freely available for classroom demonstrations, academic study, tutoring, and self-paced individual learning.</p>
+
+      <h3>2. Intellectual Property</h3>
+      <p>The code architecture, layout designs, and custom interactive engines are the intellectual property of Ian Luyali and Click &amp; Draft. You may use our simulators online in academic settings, but mirroring or re-hosting our code for commercial resale without permission is prohibited.</p>
+
+      <h3>3. Disclaimer of Scientific Warranty</h3>
+      <p>While simulations are engineered to accurately replicate classical mechanics, thermodynamics, and electronics, they are provided as conceptual learning aids. LuyaliSims is not liable for outcomes in real-world high-voltage or hazardous laboratory environments constructed without professional teacher supervision.</p>
+
+      <h3>4. Updates to Terms</h3>
+      <p>We reserve the right to refine these terms as new laboratory modules and features are introduced.</p>
+    </div>
+  </div>
+
+  <!-- 8. SIMULATOR CORE SCRIPT & INTEGRATED LOGIC -->
+  <script>
+    /* ==========================================================================
+       MODAL & FULLSCREEN CONTROLS
+       ========================================================================== */
+    function openSimModal(id) {
+      const m = document.getElementById(id);
+      if (m) {
+        m.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function closeSimModal(id) {
+      const m = document.getElementById(id);
+      if (m) {
+        m.style.display = 'none';
+        document.body.style.overflow = 'auto';
+      }
+    }
+
+    window.addEventListener('click', (e) => {
+      if (e.target.classList.contains('policy-modal')) {
+        closeSimModal(e.target.id);
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' || e.key === 'Esc') {
+        document.querySelectorAll('.policy-modal').forEach(m => {
+          m.style.display = 'none';
+        });
+        document.body.style.overflow = 'auto';
+      }
+    });
+
+    const simContainer = document.getElementById('simulator-container');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+    fullscreenBtn.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        if (simContainer.requestFullscreen) simContainer.requestFullscreen();
+        else if (simContainer.webkitRequestFullscreen) simContainer.webkitRequestFullscreen();
+        fullscreenBtn.innerHTML = '⛶ Exit';
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+        fullscreenBtn.innerHTML = '⛶ Full';
+      }
+    });
+
+    document.addEventListener('fullscreenchange', () => {
+      if (!document.fullscreenElement) {
+        fullscreenBtn.innerHTML = '⛶ Full';
+      }
+    });
+
+    /* ==========================================================================
+       AUDIO SYNTHESIS
+       ========================================================================== */
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+
+    function playClickSound(pitch = 1750, duration = 0.02) {
+      try {
+        if (!audioCtx) audioCtx = new AudioContextClass();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(pitch, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(140, audioCtx.currentTime + duration);
+        gain.gain.setValueAtTime(0.35, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    /* ==========================================================================
+       STATE MANAGEMENT
+       ========================================================================== */
+    const STATE = {
+      activeTool: 'vernier',
+      locked: false,
+      readingRevealed: true,
+      showLoupe: true,
+      showHoverInfo: false,
+      hoveredPartName: null,
+      unit: 'mm',
+      
+      vernier: {
+        rawDisplacement: 0.0,
+        zeroError: 0.0,
+        target: 'none',
+        beaker: { outerDia: 46.2, innerDia: 41.8, depth: 55.4, wallThickness: 2.2, height: 58.4 }
+      },
+
+      micrometer: {
+        rawDisplacement: 0.0,
+        zeroError: 0.0,
+        target: 'none',
+        bearing: { diameter: 12.38 }
+      },
+
+      view: {
+        x: 0, y: 0, scale: 1.0,
+        isPanning: false, isDraggingSlider: false,
+        dragStartX: 0, dragStartY: 0,
+        sliderInitialDisp: 0, lastMouseX: 0, lastMouseY: 0
+      }
+    };
+
+    const canvas = document.getElementById('simCanvas');
+    const ctx = canvas.getContext('2d');
+    const VERNIER_PX_PER_MM = 7.0;
+    const MICROMETER_PX_PER_MM = 6.5;
+
+    const DEPTH_ANCHOR = { beakerCenterX: 150, rimY: 100 };
+
+    const MICRO_GEOM = {
+      anvilFaceX: 0,
+      maxTravelMm: 25.0,
+      innerCollarX: 170, 
+      outerCollarX: 206, 
+      sleeveZeroX: 218,  
+      sleeveLengthMm: 25.0
+    };
+
+    /* ==========================================================================
+       INITIALIZATION & CONTROLS
+       ========================================================================== */
+    function init() {
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+      setupInteractions();
+      buildDropdowns();
+      resetView();
+      updateUI();
+      render();
+    }
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      render();
+    }
+
+    function switchTool(tool) {
+      STATE.activeTool = tool;
+      STATE.locked = false;
+      document.getElementById('statusBanner').style.display = 'none';
+
+      document.getElementById('tabVernier').classList.toggle('active', tool === 'vernier');
+      document.getElementById('tabMicrometer').classList.toggle('active', tool === 'micrometer');
+      document.getElementById('micrometerRatchetControls').style.display = (tool === 'micrometer') ? 'flex' : 'none';
+      document.getElementById('vernierNudgeControls').style.display = (tool === 'vernier') ? 'flex' : 'none';
+
+      const slider = document.getElementById('jawSlider');
+      if (tool === 'vernier') {
+        slider.max = 110; slider.step = 0.05; slider.value = STATE.vernier.rawDisplacement;
+      } else {
+        slider.max = 25; slider.step = 0.01; slider.value = STATE.micrometer.rawDisplacement;
+      }
+
+      buildDropdowns();
+      resetView();
+      evaluateContactStatus(tool === 'vernier' ? STATE.vernier.rawDisplacement : STATE.micrometer.rawDisplacement);
+      updateUI();
+      render();
+    }
+
+    function buildDropdowns() {
+      const objSelect = document.getElementById('objectSelect');
+      const errSelect = document.getElementById('zeroErrorSelect');
+      objSelect.innerHTML = ''; errSelect.innerHTML = '';
+
+      if (STATE.activeTool === 'vernier') {
+        objSelect.innerHTML = `
+          <option value="none">Free Exploration (No Object)</option>
+          <option value="outer">Glass Beaker: Outer Diameter</option>
+          <option value="inner">Glass Beaker: Inner Diameter</option>
+          <option value="depth">Glass Beaker: Depth</option>
+        `;
+        objSelect.value = STATE.vernier.target;
+
+        errSelect.innerHTML = `
+          <option value="0.0">No Zero Error (0.00 mm)</option>
+          <option value="0.2">+0.20 mm (Positive Error)</option>
+          <option value="0.4">+0.40 mm (Positive Error)</option>
+          <option value="-0.2">-0.20 mm (Negative Error)</option>
+          <option value="-0.4">-0.40 mm (Negative Error)</option>
+        `;
+        errSelect.value = STATE.vernier.zeroError.toFixed(1);
+      } else {
+        objSelect.innerHTML = `
+          <option value="none">Free Exploration (No Object)</option>
+          <option value="bearing">Chrome Ball Bearing</option>
+        `;
+        objSelect.value = STATE.micrometer.target;
+
+        errSelect.innerHTML = `
+          <option value="0.00">No Zero Error (0.00 mm)</option>
+          <option value="0.04">+0.04 mm (Positive Error)</option>
+          <option value="0.08">+0.08 mm (Positive Error)</option>
+          <option value="-0.03">-0.03 mm (Negative Error)</option>
+          <option value="-0.06">-0.06 mm (Negative Error)</option>
+        `;
+        errSelect.value = STATE.micrometer.zeroError.toFixed(2);
+      }
+      updateResizeSliderRange();
+    }
+
+    function setUnit(u) {
+      STATE.unit = u;
+      document.getElementById('unitMmBtn').classList.toggle('active', u === 'mm');
+      document.getElementById('unitCmBtn').classList.toggle('active', u === 'cm');
+      updateUI();
+    }
+
+    function updateResizeSliderRange() {
+      const container = document.getElementById('objectResizeContainer');
+      const slider = document.getElementById('objectSizeSlider');
+      
+      const currentTarget = (STATE.activeTool === 'vernier') ? STATE.vernier.target : STATE.micrometer.target;
+      if (currentTarget === 'none') { container.style.display = 'none'; return; }
+      container.style.display = 'flex';
+
+      if (STATE.activeTool === 'vernier') {
+        slider.min = "32"; slider.max = "62"; slider.step = "0.2"; slider.value = STATE.vernier.beaker.outerDia.toString();
+      } else {
+        slider.min = "4"; slider.max = "22"; slider.step = "0.1"; slider.value = STATE.micrometer.bearing.diameter.toString();
+      }
+    }
+
+    function onObjectResize(val) {
+      const parsed = parseFloat(val);
+      if (STATE.activeTool === 'vernier') {
+        const b = STATE.vernier.beaker;
+        b.outerDia = Math.round(parsed * 10) / 10;
+        b.innerDia = Math.round((b.outerDia - 2 * b.wallThickness) * 10) / 10;
+        b.depth = Math.round((b.outerDia * 1.20) * 10) / 10;
+        b.height = Math.round((b.depth + 3.0) * 10) / 10;
+      } else {
+        STATE.micrometer.bearing.diameter = Math.round(parsed * 100) / 100;
+      }
+      evaluateContactStatus(STATE.activeTool === 'vernier' ? STATE.vernier.rawDisplacement : STATE.micrometer.rawDisplacement);
+      updateUI(); render();
+    }
+
+    function toggleLoupe() {
+      STATE.showLoupe = !STATE.showLoupe;
+      document.getElementById('loupeToggleBtn').innerText = STATE.showLoupe ? '🔍 Loupe: ON' : '🔍 Loupe: OFF';
+      render();
+    }
+
+    function toggleHoverInfo() {
+      STATE.showHoverInfo = !STATE.showHoverInfo;
+      const btn = document.getElementById('infoToggleBtn');
+      btn.innerText = STATE.showHoverInfo ? 'ℹ️ Info: ON' : 'ℹ️ Info: OFF';
+      btn.style.color = STATE.showHoverInfo ? '#10b981' : 'var(--text)';
+      
+      if (!STATE.showHoverInfo) {
+        document.getElementById('partTooltip').style.opacity = 0;
+        STATE.hoveredPartName = null;
+      }
+    }
+
+    /* ==========================================================================
+       CANVAS EVENTS (PAN, ZOOM, DRAG & HOVER)
+       ========================================================================== */
+    function getCanvasCoords(clientX, clientY) {
+      const rect = canvas.getBoundingClientRect();
+      const screenX = clientX - rect.left;
+      const screenY = clientY - rect.top;
+      const worldX = (screenX - STATE.view.x) / STATE.view.scale;
+      const worldY = (screenY - STATE.view.y) / STATE.view.scale;
+      return { worldX, worldY, screenX, screenY };
+    }
+
+    function identifyHoveredPart(worldX, worldY) {
+      let calcX = worldX;
+      let calcY = worldY;
+
+      if (STATE.activeTool === 'vernier' && STATE.vernier.target === 'depth') {
+        const cx = worldX - (DEPTH_ANCHOR.beakerCenterX + 22.5);
+        const cy = worldY - DEPTH_ANCHOR.rimY;
+        calcX = cy + (120 * VERNIER_PX_PER_MM);
+        calcY = -cx;
+      }
+
+      if (STATE.activeTool === 'vernier') {
+        const pxPerMm = VERNIER_PX_PER_MM;
+        const sliderOffsetPx = (STATE.vernier.rawDisplacement + STATE.vernier.zeroError) * pxPerMm;
+
+        if (calcX >= sliderOffsetPx + 36 && calcX <= sliderOffsetPx + 56 && calcY >= -38 && calcY <= -26) 
+          return { name: "Locking Screw", desc: "A threaded thumb-screw used to tightly lock the sliding assembly in place to preserve a delicate measurement." };
+        if (calcX >= sliderOffsetPx && calcX <= sliderOffsetPx + 76 && calcY >= 46 && calcY <= 76)
+          return { name: "Vernier Scale", desc: "A high-precision secondary sliding scale. By identifying which mark perfectly aligns with a Main Scale mark, it grants a fractional reading precision of up to 0.05 mm." };
+        if (calcX >= sliderOffsetPx && calcX <= sliderOffsetPx + 24 && calcY >= 46 && calcY <= 236)
+          return { name: "Movable External Jaw", desc: "Closes firmly against the exterior of an object to capture outer dimensions. Moves smoothly alongside the Vernier scale." };
+        if (calcX >= sliderOffsetPx && calcX <= sliderOffsetPx + 24 && calcY >= -75 && calcY <= 0)
+          return { name: "Movable Internal Jaw", desc: "Expands outward to gently press against the inner walls of an object (like a pipe or beaker) to gauge internal diameters." };
+        if (calcX >= -30 && calcX <= 0 && calcY >= 46 && calcY <= 236)
+          return { name: "Fixed External Jaw", desc: "Provides the immovable 0.00 mm reference base block for taking all external length and diameter measurements." };
+        if (calcX >= -30 && calcX <= 0 && calcY >= -75 && calcY <= 0)
+          return { name: "Fixed Internal Jaw", desc: "The rigid origin point for internal measurements, designed to hook directly into cavities." };
+        if (calcX >= 840 && calcX <= 840 + sliderOffsetPx && calcY >= 15 && calcY <= 30)
+          return { name: "Depth Probe", desc: "A slender extending blade physically coupled to the slider. Plunges into holes or narrow slots to gauge absolute depth." };
+        if (calcX >= -30 && calcX <= 840 && calcY >= 0 && calcY <= 46)
+          return { name: "Main Scale (Beam)", desc: "The primary structural backbone of the caliper engraved with fixed macroscopic divisions (standard mm and cm)." };
+
+      } else {
+        const pxPerMm = MICROMETER_PX_PER_MM;
+        const gap = (STATE.micrometer.rawDisplacement + STATE.micrometer.zeroError) * pxPerMm;
+        const thimbleX = MICRO_GEOM.sleeveZeroX + gap;
+
+        if (calcX >= thimbleX + 145 && calcX <= thimbleX + 203 && calcY >= -15 && calcY <= 15)
+          return { name: "Ratchet Stop", desc: "A spring-loaded friction slip-clutch. Ensures exactly identical, uniform measuring pressure is applied every time without denting the specimen or straining the threads." };
+        if (calcX >= thimbleX && calcX <= thimbleX + 145 && calcY >= -27 && calcY <= 27)
+          return { name: "Thimble", desc: "The knurled rotating barrel carrying the fine circular scale (usually 50 divisions). One full rotation typically advances the spindle exactly 0.50 mm." };
+        if (calcX >= 206 && calcX <= thimbleX + 15 && calcY >= -21 && calcY <= 21)
+          return { name: "Sleeve (Barrel)", desc: "The stationary hub permanently engraved with the linear datum scale, typically notched in half-millimeter (0.5 mm) steps." };
+        if (calcX >= 173 && calcX <= 187 && calcY >= -28 && calcY <= -20)
+          return { name: "Locking Lever", desc: "A tight cam-action lever used to solidly clamp the spindle threads, freezing the position so the instrument can be removed to be read." };
+        if (calcX >= gap && calcX <= 170 && calcY >= -9 && calcY <= 9)
+          return { name: "Measuring Spindle", desc: "An ultra-precision threaded metal cylinder driven by the Thimble. Its hardened tip acts as the movable measuring face." };
+        if (calcX >= -18 && calcX <= 0 && calcY >= -9 && calcY <= 9)
+          return { name: "Anvil", desc: "The stationary tungsten-carbide reference post against which the object rests. Establishes the true zero point." };
+        if ((calcX >= -54 && calcX <= 206 && calcY >= 40 && calcY <= 195) || 
+            (calcX >= -54 && calcX <= -18 && calcY >= -20 && calcY <= 40) ||
+            (calcX >= 170 && calcX <= 206 && calcY >= -20 && calcY <= 40))
+          return { name: "U-Frame", desc: "A massive, thermally shielded, rigid 'horseshoe' structure. Engineered specifically to resist bending forces that would otherwise distort micrometer precision." };
+      }
+      return null;
+    }
+
+    function isInsideSliderHitbox(worldX, worldY) {
+      if (STATE.activeTool === 'vernier') {
+        const sliderDisp = (STATE.vernier.rawDisplacement + STATE.vernier.zeroError) * VERNIER_PX_PER_MM;
+        if (STATE.vernier.target === 'depth') {
+          const beamL = 120 * VERNIER_PX_PER_MM;
+          const sliderWorldY = DEPTH_ANCHOR.rimY - (beamL - sliderDisp);
+          return (Math.abs(worldX - (DEPTH_ANCHOR.beakerCenterX + 22.5)) <= 80 && Math.abs(worldY - sliderWorldY) <= 60);
+        } else {
+          return (worldX >= sliderDisp - 25 && worldX <= sliderDisp + 90 && worldY >= -85 && worldY <= 220);
+        }
+      } else {
+        const dispPx = (STATE.micrometer.rawDisplacement + STATE.micrometer.zeroError) * MICROMETER_PX_PER_MM;
+        const thimbleStartX = MICRO_GEOM.sleeveZeroX + dispPx;
+        return (worldX >= thimbleStartX - 4 && worldX <= thimbleStartX + 210 && worldY >= -35 && worldY <= 35);
+      }
+    }
+
+    function setupInteractions() {
+      canvas.addEventListener('mousedown', (e) => {
+        const { worldX, worldY, screenX, screenY } = getCanvasCoords(e.clientX, e.clientY);
+
+        if (!STATE.locked && isInsideSliderHitbox(worldX, worldY)) {
+          STATE.view.isDraggingSlider = true;
+          STATE.view.dragStartX = screenX;
+          STATE.view.dragStartY = screenY;
+          STATE.view.sliderInitialDisp = (STATE.activeTool === 'vernier') 
+            ? STATE.vernier.rawDisplacement : STATE.micrometer.rawDisplacement;
+          canvas.style.cursor = (STATE.activeTool === 'vernier' && STATE.vernier.target === 'depth') ? 'ns-resize' : 'ew-resize';
+          if (STATE.showHoverInfo) document.getElementById('partTooltip').style.opacity = 0;
+        } else {
+          STATE.view.isPanning = true;
+          STATE.view.lastMouseX = e.clientX;
+          STATE.view.lastMouseY = e.clientY;
+          canvas.style.cursor = 'grabbing';
+          if (STATE.showHoverInfo) document.getElementById('partTooltip').style.opacity = 0; 
+        }
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        const { worldX, worldY, screenX, screenY } = getCanvasCoords(e.clientX, e.clientY);
+
+        if (STATE.showHoverInfo && !STATE.view.isDraggingSlider && !STATE.view.isPanning) {
+          const hoveredPart = identifyHoveredPart(worldX, worldY);
+          const tooltip = document.getElementById('partTooltip');
+          
+          if (hoveredPart) {
+            if (STATE.hoveredPartName !== hoveredPart.name) {
+              STATE.hoveredPartName = hoveredPart.name;
+              tooltip.innerHTML = `<strong>${hoveredPart.name}</strong>${hoveredPart.desc}`;
+              tooltip.style.opacity = 1;
+            }
+            const offsetX = (e.clientX + 280 > window.innerWidth) ? -240 : 15;
+            const offsetY = (e.clientY + 120 > window.innerHeight) ? -100 : 15;
+            tooltip.style.transform = `translate(${e.clientX + offsetX}px, ${e.clientY + offsetY}px)`;
+          } else {
+            if (STATE.hoveredPartName !== null) {
+              STATE.hoveredPartName = null;
+              tooltip.style.opacity = 0;
+            }
+          }
+        }
+
+        if (STATE.view.isDraggingSlider) {
+          const pxPerMm = (STATE.activeTool === 'vernier') ? VERNIER_PX_PER_MM : MICROMETER_PX_PER_MM;
+          if (STATE.activeTool === 'vernier' && STATE.vernier.target === 'depth') {
+            const deltaScreenY = screenY - STATE.view.dragStartY;
+            const deltaMm = -deltaScreenY / (STATE.view.scale * pxPerMm);
+            onSliderDrag(STATE.view.sliderInitialDisp + deltaMm);
+          } else {
+            const deltaScreenX = screenX - STATE.view.dragStartX;
+            const deltaMm = deltaScreenX / (STATE.view.scale * pxPerMm);
+            onSliderDrag(STATE.view.sliderInitialDisp + deltaMm);
+          }
+        } else if (STATE.view.isPanning) {
+          const dx = e.clientX - STATE.view.lastMouseX;
+          const dy = e.clientY - STATE.view.lastMouseY;
+          STATE.view.x += dx;
+          STATE.view.y += dy;
+          STATE.view.lastMouseX = e.clientX;
+          STATE.view.lastMouseY = e.clientY;
+          render();
+        } else {
+          if (!STATE.locked && isInsideSliderHitbox(worldX, worldY)) {
+            canvas.style.cursor = (STATE.activeTool === 'vernier' && STATE.vernier.target === 'depth') ? 'ns-resize' : 'ew-resize';
+          } else {
+            canvas.style.cursor = 'grab';
+          }
+        }
+      });
+
+      window.addEventListener('mouseup', () => {
+        STATE.view.isDraggingSlider = false;
+        STATE.view.isPanning = false;
+        canvas.style.cursor = 'grab';
+      });
+
+      canvas.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        zoom(e.deltaY < 0 ? 1.12 : 0.88, e.clientX, e.clientY);
+        if (STATE.showHoverInfo) document.getElementById('partTooltip').style.opacity = 0;
+      }, { passive: false });
+      
+      canvas.addEventListener('mouseleave', () => {
+        if (STATE.showHoverInfo) {
+          document.getElementById('partTooltip').style.opacity = 0;
+          STATE.hoveredPartName = null;
+        }
+      });
+    }
+
+    function zoom(factor, clientX, clientY) {
+      const rect = canvas.getBoundingClientRect();
+      const cx = (clientX !== undefined ? clientX - rect.left : rect.width / 2);
+      const cy = (clientY !== undefined ? clientY - rect.top : rect.height / 2);
+      const newScale = Math.min(Math.max(STATE.view.scale * factor, 0.35), 4.5);
+      STATE.view.x = cx - (cx - STATE.view.x) * (newScale / STATE.view.scale);
+      STATE.view.y = cy - (cy - STATE.view.y) * (newScale / STATE.view.scale);
+      STATE.view.scale = newScale;
+      render();
+    }
+
+    function resetView() {
+      const rect = canvas.getBoundingClientRect();
+      if (STATE.activeTool === 'vernier') {
+        if (STATE.vernier.target === 'depth') {
+          STATE.view.scale = 0.58; STATE.view.x = rect.width * 0.28; STATE.view.y = rect.height * 0.65;
+        } else if (STATE.vernier.target === 'inner') {
+          STATE.view.scale = 0.88; STATE.view.x = rect.width * 0.16; STATE.view.y = rect.height * 0.58;
+        } else {
+          STATE.view.scale = 0.88; STATE.view.x = rect.width * 0.16; STATE.view.y = rect.height * 0.40;
+        }
+      } else {
+        const availableW = rect.width - 80; const availableH = rect.height - 90;
+        const desiredScale = Math.min(availableW / 680, availableH / 300, 1.05);
+        const scale = Math.max(0.50, desiredScale);
+        STATE.view.scale = scale;
+        STATE.view.x = rect.width * 0.44 - 250 * scale;
+        STATE.view.y = rect.height * 0.50 - 90 * scale;
+      }
+      render();
+    }
+
+    /* ==========================================================================
+       AUTOMATIC CONTACT & ZERO-ERROR FIT EVALUATION
+       ========================================================================== */
+    function evaluateContactStatus(disp) {
+      const banner = document.getElementById('statusBanner');
+      let target = 0; let active = false; let mode = '';
+
+      const zeroErr = (STATE.activeTool === 'vernier') ? STATE.vernier.zeroError : STATE.micrometer.zeroError;
+      const maxRange = (STATE.activeTool === 'vernier') ? 110 : 25;
+      disp = Math.max(0, Math.min(maxRange, isNaN(disp) ? 0 : disp));
+      
+      const physicalJawPos = Math.round((disp + zeroErr) * 100) / 100;
+
+      if (STATE.activeTool === 'vernier') {
+        mode = STATE.vernier.target;
+        if (mode === 'outer') { target = STATE.vernier.beaker.outerDia; active = true; }
+        else if (mode === 'inner') { target = STATE.vernier.beaker.innerDia; active = true; }
+        else if (mode === 'depth') { target = STATE.vernier.beaker.depth; active = true; }
+      } else {
+        if (STATE.micrometer.target === 'bearing') { target = STATE.micrometer.bearing.diameter; active = true; mode = 'micrometer'; }
+      }
+
+      if (!active) { banner.style.display = 'none'; return Math.max(0, Math.min(maxRange, disp)); }
+
+      banner.style.display = 'block'; banner.className = 'status-banner';
+      const tol = (mode === 'micrometer') ? 0.005 : 0.05;
+
+      if (mode === 'outer' || mode === 'micrometer') {
+        if (physicalJawPos < target - tol) {
+          banner.classList.add('danger');
+          banner.innerText = (mode === 'micrometer') 
+            ? '⚠️ DEFORMATION: Excessive force! Ratchet slipping to prevent damage.' 
+            : '⚠️ DEFORMATION: Excessive force applied! Over-tightening will deform object.';
+          return Math.max(0, target - zeroErr);
+        } else if (physicalJawPos > target + tol) {
+          banner.classList.add('warning');
+          banner.innerText = (mode === 'micrometer') ? '⚠️ GAP DETECTED: Spindle is not touching bearing! Turn ratchet to close gap.' : '⚠️ GAP DETECTED: Jaws not in contact with outer walls! Close jaws to touch surface.';
+        } else {
+          banner.classList.add('success');
+          banner.innerText = (mode === 'micrometer') ? '✅ ACCURATE CONTACT: Spindle and anvil are flush against bearing.' : '✅ ACCURATE CONTACT: Measuring faces are flush with outer walls.';
+        }
+      } else if (mode === 'inner') {
+        if (physicalJawPos > target + tol) {
+          banner.classList.add('danger'); banner.innerText = '⚠️ DEFORMATION: Excessive force on inner walls! Adjust gently.'; return Math.max(0, target - zeroErr);
+        } else if (physicalJawPos < target - tol) {
+          banner.classList.add('warning'); banner.innerText = '⚠️ GAP DETECTED: Inside nibs have not reached inner walls! Open slider to make contact.';
+        } else {
+          banner.classList.add('success'); banner.innerText = '✅ ACCURATE CONTACT: Inside nibs perfectly touching inner walls.';
+        }
+      } else if (mode === 'depth') {
+        if (physicalJawPos > target + tol) {
+          banner.classList.add('danger'); banner.innerText = '⚠️ DEFORMATION: Excessive pressure on the beaker\'s bottom floor!'; return Math.max(0, target - zeroErr);
+        } else if (physicalJawPos < target - tol) {
+          banner.classList.add('warning'); banner.innerText = '⚠️ GAP DETECTED: Depth probe has not reached the bottom floor!';
+        } else {
+          banner.classList.add('success'); banner.innerText = '✅ ACCURATE CONTACT: Depth probe tip resting firmly on internal glass floor.';
+        }
+      }
+
+      return Math.max(0, Math.min(maxRange, disp));
+    }
+
+    function onSliderDrag(val) {
+      if (STATE.locked) return;
+      const constrained = evaluateContactStatus(parseFloat(val));
+      if (STATE.activeTool === 'vernier') STATE.vernier.rawDisplacement = constrained; else STATE.micrometer.rawDisplacement = constrained;
+      updateUI(); render();
+    }
+
+    function nudgeSlider(delta) {
+      if (STATE.locked) return;
+      const cur = (STATE.activeTool === 'vernier' ? STATE.vernier.rawDisplacement : STATE.micrometer.rawDisplacement);
+      onSliderDrag(cur + delta);
+    }
+
+    function stepRatchet(dir) {
+      if (STATE.locked) return;
+      playClickSound(1800, 0.018);
+      const cur = STATE.micrometer.rawDisplacement;
+      onSliderDrag(Math.round((cur + dir * 0.01) * 100) / 100);
+    }
+
+    function autoSnapObject() {
+      if (STATE.locked) return;
+      const zeroErr = (STATE.activeTool === 'vernier') ? STATE.vernier.zeroError : STATE.micrometer.zeroError;
+      if (STATE.activeTool === 'vernier') {
+        const m = STATE.vernier.target;
+        if (m === 'outer') STATE.vernier.rawDisplacement = Math.max(0, STATE.vernier.beaker.outerDia - zeroErr);
+        else if (m === 'inner') STATE.vernier.rawDisplacement = Math.max(0, STATE.vernier.beaker.innerDia - zeroErr);
+        else if (m === 'depth') STATE.vernier.rawDisplacement = Math.max(0, STATE.vernier.beaker.depth - zeroErr);
+        else STATE.vernier.rawDisplacement = 0;
+      } else {
+        STATE.micrometer.rawDisplacement = (STATE.micrometer.target === 'bearing') 
+          ? Math.max(0, Math.round((STATE.micrometer.bearing.diameter - zeroErr) * 100) / 100) : 0;
+      }
+      playClickSound(1400, 0.035);
+      evaluateContactStatus(STATE.activeTool === 'vernier' ? STATE.vernier.rawDisplacement : STATE.micrometer.rawDisplacement);
+      updateUI(); render();
+    }
+
+    function resetApparatus() {
+      STATE.locked = false; document.getElementById('statusBanner').style.display = 'none';
+      if (STATE.activeTool === 'vernier') {
+        STATE.vernier.rawDisplacement = 0; STATE.vernier.zeroError = 0.0; STATE.vernier.target = 'none';
+        STATE.vernier.beaker = { outerDia: 46.2, innerDia: 41.8, depth: 55.4, wallThickness: 2.2, height: 58.4 };
+      } else {
+        STATE.micrometer.rawDisplacement = 0; STATE.micrometer.zeroError = 0.0; STATE.micrometer.target = 'none';
+        STATE.micrometer.bearing.diameter = 12.38;
+      }
+      buildDropdowns(); resetView(); updateUI(); render();
+    }
+
+    function toggleLock() {
+      STATE.locked = !STATE.locked;
+      const btn = document.getElementById('lockBtn');
+      btn.innerHTML = STATE.locked ? '🔓 Unlock Slider' : '🔒 Lock Slider';
+      btn.classList.toggle('primary', STATE.locked);
+      playClickSound(STATE.locked ? 1200 : 700, 0.03);
+      updateUI(); render();
+    }
+
+    function toggleReadoutReveal() {
+      STATE.readingRevealed = !STATE.readingRevealed;
+      const box = document.getElementById('readoutBox'); const btn = document.getElementById('revealBtn');
+      if (STATE.readingRevealed) { box.classList.remove('hidden-blur'); btn.innerText = 'Hide'; } 
+      else { box.classList.add('hidden-blur'); btn.innerText = 'Reveal'; }
+      render();
+    }
+
+    function onTargetChange() {
+      const val = document.getElementById('objectSelect').value;
+      if (STATE.activeTool === 'vernier') {
+        STATE.vernier.target = val;
+        if (val === 'inner' && STATE.vernier.rawDisplacement === 0) STATE.vernier.rawDisplacement = 20.0;
+        else if (val === 'depth' && STATE.vernier.rawDisplacement === 0) STATE.vernier.rawDisplacement = 30.0;
+      } else {
+        STATE.micrometer.target = val;
+        if (val === 'bearing' && STATE.micrometer.rawDisplacement === 0) STATE.micrometer.rawDisplacement = 16.0;
+      }
+      updateResizeSliderRange(); resetView();
+      evaluateContactStatus(STATE.activeTool === 'vernier' ? STATE.vernier.rawDisplacement : STATE.micrometer.rawDisplacement);
+      updateUI(); render();
+    }
+
+    function onZeroErrorChange() {
+      const val = parseFloat(document.getElementById('zeroErrorSelect').value);
+      if (STATE.activeTool === 'vernier') STATE.vernier.zeroError = val; else STATE.micrometer.zeroError = val;
+      evaluateContactStatus(STATE.activeTool === 'vernier' ? STATE.vernier.rawDisplacement : STATE.micrometer.rawDisplacement);
+      updateUI(); render();
+    }
+
+    /* ==========================================================================
+       CALCULATION READOUTS (MM / CM OPTION)
+       ========================================================================== */
+    function updateUI() {
+      const curDisp = STATE.activeTool === 'vernier' ? STATE.vernier.rawDisplacement : STATE.micrometer.rawDisplacement;
+      document.getElementById('jawSlider').value = curDisp;
+      const inCm = (STATE.unit === 'cm');
+
+      let obsStr = "0.00 mm";
+      let corrStr = "0.00 mm";
+
+      if (STATE.activeTool === 'vernier') {
+        const zeroErr = STATE.vernier.zeroError;
+        const observed = Math.max(0, STATE.vernier.rawDisplacement + zeroErr);
+        const msr = Math.floor(observed);
+        const vernierDivision = Math.round((observed - msr) / 0.1) % 10;
+        const vsr = vernierDivision * 0.1;
+        const corrected = observed - zeroErr;
+
+        if (inCm) {
+          document.getElementById('readoutSubScaleLabel').innerText = `Vernier Scale (${vernierDivision} × 0.01 cm):`;
+          document.getElementById('readoutMSR').innerText = `${(msr / 10).toFixed(2)} cm`;
+          document.getElementById('readoutVSR').innerText = `${(vsr / 10).toFixed(2)} cm`;
+          obsStr = `${((msr + vsr) / 10).toFixed(2)} cm`;
+          document.getElementById('readoutObs').innerText = obsStr;
+          document.getElementById('readoutError').innerText = `${zeroErr >= 0 ? '+' : ''}${(zeroErr / 10).toFixed(2)} cm`;
+          corrStr = `${(corrected / 10).toFixed(2)} cm`;
+          document.getElementById('readoutTotal').innerText = corrStr;
+        } else {
+          document.getElementById('readoutSubScaleLabel').innerText = `Vernier Scale (${vernierDivision} × 0.1 mm):`;
+          document.getElementById('readoutMSR').innerText = `${msr.toFixed(1)} mm`;
+          document.getElementById('readoutVSR').innerText = `${vsr.toFixed(2)} mm`;
+          obsStr = `${(msr + vsr).toFixed(2)} mm`;
+          document.getElementById('readoutObs').innerText = obsStr;
+          document.getElementById('readoutError').innerText = `${zeroErr >= 0 ? '+' : ''}${zeroErr.toFixed(2)} mm`;
+          corrStr = `${corrected.toFixed(2)} mm`;
+          document.getElementById('readoutTotal').innerText = corrStr;
+        }
+
+        document.getElementById('partsLegend').innerHTML = `
+          <li><strong>External Jaws:</strong> Measure outside dimensions (contact face at datum 0 mm).</li>
+          <li><strong>Internal Jaws:</strong> Nibs enter inverted cavity to press against inner glass walls.</li>
+          <li><strong>Depth Rod:</strong> Slides into dry empty cavity to gauge depth to bottom floor.</li>
+          <li><strong>Resizing Bar:</strong> Adjusts object dimensions dynamically for varied experiments.</li>
+          <li><strong>Coincidence Loupe:</strong> 4× inspection lens showing exact graduation alignment.</li>
+        `;
+      } else {
+        const zeroErr = STATE.micrometer.zeroError;
+        const observed = Math.max(0, STATE.micrometer.rawDisplacement + zeroErr);
+        const msr = Math.floor(observed / 0.5) * 0.5;
+        const circularDiv = Math.round((observed - msr) / 0.01) % 50;
+        const csr = circularDiv * 0.01;
+        const corrected = observed - zeroErr;
+
+        if (inCm) {
+          document.getElementById('readoutSubScaleLabel').innerText = `Thimble Scale (${circularDiv} × 0.001 cm):`;
+          document.getElementById('readoutMSR').innerText = `${(msr / 10).toFixed(3)} cm`;
+          document.getElementById('readoutVSR').innerText = `${(csr / 10).toFixed(3)} cm`;
+          obsStr = `${((msr + csr) / 10).toFixed(3)} cm`;
+          document.getElementById('readoutObs').innerText = obsStr;
+          document.getElementById('readoutError').innerText = `${zeroErr >= 0 ? '+' : ''}${(zeroErr / 10).toFixed(3)} cm`;
+          corrStr = `${(corrected / 10).toFixed(3)} cm`;
+          document.getElementById('readoutTotal').innerText = corrStr;
+        } else {
+          document.getElementById('readoutSubScaleLabel').innerText = `Thimble Scale (${circularDiv} × 0.01 mm):`;
+          document.getElementById('readoutMSR').innerText = `${msr.toFixed(2)} mm`;
+          document.getElementById('readoutVSR').innerText = `${csr.toFixed(2)} mm`;
+          obsStr = `${(msr + csr).toFixed(2)} mm`;
+          document.getElementById('readoutObs').innerText = obsStr;
+          document.getElementById('readoutError').innerText = `${zeroErr >= 0 ? '+' : ''}${zeroErr.toFixed(2)} mm`;
+          corrStr = `${corrected.toFixed(2)} mm`;
+          document.getElementById('readoutTotal').innerText = corrStr;
+        }
+
+        document.getElementById('partsLegend').innerHTML = `
+          <li><strong>Anvil:</strong> Fixed tungsten-carbide reference post mounted on the left U-arm.</li>
+          <li><strong>Spindle:</strong> Hardened precision cylindrical rod advancing through the frame collar.</li>
+          <li><strong>Sleeve (Barrel):</strong> Fixed cylinder engraved with datum line &amp; main mm scale.</li>
+          <li><strong>Thimble:</strong> Beveled conical collar engraved with 50 circular divisions (0.01 mm).</li>
+          <li><strong>Ratchet:</strong> Spring-loaded friction clutch knob ensuring uniform measuring torque.</li>
+        `;
+      }
+
+      // Update HUD Telemetry Bar
+      document.getElementById('tele-readout-obs').innerText = obsStr;
+      document.getElementById('tele-readout-corr').innerText = corrStr;
+    }
+
+    /* ==========================================================================
+       RENDERING PIPELINE
+       ========================================================================== */
+    function render() {
+      const dpr = window.devicePixelRatio || 1;
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.restore();
+
+      ctx.save();
+      ctx.translate(STATE.view.x * dpr, STATE.view.y * dpr);
+      ctx.scale(STATE.view.scale * dpr, STATE.view.scale * dpr);
+
+      if (STATE.activeTool === 'vernier') drawVernierCalliper();
+      else drawMicrometer();
+
+      ctx.restore();
+      if (STATE.showLoupe) drawInspectionLoupe(dpr);
+    }
+
+    /* ==========================================================================
+       BEAKER & VERNIER DRAWING
+       ========================================================================== */
+    function drawUprightBeaker(x, y, width, height, wallThick, baseThick) {
+      ctx.save();
+      const cornerR = Math.min(10, width * 0.15); const rimH = 7; const spoutW = 11;
+      ctx.translate(x, y);
+
+      ctx.fillStyle = 'rgba(56, 189, 248, 0.22)';
+      ctx.beginPath();
+      ctx.moveTo(-spoutW, -rimH); ctx.quadraticCurveTo(-spoutW * 0.4, 0, 0, 0);
+      ctx.lineTo(0, height - cornerR); ctx.quadraticCurveTo(0, height, cornerR, height);
+      ctx.lineTo(width - cornerR, height); ctx.quadraticCurveTo(width, height, width, height - cornerR);
+      ctx.lineTo(width, 0); ctx.quadraticCurveTo(width + 4, 0, width + 4, -rimH / 2);
+      ctx.quadraticCurveTo(width + 4, -rimH, width, -rimH); ctx.lineTo(-spoutW, -rimH); ctx.closePath(); ctx.fill();
+
+      ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 2.0; ctx.stroke();
+      ctx.fillStyle = '#06090e'; ctx.beginPath(); ctx.rect(wallThick, 0, width - 2 * wallThick, height - baseThick); ctx.fill();
+      ctx.fillStyle = 'rgba(56, 189, 248, 0.35)'; ctx.fillRect(wallThick, height - baseThick, width - 2 * wallThick, baseThick);
+      ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2.0; ctx.beginPath(); ctx.moveTo(wallThick, height - baseThick); ctx.lineTo(width - wallThick, height - baseThick); ctx.stroke();
+      ctx.strokeStyle = '#7dd3fc'; ctx.lineWidth = 1.8; ctx.beginPath(); ctx.moveTo(wallThick, 0); ctx.lineTo(wallThick, height - baseThick); ctx.moveTo(width - wallThick, 0); ctx.lineTo(width - wallThick, height - baseThick); ctx.stroke();
+      
+      drawBeakerMarkings(width, height);
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)'; ctx.fillRect(width * 0.05, 0, 2.5, height - cornerR);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.25)'; ctx.fillRect(width * 0.95, 0, 2, height - cornerR);
+      ctx.restore();
+    }
+
+    function drawInvertedBeakerBackdrop(x, y, width, height, wallThick, baseThick) {
+      ctx.save();
+      const cornerR = Math.min(10, width * 0.15); ctx.translate(x, y);
+      ctx.fillStyle = 'rgba(56, 189, 248, 0.20)';
+      ctx.beginPath(); ctx.moveTo(0, height); ctx.lineTo(0, cornerR); ctx.quadraticCurveTo(0, 0, cornerR, 0); ctx.lineTo(width - cornerR, 0); ctx.quadraticCurveTo(width, 0, width, cornerR); ctx.lineTo(width, height); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#06090e'; ctx.fillRect(wallThick, baseThick, width - 2 * wallThick, height - baseThick);
+      ctx.strokeStyle = '#7dd3fc'; ctx.lineWidth = 1.8; ctx.beginPath(); ctx.moveTo(wallThick, baseThick); ctx.lineTo(wallThick, height); ctx.moveTo(width - wallThick, baseThick); ctx.lineTo(width - wallThick, height); ctx.stroke();
+      ctx.fillStyle = 'rgba(56, 189, 248, 0.35)'; ctx.fillRect(wallThick, 0, width - 2 * wallThick, baseThick);
+      ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2.0; ctx.beginPath(); ctx.moveTo(wallThick, baseThick); ctx.lineTo(width - wallThick, baseThick); ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawInvertedBeakerFront(x, y, width, height, wallThick) {
+      ctx.save();
+      const cornerR = Math.min(10, width * 0.15); const rimH = 7; const spoutW = 11; ctx.translate(x, y);
+      ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 2.0;
+      ctx.beginPath(); ctx.moveTo(-spoutW, height + rimH); ctx.lineTo(0, height); ctx.lineTo(0, cornerR); ctx.quadraticCurveTo(0, 0, cornerR, 0); ctx.lineTo(width - cornerR, 0); ctx.quadraticCurveTo(width, 0, width, cornerR); ctx.lineTo(width, height); ctx.lineTo(width + 4, height + rimH); ctx.stroke();
+      ctx.strokeStyle = '#7dd3fc'; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.moveTo(wallThick, 0); ctx.lineTo(wallThick, height); ctx.moveTo(width - wallThick, 0); ctx.lineTo(width - wallThick, height); ctx.stroke();
+      drawBeakerMarkings(width, height);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)'; ctx.fillRect(width * 0.05, cornerR, 2.5, height - cornerR);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.25)'; ctx.fillRect(width * 0.95, cornerR, 2, height - cornerR);
+      ctx.restore();
+    }
+
+    function drawBeakerMarkings(width, height) {
+      const gradStartX = width * 0.38; const gradEndX = width * 0.55;
+      const marks = [{ label: '80', frac: 0.28 }, { label: '60', frac: 0.46 }, { label: '40', frac: 0.64 }, { label: '20', frac: 0.82 }];
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)'; ctx.fillStyle = 'rgba(255, 255, 255, 0.95)'; ctx.font = 'bold 9px monospace'; ctx.textAlign = 'right'; ctx.lineWidth = 1.3;
+      marks.forEach(m => { const my = height * m.frac; ctx.beginPath(); ctx.moveTo(gradStartX, my); ctx.lineTo(gradEndX, my); ctx.stroke(); ctx.fillText(m.label, gradStartX - 4, my + 3); });
+      const spotW = width * 0.28; const spotH = 24; const spotX = width * 0.62; const spotY = height * 0.38;
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.85)'; ctx.beginPath(); ctx.roundRect(spotX, spotY, spotW, spotH, 3); ctx.fill();
+      ctx.fillStyle = '#0b1120'; ctx.font = 'bold 7px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('PYREX ®', spotX + spotW / 2, spotY + 9); ctx.font = '6px sans-serif'; ctx.fillText('100 mL', spotX + spotW / 2, spotY + 18);
+    }
+
+    function drawCaliperBody(sliderOffsetPx) {
+      const pxPerMm = VERNIER_PX_PER_MM;
+      const beamY = 0; const beamH = 46; const beamL = 120 * pxPerMm; const extJawLength = 190;
+
+      // Depth Rod
+      ctx.fillStyle = '#cbd5e1'; ctx.strokeStyle = '#64748b'; ctx.lineWidth = 1;
+      ctx.fillRect(beamL, beamY + 20, sliderOffsetPx, 5); ctx.strokeRect(beamL, beamY + 20, sliderOffsetPx, 5);
+
+      // Main Beam
+      const beamGrad = ctx.createLinearGradient(0, beamY, 0, beamY + beamH);
+      beamGrad.addColorStop(0, '#f8fafc'); beamGrad.addColorStop(0.25, '#e2e8f0'); beamGrad.addColorStop(0.75, '#cbd5e1'); beamGrad.addColorStop(1, '#94a3b8');
+      ctx.fillStyle = beamGrad; ctx.strokeStyle = '#475569'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.rect(-30, beamY, beamL + 30, beamH); ctx.fill(); ctx.stroke();
+
+      // FIXED JAWS
+      ctx.beginPath();
+      ctx.moveTo(0, beamY); ctx.lineTo(0, beamY - 75); ctx.lineTo(-14, beamY - 75); ctx.lineTo(-24, beamY); ctx.lineTo(-30, beamY);
+      ctx.lineTo(-30, beamY + beamH); ctx.lineTo(-24, beamY + beamH); ctx.lineTo(-18, beamY + beamH + extJawLength);
+      ctx.lineTo(0, beamY + beamH + extJawLength); ctx.lineTo(0, beamY + beamH); ctx.closePath(); ctx.fill(); ctx.stroke();
+
+      // Main Scale Millimeter Graduations
+      ctx.fillStyle = '#0f172a'; ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 1; ctx.font = '10px monospace'; ctx.textAlign = 'center';
+      for (let mm = 0; mm <= 110; mm++) {
+        const x = mm * pxPerMm; let tickH = (mm % 10 === 0) ? 17 : (mm % 5 === 0 ? 12 : 7);
+        if (mm % 10 === 0) ctx.fillText((mm / 10).toString(), x, beamY + 18);
+        ctx.beginPath(); ctx.moveTo(x, beamY + beamH); ctx.lineTo(x, beamY + beamH - tickH); ctx.stroke();
+      }
+      ctx.font = '9px sans-serif'; ctx.fillText('cm', beamL - 15, beamY + 18);
+
+      // SLIDING VERNIER UNIT
+      ctx.save();
+      ctx.translate(sliderOffsetPx, 0);
+      const slideGrad = ctx.createLinearGradient(0, beamY - 75, 0, beamY + beamH + extJawLength);
+      slideGrad.addColorStop(0, '#e2e8f0'); slideGrad.addColorStop(0.5, '#cbd5e1'); slideGrad.addColorStop(1, '#94a3b8');
+      ctx.fillStyle = slideGrad; ctx.strokeStyle = '#334155'; ctx.lineWidth = 1.5;
+
+      ctx.beginPath();
+      ctx.moveTo(0, beamY); ctx.lineTo(0, beamY - 75); ctx.lineTo(14, beamY - 75); ctx.lineTo(24, beamY); ctx.lineTo(84, beamY);
+      ctx.lineTo(84, beamY - 26); ctx.lineTo(24, beamY - 26); ctx.lineTo(24, beamY); ctx.lineTo(84, beamY);
+      ctx.lineTo(84, beamY + beamH + 34); ctx.lineTo(0, beamY + beamH + 34); ctx.lineTo(0, beamY + beamH + extJawLength);
+      ctx.lineTo(18, beamY + beamH + extJawLength); ctx.lineTo(24, beamY + beamH); ctx.lineTo(0, beamY + beamH);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+
+      // Clear Aperture Window
+      ctx.save();
+      ctx.beginPath(); ctx.rect(0, beamY + 2, 76, beamH - 4); ctx.clip();
+      ctx.fillStyle = slideGrad; ctx.fillRect(0, beamY, 76, beamH);
+      ctx.fillStyle = '#0f172a'; ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 1; ctx.font = '10px monospace'; ctx.textAlign = 'center';
+      const minW = Math.max(0, Math.floor(sliderOffsetPx / pxPerMm));
+      const maxW = Math.min(110, Math.ceil((sliderOffsetPx + 76) / pxPerMm));
+      for (let mm = minW; mm <= maxW; mm++) {
+        const lx = mm * pxPerMm - sliderOffsetPx; let tickH = (mm % 10 === 0) ? 17 : (mm % 5 === 0 ? 12 : 7);
+        if (mm % 10 === 0) ctx.fillText((mm / 10).toString(), lx, beamY + 18);
+        ctx.beginPath(); ctx.moveTo(lx, beamY + beamH); ctx.lineTo(lx, beamY + beamH - tickH); ctx.stroke();
+      }
+      ctx.restore();
+
+      // Vernier Scale
+      ctx.fillStyle = '#f8fafc'; ctx.fillRect(0, beamY + beamH, 76, 30); ctx.strokeRect(0, beamY + beamH, 76, 30);
+      const vernierDivPx = 0.9 * pxPerMm; ctx.strokeStyle = '#0f172a'; ctx.fillStyle = '#0f172a'; ctx.lineWidth = 1.1; ctx.font = 'bold 9px monospace'; ctx.textAlign = 'center';
+      for (let v = 0; v <= 10; v++) {
+        const vx = v * vernierDivPx; const vh = (v === 0 || v === 5 || v === 10) ? 14 : 9;
+        ctx.beginPath(); ctx.moveTo(vx, beamY + beamH); ctx.lineTo(vx, beamY + beamH + vh); ctx.stroke();
+        if (v === 0 || v === 5 || v === 10) ctx.fillText(v.toString(), vx, beamY + beamH + 25);
+      }
+
+      // Lock Screw & Thumb Grip
+      ctx.fillStyle = STATE.locked ? '#ef4444' : '#475569'; ctx.fillRect(36, beamY - 38, 20, 12); ctx.strokeRect(36, beamY - 38, 20, 12);
+      ctx.fillStyle = '#64748b'; for (let rx = 20; rx <= 55; rx += 5) ctx.fillRect(rx, beamY + beamH + 38, 2, 8);
+      ctx.restore();
+    }
+
+    function drawVernierCalliper() {
+      const pxPerMm = VERNIER_PX_PER_MM;
+      const sliderOffsetPx = (STATE.vernier.rawDisplacement + STATE.vernier.zeroError) * pxPerMm;
+      const beamY = 0; const beamH = 46; const beamL = 120 * pxPerMm;
+      const b = STATE.vernier.beaker; const mode = STATE.vernier.target;
+      const bWidthPx = b.outerDia * pxPerMm; const bHeightPx = b.height * pxPerMm;
+      const wallThickPx = b.wallThickness * pxPerMm; const baseThickPx = (b.height - b.depth) * pxPerMm;
+
+      if (mode === 'depth') {
+        const bx = DEPTH_ANCHOR.beakerCenterX - bWidthPx / 2; const by = DEPTH_ANCHOR.rimY;
+        ctx.fillStyle = '#1e293b'; ctx.fillRect(bx - 80, by + bHeightPx, bWidthPx + 160, 25);
+        ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(bx - 80, by + bHeightPx); ctx.lineTo(bx + bWidthPx + 80, by + bHeightPx); ctx.stroke();
+        drawUprightBeaker(bx, by, bWidthPx, bHeightPx, wallThickPx, baseThickPx);
+
+        ctx.save();
+        ctx.translate(DEPTH_ANCHOR.beakerCenterX + 22.5, DEPTH_ANCHOR.rimY);
+        ctx.rotate(Math.PI / 2); ctx.translate(-beamL, 0);
+        drawCaliperBody(sliderOffsetPx);
+        ctx.restore();
+
+        const depthPx = b.depth * pxPerMm; const dimX = DEPTH_ANCHOR.beakerCenterX + 35;
+        ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(dimX, by); ctx.lineTo(dimX, by + depthPx); ctx.stroke();
+        ctx.fillStyle = '#38bdf8';
+        ctx.beginPath(); ctx.moveTo(dimX, by); ctx.lineTo(dimX - 4, by + 8); ctx.lineTo(dimX + 4, by + 8); ctx.closePath(); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(dimX, by + depthPx); ctx.lineTo(dimX - 4, by + depthPx - 8); ctx.lineTo(dimX + 4, by + depthPx - 8); ctx.closePath(); ctx.fill();
+        ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'left'; ctx.fillText(`Internal Depth`, dimX + 8, by + depthPx / 2 + 4);
+        return;
+      }
+
+      if (mode === 'outer') drawUprightBeaker(0, beamY + beamH + 20, bWidthPx, bHeightPx, wallThickPx, baseThickPx);
+      const invX = -wallThickPx; const invY = beamY - bHeightPx - 8;
+      if (mode === 'inner') drawInvertedBeakerBackdrop(invX, invY, bWidthPx, bHeightPx, wallThickPx, baseThickPx);
+      
+      drawCaliperBody(sliderOffsetPx);
+      
+      if (mode === 'inner') drawInvertedBeakerFront(invX, invY, bWidthPx, bHeightPx, wallThickPx);
+    }
+
+    /* ==========================================================================
+       AUTHENTIC MICROMETER SCREW GAUGE DRAWING
+       ========================================================================== */
+    function drawMicrometer() {
+      const pxPerMm = MICROMETER_PX_PER_MM; 
+      const physicalMm = STATE.micrometer.rawDisplacement + STATE.micrometer.zeroError;
+      const physicalGapPx = physicalMm * pxPerMm;
+
+      const innerCollarX = MICRO_GEOM.innerCollarX; 
+      const outerCollarX = MICRO_GEOM.outerCollarX; 
+      const sleeveZeroX = MICRO_GEOM.sleeveZeroX;   
+      const thimbleX = sleeveZeroX + physicalGapPx; 
+
+      const sleeveR = 21.0; const thimbleR = 27.0; const bevelW = 35; const bodyW = 110;          
+
+      ctx.save();
+      
+      // Anvil 
+      ctx.fillStyle = '#cbd5e1'; ctx.fillRect(-18, -9.0, 18, 18);
+      ctx.strokeStyle = '#475569'; ctx.lineWidth = 1.0; ctx.strokeRect(-18, -9.0, 18, 18);
+      ctx.fillStyle = '#64748b'; ctx.fillRect(-2.5, -9.0, 2.5, 18);
+      ctx.fillRect(-42, -15, 6, 5.0); ctx.fillRect(-42, 10.0, 6, 5.0);
+
+      // Bearing
+      if (STATE.micrometer.target === 'bearing') {
+        const rad = (STATE.micrometer.bearing.diameter * pxPerMm) / 2;
+        const ballGrad = ctx.createRadialGradient(rad - rad * 0.35, 0 - rad * 0.35, rad * 0.1, rad, 0, rad);
+        ballGrad.addColorStop(0.0, '#ffffff'); ballGrad.addColorStop(0.2, '#e2e8f0'); ballGrad.addColorStop(0.55, '#94a3b8'); ballGrad.addColorStop(1.0, '#0f172a');
+        ctx.fillStyle = ballGrad; ctx.beginPath(); ctx.arc(rad, 0, rad, 0, Math.PI * 2); ctx.fill(); ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1.3; ctx.stroke();
+      }
+
+      // Spindle
+      const spindleFaceX = physicalGapPx;
+      const spindleGrad = ctx.createLinearGradient(0, -9.0, 0, 9.0);
+      spindleGrad.addColorStop(0.0, '#f8fafc'); spindleGrad.addColorStop(0.3, '#e2e8f0'); spindleGrad.addColorStop(0.7, '#cbd5e1'); spindleGrad.addColorStop(1.0, '#64748b');
+      ctx.fillStyle = spindleGrad;
+      const exposedSpindleW = Math.max(0, innerCollarX - spindleFaceX);
+      ctx.fillRect(spindleFaceX, -9.0, exposedSpindleW, 18);
+      ctx.strokeStyle = '#475569'; ctx.lineWidth = 1.0; ctx.strokeRect(spindleFaceX, -9.0, exposedSpindleW, 18);
+      ctx.fillStyle = '#64748b'; ctx.fillRect(spindleFaceX, -9.0, 2.5, 18);
+
+      // U-Frame
+      const frameGrad = ctx.createLinearGradient(-54, 0, 206, 195);
+      frameGrad.addColorStop(0.0, '#111827'); frameGrad.addColorStop(0.3, '#1f293d'); frameGrad.addColorStop(0.7, '#334155'); frameGrad.addColorStop(1.0, '#1e293b');
+      ctx.fillStyle = frameGrad; ctx.strokeStyle = '#475569'; ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      ctx.moveTo(-18, -20); ctx.lineTo(-54, -20); ctx.lineTo(-54, 40);
+      ctx.bezierCurveTo(-54, 130, -10, 195, 76, 195); ctx.bezierCurveTo(162, 195, 206, 130, 206, 40);
+      ctx.lineTo(206, -20); ctx.lineTo(170, -20); ctx.lineTo(170, 40);
+      ctx.bezierCurveTo(170, 100, 140, 145, 76, 145); ctx.bezierCurveTo(12, 145, -18, 100, -18, 40);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+
+      // Pad & Lever
+      const padW = 110; const padX = 76 - padW / 2;
+      ctx.fillStyle = '#090d16'; ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.roundRect(padX, 150, padW, 24, 5); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#e2e8f0'; ctx.font = 'bold 9.5px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('0 - 25 mm   0.01 mm', 76, 166);
+      ctx.fillStyle = STATE.locked ? '#ef4444' : '#475569'; ctx.beginPath(); ctx.roundRect(173, -28, 14, 8, 2); ctx.fill(); ctx.stroke();
+
+      // Sleeve
+      const sleeveGrad = ctx.createLinearGradient(0, -sleeveR, 0, sleeveR);
+      sleeveGrad.addColorStop(0.0, '#ffffff'); sleeveGrad.addColorStop(0.25, '#f1f5f9'); sleeveGrad.addColorStop(0.75, '#cbd5e1'); sleeveGrad.addColorStop(1.0, '#94a3b8');
+      ctx.fillStyle = sleeveGrad;
+      const sleeveVisibleWidth = Math.max(0, (thimbleX + 8) - outerCollarX);
+      ctx.fillRect(outerCollarX, -sleeveR, sleeveVisibleWidth, sleeveR * 2);
+      ctx.strokeStyle = '#475569'; ctx.lineWidth = 1.2; ctx.strokeRect(outerCollarX, -sleeveR, sleeveVisibleWidth, sleeveR * 2);
+      ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 1.4; ctx.beginPath(); ctx.moveTo(outerCollarX, 0); ctx.lineTo(thimbleX, 0); ctx.stroke();
+
+      ctx.fillStyle = '#0f172a'; ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 1.1; ctx.font = 'bold 8.5px monospace'; ctx.textAlign = 'center';
+      for (let m = 0; m <= 25; m++) {
+        const mx = sleeveZeroX + m * pxPerMm; if (mx > thimbleX) break;
+        const isMajor = (m % 5 === 0); const tickH = isMajor ? 9.0 : 6.0;
+        ctx.beginPath(); ctx.moveTo(mx, 0); ctx.lineTo(mx, -tickH); ctx.stroke();
+        if (isMajor) ctx.fillText(m.toString(), mx, -12);
+        if (m < 25) {
+          const hx = mx + 0.5 * pxPerMm;
+          if (hx <= thimbleX) { ctx.beginPath(); ctx.moveTo(hx, 0); ctx.lineTo(hx, 6.0); ctx.stroke(); }
+        }
+      }
+
+      // Thimble
+      ctx.save();
+      ctx.translate(thimbleX, 0);
+      const bevelGrad = ctx.createLinearGradient(0, -thimbleR, 0, thimbleR);
+      bevelGrad.addColorStop(0.0, '#ffffff'); bevelGrad.addColorStop(0.3, '#f1f5f9'); bevelGrad.addColorStop(0.7, '#cbd5e1'); bevelGrad.addColorStop(1.0, '#94a3b8');
+      ctx.fillStyle = bevelGrad; ctx.strokeStyle = '#334155'; ctx.lineWidth = 1.3;
+      ctx.beginPath(); ctx.moveTo(0, -sleeveR); ctx.lineTo(bevelW, -thimbleR); ctx.lineTo(bevelW, thimbleR); ctx.lineTo(0, sleeveR); ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 1.4; ctx.beginPath(); ctx.moveTo(0, -sleeveR); ctx.lineTo(0, sleeveR); ctx.stroke();
+
+      const pitchPhase = (physicalMm % 0.5) / 0.5; const currentDiv = Math.round(pitchPhase * 50) % 50;
+      ctx.strokeStyle = '#0f172a'; ctx.fillStyle = '#0f172a'; ctx.font = 'bold 9px monospace'; ctx.textAlign = 'right';
+      for (let off = -12; off <= 12; off++) {
+        let divNum = (currentDiv + off) % 50; if (divNum < 0) divNum += 50;
+        const yPos = -off * 2.1;
+        if (yPos >= -sleeveR + 0.5 && yPos <= sleeveR - 0.5) {
+          const isMajor = (divNum % 5 === 0); const tickLen = isMajor ? 22 : 12;
+          ctx.lineWidth = isMajor ? 1.4 : 1.0; ctx.beginPath(); ctx.moveTo(0, yPos); ctx.lineTo(tickLen, yPos); ctx.stroke();
+          if (isMajor) ctx.fillText(divNum.toString(), bevelW - 4, yPos + 3);
+        }
+      }
+      ctx.fillStyle = bevelGrad; ctx.fillRect(bevelW, -thimbleR, bodyW, thimbleR * 2); ctx.strokeRect(bevelW, -thimbleR, bodyW, thimbleR * 2);
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.08)'; ctx.fillRect(bevelW + 12, -thimbleR, bodyW - 24, thimbleR * 2);
+      ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1.2;
+      for (let kx = bevelW + 16; kx < bevelW + bodyW - 12; kx += 4.0) {
+        ctx.beginPath(); ctx.moveTo(kx, -thimbleR + 1); ctx.lineTo(kx, thimbleR - 1); ctx.stroke();
+      }
+
+      // Ratchet
+      const stemW = 16; const stemR = 7.0;
+      ctx.fillStyle = '#64748b'; ctx.fillRect(bevelW + bodyW, -stemR, stemW, stemR * 2); ctx.strokeRect(bevelW + bodyW, -stemR, stemW, stemR * 2);
+      const knobX = bevelW + bodyW + stemW; const knobW = 42; const knobR = 15.0;
+      const knobGrad = ctx.createLinearGradient(0, -knobR, 0, knobR);
+      knobGrad.addColorStop(0.0, '#94a3b8'); knobGrad.addColorStop(0.3, '#e2e8f0'); knobGrad.addColorStop(0.7, '#475569'); knobGrad.addColorStop(1.0, '#1e293b');
+      ctx.fillStyle = knobGrad; ctx.beginPath(); ctx.roundRect(knobX, -knobR, knobW, knobR * 2, [2, 6, 6, 2]); ctx.fill(); ctx.stroke();
+      ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 1.0;
+      for (let rx = knobX + 4.5; rx < knobX + knobW - 3.5; rx += 3.5) {
+        ctx.beginPath(); ctx.moveTo(rx, -knobR + 1); ctx.lineTo(rx, knobR - 1); ctx.stroke();
+      }
+      ctx.restore();
+      ctx.restore();
+    }
+
+    /* ==========================================================================
+       4X COINCIDENCE INSPECTION LOUPE
+       ========================================================================== */
+    function drawInspectionLoupe(dpr) {
+      const loupeW = 280; const loupeH = 140; const loupeX = canvas.width / dpr - loupeW - 16; const loupeY = 16;
+      ctx.save();
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.6)'; ctx.shadowBlur = 16; ctx.fillStyle = '#090d16'; ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.roundRect(loupeX, loupeY, loupeW, loupeH, 8); ctx.fill(); ctx.stroke(); ctx.shadowBlur = 0;
+      ctx.fillStyle = '#162033'; ctx.beginPath(); ctx.roundRect(loupeX, loupeY, loupeW, 26, [8, 8, 0, 0]); ctx.fill();
+      ctx.fillStyle = '#38bdf8'; ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'left'; ctx.fillText('🔍 COINCIDENCE LOUPE (4× ZOOM)', loupeX + 10, loupeY + 17);
+      
+      ctx.save(); ctx.beginPath(); ctx.rect(loupeX + 1, loupeY + 27, loupeW - 2, loupeH - 28); ctx.clip();
+
+      if (STATE.activeTool === 'vernier') {
+        const observed = Math.max(0, STATE.vernier.rawDisplacement + STATE.vernier.zeroError);
+        const msr = Math.floor(observed); const coincIndex = Math.round((observed - msr) / 0.1) % 10;
+        const magPxPerMm = VERNIER_PX_PER_MM * 4.0; const datumY = loupeY + 76;
+        const centerMm = observed + (coincIndex * 0.9); const centerX = loupeX + loupeW / 2;
+
+        ctx.fillStyle = '#e2e8f0'; ctx.fillRect(loupeX, loupeY + 27, loupeW, datumY - (loupeY + 27));
+        ctx.fillStyle = '#ffffff'; ctx.fillRect(loupeX, datumY, loupeW, loupeY + loupeH - datumY);
+        ctx.strokeStyle = '#64748b'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(loupeX, datumY); ctx.lineTo(loupeX + loupeW, datumY); ctx.stroke();
+        ctx.fillStyle = '#0f172a'; ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 1.5; ctx.font = 'bold 10px monospace'; ctx.textAlign = 'center';
+
+        for (let m = Math.floor(centerMm - 10); m <= Math.ceil(centerMm + 10); m++) {
+          const x = centerX + (m - centerMm) * magPxPerMm; const tickH = (m % 10 === 0) ? 22 : (m % 5 === 0 ? 15 : 10);
+          ctx.beginPath(); ctx.moveTo(x, datumY); ctx.lineTo(x, datumY - tickH); ctx.stroke();
+          if (m % 5 === 0) ctx.fillText(m.toString(), x, datumY - tickH - 3);
+        }
+
+        const vernierDivPx = 0.9 * magPxPerMm; const vZeroX = centerX + (observed - centerMm) * magPxPerMm;
+        for (let v = 0; v <= 10; v++) {
+          const vx = vZeroX + v * vernierDivPx; const isCoinciding = (v === coincIndex); const vh = (v === 0 || v === 5 || v === 10) ? 20 : 12;
+          if (isCoinciding && STATE.readingRevealed) { ctx.strokeStyle = '#00ff88'; ctx.fillStyle = '#00aa55'; ctx.lineWidth = 2.5; } 
+          else { ctx.strokeStyle = '#0f172a'; ctx.fillStyle = '#0f172a'; ctx.lineWidth = 1.5; }
+          ctx.beginPath(); ctx.moveTo(vx, datumY); ctx.lineTo(vx, datumY + vh); ctx.stroke(); ctx.fillText(v.toString(), vx, datumY + vh + 12);
+          if (isCoinciding && STATE.readingRevealed) { ctx.fillStyle = '#00ff88'; ctx.beginPath(); ctx.moveTo(vx, datumY + vh + 16); ctx.lineTo(vx - 4, datumY + vh + 22); ctx.lineTo(vx + 4, datumY + vh + 22); ctx.closePath(); ctx.fill(); }
+        }
+      } else {
+        const observed = Math.max(0, STATE.micrometer.rawDisplacement + STATE.micrometer.zeroError);
+        const datumY = loupeY + 80; const dividerX = loupeX + 130; 
+        ctx.fillStyle = '#f1f5f9'; ctx.fillRect(loupeX, loupeY + 27, 130, loupeH - 27);
+        ctx.fillStyle = '#ffffff'; ctx.fillRect(dividerX, loupeY + 27, loupeW - 130, loupeH - 27);
+        ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 2.0; ctx.beginPath(); ctx.moveTo(loupeX, datumY); ctx.lineTo(dividerX, datumY); ctx.stroke();
+        ctx.strokeStyle = '#475569'; ctx.lineWidth = 2.0; ctx.beginPath(); ctx.moveTo(dividerX, loupeY + 27); ctx.lineTo(dividerX, loupeY + loupeH); ctx.stroke();
+
+        const sleeveMagPx = MICROMETER_PX_PER_MM * 4.3; 
+        ctx.fillStyle = '#0f172a'; ctx.strokeStyle = '#0f172a'; ctx.font = 'bold 11px monospace'; ctx.textAlign = 'center';
+        for (let m = Math.max(0, Math.floor(observed - 3)); m <= Math.min(25, Math.ceil(observed + 1)); m++) {
+          const tx = dividerX - (observed - m) * sleeveMagPx;
+          if (tx >= loupeX + 10 && tx <= dividerX) {
+            const isMajor = (m % 5 === 0); ctx.lineWidth = isMajor ? 1.8 : 1.2;
+            ctx.beginPath(); ctx.moveTo(tx, datumY); ctx.lineTo(tx, datumY - (isMajor ? 20 : 14)); ctx.stroke();
+            if (isMajor) ctx.fillText(m.toString(), tx, datumY - 24);
+            if (m < 25) {
+              const hx = tx + 0.5 * sleeveMagPx;
+              if (hx >= loupeX + 10 && hx <= dividerX) { ctx.beginPath(); ctx.moveTo(hx, datumY); ctx.lineTo(hx, datumY + 11); ctx.stroke(); }
+            }
+          }
+        }
+        const pitchPhase = (observed % 0.5) / 0.5; const currentDiv = Math.round(pitchPhase * 50) % 50;
+        ctx.font = 'bold 11px monospace'; ctx.textAlign = 'left';
+        for (let off = -5; off <= 5; off++) {
+          let divNum = (currentDiv + off) % 50; if (divNum < 0) divNum += 50;
+          const yPos = datumY - (off * 9.5);
+          if (yPos >= loupeY + 32 && yPos <= loupeY + loupeH - 8) {
+            const isCoinciding = (off === 0); const isMajor = (divNum % 5 === 0);
+            if (isCoinciding && STATE.readingRevealed) { ctx.strokeStyle = '#00ff88'; ctx.fillStyle = '#00aa55'; ctx.lineWidth = 2.4; } 
+            else { ctx.strokeStyle = '#0f172a'; ctx.fillStyle = '#0f172a'; ctx.lineWidth = isMajor ? 1.6 : 1.1; }
+            ctx.beginPath(); ctx.moveTo(dividerX, yPos); ctx.lineTo(dividerX + (isMajor ? 26 : 16), yPos); ctx.stroke();
+            if (isMajor || isCoinciding) ctx.fillText(divNum.toString(), dividerX + 30, yPos + 3.5);
+            if (isCoinciding && STATE.readingRevealed) {
+              ctx.fillStyle = '#00ff88'; ctx.beginPath(); ctx.moveTo(dividerX - 2, datumY); ctx.lineTo(dividerX - 8, datumY - 4); ctx.lineTo(dividerX - 8, datumY + 4); ctx.closePath(); ctx.fill();
+            }
+          }
+        }
+      }
+      ctx.restore();
+      ctx.restore();
+    }
+
+    window.addEventListener('load', init);
+  </script>
+</body>
+</html>

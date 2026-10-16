@@ -1,0 +1,2678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Interactive 3D Hooke's Law & Materials Science Virtual Laboratory. Explore spring tension, compression, ductile yield limits, series-parallel combinations, and strain energy with real-time analytics.">
+    <title>Hooke's Law & Materials Science Interactive Laboratory - LuyaliSims</title>
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    
+    <!-- Futuristic Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Base Reset & Design Tokens */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --neon-cyan: #00f3ff;
+            --neon-magenta: #bc13fe;
+            --neon-green: #00ff88;
+            --neon-amber: #f59e0b;
+            --danger-red: #ef4444;
+            --bg-dark: #070a12;
+            --panel-bg: rgba(16, 24, 43, 0.88);
+            --border-glow: rgba(0, 243, 255, 0.35);
+            --card-border: rgba(0, 243, 255, 0.2);
+            --text-main: #e2e8f0;
+            --text-muted: #8da4be;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 85% 15%, rgba(0, 243, 255, 0.08), transparent 45%),
+                radial-gradient(circle at 15% 85%, rgba(188, 19, 254, 0.08), transparent 45%),
+                linear-gradient(180deg, #05070e 0%, #0a0e1a 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 16px 20px;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 1. HEADER & TOP NAVIGATION */
+        header {
+            max-width: 1400px;
+            margin: 0 auto 16px auto;
+            width: 100%;
+        }
+
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(16, 24, 43, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(188, 19, 254, 0.5);
+            color: #e580ff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.92rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(188, 19, 254, 0.2);
+            border-color: var(--neon-magenta);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
+            transform: translateX(-3px);
+        }
+
+        .module-id {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 16px rgba(0, 243, 255, 0.4);
+            margin: 4px 0 8px 0;
+            font-size: clamp(1.4rem, 3.5vw, 2.3rem);
+            letter-spacing: 1.5px;
+            text-align: center;
+        }
+
+        .lead-summary {
+            max-width: 1050px;
+            margin: 0 auto 18px auto;
+            text-align: center;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: #cbd5e1;
+        }
+
+        /* TAB NAVIGATION HEADER */
+        .workspace-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .tab-btn {
+            background: rgba(10, 16, 30, 0.85);
+            color: var(--text-muted);
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            padding: 9px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            border-color: var(--neon-cyan);
+            color: #fff;
+            box-shadow: 0 0 12px rgba(0, 243, 255, 0.35);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(180deg, rgba(0, 243, 255, 0.2) 0%, rgba(16, 24, 43, 0.95) 100%);
+            color: var(--neon-cyan);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 18px rgba(0, 243, 255, 0.45);
+        }
+
+        main {
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* 2. SIMULATOR WORKSPACE */
+        #simulator-container {
+            background: linear-gradient(135deg, rgba(16, 24, 43, 0.92) 0%, rgba(8, 12, 22, 0.95) 100%);
+            backdrop-filter: blur(14px);
+            border: 1px solid var(--border-glow);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 25px rgba(0, 243, 255, 0.12);
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        #simulator-container:fullscreen {
+            padding: 24px;
+            overflow-y: auto;
+            background: #070a12;
+            border-radius: 0;
+            border: none;
+        }
+
+        /* HUD Telemetry Bar */
+        .hud-telemetry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(4, 8, 16, 0.85);
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            border-radius: 10px;
+            padding: 10px 16px;
+            margin-bottom: 18px;
+            font-family: 'Share Tech Mono', monospace;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .telemetry-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.92rem;
+        }
+
+        .tele-label {
+            color: #8da4be;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .tele-val {
+            color: var(--neon-cyan);
+            font-weight: 700;
+        }
+
+        .tele-val.pink { color: #ff55bb; }
+        .tele-val.green { color: var(--neon-green); }
+        .tele-val.amber { color: var(--neon-amber); }
+        .tele-val.red { color: var(--danger-red); }
+
+        .view-content {
+            display: none;
+        }
+        .view-content.active {
+            display: block;
+        }
+
+        /* TAB 1: 3-COLUMN EXPERIMENT GRID */
+        .lab-grid {
+            display: grid;
+            grid-template-columns: 410px 1fr 1fr;
+            gap: 18px;
+            align-items: stretch;
+        }
+
+        @media (max-width: 1200px) {
+            .lab-grid { grid-template-columns: 1fr 1fr; }
+            .lab-grid > div:nth-child(1) { grid-column: span 2; }
+        }
+        @media (max-width: 820px) {
+            .lab-grid { grid-template-columns: 1fr; }
+            .lab-grid > div:nth-child(1) { grid-column: span 1; }
+        }
+
+        /* TAB 2: 2-COLUMN CALCULATOR GRID */
+        .calc-layout-grid {
+            display: grid;
+            grid-template-columns: 1.15fr 1fr;
+            gap: 20px;
+            align-items: stretch;
+        }
+
+        @media (max-width: 992px) {
+            .calc-layout-grid { grid-template-columns: 1fr; }
+        }
+
+        /* CARDS & PANELS */
+        .card {
+            background: linear-gradient(145deg, rgba(11, 17, 30, 0.92) 0%, rgba(6, 9, 16, 0.95) 100%);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .card h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            color: var(--neon-cyan);
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            border-bottom: 1px solid rgba(0, 243, 255, 0.22);
+            padding-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* 3D CANVAS & VIEWER INTERACTION */
+        .interactive-viewer-wrap {
+            position: relative;
+            background: radial-gradient(circle at 50% 50%, #08171a 0%, #02070a 100%);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid rgba(0, 243, 255, 0.3);
+            box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.9);
+            width: 100%;
+            height: 520px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            touch-action: none;
+        }
+
+        canvas.interactive-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            cursor: grab;
+        }
+
+        canvas.interactive-canvas:active {
+            cursor: grabbing;
+        }
+
+        .viewer-toolbar {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 4px;
+            background: rgba(6, 11, 24, 0.88);
+            backdrop-filter: blur(8px);
+            padding: 4px 6px;
+            border-radius: 6px;
+            border: 1px solid rgba(0, 243, 255, 0.35);
+            z-index: 10;
+            align-items: center;
+        }
+
+        .viewer-hint {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(4, 8, 16, 0.82);
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            color: var(--neon-cyan);
+            font-family: 'Share Tech Mono', monospace;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .zoom-badge {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--neon-cyan);
+            min-width: 44px;
+            text-align: center;
+        }
+
+        .alert-banner {
+            display: none;
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid var(--danger-red);
+            color: #fca5a5;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.82rem;
+            animation: pulse-danger 1.5s infinite;
+        }
+
+        @keyframes pulse-danger {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* CONTROLS */
+        .mode-switch-group {
+            display: flex;
+            background: rgba(6, 12, 24, 0.9);
+            padding: 4px;
+            border-radius: 8px;
+            gap: 4px;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+        }
+
+        .mode-switch-btn {
+            flex: 1;
+            padding: 7px;
+            border: none;
+            border-radius: 6px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 0.78rem;
+            cursor: pointer;
+            background: transparent;
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+        }
+
+        .mode-switch-btn.active {
+            background: rgba(0, 243, 255, 0.2);
+            color: var(--neon-cyan);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.35);
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .control-group label {
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: #cbd5e1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .control-group label span.math-label {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--neon-green);
+        }
+
+        select, input[type="range"] {
+            min-height: 40px;
+        }
+
+        select {
+            background: #060c18;
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            color: #e2e8f0;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding: 8px 12px;
+            border-radius: 8px;
+            outline: none;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            background: #0c1527;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            height: 7px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            margin: 6px 0;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #00f3ff 30%, #0088aa 100%);
+            border: 2px solid #fff;
+            box-shadow: 0 0 8px rgba(0, 243, 255, 0.8);
+            cursor: pointer;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .sim-btn {
+            background: linear-gradient(180deg, rgba(16, 28, 54, 0.9) 0%, rgba(8, 14, 28, 0.95) 100%);
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            color: var(--neon-cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .sim-btn:hover {
+            border-color: var(--neon-cyan);
+            color: #fff;
+            box-shadow: 0 0 12px rgba(0, 243, 255, 0.45);
+            transform: translateY(-2px);
+        }
+
+        .sim-btn.secondary {
+            border-color: rgba(188, 19, 254, 0.5);
+            color: #e580ff;
+        }
+
+        .sim-btn.secondary:hover {
+            border-color: var(--neon-magenta);
+            color: #fff;
+            box-shadow: 0 0 12px rgba(188, 19, 254, 0.5);
+        }
+
+        .sim-btn.danger {
+            border-color: rgba(239, 68, 68, 0.6);
+            color: #fca5a5;
+        }
+
+        .sim-btn.danger:hover {
+            border-color: var(--danger-red);
+            color: #fff;
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.6);
+        }
+
+        .sim-btn.btn-sm {
+            padding: 4px 8px;
+            font-size: 0.72rem;
+            min-height: 28px;
+        }
+
+        /* READOUT GRIDS */
+        .readout-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .readout-box {
+            background: rgba(4, 9, 20, 0.7);
+            border: 1px solid rgba(0, 243, 255, 0.22);
+            border-radius: 8px;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .readout-box .label {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .readout-box .val {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.12rem;
+            font-weight: 700;
+            color: var(--neon-cyan);
+            margin-top: 3px;
+        }
+
+        /* TABLE */
+        .table-container {
+            max-height: 165px;
+            overflow-y: auto;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            border-radius: 8px;
+            background: rgba(4, 8, 16, 0.6);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            text-align: left;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        th {
+            background: rgba(16, 24, 43, 0.95);
+            position: sticky;
+            top: 0;
+            padding: 6px 8px;
+            color: var(--neon-cyan);
+            border-bottom: 1px solid rgba(0, 243, 255, 0.3);
+            font-weight: 700;
+        }
+
+        td {
+            padding: 5px 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: #cbd5e1;
+        }
+
+        #graphCanvas {
+            width: 100%;
+            height: 360px;
+            background: #040810;
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            border-radius: 8px;
+        }
+
+        /* EXPANDED GRAPH MODAL */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(4, 7, 15, 0.92);
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal-body-graph {
+            background: linear-gradient(145deg, #0b111e 0%, #060913 100%);
+            border: 2px solid var(--neon-cyan);
+            box-shadow: 0 0 35px rgba(0, 243, 255, 0.25);
+            width: 95%;
+            max-width: 1100px;
+            height: 88vh;
+            border-radius: 14px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        #expandedGraphCanvas {
+            flex: 1;
+            width: 100%;
+            background: #040810;
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            border-radius: 8px;
+        }
+
+        /* COLLAPSIBLE ACCORDION FOR DERIVATIONS */
+        .collapsible-header {
+            background: rgba(16, 24, 43, 0.85);
+            border: 1px solid rgba(188, 19, 254, 0.4);
+            border-radius: 8px;
+            padding: 10px 14px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #e580ff;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .collapsible-header:hover {
+            border-color: var(--neon-magenta);
+            box-shadow: 0 0 10px rgba(188, 19, 254, 0.4);
+        }
+
+        .collapsible-content {
+            border: 1px solid rgba(188, 19, 254, 0.3);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            padding: 12px 14px;
+            background: rgba(5, 9, 18, 0.85);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #cbd5e1;
+        }
+
+        .collapsible-content.hidden { display: none; }
+
+        /* 3. POLICY-COMPLIANT AD CONTAINER */
+        .ad-slot-wrapper {
+            margin: 30px auto;
+            text-align: center;
+            clear: both;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .ad-disclaimer {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            margin-bottom: 6px;
+        }
+
+        .ad-box-placeholder {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            min-height: 90px;
+            max-width: 970px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #475569;
+            font-size: 0.85rem;
+            border-radius: 8px;
+        }
+
+        /* 4. EDUCATIONAL CONTENT SECTION */
+        .educational-content {
+            line-height: 1.75;
+            font-size: 1.05rem;
+            color: #94a3b8;
+            background: rgba(10, 14, 23, 0.88);
+            padding: 30px;
+            border-radius: 16px;
+            border-left: 4px solid var(--neon-cyan);
+            border-top: 1px solid rgba(0, 243, 255, 0.2);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin-bottom: 35px;
+        }
+
+        .educational-content h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-magenta);
+            border-bottom: 1px solid rgba(188, 19, 254, 0.3);
+            padding-bottom: 8px;
+            margin-top: 1.8em;
+            margin-bottom: 0.6em;
+            font-size: 1.45rem;
+        }
+
+        .educational-content h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: #38bdf8;
+            margin-top: 1.4em;
+            margin-bottom: 0.4em;
+            font-size: 1.15rem;
+        }
+
+        .formula-box {
+            background: rgba(4, 9, 20, 0.7);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-left: 3px solid var(--neon-green);
+            padding: 14px 18px;
+            margin: 14px 0;
+            border-radius: 6px;
+            font-family: 'Share Tech Mono', monospace;
+            color: #a7f3d0;
+            font-size: 1.02rem;
+            line-height: 1.7;
+        }
+
+        .task-card {
+            background: rgba(15, 23, 42, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 18px;
+        }
+
+        .task-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            color: var(--neon-cyan);
+            margin-bottom: 8px;
+        }
+
+        details {
+            margin-top: 25px;
+            background: rgba(5, 10, 20, 0.8);
+            border: 1px solid rgba(188, 19, 254, 0.4);
+            border-radius: 10px;
+            padding: 15px 20px;
+        }
+
+        summary {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            color: #e580ff;
+            cursor: pointer;
+            padding: 6px 0;
+            user-select: none;
+        }
+
+        .solution-step {
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+            padding: 12px 0;
+        }
+
+        .solution-step:last-child {
+            border-bottom: none;
+        }
+
+        /* 5. FOOTER & COMPLIANCE MODALS */
+        footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px 20px 20px 20px;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-top: auto;
+        }
+
+        .footer-nav {
+            display: flex;
+            justify-content: center;
+            gap: 22px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .footer-nav a, .footer-modal-trigger {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.2s, text-shadow 0.2s;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .footer-nav a:hover, .footer-modal-trigger:hover {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
+        }
+
+        .policy-modal {
+            position: fixed !important;
+            top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
+            width: 100vw !important; height: 100vh !important;
+            background: rgba(4, 7, 15, 0.92) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 99999 !important;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-body {
+            background: linear-gradient(145deg, #0b111e 0%, #060913 100%);
+            border: 2px solid var(--neon-cyan);
+            border-radius: 16px;
+            max-width: 820px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 35px 30px;
+            color: #cbd5e1;
+            box-shadow: 0 0 40px rgba(0, 243, 255, 0.25);
+            line-height: 1.75;
+            position: relative;
+            text-align: left;
+        }
+
+        .modal-body h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-cyan);
+            margin-top: 0;
+            font-size: 1.6rem;
+        }
+
+        .modal-body h3 {
+            color: var(--neon-magenta);
+            font-family: 'Orbitron', sans-serif;
+            margin-top: 24px;
+            margin-bottom: 8px;
+            font-size: 1.15rem;
+        }
+
+        .modal-date {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--neon-green);
+            font-size: 0.9rem;
+            margin-top: -6px;
+            margin-bottom: 16px;
+        }
+
+        .modal-close-btn {
+            background: linear-gradient(180deg, rgba(188, 19, 254, 0.4), rgba(188, 19, 254, 0.15));
+            border: 1px solid var(--neon-magenta);
+            color: #fff;
+            padding: 8px 18px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            float: right;
+            margin-bottom: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close-btn:hover {
+            background: var(--neon-magenta);
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.8);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. HEADER & TOP NAVIGATION -->
+    <header>
+        <nav class="top-nav">
+            <a href="../index.html" class="back-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Back to LuyaliSims
+            </a>
+            <span class="module-id">MODULE ID: PHYS-MECH-009</span>
+        </nav>
+        
+        <h1>Hooke's Law & Materials Science Laboratory</h1>
+        
+        <p class="lead-summary">
+            Investigate linear elastic deformation, ductile plastic yielding, and constitutive spring network mechanics. Calibrate spring stiffness, log force-displacement data points in tension and compression modes, graph mechanical work done, and evaluate equivalent constants in complex series-parallel spring topologies.
+        </p>
+
+        <!-- Mode Workspace Selector Tabs -->
+        <div class="workspace-tabs">
+            <button class="tab-btn active" id="tabExpBtn" onclick="switchLabTab('exp')">🧪 Experiment & Plotting Rig</button>
+            <button class="tab-btn" id="tabCalcBtn" onclick="switchLabTab('calc')">🧮 Spring Systems Calculator</button>
+        </div>
+    </header>
+
+    <main>
+        <!-- 2. SIMULATOR WORKSPACE CONTAINER -->
+        <section id="simulator-container" aria-label="Interactive Spring Laboratory Workspace">
+            
+            <!-- Real-time Holographic Telemetry HUD -->
+            <div class="hud-telemetry">
+                <div class="telemetry-item">
+                    <span class="tele-label">System State:</span>
+                    <span id="tele-status" class="tele-val green">LINEAR ELASTIC</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Mode:</span>
+                    <span id="tele-mode" class="tele-val">TENSION</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Applied Force (F):</span>
+                    <span id="tele-force" class="tele-val">0.00 N</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Displacement (x):</span>
+                    <span id="tele-disp" class="tele-val pink">0.00 cm</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Strain Energy (Ep):</span>
+                    <span id="tele-energy" class="tele-val green">0.000 J</span>
+                </div>
+                <div class="telemetry-item">
+                    <button id="fullscreenBtn" class="sim-btn secondary btn-sm">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                        </svg>
+                        Fullscreen
+                    </button>
+                </div>
+            </div>
+
+            <!-- ======================================================= -->
+            <!-- TAB 1: EXPERIMENTAL APPARATUS & MULTI-GRAPH ENGINE      -->
+            <!-- ======================================================= -->
+            <div id="experimentView" class="view-content active">
+                <div class="lab-grid">
+                    
+                    <!-- Col 1: Virtual Spring Rig (Interactive Pan & Zoom Canvas) -->
+                    <div class="card">
+                        <h2>
+                            <span id="rigTitle">Virtual Spring Rig</span>
+                            <span style="font-size:0.75rem; color:var(--neon-green); font-family:'Share Tech Mono', monospace;">50 cm Ruler Scale</span>
+                        </h2>
+
+                        <div class="interactive-viewer-wrap">
+                            <div class="viewer-toolbar">
+                                <button class="sim-btn btn-sm" title="Zoom In" onclick="zoomRig(1.2)">➕</button>
+                                <button class="sim-btn btn-sm" title="Zoom Out" onclick="zoomRig(0.8)">➖</button>
+                                <button class="sim-btn secondary btn-sm" title="Fit Rig to Screen" onclick="fitRigView()">↕ Fit</button>
+                                <button class="sim-btn secondary btn-sm" title="Reset View" onclick="resetRigView()">↺ Reset</button>
+                                <span class="zoom-badge" id="rigZoomBadge">100%</span>
+                            </div>
+
+                            <div class="viewer-hint">🖱️ Drag to pan • Scroll to zoom</div>
+                            <canvas id="springCanvas" class="interactive-canvas" width="410" height="520"></canvas>
+                        </div>
+
+                        <div id="elasticWarning" class="alert-banner">
+                            ⚠️ <strong>ELASTIC LIMIT EXCEEDED!</strong> The specimen has yielded into ductile plastic deformation. Proportionality no longer holds!
+                        </div>
+                    </div>
+
+                    <!-- Col 2: Instrumentation Controls & Table -->
+                    <div class="card">
+                        <h2>Instrumentation & Data Logger</h2>
+
+                        <div class="mode-switch-group">
+                            <button class="mode-switch-btn active" id="modeBtnTension" onclick="setExperimentMode('tension')">🪝 Tension (Extension)</button>
+                            <button class="mode-switch-btn" id="modeBtnCompression" onclick="setExperimentMode('compression')">🗜️ Compression</button>
+                        </div>
+
+                        <div class="control-group">
+                            <label>
+                                <span>Spring Stiffness (k):</span>
+                                <span class="math-label" id="kValLabel">30.0 N/m</span>
+                            </label>
+                            <input type="range" id="kSlider" min="15" max="100" step="1" value="30" oninput="onKChange(this.value)">
+                        </div>
+
+                        <div class="control-group">
+                            <label>
+                                <span>Load Specimen (m):</span>
+                                <span class="math-label" id="massValLabel">0.00 kg</span>
+                            </label>
+                            <input type="range" id="massSlider" min="0" max="1.6" step="0.05" value="0" oninput="onMassSlider(this.value)">
+                        </div>
+
+                        <div class="control-group">
+                            <label>Quick Weights Addition:</label>
+                            <div class="btn-group">
+                                <button class="sim-btn btn-sm" onclick="addMass(0.05)">+50 g</button>
+                                <button class="sim-btn btn-sm" onclick="addMass(0.10)">+100 g</button>
+                                <button class="sim-btn btn-sm" onclick="addMass(0.20)">+200 g</button>
+                                <button class="sim-btn danger btn-sm" onclick="resetMass()">Reset Load</button>
+                            </div>
+                        </div>
+
+                        <div class="readout-grid">
+                            <div class="readout-box">
+                                <div class="label" id="readoutExtLabel">Extension (x)</div>
+                                <div class="val" id="readoutExt">0.00 cm</div>
+                            </div>
+                            <div class="readout-box">
+                                <div class="label" id="readoutStressLabel">Tensile Stress (σ)</div>
+                                <div class="val" id="readoutStress">0.00 MPa</div>
+                            </div>
+                            <div class="readout-box">
+                                <div class="label" id="readoutStrainLabel">Tensile Strain (ε)</div>
+                                <div class="val" id="readoutStrain">0.0000</div>
+                            </div>
+                            <div class="readout-box">
+                                <div class="label">Strain Energy (Ep)</div>
+                                <div class="val" id="readoutEnergy" style="color:var(--neon-green);">0.000 J</div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 8px;">
+                            <button class="sim-btn" style="flex:1;" onclick="recordDataPoint()">📝 Log Point</button>
+                            <button class="sim-btn secondary" onclick="clearTable()">Clear Table</button>
+                        </div>
+
+                        <div class="table-container">
+                            <table id="dataTable">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Mode</th>
+                                        <th>F (N)</th>
+                                        <th><span id="tableExtHeader">x (cm)</span></th>
+                                        <th>σ (MPa)</th>
+                                        <th>ε</th>
+                                        <th>Ep (J)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dataTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Col 3: Real-Time Multi-Mode Analytics Graph -->
+                    <div class="card">
+                        <h2>
+                            <span>Data Visualizer</span>
+                            <button class="sim-btn secondary btn-sm" onclick="toggleGraphModal(true)">⛶ Expand</button>
+                        </h2>
+
+                        <div class="control-group">
+                            <label for="graphModeSelect">Plot Analytics Mode:</label>
+                            <select id="graphModeSelect" onchange="onGraphModeChange(this.value)">
+                                <option value="f_vs_x">Force (F) vs. Displacement (x)</option>
+                                <option value="stress_vs_strain">Stress (σ) vs. Strain (ε)</option>
+                                <option value="energy_vs_x">Strain Energy (Ep) vs. Extension (x)</option>
+                            </select>
+                        </div>
+
+                        <canvas id="graphCanvas" width="450" height="360"></canvas>
+                        
+                        <p id="graphSlopeSummary" style="font-family:'Share Tech Mono', monospace; font-size:0.8rem; color:var(--neon-cyan); line-height:1.4;">
+                            Theoretical curve plotted for active specimen.
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ======================================================= -->
+            <!-- TAB 2: SYSTEM CALCULATOR WITH MODULAR SCHEMATIC VIEWER -->
+            <!-- ======================================================= -->
+            <div id="calculatorView" class="view-content">
+                <div class="calc-layout-grid">
+                    
+                    <!-- Left: Dynamic Spring Schematic Viewer (Pan & Zoom) -->
+                    <div class="card">
+                        <h2>
+                            <span>Spring Apparatus Visualizer</span>
+                            <span style="font-size:0.75rem; color:var(--neon-green); font-family:'Share Tech Mono', monospace;">Real-Time Kinetic Stretch</span>
+                        </h2>
+
+                        <div class="interactive-viewer-wrap">
+                            <div class="viewer-toolbar">
+                                <button class="sim-btn btn-sm" title="Zoom In" onclick="zoomCalc(1.2)">➕</button>
+                                <button class="sim-btn btn-sm" title="Zoom Out" onclick="zoomCalc(0.8)">➖</button>
+                                <button class="sim-btn secondary btn-sm" title="Fit to Screen" onclick="fitCalcView()">↕ Fit</button>
+                                <button class="sim-btn secondary btn-sm" title="Reset View" onclick="resetCalcView()">↺ Reset</button>
+                                <span class="zoom-badge" id="calcZoomBadge">100%</span>
+                            </div>
+
+                            <div class="viewer-hint">🖱️ Drag to pan • Scroll to zoom</div>
+                            <canvas id="calcDiagramCanvas" class="interactive-canvas" width="600" height="520"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Right: Topology Selection & Arithmetic Platform -->
+                    <div class="card">
+                        <h2>Network Topology & Solver</h2>
+
+                        <div class="control-group">
+                            <label for="systemType">Arrangement Architecture:</label>
+                            <select id="systemType" onchange="updateCalcSystem(true)">
+                                <option value="single">Single Spring</option>
+                                <option value="parallel">Parallel Network (n identical springs)</option>
+                                <option value="series">Series Chain (n identical springs)</option>
+                                <option value="comb_2p_1s">Compound A: (2 Parallel) in Series with (1 Spring)</option>
+                                <option value="comb_2p_2p">Compound B: (2 Parallel) in Series with (2 Parallel)</option>
+                                <option value="comb_3p_1s">Compound C: (3 Parallel) in Series with (1 Spring)</option>
+                                <option value="comb_series_parallel">Compound D: (2 Series) in Parallel with (1 Spring)</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group" id="springCountGroup">
+                            <label>
+                                <span>Spring Units in Group (n):</span>
+                                <span class="math-label" id="springCountLabel">3</span>
+                            </label>
+                            <input type="range" id="springCountInput" min="2" max="5" step="1" value="3" oninput="updateCalcSystem(true)">
+                        </div>
+
+                        <div class="control-group">
+                            <label>
+                                <span>Stiffness per Coil (k):</span>
+                                <span class="math-label" id="calcKLabel">45.0 N/m</span>
+                            </label>
+                            <input type="range" id="calcKInput" min="10" max="200" step="5" value="45" oninput="updateCalcSystem()">
+                        </div>
+
+                        <div class="control-group">
+                            <label>
+                                <span>Attached Mass (m):</span>
+                                <span class="math-label" id="calcMassLabel">2.40 kg</span>
+                            </label>
+                            <input type="range" id="calcMassInput" min="0.1" max="4.0" step="0.1" value="2.4" oninput="updateCalcSystem()">
+                        </div>
+
+                        <div class="readout-grid">
+                            <div class="readout-box">
+                                <div class="label">Equivalent Stiffness (k_eq)</div>
+                                <div class="val" id="calcKeq" style="color:var(--neon-cyan);">--</div>
+                            </div>
+                            <div class="readout-box">
+                                <div class="label">Total Force (F_total)</div>
+                                <div class="val" id="calcTotalForce">--</div>
+                            </div>
+                            <div class="readout-box">
+                                <div class="label">System Stretch (X_tot)</div>
+                                <div class="val" id="calcTotalExt" style="color:#ff55bb;">--</div>
+                            </div>
+                            <div class="readout-box">
+                                <div class="label">Total Strain Energy (W)</div>
+                                <div class="val" id="calcTotalWork" style="color:var(--neon-green);">--</div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="collapsible-header" id="breakdownToggleBtn" onclick="toggleBreakdown()">
+                                <span>📘 Step-by-Step Analytical Derivation</span>
+                                <span id="breakdownIcon">▼</span>
+                            </div>
+                            <div class="collapsible-content" id="breakdownContent">
+                                <div id="calcDerivationDetails"></div>
+                            </div>
+                        </div>
+
+                        <div style="background: rgba(4, 9, 20, 0.7); border: 1px solid rgba(0, 243, 255, 0.3); border-radius: 8px; padding: 10px; font-size: 0.85rem; color: #cbd5e1; line-height: 1.5;">
+                            💡 <strong>Constitutive Rules:</strong> Springs in parallel share total external load (F_total = sum of F_i) and extend equally. Springs in series sustain equal force (F_i = F_total) while their respective extensions add up.
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </section>
+
+        <!-- 3. SAFE AD PLACEMENT SLOT -->
+        <div class="ad-slot-wrapper">
+            <div class="ad-disclaimer">Advertisement</div>
+            <div class="ad-box-placeholder">
+                <!-- Google AdSense Responsive Display Ad Unit -->
+                <span>[AdSense Responsive Display Unit]</span>
+            </div>
+        </div>
+
+        <!-- 4. EDUCATIONAL REFERENCE & LABORATORY MANUAL -->
+        <article class="educational-content">
+            <section>
+                <h2>How to Operate the Simulator</h2>
+                <p>
+                    This virtual laboratory enables precision testing of elastic bodies under tensile and compressive loading, alongside the quantitative analysis of complex spring arrays:
+                </p>
+                <ol style="margin-left: 20px; margin-top: 8px; display: flex; flex-direction: column; gap: 8px;">
+                    <li><strong>Rig Setup & Mode Selection:</strong> Toggle between <em>Tension (Extension)</em> and <em>Compression</em>. In tension mode, weights suspend from the lower hook; in compression mode, weights push down onto the upper load plate.</li>
+                    <li><strong>Stiffness & Load Tuning:</strong> Adjust the spring stiffness slider (<em>k</em>) to vary coil thickness and resistance. Adjust the load mass (<em>m</em>) or click quick-addition buttons (+50 g, +100 g, +200 g) to observe real-time extension against the integrated 50 cm ruler.</li>
+                    <li><strong>Plastic Yielding Identification:</strong> If the extension exceeds the 30.0 cm threshold (elastic limit), the coils turn red and a plastic yield warning triggers. In this region, deformation is non-linear and permanent.</li>
+                    <li><strong>Logging & Plotting:</strong> Click <strong>Log Point</strong> to record values in the data table. Use the graph selector to switch between <em>Force vs. Displacement</em>, <em>Stress vs. Strain</em>, and <em>Strain Energy vs. Extension</em>.</li>
+                    <li><strong>Spring Network Solver (Tab 2):</strong> Switch to the <strong>Spring Systems Calculator</strong> to configure single, series, parallel, and compound networks. Inspect how total tension distributes through sub-branches and review the step-by-step arithmetic derivation.</li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>Scientific Theory & Working Principles</h2>
+                <p>
+                    Robert Hooke first stated in 1678 that the deformation of an elastic body is proportional to the deforming force applied to it, expressed as <em>ceiiinosssttuv</em> (Latin: <em>Ut tensio, sic vis</em> — "as the extension, so the force").
+                </p>
+                <p>
+                    <strong>1. The Proportional & Elastic Limit:</strong> For small displacements, metallic crystal lattices undergo reversible bond stretching. The restoring force exerted by the spring opposes the displacement. When the applied stress surpasses the material's yield strength, slip planes in the crystal dislocation network slide permanently. The specimen transitions into plastic deformation, where displacement no longer returns to zero upon unloading.
+                </p>
+                <p>
+                    <strong>2. Stress and Strain Normalization:</strong> Hooke's law is a macroscopic manifestation of the microscopic stress-strain relationship. Engineering stress (<em>σ</em>) normalizes applied tensile force over original wire cross-sectional area (<em>A</em>), while engineering strain (<em>ε</em>) normalizes change in length over original active coil length (<em>L</em><sub>0</sub>). In the linear regime, stress and strain are linked via Young's Modulus (<em>E</em>): <em>σ = E · ε</em>.
+                </p>
+                <p>
+                    <strong>3. Elastic Strain Energy:</strong> The work done by an external load stretching a spring from rest to displacement <em>x</em> is stored internally as elastic potential energy (<em>E</em><sub>p</sub>). On a Force vs. Displacement plot, this work corresponds to the area under the curve. For an ideal linear spring, this produces the parabolic relation <em>E</em><sub>p</sub> = 0.5 · <em>k</em> · <em>x</em><sup>2</sup>.
+                </p>
+            </section>
+
+            <section>
+                <h2>Mathematical Foundations & Formulas</h2>
+                <p>Key governing equations for solid mechanics and spring networks:</p>
+                
+                <div class="formula-box">
+                    <strong>Hooke's Law (Restoring Force):</strong> F_restoring = -k · x<br>
+                    <strong>Applied Equilibrium Load:</strong> F = m · g = k · x<br>
+                    <strong>Engineering Stress:</strong> σ = F / A &nbsp;&nbsp;(where A = π · r_wire²)<br>
+                    <strong>Engineering Strain:</strong> ε = ΔL / L₀ = x / L₀<br>
+                    <strong>Elastic Strain Energy:</strong> Ep = 0.5 · k · x² = 0.5 · F · x<br>
+                    <strong>Springs in Parallel:</strong> k_eq = k₁ + k₂ + ... + k_n<br>
+                    <strong>Springs in Series:</strong> 1 / k_eq = 1 / k₁ + 1 / k₂ + ... + 1 / k_n
+                </div>
+            </section>
+
+            <section>
+                <h2>Real-World Engineering & Industrial Applications</h2>
+                <p>Constitutive spring mechanics are foundational to modern structural and mechanical systems:</p>
+                <ul style="margin-left: 20px; margin-top: 8px; display: flex; flex-direction: column; gap: 8px;">
+                    <li><strong>Automotive Suspension Struts:</strong> Vehicle suspension combines coil springs in parallel with pneumatic shock absorbers. Springs isolate the chassis from high-frequency road vibrations, while designers calculate equivalent stiffness to optimize ride comfort and roll stability.</li>
+                    <li><strong>Earthquake Base Isolators:</strong> Civil structures in seismic zones rest on heavy elastomeric bearings and lead-rubber spring assemblies. Acting as parallel spring-damper banks, these isolators lower the building's natural frequency, decoupling it from ground accelerations.</li>
+                    <li><strong>Precision Seismometry & Accelerometers:</strong> Micro-electro-mechanical systems (MEMS) sensors use micro-etched silicon cantilever springs to suspend proof masses. External accelerations produce minute displacements measured through capacitive readouts governed by Hooke's proportionality.</li>
+                    <li><strong>Biomechanical Prosthetics & Tendon Robotics:</strong> Modern carbon-fiber prosthetic running blades act as high-efficiency leaf springs that store and release strain energy (<em>E</em><sub>p</sub>) during the stance phase, closely replicating human Achilles tendon biomechanics.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Practice Problems & Diagnostic Tasks</h2>
+                <p>Consolidate your quantitative comprehension with five senior high school laboratory problems:</p>
+
+                <div class="task-card">
+                    <div class="task-title">Task 1: Direct Proportionality & Extension</div>
+                    <p>
+                        A calibrated steel spring has a stiffness of <em>k</em> = 40.0 N/m and an unstretched length of 20.0 cm. A laboratory weight of mass <em>m</em> = 0.60 kg is suspended from the spring and allowed to reach static equilibrium. Taking gravitational acceleration <em>g</em> = 9.81 m/s², determine the gravitational force (load) applied, the resulting extension in centimeters, and the total stretched length of the spring.
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 2: Parallel Suspension Analysis</div>
+                    <p>
+                        A rigid, horizontal support bar suspends an engine block weighing 600 N. The bar is supported symmetrically by four identical, non-yielding vertical springs arranged in parallel. If each individual spring possesses a spring constant of <em>k</em> = 750 N/m, calculate:
+                        <br>(a) The equivalent spring constant (<em>k</em><sub>eq</sub>) of the four-spring network.
+                        <br>(b) The vertical displacement (stretch) of the engine block.
+                        <br>(c) The tensile load borne by each individual spring.
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 3: Series Chain Extension & Energy</div>
+                    <p>
+                        Two springs with constants <em>k</em><sub>1</sub> = 60.0 N/m and <em>k</em><sub>2</sub> = 30.0 N/m are connected in series end-to-end. A tensile load of <em>F</em> = 12.0 N is applied across the overall chain.
+                        <br>(a) Calculate the equivalent spring constant of the series combination.
+                        <br>(b) Calculate the individual extension in each spring.
+                        <br>(c) Determine the total elastic strain energy stored in the combined system.
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 4: Limit Analysis & Plastic Threshold</div>
+                    <p>
+                        A testing rig uses a spring with stiffness <em>k</em> = 35.0 N/m and an elastic limit defined at an extension of <em>x</em><sub>limit</sub> = 0.30 m. 
+                        <br>(a) What maximum suspended mass (kg) can be attached before permanent plastic deformation occurs?
+                        <br>(b) If a 1.50 kg mass is mistakenly hung on this spring, calculate the excess deforming force acting beyond the proportional threshold.
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 5: Compound Suspension Troubleshooting</div>
+                    <p>
+                        An industrial apparatus employs Compound Arrangement A: two identical springs with stiffness <em>k</em> = 50.0 N/m arranged in parallel, connected in series with a single identical spring (<em>k</em> = 50.0 N/m). A total mass of <em>m</em> = 2.0 kg is suspended from the bottom hook.
+                        <br>(a) Determine the equivalent stiffness (<em>k</em><sub>eq</sub>) of this compound system.
+                        <br>(b) Find the extension of the parallel section and the single series spring section.
+                        <br>(c) Find the total vertical displacement of the 2.0 kg load.
+                    </p>
+                </div>
+
+                <!-- Collapsible Step-by-Step Solutions -->
+                <details>
+                    <summary>Click to Reveal Step-by-Step Solutions and Proofs</summary>
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 1:</strong></p>
+                        <p>1. Applied force: <em>F</em> = <em>m</em> · <em>g</em> = 0.60 kg × 9.81 m/s² = <strong>5.886 N</strong>.</p>
+                        <p>2. Extension: <em>x</em> = <em>F</em> / <em>k</em> = 5.886 N / 40.0 N/m = 0.14715 m = <strong>14.72 cm</strong>.</p>
+                        <p>3. Total length: <em>L</em> = <em>L</em><sub>0</sub> + <em>x</em> = 20.0 cm + 14.72 cm = <strong>34.72 cm</strong>.</p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 2:</strong></p>
+                        <p>1. Equivalent stiffness for <em>n</em> = 4 springs in parallel: <em>k</em><sub>eq</sub> = <em>n</em> · <em>k</em> = 4 × 750 N/m = <strong>3000 N/m</strong>.</p>
+                        <p>2. Displacement: <em>X</em> = <em>F</em><sub>total</sub> / <em>k</em><sub>eq</sub> = 600 N / 3000 N/m = 0.20 m = <strong>20.0 cm</strong>.</p>
+                        <p>3. Load sharing: Because the load is shared equally, <em>F</em><sub>i</sub> = <em>F</em><sub>total</sub> / 4 = 600 N / 4 = <strong>150 N per spring</strong>.</p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 3:</strong></p>
+                        <p>1. Series equivalent stiffness: 1 / <em>k</em><sub>eq</sub> = 1/<em>k</em><sub>1</sub> + 1/<em>k</em><sub>2</sub> = 1/60 + 1/30 = 3/60 = 1/20. Hence, <em>k</em><sub>eq</sub> = <strong>20.0 N/m</strong>.</p>
+                        <p>2. In series, both springs experience the full force <em>F</em> = 12.0 N:<br>
+                        Extension 1: <em>x</em><sub>1</sub> = 12.0 N / 60.0 N/m = 0.20 m = <strong>20.0 cm</strong>.<br>
+                        Extension 2: <em>x</em><sub>2</sub> = 12.0 N / 30.0 N/m = 0.40 m = <strong>40.0 cm</strong>.<br>
+                        Total extension = <em>x</em><sub>1</sub> + <em>x</em><sub>2</sub> = <strong>60.0 cm</strong>.</p>
+                        <p>3. Total strain energy: <em>E</em><sub>p</sub> = 0.5 · <em>k</em><sub>eq</sub> · <em>x</em><sub>tot</sub><sup>2</sup> = 0.5 × 20.0 N/m × (0.60 m)<sup>2</sup> = <strong>3.60 J</strong>.</p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 4:</strong></p>
+                        <p>1. Maximum proportional force: <em>F</em><sub>limit</sub> = <em>k</em> · <em>x</em><sub>limit</sub> = 35.0 N/m × 0.30 m = <strong>10.5 N</strong>.</p>
+                        <p>Max mass: <em>m</em><sub>limit</sub> = <em>F</em><sub>limit</sub> / <em>g</em> = 10.5 N / 9.81 m/s² = <strong>1.07 kg</strong>.</p>
+                        <p>2. Actual applied force for 1.50 kg: <em>F</em><sub>applied</sub> = 1.50 kg × 9.81 m/s² = <strong>14.715 N</strong>.</p>
+                        <p>Excess force beyond elastic threshold: Δ<em>F</em> = 14.715 N - 10.5 N = <strong>4.215 N</strong> (causing ductile plastic yielding).</p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 5:</strong></p>
+                        <p>1. Parallel upper stage: <em>k</em><sub>p</sub> = <em>k</em> + <em>k</em> = 50.0 + 50.0 = 100.0 N/m.<br>
+                        Combined with lower single spring in series: 1 / <em>k</em><sub>eq</sub> = 1/<em>k</em><sub>p</sub> + 1/<em>k</em> = 1/100 + 1/50 = 3/100.<br>
+                        <em>k</em><sub>eq</sub> = 100 / 3 = <strong>33.33 N/m</strong>.</p>
+                        <p>2. Total weight suspended: <em>F</em> = 2.0 kg × 9.81 m/s² = 19.62 N.<br>
+                        Parallel upper stage stretch: <em>x</em><sub>p</sub> = 19.62 N / 100.0 N/m = 0.1962 m = <strong>19.62 cm</strong>.<br>
+                        Single lower spring stretch: <em>x</em><sub>s</sub> = 19.62 N / 50.0 N/m = 0.3924 m = <strong>39.24 cm</strong>.</p>
+                        <p>3. Total displacement: <em>X</em><sub>tot</sub> = <em>x</em><sub>p</sub> + <em>x</em><sub>s</sub> = 19.62 cm + 39.24 cm = <strong>58.86 cm</strong>.</p>
+                    </div>
+                </details>
+            </section>
+        </article>
+    </main>
+
+    <!-- EXPANDED GRAPH MODAL -->
+    <div id="graphModal" class="modal-overlay" role="dialog" aria-modal="true">
+        <div class="modal-body-graph">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2 style="font-family:'Orbitron', sans-serif; font-size:1.15rem; color:var(--neon-cyan);">Expanded Scientific Plotter</h2>
+                <button class="sim-btn danger btn-sm" onclick="toggleGraphModal(false)">✕ Close</button>
+            </div>
+            <canvas id="expandedGraphCanvas"></canvas>
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem;">
+                <span id="modalSlopeSummary" style="font-family:'Share Tech Mono', monospace; color:var(--neon-green);">Analytical summary</span>
+                <button class="sim-btn secondary btn-sm" onclick="exportDataCSV()">📥 Export Data (CSV)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. SYNCHRONIZED COMPLIANCE FOOTER -->
+    <footer>
+        <nav class="footer-nav">
+            <a href="../index.html">Home</a>
+            <a href="../index.html#about-section">About Us</a>
+            <button type="button" class="footer-modal-trigger" onclick="openSimModal('simPrivacyModal')">Privacy Policy</button>
+            <button type="button" class="footer-modal-trigger" onclick="openSimModal('simTermsModal')">Terms of Service</button>
+            <a href="../index.html#contact-section">Contact Us</a>
+            <a href="https://forms.gle/fYxxaNKAh21dPUoBA" target="_blank" rel="noopener noreferrer">Simulator Suggestions</a>
+        </nav>
+        <p>&copy; 2026 LuyaliSims | Engineered by Click & Draft | Dedicated to Open STEM Education</p>
+    </footer>
+
+    <!-- 6. IDENTICAL PRIVACY POLICY MODAL -->
+    <div id="simPrivacyModal" class="policy-modal" role="dialog" aria-modal="true" aria-labelledby="privacyTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeSimModal('simPrivacyModal')">Close [✕]</button>
+            <h2 id="privacyTitle">Privacy Policy</h2>
+            <p class="modal-date">Last Updated: September 2026</p>
+            <p>Welcome to LuyaliSims. We respect your privacy and are committed to protecting your personal data. This privacy policy explains how we treat information when you interact with our educational simulators.</p>
+            
+            <h3>1. Educational Purpose & Information Collection</h3>
+            <p>LuyaliSims is a free educational portal. We do not require account registration, passwords, or personal login information to run any simulation. All simulation calculations occur locally within your browser using client-side JavaScript.</p>
+
+            <h3>2. Google AdSense & Third-Party Cookies</h3>
+            <p>We may display advertisements served by Google AdSense to fund our free educational tools. Google, as a third-party vendor, uses cookies to serve ads on our site based on users' visits to this and other sites on the Internet.</p>
+            <ul style="margin-left: 20px;">
+                <li>Google's use of advertising cookies enables it and its partners to serve ads based on your visit to LuyaliSims and other sites.</li>
+                <li>Users may opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" style="color: var(--neon-cyan);">Google Ads Settings</a>.</li>
+            </ul>
+
+            <h3>3. Log Files & Analytics</h3>
+            <p>Like standard websites, our hosting servers collect anonymous log records (including IP addresses, browser types, and timestamp references) to monitor server uptime, fix script errors, and optimize simulator performance.</p>
+
+            <h3>4. Children's Online Privacy (COPPA Compliance)</h3>
+            <p>Our educational simulators are built for students and educators of all ages. We do not knowingly solicit or collect personally identifiable information from children under 13.</p>
+
+            <h3>5. Contact Regarding Privacy</h3>
+            <p>If you have any questions regarding this policy, contact us at: <a href="mailto:luyashliz@gmail.com" style="color: var(--neon-cyan);">luyashliz@gmail.com</a>.</p>
+        </div>
+    </div>
+
+    <!-- 7. IDENTICAL TERMS OF SERVICE MODAL -->
+    <div id="simTermsModal" class="policy-modal" role="dialog" aria-modal="true" aria-labelledby="termsTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeSimModal('simTermsModal')">Close [✕]</button>
+            <h2 id="termsTitle">Terms of Service</h2>
+            <p class="modal-date">Effective Date: September 2026</p>
+
+            <h3>1. Permitted Educational Use</h3>
+            <p>All interactive models, simulations, practice problems, and laboratory worksheets on LuyaliSims are made freely available for classroom demonstrations, academic study, tutoring, and self-paced individual learning.</p>
+
+            <h3>2. Intellectual Property</h3>
+            <p>The code architecture, layout designs, and custom interactive engines are the intellectual property of Ian Luyali and Click & Draft. You may use our simulators online in academic settings, but mirroring or re-hosting our code for commercial resale without permission is prohibited.</p>
+
+            <h3>3. Disclaimer of Scientific Warranty</h3>
+            <p>While simulations are engineered to accurately replicate classical mechanics, thermodynamics, and electronics, they are provided as conceptual learning aids. LuyaliSims is not liable for outcomes in real-world high-voltage or hazardous laboratory environments constructed without professional teacher supervision.</p>
+
+            <h3>4. Updates to Terms</h3>
+            <p>We reserve the right to refine these terms as new laboratory modules and features are introduced.</p>
+        </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- 8. SIMULATOR CORE SCRIPT & MODAL LOGIC                   -->
+    <!-- ======================================================== -->
+    <script>
+        // Modal Controls
+        function openSimModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeSimModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('policy-modal')) {
+                closeSimModal(e.target.id);
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' || e.key === 'Esc') {
+                document.querySelectorAll('.policy-modal').forEach(m => {
+                    m.style.display = 'none';
+                });
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // Fullscreen Implementation
+        const simContainer = document.getElementById('simulator-container');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                if (simContainer.requestFullscreen) simContainer.requestFullscreen();
+                else if (simContainer.webkitRequestFullscreen) simContainer.webkitRequestFullscreen();
+                fullscreenBtn.innerHTML = 'Exit Screen';
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+                fullscreenBtn.innerHTML = `
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                    </svg> Fullscreen`;
+            }
+        });
+
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                fullscreenBtn.innerHTML = `
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                    </svg> Fullscreen`;
+            }
+        });
+
+        // ========================================================
+        // PHYSICS MODEL & SPECIMEN PROPERTIES
+        // ========================================================
+        const g = 9.81; // m/s²
+        const L0 = 0.20; // 20 cm initial length of active coil section
+        const wireDiameter = 0.002; // 2 mm wire diameter
+        const crossSectionalArea = Math.PI * Math.pow(wireDiameter / 2, 2); // m²
+        const elasticLimitExtension = 0.30; // 30 cm limit threshold
+
+        let experimentMode = "tension"; // "tension" or "compression"
+        let currentK = 30.0;
+        let currentMass = 0.0;
+        let currentGraphMode = "f_vs_x";
+        let recordedPoints = [];
+
+        let animatedExtension = 0.0;
+        let targetExtension = 0.0;
+
+        // Canvases
+        const springCanvas = document.getElementById("springCanvas");
+        const springCtx = springCanvas.getContext("2d");
+        const graphCanvas = document.getElementById("graphCanvas");
+        const graphCtx = graphCanvas.getContext("2d");
+        const expandedGraphCanvas = document.getElementById("expandedGraphCanvas");
+        const expandedGraphCtx = expandedGraphCanvas.getContext("2d");
+        const calcDiagramCanvas = document.getElementById("calcDiagramCanvas");
+        const calcDiagramCtx = calcDiagramCanvas.getContext("2d");
+
+        // ========================================================
+        // RIG PAN & ZOOM ENGINE (TAB 1)
+        // ========================================================
+        let rigZoom = 1.0;
+        let rigPanX = 0;
+        let rigPanY = 0;
+        let isRigDragging = false;
+        let rigDragStartX = 0;
+        let rigDragStartY = 0;
+
+        function resetRigView() {
+            rigZoom = 1.0;
+            rigPanX = 0;
+            rigPanY = 0;
+            updateRigZoomBadge();
+        }
+
+        function zoomRig(factor) {
+            rigZoom = Math.max(0.15, Math.min(3.5, rigZoom * factor));
+            updateRigZoomBadge();
+        }
+
+        function updateRigZoomBadge() {
+            document.getElementById("rigZoomBadge").innerText = Math.round(rigZoom * 100) + "%";
+        }
+
+        function fitRigView() {
+            const pixelsPerCm = 430 / 50;
+            const unextendedPixels = 100;
+            const extPixels = animatedExtension * 100 * pixelsPerCm;
+            const canvasH = springCanvas.height;
+
+            if (experimentMode === "tension") {
+                const currentBottomY = 34 + unextendedPixels + extPixels + 50;
+                rigZoom = Math.min(1.0, Math.max(0.2, (canvasH - 40) / currentBottomY));
+                rigPanX = 0;
+                rigPanY = 15;
+            } else {
+                rigZoom = 1.0;
+                rigPanX = 0;
+                rigPanY = 20;
+            }
+            updateRigZoomBadge();
+        }
+
+        springCanvas.addEventListener("wheel", (e) => {
+            e.preventDefault();
+            const factor = e.deltaY < 0 ? 1.12 : 0.88;
+            rigZoom = Math.max(0.15, Math.min(3.5, rigZoom * factor));
+            updateRigZoomBadge();
+        }, { passive: false });
+
+        springCanvas.addEventListener("mousedown", (e) => {
+            isRigDragging = true;
+            rigDragStartX = e.clientX - rigPanX;
+            rigDragStartY = e.clientY - rigPanY;
+        });
+
+        window.addEventListener("mousemove", (e) => {
+            if (!isRigDragging) return;
+            rigPanX = e.clientX - rigDragStartX;
+            rigPanY = e.clientY - rigDragStartY;
+        });
+
+        window.addEventListener("mouseup", () => {
+            isRigDragging = false;
+        });
+
+        let rigTouchStartDist = 0;
+        springCanvas.addEventListener("touchstart", (e) => {
+            if (e.touches.length === 1) {
+                isRigDragging = true;
+                rigDragStartX = e.touches[0].clientX - rigPanX;
+                rigDragStartY = e.touches[0].clientY - rigPanY;
+            } else if (e.touches.length === 2) {
+                rigTouchStartDist = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+            }
+        });
+
+        springCanvas.addEventListener("touchmove", (e) => {
+            if (e.touches.length === 1 && isRigDragging) {
+                rigPanX = e.touches[0].clientX - rigDragStartX;
+                rigPanY = e.touches[0].clientY - rigDragStartY;
+            } else if (e.touches.length === 2) {
+                e.preventDefault();
+                const dist = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                if (rigTouchStartDist > 0) {
+                    const factor = dist / rigTouchStartDist;
+                    rigZoom = Math.max(0.15, Math.min(3.5, rigZoom * factor));
+                    rigTouchStartDist = dist;
+                    updateRigZoomBadge();
+                }
+            }
+        }, { passive: false });
+
+        springCanvas.addEventListener("touchend", () => {
+            isRigDragging = false;
+            rigTouchStartDist = 0;
+        });
+
+        // ========================================================
+        // CALCULATOR PAN & ZOOM ENGINE (TAB 2)
+        // ========================================================
+        let calcZoom = 1.0;
+        let calcPanX = 0;
+        let calcPanY = 0;
+        let isCalcDragging = false;
+        let calcDragStartX = 0;
+        let calcDragStartY = 0;
+        let lastRenderedSchematicParams = null;
+
+        function resetCalcView() {
+            calcZoom = 1.0;
+            calcPanX = 0;
+            calcPanY = 0;
+            updateCalcZoomBadge();
+            redrawCurrentSchematic();
+        }
+
+        function zoomCalc(factor) {
+            calcZoom = Math.max(0.25, Math.min(3.5, calcZoom * factor));
+            updateCalcZoomBadge();
+            redrawCurrentSchematic();
+        }
+
+        function updateCalcZoomBadge() {
+            document.getElementById("calcZoomBadge").innerText = Math.round(calcZoom * 100) + "%";
+        }
+
+        function fitCalcView() {
+            if (!lastRenderedSchematicParams) return;
+            const totalH = lastRenderedSchematicParams.totalApparatusHeight || 400;
+            const canvasH = calcDiagramCanvas.height;
+            calcZoom = Math.min(1.4, Math.max(0.3, (canvasH - 80) / totalH));
+            calcPanX = 0;
+            calcPanY = 20;
+            updateCalcZoomBadge();
+            redrawCurrentSchematic();
+        }
+
+        calcDiagramCanvas.addEventListener("wheel", (e) => {
+            e.preventDefault();
+            const factor = e.deltaY < 0 ? 1.12 : 0.88;
+            calcZoom = Math.max(0.25, Math.min(3.5, calcZoom * factor));
+            updateCalcZoomBadge();
+            redrawCurrentSchematic();
+        }, { passive: false });
+
+        calcDiagramCanvas.addEventListener("mousedown", (e) => {
+            isCalcDragging = true;
+            calcDragStartX = e.clientX - calcPanX;
+            calcDragStartY = e.clientY - calcPanY;
+        });
+
+        window.addEventListener("mousemove", (e) => {
+            if (!isCalcDragging) return;
+            calcPanX = e.clientX - calcDragStartX;
+            calcPanY = e.clientY - calcDragStartY;
+            redrawCurrentSchematic();
+        });
+
+        window.addEventListener("mouseup", () => {
+            isCalcDragging = false;
+        });
+
+        calcDiagramCanvas.addEventListener("touchstart", (e) => {
+            if (e.touches.length === 1) {
+                isCalcDragging = true;
+                calcDragStartX = e.touches[0].clientX - calcPanX;
+                calcDragStartY = e.touches[0].clientY - calcPanY;
+            }
+        });
+
+        calcDiagramCanvas.addEventListener("touchmove", (e) => {
+            if (e.touches.length === 1 && isCalcDragging) {
+                calcPanX = e.touches[0].clientX - calcDragStartX;
+                calcPanY = e.touches[0].clientY - calcDragStartY;
+                redrawCurrentSchematic();
+            }
+        });
+
+        calcDiagramCanvas.addEventListener("touchend", () => {
+            isCalcDragging = false;
+        });
+
+        function redrawCurrentSchematic() {
+            if (lastRenderedSchematicParams) {
+                const p = lastRenderedSchematicParams;
+                drawCombinationSchematic(p.type, p.count, p.stages, p.mass, p.totalExt);
+            }
+        }
+
+        // ========================================================
+        // TAB MANAGEMENT & EXPERIMENT MODE TOGGLE
+        // ========================================================
+        function switchLabTab(tab) {
+            document.getElementById("experimentView").classList.toggle("active", tab === "exp");
+            document.getElementById("calculatorView").classList.toggle("active", tab === "calc");
+            document.getElementById("tabExpBtn").classList.toggle("active", tab === "exp");
+            document.getElementById("tabCalcBtn").classList.toggle("active", tab === "calc");
+
+            if (tab === "exp") {
+                renderGraph(graphCanvas, graphCtx);
+            } else {
+                updateCalcSystem(true);
+            }
+        }
+
+        function setExperimentMode(mode) {
+            experimentMode = mode;
+            document.getElementById("modeBtnTension").classList.toggle("active", mode === "tension");
+            document.getElementById("modeBtnCompression").classList.toggle("active", mode === "compression");
+
+            const isComp = mode === "compression";
+            document.getElementById("rigTitle").innerText = isComp ? "Compression Rig" : "Virtual Spring Rig";
+            document.getElementById("readoutExtLabel").innerText = isComp ? "Compression (x)" : "Extension (x)";
+            document.getElementById("readoutStressLabel").innerText = isComp ? "Compressive Stress (σ)" : "Tensile Stress (σ)";
+            document.getElementById("readoutStrainLabel").innerText = isComp ? "Compressive Strain (ε)" : "Tensile Strain (ε)";
+            document.getElementById("tableExtHeader").innerText = isComp ? "Comp x (cm)" : "x (cm)";
+            document.getElementById("tele-mode").innerText = isComp ? "COMPRESSION" : "TENSION";
+
+            resetRigView();
+            updatePhysics();
+            renderGraph(graphCanvas, graphCtx);
+        }
+
+        function toggleBreakdown() {
+            const content = document.getElementById("breakdownContent");
+            const icon = document.getElementById("breakdownIcon");
+            if (content.classList.contains("hidden")) {
+                content.classList.remove("hidden");
+                icon.innerText = "▼";
+            } else {
+                content.classList.add("hidden");
+                icon.innerText = "▶";
+            }
+        }
+
+        // ========================================================
+        // DUCTILE YIELD & STRAIN ENERGY PHYSICS MODEL
+        // ========================================================
+        function computePhysicsAtExtension(x, k) {
+            const xLim = elasticLimitExtension; // 0.30 m
+            const fLim = k * xLim;
+            let force = 0;
+            let energy = 0;
+            let isPlastic = false;
+
+            if (x <= xLim) {
+                force = k * x;
+                energy = 0.5 * k * Math.pow(x, 2);
+            } else {
+                isPlastic = true;
+                const delta = x - xLim;
+                const deltaFMax = 1.6 * (k / 30.0);
+                const kYield = 0.18 * k;
+                const kEff = k - kYield;
+                
+                const expTerm = Math.exp(-(kEff / deltaFMax) * delta);
+                force = fLim + deltaFMax * (1.0 - expTerm) + kYield * delta;
+                energy = 0.5 * k * Math.pow(xLim, 2);
+            }
+
+            const stressMPa = (force / crossSectionalArea) / 1e6;
+            const strain = x / L0;
+
+            return { force, extension: x, isPlastic, stressMPa, strain, energy };
+        }
+
+        function calculateHookeState(mass, k) {
+            const appliedForce = mass * g;
+            const fLim = k * elasticLimitExtension;
+            let ext = 0;
+
+            if (appliedForce <= fLim) {
+                ext = appliedForce / k;
+            } else {
+                const deltaFMax = 1.6 * (k / 30.0);
+                const kYield = 0.18 * k;
+                const kEff = k - kYield;
+
+                let delta = (appliedForce - fLim) / (kYield + 5.0);
+                for (let iter = 0; iter < 12; iter++) {
+                    const expTerm = Math.exp(-(kEff / deltaFMax) * delta);
+                    const fCur = fLim + deltaFMax * (1.0 - expTerm) + kYield * delta;
+                    const fPrime = kEff * expTerm + kYield;
+                    const diff = fCur - appliedForce;
+                    if (Math.abs(diff) < 1e-7) break;
+                    delta -= diff / fPrime;
+                    if (delta < 0) delta = 0;
+                }
+                ext = elasticLimitExtension + delta;
+            }
+
+            return computePhysicsAtExtension(ext, k);
+        }
+
+        function updatePhysics() {
+            const state = calculateHookeState(currentMass, currentK);
+            targetExtension = state.extension;
+
+            document.getElementById("kValLabel").innerText = currentK.toFixed(1) + " N/m";
+            document.getElementById("massValLabel").innerText = currentMass.toFixed(2) + " kg";
+            document.getElementById("readoutExt").innerText = (state.extension * 100).toFixed(2) + " cm";
+            document.getElementById("readoutStress").innerText = state.stressMPa.toFixed(2) + " MPa";
+            document.getElementById("readoutStrain").innerText = state.strain.toFixed(4);
+            document.getElementById("readoutEnergy").innerText = state.energy.toFixed(3) + " J";
+
+            // Telemetry Status Updates
+            document.getElementById("tele-force").innerText = state.force.toFixed(2) + " N";
+            document.getElementById("tele-disp").innerText = (state.extension * 100).toFixed(2) + " cm";
+            document.getElementById("tele-energy").innerText = state.energy.toFixed(3) + " J";
+
+            const teleStatus = document.getElementById("tele-status");
+            if (state.isPlastic) {
+                teleStatus.innerText = "PLASTIC YIELD";
+                teleStatus.className = "tele-val red";
+                document.getElementById("elasticWarning").style.display = "block";
+            } else {
+                teleStatus.innerText = "LINEAR ELASTIC";
+                teleStatus.className = "tele-val green";
+                document.getElementById("elasticWarning").style.display = "none";
+            }
+        }
+
+        function onKChange(val) {
+            currentK = parseFloat(val);
+            updatePhysics();
+            renderGraph(graphCanvas, graphCtx);
+            if (document.getElementById("graphModal").classList.contains("active")) {
+                renderGraph(expandedGraphCanvas, expandedGraphCtx);
+            }
+        }
+
+        function onMassSlider(val) {
+            currentMass = parseFloat(val);
+            updatePhysics();
+        }
+
+        function addMass(delta) {
+            currentMass = Math.min(1.6, Math.max(0, currentMass + delta));
+            document.getElementById("massSlider").value = currentMass;
+            updatePhysics();
+        }
+
+        function resetMass() {
+            currentMass = 0.0;
+            document.getElementById("massSlider").value = 0;
+            updatePhysics();
+        }
+
+        // ========================================================
+        // 3D HELICAL SPRING RENDERING ENGINE
+        // ========================================================
+        function drawRealistic3DSpring(ctx, cx, startY, endY, radius, coils, wireRadius, isStrainedPlastic = false) {
+            const clampedEndY = Math.max(startY + 24, endY);
+            const totalHeight = clampedEndY - startY;
+            const leadIn = Math.min(16, totalHeight * 0.1);
+            const coilRegion = Math.max(10, totalHeight - 2 * leadIn);
+            const step = coilRegion / coils;
+
+            const backColor = isStrainedPlastic ? "#7f1d1d" : "#0284c7";
+            const frontColor = isStrainedPlastic ? "#ef4444" : "#00f3ff";
+            const hookColor = isStrainedPlastic ? "#991b1b" : "#38bdf8";
+
+            // 1. Top Hook
+            ctx.lineWidth = wireRadius * 2.0;
+            ctx.lineCap = "round";
+            ctx.strokeStyle = hookColor;
+            ctx.beginPath();
+            ctx.moveTo(cx, startY);
+            ctx.lineTo(cx, startY + leadIn * 0.45);
+            ctx.bezierCurveTo(
+                cx, startY + leadIn * 0.85,
+                cx + radius, startY + leadIn * 0.65,
+                cx + radius, startY + leadIn
+            );
+            ctx.stroke();
+
+            // 2. Back Half-Turns
+            ctx.lineWidth = wireRadius * 1.85;
+            ctx.strokeStyle = backColor;
+            for (let i = 0; i < coils; i++) {
+                const yTop = startY + leadIn + i * step;
+                const yMid = yTop + step * 0.5;
+                ctx.beginPath();
+                ctx.moveTo(cx + radius, yTop);
+                ctx.bezierCurveTo(
+                    cx + radius, yTop + step * 0.25,
+                    cx - radius, yTop + step * 0.25,
+                    cx - radius, yMid
+                );
+                ctx.stroke();
+            }
+
+            // 3. Front Half-Turns
+            ctx.lineWidth = wireRadius * 2.2;
+            ctx.strokeStyle = frontColor;
+            for (let i = 0; i < coils; i++) {
+                const yMid = startY + leadIn + i * step + step * 0.5;
+                const yBot = startY + leadIn + (i + 1) * step;
+                ctx.beginPath();
+                ctx.moveTo(cx - radius, yMid);
+                ctx.bezierCurveTo(
+                    cx - radius, yMid + step * 0.25,
+                    cx + radius, yMid + step * 0.25,
+                    cx + radius, yBot
+                );
+                ctx.stroke();
+            }
+
+            // 4. Bottom Hook
+            ctx.lineWidth = wireRadius * 2.0;
+            ctx.strokeStyle = hookColor;
+            const bottomCoilY = startY + leadIn + coils * step;
+            ctx.beginPath();
+            ctx.moveTo(cx + radius, bottomCoilY);
+            ctx.bezierCurveTo(
+                cx + radius, clampedEndY - leadIn * 0.65,
+                cx, clampedEndY - leadIn * 0.85,
+                cx, clampedEndY - leadIn * 0.45
+            );
+            ctx.lineTo(cx, clampedEndY);
+            ctx.stroke();
+        }
+
+        // ========================================================
+        // RIG ANIMATION LOOP (TENSION & COMPRESSION)
+        // ========================================================
+        function renderSpringRig() {
+            animatedExtension += (targetExtension - animatedExtension) * 0.12;
+
+            const w = springCanvas.width;
+            const h = springCanvas.height;
+            springCtx.clearRect(0, 0, w, h);
+
+            springCtx.save();
+            springCtx.translate(w / 2 + rigPanX, rigPanY);
+            springCtx.scale(rigZoom, rigZoom);
+            springCtx.translate(-w / 2, 0);
+
+            const pixelsPerCm = 430 / 50;
+            const rulerX = 265;
+            const rulerY = 45;
+            const rulerH = 430;
+
+            // Ruler Background & Grid
+            springCtx.fillStyle = "rgba(15, 23, 42, 0.9)";
+            springCtx.fillRect(rulerX, rulerY, 44, rulerH);
+            springCtx.strokeStyle = "rgba(0, 243, 255, 0.4)";
+            springCtx.lineWidth = 1;
+            springCtx.strokeRect(rulerX, rulerY, 44, rulerH);
+
+            springCtx.fillStyle = "#00f3ff";
+            springCtx.font = "9px 'Share Tech Mono', monospace";
+            for (let cm = 0; cm <= 50; cm++) {
+                const y = rulerY + cm * pixelsPerCm;
+                const isMajor = cm % 5 === 0;
+                springCtx.beginPath();
+                springCtx.moveTo(rulerX, y);
+                springCtx.lineTo(rulerX + (isMajor ? 14 : 7), y);
+                springCtx.stroke();
+                if (isMajor) springCtx.fillText(`${cm}`, rulerX + 17, y + 3);
+            }
+
+            const springX = 150;
+            const wireRadius = 1.4 + (currentK / 100) * 2.6;
+            const isYielded = animatedExtension > elasticLimitExtension;
+
+            if (experimentMode === "tension") {
+                // Structural Stand
+                springCtx.fillStyle = "#1e293b";
+                springCtx.fillRect(25, 20, 250, 14);
+                springCtx.fillRect(25, 20, 14, 500);
+                springCtx.fillRect(10, 520, 180, 14);
+
+                const springTopY = 34;
+                const unextendedPixels = 100;
+                const extPixels = animatedExtension * 100 * pixelsPerCm;
+                const springBottomY = springTopY + unextendedPixels + extPixels;
+
+                // Rest Reference Line
+                springCtx.setLineDash([4, 4]);
+                springCtx.strokeStyle = "#00ff88";
+                springCtx.beginPath();
+                springCtx.moveTo(springX - 35, springTopY + unextendedPixels);
+                springCtx.lineTo(rulerX + 8, springTopY + unextendedPixels);
+                springCtx.stroke();
+
+                // Live Stretch Indicator
+                springCtx.strokeStyle = isYielded ? "#ef4444" : "#ff55bb";
+                springCtx.beginPath();
+                springCtx.moveTo(springX - 35, springBottomY);
+                springCtx.lineTo(rulerX + 8, springBottomY);
+                springCtx.stroke();
+                springCtx.setLineDash([]);
+
+                drawRealistic3DSpring(springCtx, springX, springTopY, springBottomY, 18, 14, wireRadius, isYielded);
+
+                // Hanging Load Plate
+                springCtx.strokeStyle = "#00f3ff";
+                springCtx.fillStyle = "#0f172a";
+                springCtx.lineWidth = 2;
+                springCtx.beginPath();
+                springCtx.arc(springX, springBottomY + 7, 7, 0, Math.PI * 2);
+                springCtx.stroke();
+                springCtx.fill();
+
+                const baseWidth = 36;
+                const baseHeight = 22;
+                const scaleMultiplier = 1 + (currentMass / 1.6) * 1.1;
+                const massW = baseWidth * scaleMultiplier;
+                const massH = baseHeight * scaleMultiplier;
+                const massY = springBottomY + 16;
+
+                springCtx.fillStyle = "#1e293b";
+                springCtx.fillRect(springX - massW / 2, massY, massW, massH);
+                springCtx.strokeStyle = "rgba(0, 243, 255, 0.5)";
+                springCtx.strokeRect(springX - massW / 2, massY, massW, massH);
+
+                springCtx.fillStyle = "#e2e8f0";
+                springCtx.font = `bold ${Math.max(10, Math.round(10 * scaleMultiplier))}px 'Share Tech Mono', monospace`;
+                springCtx.textAlign = "center";
+                springCtx.fillText(`${(currentMass * 1000).toFixed(0)}g`, springX, massY + massH / 2 + 4);
+                springCtx.textAlign = "left";
+
+            } else {
+                // Compression Stand
+                springCtx.fillStyle = "#1e293b";
+                springCtx.fillRect(20, 480, 270, 16);
+                springCtx.fillRect(25, 80, 14, 400);
+
+                const baseY = 480;
+                const initialSpringLength = 220;
+                const compPixels = animatedExtension * 100 * pixelsPerCm;
+                const compressedLength = Math.max(45, initialSpringLength - compPixels);
+                const springTopY = baseY - compressedLength;
+
+                springCtx.setLineDash([4, 4]);
+                springCtx.strokeStyle = "#00ff88";
+                springCtx.beginPath();
+                springCtx.moveTo(springX - 45, baseY - initialSpringLength);
+                springCtx.lineTo(rulerX + 8, baseY - initialSpringLength);
+                springCtx.stroke();
+
+                springCtx.strokeStyle = isYielded ? "#ef4444" : "#ff55bb";
+                springCtx.beginPath();
+                springCtx.moveTo(springX - 45, springTopY);
+                springCtx.lineTo(rulerX + 8, springTopY);
+                springCtx.stroke();
+                springCtx.setLineDash([]);
+
+                drawRealistic3DSpring(springCtx, springX, springTopY, baseY, 20, 12, wireRadius, isYielded);
+
+                const platW = 75;
+                const platH = 10;
+                springCtx.fillStyle = "#0f172a";
+                springCtx.strokeStyle = "rgba(0, 243, 255, 0.6)";
+                springCtx.fillRect(springX - platW / 2, springTopY - platH, platW, platH);
+                springCtx.strokeRect(springX - platW / 2, springTopY - platH, platW, platH);
+
+                if (currentMass > 0) {
+                    const scaleMultiplier = 1 + (currentMass / 1.6) * 1.1;
+                    const massW = 40 * scaleMultiplier;
+                    const massH = 26 * scaleMultiplier;
+                    const massY = springTopY - platH - massH;
+
+                    springCtx.fillStyle = "#1e293b";
+                    springCtx.fillRect(springX - massW / 2, massY, massW, massH);
+                    springCtx.strokeStyle = "#00f3ff";
+                    springCtx.lineWidth = 1.5;
+                    springCtx.strokeRect(springX - massW / 2, massY, massW, massH);
+
+                    springCtx.fillStyle = "#e2e8f0";
+                    springCtx.font = `bold ${Math.max(10, Math.round(10 * scaleMultiplier))}px 'Share Tech Mono', monospace`;
+                    springCtx.textAlign = "center";
+                    springCtx.fillText(`${(currentMass * 1000).toFixed(0)}g`, springX, massY + massH / 2 + 4);
+                    springCtx.textAlign = "left";
+                }
+            }
+
+            springCtx.restore();
+            requestAnimationFrame(renderSpringRig);
+        }
+
+        // ========================================================
+        // EXPERIMENTAL DATA TABLE LOGGING
+        // ========================================================
+        function recordDataPoint() {
+            const state = calculateHookeState(currentMass, currentK);
+            const extCm = state.extension * 100;
+
+            const pt = {
+                trial: recordedPoints.length + 1,
+                mode: experimentMode,
+                kOrig: currentK,
+                force: state.force,
+                extM: state.extension,
+                extCm: extCm,
+                stressMPa: state.stressMPa,
+                strain: state.strain,
+                energy: state.energy,
+                isPlastic: state.isPlastic
+            };
+
+            recordedPoints.push(pt);
+
+            const tbody = document.getElementById("dataTableBody");
+            const tr = document.createElement("tr");
+            if (pt.isPlastic) tr.style.backgroundColor = "rgba(239, 68, 68, 0.2)";
+
+            tr.innerHTML = `
+                <td><strong>#${pt.trial}</strong></td>
+                <td><span style="font-size:0.75rem; font-weight:700; color:${pt.mode === 'compression' ? '#00f3ff' : '#ff55bb'}">${pt.mode === 'compression' ? 'Comp' : 'Tens'}</span></td>
+                <td>${pt.force.toFixed(2)}</td>
+                <td>${pt.extCm.toFixed(2)}</td>
+                <td>${pt.stressMPa.toFixed(2)}</td>
+                <td>${pt.strain.toFixed(4)}</td>
+                <td>${pt.energy.toFixed(3)}</td>
+            `;
+            tbody.appendChild(tr);
+
+            renderGraph(graphCanvas, graphCtx);
+            if (document.getElementById("graphModal").classList.contains("active")) {
+                renderGraph(expandedGraphCanvas, expandedGraphCtx);
+            }
+        }
+
+        function clearTable() {
+            recordedPoints = [];
+            document.getElementById("dataTableBody").innerHTML = "";
+            renderGraph(graphCanvas, graphCtx);
+            if (document.getElementById("graphModal").classList.contains("active")) {
+                renderGraph(expandedGraphCanvas, expandedGraphCtx);
+            }
+        }
+
+        function onGraphModeChange(mode) {
+            currentGraphMode = mode;
+            renderGraph(graphCanvas, graphCtx);
+            if (document.getElementById("graphModal").classList.contains("active")) {
+                renderGraph(expandedGraphCanvas, expandedGraphCtx);
+            }
+        }
+
+        // ========================================================
+        // MULTI-MODE GRAPH RENDERING
+        // ========================================================
+        function renderGraph(canvas, ctx) {
+            const w = canvas.width;
+            const h = canvas.height;
+            ctx.clearRect(0, 0, w, h);
+
+            const m = { top: 35, right: 35, bottom: 50, left: 60 };
+            const pw = w - m.left - m.right;
+            const ph = h - m.top - m.bottom;
+
+            let effectiveK = currentK;
+            const linearPoints = recordedPoints.filter(p => !p.isPlastic && p.extM > 0.001);
+            if (linearPoints.length > 0) {
+                let sumFExt = 0;
+                let sumExt2 = 0;
+                linearPoints.forEach(p => {
+                    sumFExt += p.force * p.extM;
+                    sumExt2 += p.extM * p.extM;
+                });
+                effectiveK = sumExt2 > 0 ? (sumFExt / sumExt2) : currentK;
+            }
+
+            let xMax = 0.50;
+            let yMax = 18.0;
+            let xLabel = "Displacement x (cm)";
+            let yLabel = "Force F (N)";
+            let xFactor = 100;
+            let summaryText = "";
+
+            if (currentGraphMode === "stress_vs_strain") {
+                xMax = 2.5;
+                yMax = 6.0;
+                xLabel = "Strain ε (dimensionless)";
+                yLabel = "Stress σ (MPa)";
+                xFactor = 1;
+                summaryText = "Linear elastic regime σ = E·ε transitioning into ductile yield plateau beyond elastic threshold.";
+            } else if (currentGraphMode === "energy_vs_x") {
+                xMax = 0.50;
+                yMax = 4.0;
+                xLabel = "Extension x (cm)";
+                yLabel = "Strain Energy Ep (J)";
+                xFactor = 100;
+                summaryText = "Strain Energy curve follows parabolic Ep = 0.5·k·x² profile up to the elastic limit.";
+            } else {
+                xMax = 0.50;
+                yMax = 18.0;
+                xLabel = "Displacement x (cm)";
+                yLabel = "Force F (N)";
+                xFactor = 100;
+                summaryText = "Linear Hookean proportionality F = k·x transitioning into plastic yield compliance.";
+            }
+
+            // 1. Grid
+            ctx.strokeStyle = "rgba(0, 243, 255, 0.12)";
+            ctx.lineWidth = 1;
+            ctx.fillStyle = "#64748b";
+            ctx.font = "10px 'Share Tech Mono', monospace";
+
+            const xDivs = 5;
+            for (let i = 0; i <= xDivs; i++) {
+                const val = (xMax / xDivs) * i;
+                const x = m.left + (val / xMax) * pw;
+                ctx.beginPath();
+                ctx.moveTo(x, m.top);
+                ctx.lineTo(x, m.top + ph);
+                ctx.stroke();
+                ctx.fillText((val * xFactor).toFixed(1), x - 8, m.top + ph + 18);
+            }
+
+            const yDivs = 5;
+            for (let j = 0; j <= yDivs; j++) {
+                const val = (yMax / yDivs) * j;
+                const y = m.top + ph - (val / yMax) * ph;
+                ctx.beginPath();
+                ctx.moveTo(m.left, y);
+                ctx.lineTo(m.left + pw, y);
+                ctx.stroke();
+                ctx.fillText(val.toFixed(1), m.left - 42, y + 4);
+            }
+
+            // 2. Axes
+            ctx.strokeStyle = "rgba(0, 243, 255, 0.6)";
+            ctx.lineWidth = 1.6;
+            ctx.beginPath();
+            ctx.moveTo(m.left, m.top);
+            ctx.lineTo(m.left, m.top + ph);
+            ctx.lineTo(m.left + pw, m.top + ph);
+            ctx.stroke();
+
+            ctx.fillStyle = "#00f3ff";
+            ctx.font = "11px 'Share Tech Mono', monospace";
+            ctx.textAlign = "center";
+            ctx.fillText(xLabel, m.left + pw / 2, h - 14);
+
+            ctx.save();
+            ctx.translate(16, m.top + ph / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.fillText(yLabel, 0, 0);
+            ctx.restore();
+            ctx.textAlign = "left";
+
+            // 3. Elastic Limit Marker
+            let limitXVal = elasticLimitExtension;
+            if (currentGraphMode === "stress_vs_strain") {
+                limitXVal = elasticLimitExtension / L0;
+            }
+
+            const limitPixelX = m.left + (limitXVal / xMax) * pw;
+            ctx.setLineDash([4, 4]);
+            ctx.strokeStyle = "#f59e0b";
+            ctx.beginPath();
+            ctx.moveTo(limitPixelX, m.top);
+            ctx.lineTo(limitPixelX, m.top + ph);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            ctx.fillStyle = "#f59e0b";
+            ctx.font = "9px 'Share Tech Mono', monospace";
+            ctx.textAlign = "center";
+            ctx.fillText("Elastic Limit", limitPixelX, m.top - 8);
+            ctx.textAlign = "left";
+
+            // 4. Continuous Theoretical Curve
+            ctx.lineWidth = 2.4;
+            const curveSamples = 200;
+            let prevSimX = 0;
+            let prevSimY = 0;
+
+            for (let s = 0; s <= curveSamples; s++) {
+                const simExt = (s / curveSamples) * xMax;
+                const state = computePhysicsAtExtension(simExt, effectiveK);
+                let simX = simExt;
+                let simY = 0;
+
+                if (currentGraphMode === "f_vs_x") {
+                    simY = state.force;
+                } else if (currentGraphMode === "stress_vs_strain") {
+                    simX = state.strain;
+                    simY = state.stressMPa;
+                } else if (currentGraphMode === "energy_vs_x") {
+                    simY = state.energy;
+                }
+
+                const px = m.left + (simX / xMax) * pw;
+                const py = m.top + ph - (simY / yMax) * ph;
+
+                if (s > 0) {
+                    ctx.beginPath();
+                    if (currentGraphMode === "energy_vs_x") {
+                        ctx.strokeStyle = "#00ff88";
+                    } else {
+                        ctx.strokeStyle = (simExt <= elasticLimitExtension) ? "#00f3ff" : "#ef4444";
+                    }
+                    ctx.moveTo(prevSimX, prevSimY);
+                    ctx.lineTo(px, py);
+                    ctx.stroke();
+                }
+                prevSimX = px;
+                prevSimY = py;
+            }
+
+            // 5. Experimental Data Points
+            recordedPoints.forEach(pt => {
+                let ptX = pt.extM;
+                let ptY = pt.force;
+
+                if (currentGraphMode === "stress_vs_strain") {
+                    ptX = pt.strain;
+                    ptY = pt.stressMPa;
+                } else if (currentGraphMode === "energy_vs_x") {
+                    ptX = pt.extM;
+                    ptY = pt.energy;
+                }
+
+                const px = m.left + (ptX / xMax) * pw;
+                const py = m.top + ph - (ptY / yMax) * ph;
+
+                ctx.beginPath();
+                ctx.arc(px, py, 5, 0, 2 * Math.PI);
+                ctx.fillStyle = pt.isPlastic ? "#ef4444" : "#ff55bb";
+                ctx.fill();
+                ctx.lineWidth = 1.5;
+                ctx.strokeStyle = "#ffffff";
+                ctx.stroke();
+            });
+
+            document.getElementById("graphSlopeSummary").innerText = summaryText;
+            document.getElementById("modalSlopeSummary").innerText = summaryText;
+        }
+
+        function toggleGraphModal(show) {
+            const modal = document.getElementById("graphModal");
+            if (show) {
+                modal.classList.add("active");
+                setTimeout(() => {
+                    expandedGraphCanvas.width = expandedGraphCanvas.parentElement.clientWidth;
+                    expandedGraphCanvas.height = expandedGraphCanvas.parentElement.clientHeight - 85;
+                    renderGraph(expandedGraphCanvas, expandedGraphCtx);
+                }, 50);
+            } else {
+                modal.classList.remove("active");
+            }
+        }
+
+        function exportDataCSV() {
+            if (recordedPoints.length === 0) {
+                alert("No experimental records available to export!");
+                return;
+            }
+            let csv = "Trial,Mode,Force (N),Displacement (cm),Stress (MPa),Strain,Work Done (J),Plastic Yielded\n";
+            recordedPoints.forEach(p => {
+                csv += `${p.trial},${p.mode},${p.force.toFixed(2)},${p.extCm.toFixed(2)},${p.stressMPa.toFixed(2)},${p.strain.toFixed(4)},${p.energy.toFixed(3)},${p.isPlastic ? 'YES' : 'NO'}\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "hookes_law_laboratory_data.csv";
+            a.click();
+        }
+
+        // ========================================================
+        // SPRING COMBINATIONS SOLVER & DYNAMIC SCHEMATIC (TAB 2)
+        // ========================================================
+        function updateCalcSystem(autoFitView = false) {
+            const type = document.getElementById("systemType").value;
+            const count = parseInt(document.getElementById("springCountInput").value);
+            const k = parseFloat(document.getElementById("calcKInput").value);
+            const mass = parseFloat(document.getElementById("calcMassInput").value);
+
+            document.getElementById("springCountLabel").innerText = count;
+            document.getElementById("calcKLabel").innerText = k.toFixed(1) + " N/m";
+            document.getElementById("calcMassLabel").innerText = mass.toFixed(2) + " kg";
+
+            const isCustomN = (type === "parallel" || type === "series");
+            document.getElementById("springCountGroup").style.display = isCustomN ? "flex" : "none";
+
+            const totalF = mass * g;
+            let keq = 0;
+            let breakdownHTML = "";
+            let stages = {};
+
+            if (type === "single") {
+                keq = k;
+                const ext = totalF / keq;
+                stages = { ext1: ext, ext2: 0, f1: totalF, f2: 0 };
+                breakdownHTML = `
+                    <p>• <strong>Equivalent Stiffness:</strong> <i>k</i><sub>eq</sub> = <i>k</i> = <strong>${keq.toFixed(2)} N/m</strong></p>
+                    <p>• <strong>Applied Tension:</strong> <i>F</i> = <strong>${totalF.toFixed(2)} N</strong></p>
+                    <p>• <strong>Specimen Stress & Strain:</strong> σ = <strong>${((totalF / crossSectionalArea) / 1e6).toFixed(2)} MPa</strong>, ε = <strong>${(ext / L0).toFixed(4)}</strong></p>
+                `;
+            } else if (type === "parallel") {
+                keq = count * k;
+                const ext = totalF / keq;
+                const fi = totalF / count;
+                stages = { ext1: ext, ext2: 0, f1: fi, f2: 0, count: count };
+                breakdownHTML = `
+                    <p>• <strong>Equivalent Stiffness:</strong> <i>k</i><sub>eq</sub> = <i>n</i> · <i>k</i> = ${count} × ${k} = <strong>${keq.toFixed(2)} N/m</strong></p>
+                    <p>• <strong>Load Sharing:</strong> Each of the ${count} springs carries <i>F<sub>i</sub></i> = <i>F</i> / ${count} = <strong>${fi.toFixed(2)} N</strong></p>
+                    <p>• <strong>Individual Stress:</strong> σ<sub>i</sub> = <strong>${((fi / crossSectionalArea) / 1e6).toFixed(2)} MPa</strong>, ε<sub>i</sub> = <strong>${(ext / L0).toFixed(4)}</strong></p>
+                `;
+            } else if (type === "series") {
+                keq = k / count;
+                const extSingle = totalF / k;
+                stages = { ext1: extSingle, ext2: 0, f1: totalF, f2: 0, count: count };
+                breakdownHTML = `
+                    <p>• <strong>Equivalent Stiffness:</strong> 1/<i>k</i><sub>eq</sub> = <i>n</i>/<i>k</i> ⟹ <i>k</i><sub>eq</sub> = <i>k</i> / ${count} = <strong>${keq.toFixed(2)} N/m</strong></p>
+                    <p>• <strong>Full Tension per Spring:</strong> Every spring carries full <i>F<sub>i</sub></i> = <strong>${totalF.toFixed(2)} N</strong></p>
+                    <p>• <strong>Individual Extension:</strong> Each spring stretches <strong>${(extSingle * 100).toFixed(2)} cm</strong> (Total = ${(extSingle * count * 100).toFixed(2)} cm)</p>
+                `;
+            } else if (type === "comb_2p_1s") {
+                const kp = 2 * k;
+                keq = (kp * k) / (kp + k);
+                const extP = totalF / kp;
+                const extS = totalF / k;
+                stages = { ext1: extP, ext2: extS, f1: totalF / 2, f2: totalF };
+                breakdownHTML = `
+                    <p>• <strong>Topology:</strong> (2 Springs in Parallel) in Series with (1 Single Spring)</p>
+                    <p>• <strong>Substage Parallel (kp):</strong> 2<i>k</i> = ${kp.toFixed(1)} N/m ⟹ Extension: <strong>${(extP * 100).toFixed(2)} cm</strong></p>
+                    <p>• <strong>Substage Single Series:</strong> Extension: <strong>${(extS * 100).toFixed(2)} cm</strong></p>
+                    <p>• <strong>Equivalent Stiffness:</strong> <i>k</i><sub>eq</sub> = (2/3)<i>k</i> = <strong>${keq.toFixed(2)} N/m</strong></p>
+                    <p>• <strong>Force Distribution:</strong> Top pair takes <strong>${(totalF / 2).toFixed(2)} N</strong> each; Bottom single spring takes full <strong>${totalF.toFixed(2)} N</strong>.</p>
+                `;
+            } else if (type === "comb_2p_2p") {
+                const kp = 2 * k;
+                keq = kp / 2;
+                const extStage = totalF / kp;
+                stages = { ext1: extStage, ext2: extStage, f1: totalF / 2, f2: totalF / 2 };
+                breakdownHTML = `
+                    <p>• <strong>Topology:</strong> (2 Parallel) in Series with (2 Parallel)</p>
+                    <p>• <strong>Stage 1 (kp1):</strong> 2<i>k</i> = ${kp.toFixed(1)} N/m ⟹ Ext: <strong>${(extStage * 100).toFixed(2)} cm</strong></p>
+                    <p>• <strong>Stage 2 (kp2):</strong> 2<i>k</i> = ${kp.toFixed(1)} N/m ⟹ Ext: <strong>${(extStage * 100).toFixed(2)} cm</strong></p>
+                    <p>• <strong>Equivalent Stiffness:</strong> <i>k</i><sub>eq</sub> = <i>k</i> = <strong>${keq.toFixed(2)} N/m</strong></p>
+                    <p>• <strong>Force on Each Spring:</strong> <i>F</i>/2 = <strong>${(totalF / 2).toFixed(2)} N</strong></p>
+                `;
+            } else if (type === "comb_3p_1s") {
+                const kp = 3 * k;
+                keq = (kp * k) / (kp + k);
+                const extP = totalF / kp;
+                const extS = totalF / k;
+                stages = { ext1: extP, ext2: extS, f1: totalF / 3, f2: totalF };
+                breakdownHTML = `
+                    <p>• <strong>Topology:</strong> (3 Parallel) in Series with (1 Single Spring)</p>
+                    <p>• <strong>Top Parallel Stage:</strong> <i>k</i><sub>p</sub> = 3<i>k</i> = ${kp.toFixed(1)} N/m ⟹ Ext: <strong>${(extP * 100).toFixed(2)} cm</strong></p>
+                    <p>• <strong>Bottom Single Stage:</strong> Ext: <strong>${(extS * 100).toFixed(2)} cm</strong> (Carries full ${totalF.toFixed(2)} N)</p>
+                    <p>• <strong>Equivalent Stiffness:</strong> <i>k</i><sub>eq</sub> = (3/4)<i>k</i> = <strong>${keq.toFixed(2)} N/m</strong></p>
+                `;
+            } else if (type === "comb_series_parallel") {
+                const ks = k / 2;
+                keq = ks + k;
+                const totalExt = totalF / keq;
+                const fBranchSeries = ks * totalExt;
+                const fBranchSingle = k * totalExt;
+                stages = { ext1: totalExt / 2, ext2: totalExt, f1: fBranchSeries, f2: fBranchSingle };
+                breakdownHTML = `
+                    <p>• <strong>Topology:</strong> (2 Series Branch) in Parallel with (1 Single Spring Branch)</p>
+                    <p>• <strong>Series Branch Stiffness:</strong> <i>k</i><sub>s</sub> = <i>k</i> / 2 = ${ks.toFixed(1)} N/m</p>
+                    <p>• <strong>Equivalent Stiffness:</strong> <i>k</i><sub>eq</sub> = <i>k</i><sub>s</sub> + <i>k</i> = 1.5<i>k</i> = <strong>${keq.toFixed(2)} N/m</strong></p>
+                    <p>• <strong>Load Division:</strong> Single branch carries <strong>${fBranchSingle.toFixed(2)} N</strong>; Series branch carries <strong>${fBranchSeries.toFixed(2)} N</strong>.</p>
+                `;
+            }
+
+            const totalExt = totalF / keq;
+            const workDone = 0.5 * keq * Math.pow(totalExt, 2);
+
+            document.getElementById("calcKeq").innerText = keq.toFixed(2) + " N/m";
+            document.getElementById("calcTotalForce").innerText = totalF.toFixed(2) + " N";
+            document.getElementById("calcTotalExt").innerText = (totalExt * 100).toFixed(2) + " cm";
+            document.getElementById("calcTotalWork").innerText = workDone.toFixed(3) + " J";
+            document.getElementById("calcDerivationDetails").innerHTML = breakdownHTML;
+
+            lastRenderedSchematicParams = { type, count, stages, mass, totalExt };
+
+            if (autoFitView) {
+                fitCalcView();
+            } else {
+                redrawCurrentSchematic();
+            }
+        }
+
+        function drawCombinationSchematic(type, count, stages, mass, totalExt) {
+            const w = calcDiagramCanvas.width;
+            const h = calcDiagramCanvas.height;
+
+            calcDiagramCtx.clearRect(0, 0, w, h);
+
+            calcDiagramCtx.save();
+            calcDiagramCtx.translate(w / 2 + calcPanX, calcPanY);
+            calcDiagramCtx.scale(calcZoom, calcZoom);
+            calcDiagramCtx.translate(-w / 2, 0);
+
+            // Ceiling Rig Support
+            calcDiagramCtx.fillStyle = "#1e293b";
+            calcDiagramCtx.fillRect(w / 2 - 130, 20, 260, 8);
+            calcDiagramCtx.strokeStyle = "rgba(0, 243, 255, 0.4)";
+            calcDiagramCtx.strokeRect(w / 2 - 130, 20, 260, 8);
+
+            const pixelsPerMeter = 160;
+            const baseLen = 65;
+
+            function renderHangingMass(cx, bottomY) {
+                const scale = 1 + (mass / 4.0) * 1.0;
+                const mw = 34 * scale;
+                const mh = 22 * scale;
+                calcDiagramCtx.fillStyle = "#1e293b";
+                calcDiagramCtx.fillRect(cx - mw / 2, bottomY, mw, mh);
+                calcDiagramCtx.strokeStyle = "#00f3ff";
+                calcDiagramCtx.lineWidth = 1.5;
+                calcDiagramCtx.strokeRect(cx - mw / 2, bottomY, mw, mh);
+                calcDiagramCtx.fillStyle = "#00f3ff";
+                calcDiagramCtx.font = "bold 9px 'Share Tech Mono', monospace";
+                calcDiagramCtx.textAlign = "center";
+                calcDiagramCtx.fillText(`${mass.toFixed(1)}kg`, cx, bottomY + mh / 2 + 3);
+                calcDiagramCtx.textAlign = "left";
+                return bottomY + mh;
+            }
+
+            const topY = 28;
+            let totalApparatusBottom = 300;
+
+            if (type === "single") {
+                const extPix = stages.ext1 * pixelsPerMeter;
+                const endY = topY + baseLen + extPix;
+                drawRealistic3DSpring(calcDiagramCtx, w / 2, topY, endY, 14, 10, 2.0);
+                totalApparatusBottom = renderHangingMass(w / 2, endY + 2);
+            } else if (type === "parallel") {
+                const extPix = stages.ext1 * pixelsPerMeter;
+                const endY = topY + baseLen + extPix;
+                const span = 140;
+                const stepX = (count > 1) ? span / (count - 1) : 0;
+                const startX = w / 2 - span / 2;
+
+                for (let i = 0; i < count; i++) {
+                    const sx = (count === 1) ? w / 2 : startX + i * stepX;
+                    drawRealistic3DSpring(calcDiagramCtx, sx, topY, endY, 12, 10, 1.8);
+                }
+                calcDiagramCtx.fillStyle = "#0f172a";
+                calcDiagramCtx.strokeStyle = "rgba(0, 243, 255, 0.5)";
+                calcDiagramCtx.fillRect(startX - 10, endY, span + 20, 6);
+                calcDiagramCtx.strokeRect(startX - 10, endY, span + 20, 6);
+                totalApparatusBottom = renderHangingMass(w / 2, endY + 8);
+            } else if (type === "series") {
+                const extPixEach = stages.ext1 * pixelsPerMeter;
+                const segLen = (150 / count) + extPixEach;
+                let curY = topY;
+                for (let i = 0; i < count; i++) {
+                    drawRealistic3DSpring(calcDiagramCtx, w / 2, curY, curY + segLen, 12, 8, 1.8);
+                    curY += segLen;
+                    if (i < count - 1) {
+                        calcDiagramCtx.fillStyle = "#00f3ff";
+                        calcDiagramCtx.beginPath();
+                        calcDiagramCtx.arc(w / 2, curY, 3.5, 0, Math.PI * 2);
+                        calcDiagramCtx.fill();
+                    }
+                }
+                totalApparatusBottom = renderHangingMass(w / 2, curY + 2);
+            } else if (type === "comb_2p_1s") {
+                const extP = stages.ext1 * pixelsPerMeter;
+                const extS = stages.ext2 * pixelsPerMeter;
+                const midY = topY + baseLen * 0.75 + extP;
+
+                drawRealistic3DSpring(calcDiagramCtx, w / 2 - 32, topY, midY, 12, 8, 1.8);
+                drawRealistic3DSpring(calcDiagramCtx, w / 2 + 32, topY, midY, 12, 8, 1.8);
+
+                calcDiagramCtx.fillStyle = "#0f172a";
+                calcDiagramCtx.fillRect(w / 2 - 45, midY, 90, 5);
+
+                const endY = midY + 5 + baseLen * 0.75 + extS;
+                drawRealistic3DSpring(calcDiagramCtx, w / 2, midY + 5, endY, 12, 8, 1.8);
+                totalApparatusBottom = renderHangingMass(w / 2, endY + 2);
+            } else if (type === "comb_2p_2p") {
+                const ext1 = stages.ext1 * pixelsPerMeter;
+                const ext2 = stages.ext2 * pixelsPerMeter;
+                const midY = topY + baseLen * 0.7 + ext1;
+
+                drawRealistic3DSpring(calcDiagramCtx, w / 2 - 32, topY, midY, 11, 7, 1.7);
+                drawRealistic3DSpring(calcDiagramCtx, w / 2 + 32, topY, midY, 11, 7, 1.7);
+                calcDiagramCtx.fillStyle = "#0f172a";
+                calcDiagramCtx.fillRect(w / 2 - 45, midY, 90, 5);
+
+                const endY = midY + 5 + baseLen * 0.7 + ext2;
+                drawRealistic3DSpring(calcDiagramCtx, w / 2 - 32, midY + 5, endY, 11, 7, 1.7);
+                drawRealistic3DSpring(calcDiagramCtx, w / 2 + 32, midY + 5, endY, 11, 7, 1.7);
+                calcDiagramCtx.fillRect(w / 2 - 45, endY, 90, 5);
+                totalApparatusBottom = renderHangingMass(w / 2, endY + 7);
+            } else if (type === "comb_3p_1s") {
+                const extP = stages.ext1 * pixelsPerMeter;
+                const extS = stages.ext2 * pixelsPerMeter;
+                const midY = topY + baseLen * 0.7 + extP;
+
+                drawRealistic3DSpring(calcDiagramCtx, w / 2 - 45, topY, midY, 10, 7, 1.6);
+                drawRealistic3DSpring(calcDiagramCtx, w / 2, topY, midY, 10, 7, 1.6);
+                drawRealistic3DSpring(calcDiagramCtx, w / 2 + 45, topY, midY, 10, 7, 1.6);
+                calcDiagramCtx.fillStyle = "#0f172a";
+                calcDiagramCtx.fillRect(w / 2 - 55, midY, 110, 5);
+
+                const endY = midY + 5 + baseLen * 0.75 + extS;
+                drawRealistic3DSpring(calcDiagramCtx, w / 2, midY + 5, endY, 12, 8, 1.8);
+                totalApparatusBottom = renderHangingMass(w / 2, endY + 2);
+            } else if (type === "comb_series_parallel") {
+                const extTotal = stages.ext2 * pixelsPerMeter;
+                const endY = topY + baseLen * 1.5 + extTotal;
+
+                const midSeriesY = topY + (endY - topY) / 2;
+                drawRealistic3DSpring(calcDiagramCtx, w / 2 - 45, topY, midSeriesY, 11, 7, 1.7);
+                drawRealistic3DSpring(calcDiagramCtx, w / 2 - 45, midSeriesY, endY, 11, 7, 1.7);
+
+                drawRealistic3DSpring(calcDiagramCtx, w / 2 + 45, topY, endY, 13, 12, 1.9);
+
+                calcDiagramCtx.fillStyle = "#0f172a";
+                calcDiagramCtx.fillRect(w / 2 - 60, endY, 120, 6);
+                totalApparatusBottom = renderHangingMass(w / 2, endY + 8);
+            }
+
+            calcDiagramCtx.restore();
+
+            if (lastRenderedSchematicParams) {
+                lastRenderedSchematicParams.totalApparatusHeight = totalApparatusBottom;
+            }
+        }
+
+        // ========================================================
+        // STARTUP INITIALIZATION
+        // ========================================================
+        window.addEventListener("load", () => {
+            updatePhysics();
+            renderSpringRig();
+            renderGraph(graphCanvas, graphCtx);
+            updateCalcSystem(true);
+        });
+    </script>
+</body>
+</html>

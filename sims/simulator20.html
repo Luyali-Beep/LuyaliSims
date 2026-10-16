@@ -1,0 +1,2355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Interactive Principle of Moments and Static Equilibrium Simulator - Explore levers, suspended beams, and toppling stability with real-time mathematical breakdowns.">
+    <title>Principle of Moments & Equilibrium Simulator - LuyaliSims STEM Labs</title>
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    
+    <!-- Import Futuristic Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Base Reset & Variables */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --neon-cyan: #00f3ff;
+            --neon-magenta: #bc13fe;
+            --neon-green: #00ff88;
+            --neon-amber: #f59e0b;
+            --neon-rose: #f43f5e;
+            --bg-dark: #070a12;
+            --panel-bg: rgba(16, 24, 43, 0.85);
+            --border-glow: rgba(0, 243, 255, 0.35);
+            --border: #1e293b;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 85% 15%, rgba(0, 243, 255, 0.08), transparent 45%),
+                radial-gradient(circle at 15% 85%, rgba(188, 19, 254, 0.08), transparent 45%),
+                linear-gradient(180deg, #05070e 0%, #0a0e1a 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 16px 20px;
+            overflow-x: hidden;
+        }
+
+        /* 1. HEADER & TOP NAVIGATION */
+        header {
+            max-width: 1200px;
+            margin: 0 auto 15px auto;
+        }
+
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 18px;
+            background: rgba(16, 24, 43, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(188, 19, 254, 0.5);
+            color: #e580ff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(188, 19, 254, 0.2);
+            border-color: var(--neon-magenta);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
+            transform: translateX(-3px);
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+            margin: 6px 0 10px 0;
+            font-size: clamp(1.35rem, 3.5vw, 2.2rem);
+            letter-spacing: 1.5px;
+            text-align: center;
+        }
+
+        .lead-summary {
+            max-width: 960px;
+            margin: 0 auto 20px auto;
+            text-align: center;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: #cbd5e1;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* 2. SIMULATOR WORKSPACE */
+        #simulator-container {
+            background: linear-gradient(135deg, rgba(16, 24, 43, 0.88) 0%, rgba(8, 12, 22, 0.94) 100%);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-glow);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75), 0 0 25px rgba(0, 243, 255, 0.12);
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .hud-telemetry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(4, 8, 16, 0.85);
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            border-radius: 10px;
+            padding: 10px 16px;
+            margin-bottom: 18px;
+            font-family: 'Share Tech Mono', monospace;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .telemetry-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.92rem;
+        }
+
+        .tele-label {
+            color: #8da4be;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .tele-val {
+            color: var(--neon-cyan);
+            font-weight: 700;
+        }
+
+        .tele-val.pink {
+            color: #ff55bb;
+        }
+
+        .tele-val.green {
+            color: var(--neon-green);
+        }
+
+        .tele-val.amber {
+            color: var(--neon-amber);
+        }
+
+        .sim-layout {
+            display: grid;
+            grid-template-columns: 1.35fr 1fr;
+            gap: 20px;
+            align-items: stretch;
+        }
+
+        .viewport-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            width: 100%;
+            height: 520px;
+            background: radial-gradient(circle at 50% 50%, #091224 0%, #03060d 100%);
+            border-radius: 12px;
+            overflow: hidden;
+            touch-action: none;
+            border: 3px solid #1e293b;
+            box-shadow: 
+                0 0 0 2px rgba(0, 243, 255, 0.35),
+                0 15px 35px rgba(0, 0, 0, 0.8),
+                inset 0 0 35px rgba(0, 0, 0, 0.95);
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: grab;
+        }
+
+        canvas:active {
+            cursor: grabbing;
+        }
+
+        .sim-status-banner {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(8, 14, 28, 0.92);
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            backdrop-filter: blur(8px);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-family: 'Share Tech Mono', monospace;
+            pointer-events: none;
+            z-index: 6;
+        }
+
+        .canvas-toolbar {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            display: flex;
+            gap: 5px;
+            background: rgba(8, 14, 28, 0.92);
+            padding: 5px;
+            border-radius: 6px;
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            backdrop-filter: blur(6px);
+            z-index: 6;
+        }
+
+        .tool-btn {
+            background: #17243b;
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            color: var(--text-main);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.15s;
+        }
+
+        .tool-btn:hover {
+            background: #25395c;
+            border-color: var(--neon-cyan);
+            color: #fff;
+        }
+
+        .legend-bar {
+            display: flex;
+            gap: 12px;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            background: rgba(11, 18, 32, 0.85);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            padding: 8px 12px;
+            border-radius: 8px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .state-badge {
+            display: inline-block;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .state-balanced {
+            background: rgba(0, 255, 136, 0.15);
+            color: var(--neon-green);
+            border: 1px solid var(--neon-green);
+        }
+
+        .state-unbalanced {
+            background: rgba(244, 63, 94, 0.2);
+            color: var(--neon-rose);
+            border: 1px solid var(--neon-rose);
+        }
+
+        /* CONTROLS PANEL */
+        .controls-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            background: linear-gradient(145deg, rgba(11, 17, 30, 0.9) 0%, rgba(6, 9, 16, 0.95) 100%);
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            max-height: 590px;
+            overflow-y: auto;
+        }
+
+        .controls-panel::-webkit-scrollbar {
+            width: 6px;
+        }
+        .controls-panel::-webkit-scrollbar-thumb {
+            background: rgba(0, 243, 255, 0.3);
+            border-radius: 3px;
+        }
+
+        .panel-heading {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.88rem;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border-bottom: 1px solid rgba(0, 243, 255, 0.25);
+            padding-bottom: 6px;
+            margin: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .mode-nav {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            background: #0b1220;
+            padding: 4px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+        }
+
+        .mode-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 8px 4px;
+            border-radius: 5px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.78rem;
+            font-family: 'Orbitron', sans-serif;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .mode-btn.active {
+            background: var(--neon-cyan);
+            color: #041226;
+            box-shadow: 0 0 12px rgba(0, 243, 255, 0.6);
+        }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .sim-btn {
+            background: linear-gradient(180deg, rgba(16, 28, 54, 0.9) 0%, rgba(8, 14, 28, 0.95) 100%);
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            color: var(--neon-cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 8px 6px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .sim-btn:hover {
+            border-color: var(--neon-cyan);
+            color: #fff;
+            box-shadow: 0 0 12px rgba(0, 243, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .sim-btn.secondary {
+            border-color: rgba(188, 19, 254, 0.5);
+            color: #e580ff;
+        }
+
+        .sim-btn.secondary:hover {
+            border-color: var(--neon-magenta);
+            color: #fff;
+            box-shadow: 0 0 12px rgba(188, 19, 254, 0.6);
+        }
+
+        .sim-btn.balance-btn {
+            border-color: rgba(0, 255, 136, 0.5);
+            color: var(--neon-green);
+        }
+
+        .sim-btn.balance-btn:hover {
+            border-color: var(--neon-green);
+            color: #fff;
+            box-shadow: 0 0 12px rgba(0, 255, 136, 0.6);
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .control-group {
+            background: rgba(12, 19, 34, 0.7);
+            padding: 6px 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(0, 243, 255, 0.15);
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .control-group label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #cbd5e1;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .control-group label span.val {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--neon-cyan);
+            font-weight: 700;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            background: #08101e;
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            height: 6px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin: 4px 0;
+            width: 100%;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #00f3ff 35%, #0088aa 100%);
+            border: 2px solid #fff;
+            box-shadow: 0 0 8px rgba(0, 243, 255, 0.8);
+            cursor: pointer;
+        }
+
+        /* MATHEMATICAL ANALYSIS COMPONENT */
+        .math-card {
+            background: rgba(8, 14, 26, 0.8);
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 4px;
+        }
+
+        .math-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+            padding-bottom: 6px;
+            margin-bottom: 8px;
+        }
+
+        .math-header h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.82rem;
+            color: var(--neon-cyan);
+            letter-spacing: 1px;
+        }
+
+        .math-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .math-toggle-btn {
+            background: rgba(16, 28, 54, 0.9);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            color: var(--neon-cyan);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.76rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.15s;
+        }
+
+        .math-toggle-btn:hover {
+            border-color: var(--neon-cyan);
+            color: #fff;
+            box-shadow: 0 0 8px rgba(0, 243, 255, 0.5);
+        }
+
+        .math-toggle-btn.secondary {
+            border-color: rgba(188, 19, 254, 0.4);
+            color: #e580ff;
+        }
+
+        .calc-section {
+            background: rgba(5, 9, 18, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 6px;
+            padding: 8px;
+            margin-top: 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .calc-title {
+            font-size: 0.74rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 700;
+            color: var(--neon-green);
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .formula-row {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.82rem;
+            color: #93c5fd;
+            padding-bottom: 3px;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+
+        .calc-step {
+            font-size: 0.8rem;
+            line-height: 1.45;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            color: #cbd5e1;
+        }
+
+        .reveal-box {
+            display: inline-flex;
+            align-items: center;
+            background: #17243c;
+            color: #f8fafc;
+            padding: 1px 7px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-family: 'Share Tech Mono', monospace;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            user-select: none;
+        }
+
+        .reveal-box:hover {
+            border-color: var(--neon-cyan);
+            background: #25395c;
+            box-shadow: 0 0 8px rgba(0, 243, 255, 0.4);
+        }
+
+        .reveal-box.hidden-answer {
+            background: #090e1a;
+            color: var(--neon-amber);
+            border: 1px dashed var(--neon-amber);
+            font-style: italic;
+        }
+
+        .reveal-box.hidden-answer::after {
+            content: " [Click to Reveal]";
+            font-size: 0.68rem;
+            font-weight: normal;
+            color: var(--text-muted);
+        }
+
+        .unbalanced-warning {
+            background: rgba(244, 63, 94, 0.12);
+            border: 1px solid rgba(244, 63, 94, 0.4);
+            padding: 10px;
+            border-radius: 6px;
+            color: #fca5a5;
+            font-size: 0.82rem;
+            line-height: 1.45;
+        }
+
+        .unbalanced-warning strong {
+            color: var(--neon-rose);
+            display: block;
+            margin-bottom: 3px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+        }
+
+        .balanced-notice {
+            background: rgba(0, 255, 136, 0.12);
+            border: 1px solid rgba(0, 255, 136, 0.4);
+            padding: 8px 10px;
+            border-radius: 6px;
+            color: #a7f3d0;
+            font-size: 0.82rem;
+        }
+
+        .analysis-hidden-placeholder {
+            background: rgba(8, 14, 26, 0.5);
+            border: 1px dashed rgba(0, 243, 255, 0.25);
+            border-radius: 8px;
+            padding: 22px 14px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        .analysis-hidden-placeholder strong {
+            color: var(--neon-cyan);
+            display: block;
+            margin-bottom: 4px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+        }
+
+        /* 3. POLICY-COMPLIANT AD CONTAINER */
+        .ad-slot-wrapper {
+            margin: 30px auto;
+            text-align: center;
+            clear: both;
+        }
+
+        .ad-disclaimer {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            margin-bottom: 6px;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .ad-box-placeholder {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            min-height: 90px;
+            max-width: 970px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #475569;
+            font-size: 0.85rem;
+            border-radius: 8px;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        /* 4. EDUCATIONAL CONTENT SECTION */
+        .educational-content {
+            line-height: 1.75;
+            font-size: 1.05rem;
+            color: #94a3b8;
+            background: rgba(10, 14, 23, 0.85);
+            padding: 30px;
+            border-radius: 16px;
+            border-left: 4px solid var(--neon-cyan);
+            border-top: 1px solid rgba(0, 243, 255, 0.2);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin-bottom: 35px;
+        }
+
+        .educational-content h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-magenta);
+            border-bottom: 1px solid rgba(188, 19, 254, 0.3);
+            padding-bottom: 8px;
+            margin-top: 1.8em;
+            margin-bottom: 0.6em;
+            font-size: 1.45rem;
+        }
+
+        .educational-content h2:first-of-type {
+            margin-top: 0;
+        }
+
+        .educational-content h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: #38bdf8;
+            margin-top: 1.4em;
+            margin-bottom: 0.4em;
+            font-size: 1.15rem;
+        }
+
+        .formula-box {
+            background: rgba(4, 9, 20, 0.7);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-left: 3px solid var(--neon-green);
+            padding: 14px 18px;
+            margin: 14px 0;
+            border-radius: 6px;
+            font-family: 'Share Tech Mono', monospace;
+            color: #a7f3d0;
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+
+        .task-card {
+            background: rgba(15, 23, 42, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 18px;
+        }
+
+        .task-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            color: var(--neon-cyan);
+            margin-bottom: 8px;
+        }
+
+        details {
+            margin-top: 25px;
+            background: rgba(5, 10, 20, 0.8);
+            border: 1px solid rgba(188, 19, 254, 0.4);
+            border-radius: 10px;
+            padding: 15px 20px;
+        }
+
+        summary {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            color: #e580ff;
+            cursor: pointer;
+            padding: 6px 0;
+            user-select: none;
+        }
+
+        .solution-step {
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+            padding: 14px 0;
+        }
+
+        .solution-step:last-child {
+            border-bottom: none;
+        }
+
+        /* 5. FOOTER & ACCURATE ALIGNED LINKS */
+        footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px 20px 20px 20px;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .footer-nav {
+            display: flex;
+            justify-content: center;
+            gap: 22px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .footer-nav a, .footer-modal-trigger {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.2s, text-shadow 0.2s;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .footer-nav a:hover, .footer-modal-trigger:hover {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
+        }
+
+        /* 6. SELF-CONTAINED POLICY MODALS */
+        .policy-modal {
+            position: fixed !important;
+            top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
+            width: 100vw !important; height: 100vh !important;
+            background: rgba(4, 7, 15, 0.92) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 99999 !important;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-body {
+            background: linear-gradient(145deg, #0b111e 0%, #060913 100%);
+            border: 2px solid var(--neon-cyan);
+            border-radius: 16px;
+            max-width: 820px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 35px 30px;
+            color: #cbd5e1;
+            box-shadow: 0 0 40px rgba(0, 243, 255, 0.25);
+            line-height: 1.75;
+            position: relative;
+            text-align: left;
+        }
+
+        .modal-body h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-cyan);
+            margin-top: 0;
+            font-size: 1.6rem;
+        }
+
+        .modal-body h3 {
+            color: var(--neon-magenta);
+            font-family: 'Orbitron', sans-serif;
+            margin-top: 24px;
+            margin-bottom: 8px;
+            font-size: 1.15rem;
+        }
+
+        .modal-date {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--neon-green);
+            font-size: 0.9rem;
+            margin-top: -6px;
+            margin-bottom: 16px;
+        }
+
+        .modal-close-btn {
+            background: linear-gradient(180deg, rgba(188, 19, 254, 0.4), rgba(188, 19, 254, 0.15));
+            border: 1px solid var(--neon-magenta);
+            color: #fff;
+            padding: 8px 18px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            float: right;
+            margin-bottom: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close-btn:hover {
+            background: var(--neon-magenta);
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.8);
+        }
+
+        @media (max-width: 950px) {
+            body { padding: 10px; }
+            #simulator-container, .educational-content { padding: 14px; }
+            .sim-layout { grid-template-columns: 1fr; }
+            .canvas-wrapper { height: 420px; }
+            .controls-panel { max-height: none; }
+            .btn-grid { grid-template-columns: 1fr 1fr; }
+            .hud-telemetry { flex-direction: column; align-items: flex-start; }
+            .modal-body { padding: 22px 18px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. HEADER & TOP NAVIGATION -->
+    <header>
+        <nav class="top-nav">
+            <a href="../index.html" class="back-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Back to LuyaliSims
+            </a>
+            <span style="font-family: 'Share Tech Mono', monospace; font-size: 0.85rem; color: #64748b;">
+                MODULE ID: PHYS-MOM-04
+            </span>
+        </nav>
+        
+        <h1>Principle of Moments & Equilibrium Simulator</h1>
+        
+        <!-- Contextual Summary: Guarantees substantial text exists ABOVE the fold -->
+        <p class="lead-summary">
+            Investigate the conditions of complete static equilibrium through interactive multi-body simulations. Analyze the clockwise and anti-clockwise moments acting about fulcrum pivots, calculate string tensions across dual-supported beams, and evaluate the critical overturning thresholds that govern mechanical tipping stability. Adjust physical parameters, explore rotational dynamics, and observe step-by-step mathematical proofs in real time.
+        </p>
+    </header>
+
+    <main>
+        <!-- 2. SIMULATOR APP WORKSPACE -->
+        <section id="simulator-container" aria-label="Interactive Simulator Workspace">
+            
+            <!-- Telemetry Status Bar -->
+            <div class="hud-telemetry">
+                <div class="telemetry-item">
+                    <span class="tele-label">System State:</span>
+                    <span id="tele-status" class="tele-val green">BALANCED</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Active Mode:</span>
+                    <span id="tele-mode" class="tele-val">1. Fulcrum Lever</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Equilibrium Metric:</span>
+                    <span id="tele-metric" class="tele-val pink">Net Torque: 0.0 N·m</span>
+                </div>
+            </div>
+
+            <div class="sim-layout">
+                <!-- Visual Physics Viewport -->
+                <div class="viewport-panel">
+                    <div class="canvas-wrapper" id="canvasFrame">
+                        <canvas id="simCanvas"></canvas>
+                        
+                        <div class="sim-status-banner" id="statusBanner">
+                            Status: <span id="statusText">Evaluating...</span>
+                        </div>
+
+                        <div class="canvas-toolbar">
+                            <button class="tool-btn" onclick="adjustZoom(1.15)">➕ Zoom</button>
+                            <button class="tool-btn" onclick="adjustZoom(0.85)">➖ Zoom</button>
+                            <button class="tool-btn" onclick="panCamera(-30, 0)">⬅️</button>
+                            <button class="tool-btn" onclick="panCamera(30, 0)">➡️</button>
+                            <button class="tool-btn" onclick="panCamera(0, -25)">⬆️</button>
+                            <button class="tool-btn" onclick="panCamera(0, 25)">⬇️</button>
+                            <button class="tool-btn" onclick="resetCamera()">🎯 Reset View</button>
+                        </div>
+                    </div>
+
+                    <div class="legend-bar">
+                        <div class="legend-item"><span class="legend-dot" style="background:var(--neon-rose)"></span> Clockwise Moment (CW)</div>
+                        <div class="legend-item"><span class="legend-dot" style="background:var(--neon-green)"></span> Anti-Clockwise Moment (ACW)</div>
+                        <div class="legend-item"><span class="legend-dot" style="background:var(--neon-cyan)"></span> Support Reaction / String Tension</div>
+                        <div class="legend-item"><span class="legend-dot" style="background:var(--neon-amber)"></span> Center of Gravity</div>
+                    </div>
+                </div>
+
+                <!-- Simulation Controls & Interactive Mathematical Console -->
+                <div class="controls-panel">
+                    <div class="panel-heading">
+                        <span>Select Configuration</span>
+                    </div>
+
+                    <div class="mode-nav">
+                        <button class="mode-btn active" onclick="setMode('lever')">1. Lever</button>
+                        <button class="mode-btn" onclick="setMode('string')">2. Suspended</button>
+                        <button class="mode-btn" onclick="setMode('box')">3. Tilting</button>
+                    </div>
+
+                    <div class="btn-grid">
+                        <button class="sim-btn" onclick="resetAndPlay()">🔄 Reset</button>
+                        <button class="sim-btn secondary" onclick="togglePlayPause()" id="playPauseBtn">⏸️ Pause</button>
+                        <button class="sim-btn balance-btn" onclick="autoBalance()">🎯 Auto-Bal</button>
+                    </div>
+
+                    <div class="controls-grid" id="controlsGrid"></div>
+
+                    <!-- Mathematical Analysis Component -->
+                    <div class="math-card">
+                        <div class="math-header">
+                            <h3>Mathematical Analysis</h3>
+                            <div class="math-actions">
+                                <button class="math-toggle-btn secondary" onclick="toggleHideAnalysis()" id="btnHideAnalysis">👁️ Hide Methods</button>
+                                <button class="math-toggle-btn" onclick="toggleRevealAll()" id="btnRevealAll">Show Answers</button>
+                            </div>
+                        </div>
+                        <div id="mathContentArea"></div>
+                    </div>
+
+                    <div style="margin-top: 4px;">
+                        <button id="fullscreenBtn" class="sim-btn secondary" style="width: 100%;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                            </svg>
+                            Toggle Fullscreen View
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. POLICY-COMPLIANT AD CONTAINER -->
+        <div class="ad-slot-wrapper">
+            <div class="ad-disclaimer">Advertisement</div>
+            <div class="ad-box-placeholder">
+                <!-- Google AdSense Responsive Unit Goes Here -->
+                <span>[AdSense Responsive Display Unit]</span>
+            </div>
+        </div>
+
+        <!-- 4. EDUCATIONAL REFERENCE ARTICLE -->
+        <article class="educational-content">
+            <section>
+                <h2>How to Operate the Simulator</h2>
+                <p>
+                    This interactive laboratory provides three dedicated physical configurations for testing moments and static equilibrium. Select an experimental mode from the top console:
+                </p>
+                <p>
+                    <strong>1. Fulcrum Lever:</strong> Adjust the masses and positions of Load 1 and Load 2 along the beam. You can shift the central fulcrum pivot away from the center to study the effect of the beam's own self-weight. Observe angular tipping in real time when net torque is non-zero, or click <em>Auto-Bal</em> to compute the precise counter-lever distance.
+                </p>
+                <p>
+                    <strong>2. Suspended Beam:</strong> Shift dual overhead supporting cables and asymmetric hung loads. Monitor the upward string tensions (<em>T</em>₁ and <em>T</em>₂). If a load moves excessively beyond an anchor, notice how the distant cable slacks (<em>T</em> approaches 0 N) while the loaded cable bears the system's entire downward weight.
+                </p>
+                <p>
+                    <strong>3. Tilting Metal Box:</strong> Test the overturning stability of a rectangular body. Vary the box mass, base width, push height, and applied horizontal force. Watch how the restoring moment (driven by gravity through the center of mass) competes against the overturning moment (driven by the lateral pushing force) about the bottom-edge pivot.
+                </p>
+                <p>
+                    Use the <em>Hide Methods</em> and <em>Show Answers</em> toggles inside the Mathematical Analysis panel to test your manual calculation skills before revealing step-by-step proofs.
+                </p>
+            </section>
+
+            <section>
+                <h2>Scientific Theory & Working Principles</h2>
+                <p>
+                    For any rigid body to remain in complete static equilibrium, two fundamental conditions of Newtonian mechanics must be fulfilled simultaneously:
+                </p>
+                <p>
+                    <strong>First Condition (Translational Equilibrium):</strong> The vector sum of all external forces acting upon the system must equal zero. In a vertical 2D plane:
+                </p>
+                <div class="formula-box">
+                    Sum of Upward Forces (ΣF_up) - Sum of Downward Forces (ΣF_down) = 0<br>
+                    R_pivot = W_total = (m_1 + m_2 + m_beam) · g
+                </div>
+                <p>
+                    <strong>Second Condition (Rotational Equilibrium):</strong> The vector sum of all external moments (or torques) acting about any chosen pivot axis must equal zero. The <em>Principle of Moments</em> dictates that when a body is in rotational equilibrium:
+                </p>
+                <div class="formula-box">
+                    Sum of Anti-Clockwise Moments = Sum of Clockwise Moments<br>
+                    Στ_ACW = Στ_CW<br>
+                    Σ(F_i · d_i) = 0
+                </div>
+                <p>
+                    Where <em>F</em> represents the acting force and <em>d</em> is the perpendicular distance between the line of action of the force and the chosen pivot point.
+                </p>
+                <h3>Center of Gravity & Stability Criteria</h3>
+                <p>
+                    The <em>Center of Gravity</em> (C.G.) is the single point through which the entire weight of a body acts. When a body rests on a flat horizontal plane, its weight exerts a restoring moment that tends to keep its base seated. As a lateral force acts upon the body, tipping begins about the extreme bottom edge pivot. The body topples whenever the vertical line of action of its center of gravity falls outside the boundary of its base of support.
+                </p>
+            </section>
+
+            <section>
+                <h2>Mathematical Foundations & Formulas</h2>
+                <p>
+                    The quantitative calculations performed across the three simulator modes rely on standard classical mechanics equations:
+                </p>
+                <div class="formula-box">
+                    Weight Calculation: W = m · g (where g = 9.8 m/s²)<br><br>
+                    Moment of a Force: τ = F · d_perpendicular<br><br>
+                    Fulcrum Lever Balance: (m_1 · g · |d_1 - p|) + (m_beam · g · |0 - p|) = m_2 · g · |d_2 - p|<br><br>
+                    Suspended Beam Cable Tensions:<br>
+                    Taking moments about Left Cable (s_1):<br>
+                    T_2 · (s_2 - s_1) = Σ [W_i · (d_i - s_1)]<br>
+                    T_1 = W_total - T_2<br><br>
+                    Critical Toppling Push Force: F_crit = (W · [Width / 2]) / Height_push
+                </div>
+            </section>
+
+            <section>
+                <h2>Real-World Engineering & Industrial Applications</h2>
+                <p>
+                    The Principle of Moments is foundational to several branches of mechanical and structural engineering:
+                </p>
+                <p>
+                    <strong>1. Tower Cranes & Cantilever Construction:</strong> Heavy construction cranes utilize concrete counterweights placed along a rear counter-jib. The massive clockwise moment produced by the counterweight balances the variable anti-clockwise load moment exerted by hoisted cargo, preventing the central mast from suffering catastrophic bending failure.
+                </p>
+                <p>
+                    <strong>2. Suspension Bridges & Cable-Stayed Trusses:</strong> As vehicular traffic crosses bridges, weight distribution constantly shifts. Civil engineers design dual suspension towers and anchor cables using moment summation equations to ensure cable tension never exceeds tensile yield limits or induces slack.
+                </p>
+                <p>
+                    <strong>3. Vehicle Rollover & Heavy Machinery Stability:</strong> SUVs, freight trucks, and forklifts are designed with low centers of gravity and wide wheelbases. As a vehicle navigates a curve, lateral centrifugal force acts through the center of gravity. If the overturning moment exceeds the restoring moment provided by the vehicle's half-track width, rollover occurs.
+                </p>
+                <p>
+                    <strong>4. Orthopedic Biomechanics & Ergonomics:</strong> The human musculoskeletal system operates through class-1, class-2, and class-3 levers. Tendons apply muscular tensile forces over short moment arms across joints (such as the bicep lifting an object in the palm), requiring large internal forces to balance external loads.
+                </p>
+            </section>
+
+            <section>
+                <h2>Practice Problems & Diagnostic Tasks</h2>
+                <p>Test your quantitative comprehension using the five laboratory exercises below:</p>
+
+                <div class="task-card">
+                    <div class="task-title">Task 1: Basic Lever Equilibrium Calculation</div>
+                    <p>
+                        A uniform wooden meter rule of mass 0.20 kg is pivoted exactly at its 0.50 m mark. A mass of 0.60 kg is placed at the 0.10 m mark (distance of 0.40 m from pivot). Calculate the distance from the pivot at which a 0.80 kg mass must be placed on the opposite side to bring the meter rule into horizontal equilibrium. Use g = 9.8 m/s².
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 2: Off-Center Pivot with Beam Self-Weight</div>
+                    <p>
+                        A uniform metallic beam of length 6.0 m has a mass of 12.0 kg. Its center of gravity is at the 3.0 m mark. The pivot is placed at the 2.0 m mark (1.0 m to the left of the beam's center of gravity). A load of 30.0 kg is placed at the left edge (0.0 m mark, which is 2.0 m from the pivot). Calculate the mass of a counterweight that must be placed at the right end (6.0 m mark, which is 4.0 m from the pivot) to achieve rotational equilibrium.
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 3: Dual-Support Cable Tensions</div>
+                    <p>
+                        A light scaffolding plank of length 8.0 m and mass 20.0 kg is supported by two vertical ropes located at its ends (x = 0.0 m and x = 8.0 m). A painter of mass 70.0 kg stands at x = 2.0 m from the left end. Taking g = 9.8 m/s², determine the tension in the left rope (T₁) and the tension in the right rope (T₂).
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 4: Critical Toppling Push Force Analysis</div>
+                    <p>
+                        A heavy industrial metal cabinet of mass 80.0 kg has a rectangular base with a width of 1.2 m and a height of 2.4 m. Its center of gravity is located at its geometric center (0.6 m from each vertical side, 1.2 m from the base). A horizontal push force is applied at a height of 1.8 m from the ground. Determine the minimum horizontal pushing force required to initiate toppling about the bottom front edge.
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 5: Cable Slack Condition & Boundary Analysis</div>
+                    <p>
+                        A horizontal beam of length 10.0 m and mass 40.0 kg is supported by two vertical cables placed at x = 2.0 m and x = 8.0 m. A mobile inspection robot of mass 60.0 kg traverses toward the right end of the beam. Determine how far to the right of the second cable the robot can travel before the left cable becomes completely slack (T₁ = 0 N).
+                    </p>
+                </div>
+
+                <!-- Collapsible Solutions -->
+                <details>
+                    <summary>Click to Reveal Solutions and Step-by-Step Proofs</summary>
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 1:</strong></p>
+                        <p>1. Identify the pivot: Center of the ruler = 0.50 m mark. The ruler's weight acts at the pivot, so its moment arm is 0 m (zero torque).</p>
+                        <p>2. Anti-clockwise moment from Load 1: τ_ACW = m₁ · g · d₁ = 0.60 kg × 9.8 m/s² × 0.40 m = 2.352 N·m.</p>
+                        <p>3. Clockwise moment from Load 2: τ_CW = m₂ · g · d₂ = 0.80 kg × 9.8 m/s² × d₂ = 7.84 · d₂ N·m.</p>
+                        <p>4. Equating moments: 7.84 · d₂ = 2.352 ⇒ d₂ = 2.352 / 7.84 = <strong>0.30 m (or 30 cm) from the pivot</strong> (positioned at the 0.80 m mark).</p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 2:</strong></p>
+                        <p>1. Pivot is at x = 2.0 m. Distance to left load: d₁ = 2.0 m - 0.0 m = 2.0 m (Anti-clockwise).</p>
+                        <p>2. Distance to beam C.G.: d_beam = 3.0 m - 2.0 m = 1.0 m to the right (Clockwise).</p>
+                        <p>3. Distance to counterweight: d₂ = 6.0 m - 2.0 m = 4.0 m to the right (Clockwise).</p>
+                        <p>4. Setting Στ_ACW = Στ_CW (cancelling g throughout):</p>
+                        <p>(30.0 kg × 2.0 m) = (12.0 kg × 1.0 m) + (m₂ × 4.0 m)</p>
+                        <p>60.0 = 12.0 + 4.0 · m₂ ⇒ 4.0 · m₂ = 48.0 ⇒ <strong>m₂ = 12.0 kg</strong>.</p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 3:</strong></p>
+                        <p>1. Total downward forces: W_plank = 20.0 kg × 9.8 m/s² = 196.0 N (acting at x = 4.0 m, midpoint). W_painter = 70.0 kg × 9.8 m/s² = 686.0 N (acting at x = 2.0 m). Total W = 882.0 N.</p>
+                        <p>2. Take moments about Left Rope (x = 0.0 m):</p>
+                        <p>Clockwise moments = (686.0 N × 2.0 m) + (196.0 N × 4.0 m) = 1372.0 + 784.0 = 2156.0 N·m.</p>
+                        <p>Anti-clockwise moment from right rope tension = T₂ × 8.0 m.</p>
+                        <p>T₂ = 2156.0 / 8.0 = <strong>269.5 N</strong>.</p>
+                        <p>3. Translational equilibrium: T₁ = Total W - T₂ = 882.0 N - 269.5 N = <strong>612.5 N</strong>.</p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 4:</strong></p>
+                        <p>1. Total weight of cabinet: W = 80.0 kg × 9.8 m/s² = 784.0 N.</p>
+                        <p>2. Restoring lever arm about front pivot edge = Half-width = 1.2 m / 2 = 0.6 m.</p>
+                        <p>3. Restoring Moment: τ_restoring = W × 0.6 m = 784.0 N × 0.6 m = 470.4 N·m.</p>
+                        <p>4. Overturning Moment: τ_overturn = F_push × Height_push = F_push × 1.8 m.</p>
+                        <p>5. At the critical tipping point: F_push × 1.8 m = 470.4 N·m ⇒ F_push = 470.4 / 1.8 = <strong>261.33 N</strong>.</p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 5:</strong></p>
+                        <p>1. Let the right cable position (x = 8.0 m) serve as the pivot. Span between cables = 8.0 m - 2.0 m = 6.0 m.</p>
+                        <p>2. Beam C.G. is at x = 5.0 m, which is 3.0 m to the left of the right cable.</p>
+                        <p>3. When T₁ = 0 N (cable slacks), the right cable acts as a knife-edge pivot.</p>
+                        <p>4. Anti-clockwise moment about the right cable: Provided by beam weight = 40.0 kg × 9.8 m/s² × 3.0 m = 1176.0 N·m.</p>
+                        <p>5. Clockwise moment from robot located at distance d_overhang past the right cable: (60.0 kg × 9.8 m/s²) × d_overhang = 588.0 · d_overhang N·m.</p>
+                        <p>6. Setting moments equal: 588.0 · d_overhang = 1176.0 ⇒ <strong>d_overhang = 2.0 m</strong> (robot reaches x = 10.0 m, the exact right tip of the beam, before tipping begins).</p>
+                    </div>
+                </details>
+            </section>
+        </article>
+    </main>
+
+    <!-- 5. SYNCHRONIZED COMPLIANCE FOOTER -->
+    <footer>
+        <nav class="footer-nav">
+            <a href="../index.html">Home</a>
+            <a href="../index.html#about-section">About Us</a>
+            <button type="button" class="footer-modal-trigger" onclick="openSimModal('simPrivacyModal')">Privacy Policy</button>
+            <button type="button" class="footer-modal-trigger" onclick="openSimModal('simTermsModal')">Terms of Service</button>
+            <a href="../index.html#contact-section">Contact Us</a>
+            <a href="https://forms.gle/fYxxaNKAh21dPUoBA" target="_blank" rel="noopener noreferrer">Simulator Suggestions</a>
+        </nav>
+        <p>&copy; 2026 LuyaliSims | Engineered by Click & Draft | Dedicated to Open STEM Education</p>
+    </footer>
+
+    <!-- 6. IDENTICAL PRIVACY POLICY MODAL -->
+    <div id="simPrivacyModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="privacyTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeSimModal('simPrivacyModal')">Close [✕]</button>
+            <h2 id="privacyTitle">Privacy Policy</h2>
+            <p class="modal-date">Last Updated: September 2026</p>
+            <p>Welcome to LuyaliSims. We respect your privacy and are committed to protecting your personal data. This privacy policy explains how we treat information when you interact with our educational simulators.</p>
+            
+            <h3>1. Educational Purpose & Information Collection</h3>
+            <p>LuyaliSims is a free educational portal. We do not require account registration, passwords, or personal login information to run any simulation. All simulation calculations occur locally within your browser using client-side JavaScript.</p>
+
+            <h3>2. Google AdSense & Third-Party Cookies</h3>
+            <p>We may display advertisements served by Google AdSense to fund our free educational tools. Google, as a third-party vendor, uses cookies to serve ads on our site based on users' visits to this and other sites on the Internet.</p>
+            <ul>
+                <li>Google's use of advertising cookies enables it and its partners to serve ads based on your visit to LuyaliSims and other sites.</li>
+                <li>Users may opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" style="color: var(--neon-cyan);">Google Ads Settings</a>.</li>
+            </ul>
+
+            <h3>3. Log Files & Analytics</h3>
+            <p>Like standard websites, our hosting servers collect anonymous log records (including IP addresses, browser types, and timestamp references) to monitor server uptime, fix script errors, and optimize simulator performance.</p>
+
+            <h3>4. Children's Online Privacy (COPPA Compliance)</h3>
+            <p>Our educational simulators are built for students and educators of all ages. We do not knowingly solicit or collect personally identifiable information from children under 13.</p>
+
+            <h3>5. Contact Regarding Privacy</h3>
+            <p>If you have any questions regarding this policy, contact us at: <a href="mailto:luyashliz@gmail.com" style="color: var(--neon-cyan);">luyashliz@gmail.com</a>.</p>
+        </div>
+    </div>
+
+    <!-- 7. IDENTICAL TERMS OF SERVICE MODAL -->
+    <div id="simTermsModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="termsTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeSimModal('simTermsModal')">Close [✕]</button>
+            <h2 id="termsTitle">Terms of Service</h2>
+            <p class="modal-date">Effective Date: September 2026</p>
+
+            <h3>1. Permitted Educational Use</h3>
+            <p>All interactive models, simulations, practice problems, and laboratory worksheets on LuyaliSims are made freely available for classroom demonstrations, academic study, tutoring, and self-paced individual learning.</p>
+
+            <h3>2. Intellectual Property</h3>
+            <p>The code architecture, layout designs, and custom interactive engines are the intellectual property of Ian Luyali and Click & Draft. You may use our simulators online in academic settings, but mirroring or re-hosting our code for commercial resale without permission is prohibited.</p>
+
+            <h3>3. Disclaimer of Scientific Warranty</h3>
+            <p>While simulations are engineered to accurately replicate classical mechanics, thermodynamics, and electronics, they are provided as conceptual learning aids. LuyaliSims is not liable for outcomes in real-world high-voltage or hazardous laboratory environments constructed without professional teacher supervision.</p>
+
+            <h3>4. Updates to Terms</h3>
+            <p>We reserve the right to refine these terms as new laboratory modules and features are introduced.</p>
+        </div>
+    </div>
+
+    <!-- 8. SIMULATOR CORE SCRIPT -->
+    <script>
+        // Modal Controls
+        function openSimModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeSimModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('policy-modal')) {
+                closeSimModal(e.target.id);
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' || e.key === 'Esc') {
+                document.querySelectorAll('.policy-modal').forEach(m => {
+                    m.style.display = 'none';
+                });
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // Fullscreen Implementation
+        const simContainer = document.getElementById('simulator-container');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                if (simContainer.requestFullscreen) simContainer.requestFullscreen();
+                else if (simContainer.webkitRequestFullscreen) simContainer.webkitRequestFullscreen();
+                fullscreenBtn.innerHTML = 'Exit Fullscreen';
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+                fullscreenBtn.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                    </svg> Toggle Fullscreen View`;
+            }
+        });
+
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                fullscreenBtn.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                    </svg> Toggle Fullscreen View`;
+            }
+            setTimeout(resizeCanvas, 100);
+        });
+
+        // Physics Constants & State
+        const g = 9.8;
+        let currentMode = 'lever';
+        let isRunning = true;
+        let revealAnswers = false;
+        let hideEntireAnalysis = false;
+
+        let camera = {
+            x: 0,
+            y: 0,
+            zoom: 1.0,
+            isDragging: false,
+            dragStartX: 0,
+            dragStartY: 0
+        };
+
+        // Fulcrum Lever State
+        const leverState = {
+            beamLength: 10.0,
+            beamMass: 4.0,
+            pivotPos: 0.0,
+            m1: 42.0,
+            d1: -4.0,
+            m2: 52.0,
+            d2: 3.23,
+            angle: 0.0,
+            omega: 0.0,
+            alpha: 0.0
+        };
+
+        // Suspended Beam State
+        const stringState = {
+            beamLength: 10.0,
+            beamMass: 6.0,
+            string1Pos: -3.5,
+            string2Pos: 3.5,
+            m1: 15.0,
+            d1: -2.0,
+            m2: 25.0,
+            d2: 2.0,
+            sag1: 0.0,
+            sag2: 0.0,
+            angle: 0.0,
+            isSlack1: false,
+            isSlack2: false
+        };
+
+        // Tilting Box State
+        const boxState = {
+            width: 2.0,
+            height: 4.0,
+            mass: 50.0,
+            pushForce: 120.0,
+            pushHeight: 3.2,
+            angle: 0.0,
+            omega: 0.0
+        };
+
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            const container = document.getElementById('canvasFrame');
+            if (!container) return;
+            const rect = container.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.resetTransform();
+            ctx.scale(dpr, dpr);
+        }
+        window.addEventListener('resize', resizeCanvas);
+        setTimeout(resizeCanvas, 60);
+
+        // Viewport Dragging & Zooming
+        canvas.addEventListener('mousedown', (e) => {
+            camera.isDragging = true;
+            camera.dragStartX = e.clientX - camera.x;
+            camera.dragStartY = e.clientY - camera.y;
+        });
+        window.addEventListener('mousemove', (e) => {
+            if (camera.isDragging) {
+                camera.x = e.clientX - camera.dragStartX;
+                camera.y = e.clientY - camera.dragStartY;
+            }
+        });
+        window.addEventListener('mouseup', () => { camera.isDragging = false; });
+        window.addEventListener('mouseleave', () => { camera.isDragging = false; });
+
+        canvas.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const factor = e.deltaY < 0 ? 1.08 : 0.92;
+            adjustZoom(factor);
+        }, { passive: false });
+
+        function adjustZoom(factor) {
+            camera.zoom = Math.max(0.4, Math.min(2.5, camera.zoom * factor));
+        }
+        function panCamera(dx, dy) {
+            camera.x += dx;
+            camera.y += dy;
+        }
+        function resetCamera() {
+            camera.x = 0;
+            camera.y = 0;
+            camera.zoom = 1.0;
+        }
+
+        // Mode Switching
+        function setMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.mode-btn').forEach((b, idx) => {
+                b.classList.remove('active');
+                if ((mode === 'lever' && idx === 0) || (mode === 'string' && idx === 1) || (mode === 'box' && idx === 2)) {
+                    b.classList.add('active');
+                }
+            });
+
+            const modeNames = {
+                lever: '1. Fulcrum Lever',
+                string: '2. Suspended Beam',
+                box: '3. Tilting Metal Box'
+            };
+            document.getElementById('tele-mode').innerText = modeNames[mode];
+
+            resetCamera();
+            resetAndPlay();
+            renderControls();
+            updateCalculations();
+        }
+
+        function togglePlayPause() {
+            isRunning = !isRunning;
+            document.getElementById('playPauseBtn').innerHTML = isRunning ? '⏸️ Pause' : '▶️ Play';
+        }
+
+        function resetAndPlay() {
+            isRunning = true;
+            document.getElementById('playPauseBtn').innerHTML = '⏸️ Pause';
+            if (currentMode === 'lever') {
+                leverState.angle = 0.0;
+                leverState.omega = 0.0;
+            } else if (currentMode === 'box') {
+                boxState.angle = 0.0;
+                boxState.omega = 0.0;
+            }
+            updateCalculations();
+        }
+
+        // Mathematical Breakdown Toggles
+        function toggleRevealAll() {
+            revealAnswers = !revealAnswers;
+            document.getElementById('btnRevealAll').innerText = revealAnswers ? 'Hide Answers' : 'Show Answers';
+            updateCalculations();
+        }
+
+        function toggleHideAnalysis() {
+            hideEntireAnalysis = !hideEntireAnalysis;
+            const btn = document.getElementById('btnHideAnalysis');
+            const ansBtn = document.getElementById('btnRevealAll');
+
+            if (hideEntireAnalysis) {
+                btn.innerText = '👁️ Show Methods';
+                btn.style.color = 'var(--neon-green)';
+                ansBtn.style.display = 'none';
+            } else {
+                btn.innerText = '👁️ Hide Methods';
+                btn.style.color = 'var(--neon-cyan)';
+                ansBtn.style.display = 'inline-block';
+            }
+            updateCalculations();
+        }
+
+        function autoBalance() {
+            if (currentMode === 'lever') {
+                const p = leverState.pivotPos;
+                const arm1 = leverState.d1 - p;
+                const requiredArm2 = (-leverState.m1 * arm1 + leverState.beamMass * p) / leverState.m2;
+                const targetD2 = p + requiredArm2;
+
+                if (targetD2 >= 0.2 && targetD2 <= 4.8) {
+                    leverState.d2 = Number(targetD2.toFixed(2));
+                } else {
+                    const currentArm2 = leverState.d2 - p;
+                    if (currentArm2 !== 0) {
+                        const requiredM2 = (-leverState.m1 * arm1 + leverState.beamMass * p) / currentArm2;
+                        leverState.m2 = Math.max(1, Math.min(60, Number(requiredM2.toFixed(1))));
+                        const fineArm2 = (-leverState.m1 * arm1 + leverState.beamMass * p) / leverState.m2;
+                        leverState.d2 = Number((p + fineArm2).toFixed(2));
+                    }
+                }
+
+                leverState.angle = 0.0;
+                leverState.omega = 0.0;
+                leverState.alpha = 0.0;
+            } else if (currentMode === 'string') {
+                stringState.m2 = stringState.m1;
+                stringState.d2 = Math.abs(stringState.d1);
+            } else if (currentMode === 'box') {
+                const W = boxState.mass * g;
+                const F_crit = (W * (boxState.width / 2)) / boxState.pushHeight;
+                boxState.pushForce = Math.max(0, Math.round(F_crit * 0.85));
+                boxState.angle = 0.0;
+                boxState.omega = 0.0;
+            }
+
+            renderControls();
+            updateCalculations();
+        }
+
+        // Simulation Loop
+        let lastTime = performance.now();
+
+        function physicsLoop(now) {
+            const dt = Math.min((now - lastTime) / 1000, 0.032);
+            lastTime = now;
+
+            if (isRunning) {
+                if (currentMode === 'lever') {
+                    updateLeverPhysics(dt);
+                } else if (currentMode === 'string') {
+                    updateStringPhysics(dt);
+                } else if (currentMode === 'box') {
+                    updateBoxPhysics(dt);
+                }
+            }
+
+            drawScene();
+            requestAnimationFrame(physicsLoop);
+        }
+
+        function updateLeverPhysics(dt) {
+            const p = leverState.pivotPos;
+            const cosA = Math.cos(leverState.angle);
+
+            const r1 = leverState.d1 - p;
+            const r2 = leverState.d2 - p;
+            const rBeam = 0.0 - p;
+
+            const tau1 = (leverState.m1 * g) * r1 * cosA;
+            const tau2 = (leverState.m2 * g) * r2 * cosA;
+            const tauBeam = (leverState.beamMass * g) * rBeam * cosA;
+            let netTorque = tau1 + tau2 + tauBeam;
+
+            if (Math.abs(netTorque) < 25.0) {
+                leverState.omega *= 0.88;
+                leverState.angle += (0.0 - leverState.angle) * 0.12;
+                if (Math.abs(leverState.angle) < 0.002) {
+                    leverState.angle = 0.0;
+                    leverState.omega = 0.0;
+                }
+                return;
+            }
+
+            const I_beam = (1 / 12) * leverState.beamMass * Math.pow(leverState.beamLength, 2) + leverState.beamMass * Math.pow(p, 2);
+            const I_m1 = leverState.m1 * Math.pow(r1, 2);
+            const I_m2 = leverState.m2 * Math.pow(r2, 2);
+            const I_total = Math.max(2.0, I_beam + I_m1 + I_m2);
+
+            leverState.alpha = netTorque / I_total;
+            const damping = 0.965;
+            leverState.omega = (leverState.omega + leverState.alpha * dt) * damping;
+            leverState.angle += leverState.omega * dt;
+
+            const maxAngle = 0.39;
+            if (leverState.angle > maxAngle) {
+                leverState.angle = maxAngle;
+                leverState.omega = -leverState.omega * 0.12;
+            } else if (leverState.angle < -maxAngle) {
+                leverState.angle = -maxAngle;
+                leverState.omega = -leverState.omega * 0.12;
+            }
+        }
+
+        function updateStringPhysics(dt) {
+            const t = calcSuspendedTensions();
+            const compliance = 0.0016;
+            const span = stringState.string2Pos - stringState.string1Pos;
+
+            if (t.T1 < 0) {
+                stringState.isSlack1 = true;
+                stringState.isSlack2 = false;
+                stringState.sag1 = 0.6;
+                stringState.sag2 = t.T2 * compliance;
+            } else if (t.T2 < 0) {
+                stringState.isSlack2 = true;
+                stringState.isSlack1 = false;
+                stringState.sag2 = 0.6;
+                stringState.sag1 = t.T1 * compliance;
+            } else {
+                stringState.isSlack1 = false;
+                stringState.isSlack2 = false;
+                stringState.sag1 = t.T1 * compliance;
+                stringState.sag2 = t.T2 * compliance;
+            }
+
+            const targetAngle = Math.atan2((stringState.sag2 - stringState.sag1), span);
+            stringState.angle += (targetAngle - stringState.angle) * 0.15;
+        }
+
+        function updateBoxPhysics(dt) {
+            const W = boxState.mass * g;
+            const w = boxState.width;
+            const h = boxState.pushHeight;
+            const H = boxState.height;
+
+            const cosA = Math.cos(boxState.angle);
+            const sinA = Math.sin(boxState.angle);
+
+            const overturnTorque = boxState.pushForce * (h * cosA + w * sinA);
+            const restoreTorque = W * Math.max(0, (w / 2) * cosA - (H / 2) * sinA);
+            const netTorque = overturnTorque - restoreTorque;
+
+            const I_box = (1 / 3) * boxState.mass * (w * w + H * H);
+
+            if (netTorque > 0 || boxState.angle > 0.001) {
+                const alpha = netTorque / I_box;
+                boxState.omega = (boxState.omega + alpha * dt) * 0.94;
+                boxState.angle += boxState.omega * dt;
+
+                if (boxState.angle >= Math.PI / 2) {
+                    boxState.angle = Math.PI / 2;
+                    boxState.omega = 0;
+                } else if (boxState.angle <= 0) {
+                    boxState.angle = 0;
+                    boxState.omega = 0;
+                }
+            } else {
+                boxState.angle = 0;
+                boxState.omega = 0;
+            }
+        }
+
+        // Canvas Rendering Routines
+        function drawScene() {
+            const rect = canvas.getBoundingClientRect();
+            const cw = rect.width;
+            const ch = rect.height;
+
+            ctx.clearRect(0, 0, cw, ch);
+
+            ctx.save();
+            ctx.translate(cw / 2 + camera.x, ch / 2 + camera.y);
+            ctx.scale(camera.zoom, camera.zoom);
+
+            drawGrid();
+
+            if (currentMode === 'lever') {
+                drawLeverScene();
+            } else if (currentMode === 'string') {
+                drawStringScene();
+            } else if (currentMode === 'box') {
+                drawBoxScene();
+            }
+
+            ctx.restore();
+        }
+
+        function drawGrid() {
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.04)';
+            ctx.lineWidth = 1;
+            const size = 1100;
+            const step = 40;
+            for (let x = -size; x <= size; x += step) {
+                ctx.beginPath();
+                ctx.moveTo(x, -size);
+                ctx.lineTo(x, size);
+                ctx.stroke();
+            }
+            for (let y = -size; y <= size; y += step) {
+                ctx.beginPath();
+                ctx.moveTo(-size, y);
+                ctx.lineTo(size, y);
+                ctx.stroke();
+            }
+        }
+
+        function drawVector(fromX, fromY, toX, toY, color, label) {
+            const headlen = 9;
+            const dx = toX - fromX;
+            const dy = toY - fromY;
+            const angle = Math.atan2(dy, dx);
+
+            ctx.save();
+            ctx.strokeStyle = color;
+            ctx.fillStyle = color;
+            ctx.lineWidth = 2.5;
+
+            ctx.beginPath();
+            ctx.moveTo(fromX, fromY);
+            ctx.lineTo(toX, toY);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(toX, toY);
+            ctx.lineTo(toX - headlen * Math.cos(angle - Math.PI / 6), toY - headlen * Math.sin(angle - Math.PI / 6));
+            ctx.lineTo(toX - headlen * Math.cos(angle + Math.PI / 6), toY - headlen * Math.sin(angle + Math.PI / 6));
+            ctx.closePath();
+            ctx.fill();
+
+            if (label) {
+                ctx.font = 'bold 11px Rajdhani, sans-serif';
+                ctx.fillStyle = color;
+                const textOffset = (dy > 0) ? 14 : -7;
+                ctx.fillText(label, toX + 6, toY + textOffset);
+            }
+            ctx.restore();
+        }
+
+        function drawLeverScene() {
+            const scale = 44;
+            const groundY = 130;
+            const pivotApexY = groundY - 60;
+            const pivotBaseX = leverState.pivotPos * scale;
+
+            // Ground base
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(-600, groundY, 1200, 90);
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.2)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(-600, groundY);
+            ctx.lineTo(600, groundY);
+            ctx.stroke();
+
+            // Fulcrum Wedge
+            ctx.fillStyle = '#1e293b';
+            ctx.beginPath();
+            ctx.moveTo(pivotBaseX, pivotApexY);
+            ctx.lineTo(pivotBaseX - 32, groundY);
+            ctx.lineTo(pivotBaseX + 32, groundY);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.4)';
+            ctx.stroke();
+
+            // Pivot Apex Pin
+            ctx.fillStyle = '#00f3ff';
+            ctx.beginPath();
+            ctx.arc(pivotBaseX, pivotApexY, 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Rotate Beam
+            ctx.save();
+            ctx.translate(pivotBaseX, pivotApexY);
+            ctx.rotate(leverState.angle);
+
+            const beamL = leverState.beamLength * scale;
+            const beamComRel = (0.0 - leverState.pivotPos) * scale;
+            const beamLeft = beamComRel - beamL / 2;
+
+            ctx.fillStyle = '#1e293b';
+            ctx.strokeStyle = '#00f3ff';
+            ctx.lineWidth = 2;
+            ctx.fillRect(beamLeft, -9, beamL, 18);
+            ctx.strokeRect(beamLeft, -9, beamL, 18);
+
+            // Ticks
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+            ctx.lineWidth = 1;
+            for (let m = -5; m <= 5; m++) {
+                const mx = (m - leverState.pivotPos) * scale;
+                ctx.beginPath();
+                ctx.moveTo(mx, -9);
+                ctx.lineTo(mx, 9);
+                ctx.stroke();
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = '9px monospace';
+                ctx.fillText(`${m}m`, mx - 8, -13);
+            }
+
+            // Mass 1 (Left - Rose)
+            const m1X = (leverState.d1 - leverState.pivotPos) * scale;
+            const m1Size = 18 + Math.min(30, leverState.m1 * 0.45);
+            ctx.fillStyle = '#f43f5e';
+            ctx.fillRect(m1X - m1Size / 2, -9 - m1Size, m1Size, m1Size);
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 10px Rajdhani, sans-serif';
+            ctx.fillText(`${leverState.m1}kg`, m1X - 13, -15);
+
+            // Mass 2 (Right - Green)
+            const m2X = (leverState.d2 - leverState.pivotPos) * scale;
+            const m2Size = 18 + Math.min(30, leverState.m2 * 0.45);
+            ctx.fillStyle = '#00ff88';
+            ctx.fillRect(m2X - m2Size / 2, -9 - m2Size, m2Size, m2Size);
+            ctx.fillStyle = '#041226';
+            ctx.font = 'bold 10px Rajdhani, sans-serif';
+            ctx.fillText(`${leverState.m2}kg`, m2X - 13, -15);
+
+            // Center of Gravity Pin (Amber)
+            ctx.fillStyle = '#f59e0b';
+            ctx.beginPath();
+            ctx.arc(beamComRel, 0, 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+
+            const cosA = Math.cos(leverState.angle);
+            const sinA = Math.sin(leverState.angle);
+
+            function localToWorld(lx, ly) {
+                return {
+                    x: pivotBaseX + lx * cosA - ly * sinA,
+                    y: pivotApexY + lx * sinA + ly * cosA
+                };
+            }
+
+            const totalDown = (leverState.m1 + leverState.m2 + leverState.beamMass) * g;
+            drawVector(pivotBaseX, pivotApexY, pivotBaseX, pivotApexY - 70, '#00f3ff', `R = ${totalDown.toFixed(0)} N`);
+
+            const p1 = localToWorld((leverState.d1 - leverState.pivotPos) * scale, 0);
+            drawVector(p1.x, p1.y, p1.x, p1.y + Math.min(80, leverState.m1 * 1.4), '#f43f5e', `W₁ = ${(leverState.m1 * g).toFixed(0)} N`);
+
+            const p2 = localToWorld((leverState.d2 - leverState.pivotPos) * scale, 0);
+            drawVector(p2.x, p2.y, p2.x, p2.y + Math.min(80, leverState.m2 * 1.4), '#00ff88', `W₂ = ${(leverState.m2 * g).toFixed(0)} N`);
+
+            const pCom = localToWorld(beamComRel, 0);
+            drawVector(pCom.x, pCom.y, pCom.x, pCom.y + 35, '#f59e0b', `W_beam`);
+
+            const isEquil = checkLeverEquilibrium();
+            const statusBanner = document.getElementById('statusText');
+            const teleStatus = document.getElementById('tele-status');
+            const teleMetric = document.getElementById('tele-metric');
+
+            if (isEquil) {
+                statusBanner.innerHTML = '<span class="state-badge state-balanced">BALANCED (Στ = 0)</span>';
+                teleStatus.innerHTML = '<span style="color:var(--neon-green)">BALANCED</span>';
+                teleMetric.innerHTML = '<span style="color:var(--neon-green)">Net Torque: 0.0 N·m</span>';
+            } else {
+                const netMom = getLeverNetTorque();
+                statusBanner.innerHTML = `<span class="state-badge state-unbalanced">UNBALANCED &bull; NET: ${netMom.toFixed(1)} N&middot;m</span>`;
+                teleStatus.innerHTML = '<span style="color:var(--neon-rose)">UNBALANCED</span>';
+                teleMetric.innerHTML = `<span style="color:var(--neon-rose)">Net: ${netMom.toFixed(1)} N·m</span>`;
+            }
+        }
+
+        function drawStringScene() {
+            const scale = 44;
+            const baseBeamY = 40;
+            const ceilingY = -130;
+
+            // Ceiling fixture
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(-600, ceilingY - 25, 1200, 25);
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.25)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(-600, ceilingY);
+            ctx.lineTo(600, ceilingY);
+            ctx.stroke();
+
+            const s1X = stringState.string1Pos * scale;
+            const s2X = stringState.string2Pos * scale;
+            const t = calcSuspendedTensions();
+
+            const attachY1 = baseBeamY + stringState.sag1 * 70;
+            const attachY2 = baseBeamY + stringState.sag2 * 70;
+
+            ctx.strokeStyle = stringState.isSlack1 ? '#64748b' : '#00f3ff';
+            ctx.lineWidth = stringState.isSlack1 ? 1.5 : 3;
+            ctx.setLineDash(stringState.isSlack1 ? [3, 4] : [4, 4]);
+            ctx.beginPath();
+            ctx.moveTo(s1X, ceilingY);
+            ctx.lineTo(s1X, attachY1);
+            ctx.stroke();
+
+            ctx.strokeStyle = stringState.isSlack2 ? '#64748b' : '#00f3ff';
+            ctx.lineWidth = stringState.isSlack2 ? 1.5 : 3;
+            ctx.setLineDash(stringState.isSlack2 ? [3, 4] : [4, 4]);
+            ctx.beginPath();
+            ctx.moveTo(s2X, ceilingY);
+            ctx.lineTo(s2X, attachY2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            ctx.save();
+            const midAttachX = (s1X + s2X) / 2;
+            const midAttachY = (attachY1 + attachY2) / 2;
+            ctx.translate(midAttachX, midAttachY);
+            ctx.rotate(stringState.angle);
+
+            const beamL = stringState.beamLength * scale;
+            ctx.fillStyle = '#1e293b';
+            ctx.strokeStyle = '#00f3ff';
+            ctx.lineWidth = 2;
+            ctx.fillRect(-beamL / 2, -9, beamL, 18);
+            ctx.strokeRect(-beamL / 2, -9, beamL, 18);
+
+            for (let m = -5; m <= 5; m++) {
+                const tx = m * scale;
+                ctx.beginPath();
+                ctx.moveTo(tx, -9);
+                ctx.lineTo(tx, 9);
+                ctx.stroke();
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = '9px monospace';
+                ctx.fillText(`${m}m`, tx - 8, 20);
+            }
+
+            const m1X = stringState.d1 * scale;
+            const m1Size = 20 + stringState.m1 * 0.4;
+            ctx.fillStyle = '#f43f5e';
+            ctx.fillRect(m1X - m1Size / 2, 9, m1Size, m1Size);
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 10px Rajdhani, sans-serif';
+            ctx.fillText(`${stringState.m1}kg`, m1X - 13, 23 + m1Size / 2);
+
+            const m2X = stringState.d2 * scale;
+            const m2Size = 20 + stringState.m2 * 0.4;
+            ctx.fillStyle = '#00ff88';
+            ctx.fillRect(m2X - m2Size / 2, 9, m2Size, m2Size);
+            ctx.fillStyle = '#041226';
+            ctx.font = 'bold 10px Rajdhani, sans-serif';
+            ctx.fillText(`${stringState.m2}kg`, m2X - 13, 23 + m2Size / 2);
+
+            ctx.restore();
+
+            if (!stringState.isSlack1) {
+                drawVector(s1X, attachY1, s1X, attachY1 - Math.min(75, Math.max(15, t.T1 * 0.2)), '#00f3ff', `T₁ = ${t.T1.toFixed(1)} N`);
+            } else {
+                ctx.fillStyle = '#f43f5e';
+                ctx.font = 'bold 10px Rajdhani, sans-serif';
+                ctx.fillText('SLACK STRING (T₁ = 0)', s1X - 50, attachY1 - 20);
+            }
+
+            if (!stringState.isSlack2) {
+                drawVector(s2X, attachY2, s2X, attachY2 - Math.min(75, Math.max(15, t.T2 * 0.2)), '#00f3ff', `T₂ = ${t.T2.toFixed(1)} N`);
+            }
+
+            const isLevel = Math.abs(t.T1 - t.T2) < 5.0 && !stringState.isSlack1 && !stringState.isSlack2;
+            const statusBanner = document.getElementById('statusText');
+            const teleStatus = document.getElementById('tele-status');
+            const teleMetric = document.getElementById('tele-metric');
+
+            if (isLevel) {
+                statusBanner.innerHTML = '<span class="state-badge state-balanced">LEVEL EQUILIBRIUM: (T₁ ≈ T₂)</span>';
+                teleStatus.innerHTML = '<span style="color:var(--neon-green)">LEVEL</span>';
+                teleMetric.innerHTML = '<span style="color:var(--neon-green)">T₁ ≈ T₂ (Balanced)</span>';
+            } else {
+                const diff = Math.abs(t.T1 - t.T2).toFixed(1);
+                statusBanner.innerHTML = `<span class="state-badge state-unbalanced">TILTED &bull; ΔT = ${diff} N</span>`;
+                teleStatus.innerHTML = '<span style="color:var(--neon-amber)">ASYMMETRIC LOAD</span>';
+                teleMetric.innerHTML = `<span style="color:var(--neon-amber)">ΔT: ${diff} N</span>`;
+            }
+        }
+
+        function drawBoxScene() {
+            const scale = 44;
+            const groundY = 120;
+            const pivotCornerX = 80;
+
+            // Ground plane
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(-600, groundY, 1200, 90);
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.25)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(-600, groundY);
+            ctx.lineTo(600, groundY);
+            ctx.stroke();
+
+            const bw = boxState.width * scale;
+            const bh = boxState.height * scale;
+            const W = boxState.mass * g;
+
+            ctx.save();
+            ctx.translate(pivotCornerX, groundY);
+            ctx.rotate(boxState.angle);
+
+            // Box Body
+            ctx.fillStyle = '#1e293b';
+            ctx.strokeStyle = '#00f3ff';
+            ctx.lineWidth = 3;
+            ctx.fillRect(-bw, -bh, bw, bh);
+            ctx.strokeRect(-bw, -bh, bw, bh);
+
+            // Mass Label
+            ctx.fillStyle = '#f8fafc';
+            ctx.font = 'bold 12px Rajdhani, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(`Mass: ${boxState.mass} kg`, -bw / 2, -bh / 2 - 24);
+
+            // Center of Gravity
+            const cgX = -bw / 2;
+            const cgY = -bh / 2;
+            ctx.fillStyle = '#f59e0b';
+            ctx.beginPath();
+            ctx.arc(cgX, cgY, 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.font = '10px Rajdhani, sans-serif';
+            ctx.fillText('C.G.', cgX, cgY - 8);
+
+            ctx.restore();
+
+            const cosA = Math.cos(boxState.angle);
+            const sinA = Math.sin(boxState.angle);
+
+            const worldCgX = pivotCornerX + (-bw / 2) * cosA - (-bh / 2) * sinA;
+            const worldCgY = groundY + (-bw / 2) * sinA + (-bh / 2) * cosA;
+
+            drawVector(
+                worldCgX, 
+                worldCgY, 
+                worldCgX, 
+                worldCgY + 75, 
+                '#f59e0b', 
+                `Weight W = mg = ${W.toFixed(0)} N`
+            );
+
+            const pushLocalY = -boxState.pushHeight * scale;
+            const worldPushX = pivotCornerX + (-bw) * cosA - (pushLocalY) * sinA;
+            const worldPushY = groundY + (-bw) * sinA + (pushLocalY) * cosA;
+            drawVector(worldPushX - 80, worldPushY, worldPushX, worldPushY, '#00f3ff', `F_push = ${boxState.pushForce} N`);
+
+            // Pivot Corner Marker
+            ctx.fillStyle = '#f43f5e';
+            ctx.beginPath();
+            ctx.arc(pivotCornerX, groundY, 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.font = 'bold 11px Rajdhani, sans-serif';
+            ctx.fillText('Pivot Edge', pivotCornerX + 8, groundY + 16);
+
+            const W_restoring = W * (boxState.width / 2);
+            const F_overturn = boxState.pushForce * boxState.pushHeight;
+            const banner = document.getElementById('statusText');
+            const teleStatus = document.getElementById('tele-status');
+            const teleMetric = document.getElementById('tele-metric');
+
+            if (F_overturn > W_restoring) {
+                banner.innerHTML = `<span class="state-badge state-unbalanced">TOPPLING! Overturn (${F_overturn.toFixed(0)} N·m) > Restoring (${W_restoring.toFixed(0)} N·m)</span>`;
+                teleStatus.innerHTML = '<span style="color:var(--neon-rose)">TOPPLING FORWARD</span>';
+                teleMetric.innerHTML = `<span style="color:var(--neon-rose)">Overturn: ${F_overturn.toFixed(0)} N·m</span>`;
+            } else {
+                banner.innerHTML = `<span class="state-badge state-balanced">STABLE: Restoring (${W_restoring.toFixed(0)} N·m) > Overturn (${F_overturn.toFixed(0)} N·m)</span>`;
+                teleStatus.innerHTML = '<span style="color:var(--neon-green)">STABLE</span>';
+                teleMetric.innerHTML = `<span style="color:var(--neon-green)">Restoring: ${W_restoring.toFixed(0)} N·m</span>`;
+            }
+        }
+
+        function getLeverNetTorque() {
+            const p = leverState.pivotPos;
+            const tau1 = (leverState.m1 * g) * (leverState.d1 - p);
+            const tau2 = (leverState.m2 * g) * (leverState.d2 - p);
+            const tauBeam = (leverState.beamMass * g) * (0.0 - p);
+            return Math.abs(tau1 + tau2 + tauBeam);
+        }
+
+        function checkLeverEquilibrium() {
+            const p = leverState.pivotPos;
+            const momACW = (leverState.m1 * g) * Math.abs(leverState.d1 - p);
+            const momCW = (leverState.m2 * g) * Math.abs(leverState.d2 - p);
+            const net = Math.abs(momACW - momCW);
+            const maxMom = Math.max(momACW, momCW, 1.0);
+            return net <= 25.0 || (net / maxMom) <= 0.015;
+        }
+
+        function calcSuspendedTensions() {
+            const w1 = stringState.m1 * g;
+            const w2 = stringState.m2 * g;
+            const wBeam = stringState.beamMass * g;
+            const totalW = w1 + w2 + wBeam;
+
+            const d_span = stringState.string2Pos - stringState.string1Pos;
+            const d1_rel = stringState.d1 - stringState.string1Pos;
+            const d2_rel = stringState.d2 - stringState.string1Pos;
+            const dBeam_rel = 0.0 - stringState.string1Pos;
+
+            const sumM_S1 = (w1 * d1_rel) + (w2 * d2_rel) + (wBeam * dBeam_rel);
+            const T2 = sumM_S1 / d_span;
+            const T1 = totalW - T2;
+
+            return { w1, w2, wBeam, totalW, T1, T2 };
+        }
+
+        function createRevealSpan(value, unit = '') {
+            const cls = revealAnswers ? 'reveal-box' : 'reveal-box hidden-answer';
+            const text = revealAnswers ? `${value} ${unit}` : 'Answer';
+            return `<span class="${cls}" onclick="toggleSingleAnswer(this, '${value} ${unit}')">${text}</span>`;
+        }
+
+        function toggleSingleAnswer(el, realVal) {
+            if (el.classList.contains('hidden-answer')) {
+                el.classList.remove('hidden-answer');
+                el.innerHTML = realVal;
+            } else {
+                el.classList.add('hidden-answer');
+                el.innerHTML = 'Answer';
+            }
+        }
+
+        // Mathematical Breakdown Updates
+        function updateCalculations() {
+            const container = document.getElementById('mathContentArea');
+
+            if (hideEntireAnalysis) {
+                container.innerHTML = `
+                    <div class="analysis-hidden-placeholder">
+                        <strong>Mathematical Methods Hidden</strong>
+                        The analysis panel is hidden for self-practice or diagnostic testing.<br>
+                        Click <strong>"👁️ Show Methods"</strong> above to reveal formulas and live proofs.
+                    </div>
+                `;
+                return;
+            }
+
+            if (currentMode === 'lever') {
+                const isEquil = checkLeverEquilibrium();
+                const p = leverState.pivotPos;
+                const w1 = leverState.m1 * g;
+                const w2 = leverState.m2 * g;
+                const wBeam = leverState.beamMass * g;
+                const arm1 = Math.abs(leverState.d1 - p);
+                const arm2 = Math.abs(leverState.d2 - p);
+                const momACW = w1 * arm1;
+                const momCW = w2 * arm2;
+                const totalR = w1 + w2 + wBeam;
+                const netDiff = Math.abs(momACW - momCW);
+
+                if (!isEquil) {
+                    container.innerHTML = `
+                        <div class="unbalanced-warning">
+                            <strong>System Not in Equilibrium</strong>
+                            The Principle of Moments (Στ_ACW = Στ_CW) strictly requires rotational equilibrium.<br><br>
+                            Current State Breakdown:<br>
+                            • Anti-Clockwise Moment: <strong>${momACW.toFixed(1)} N·m</strong><br>
+                            • Clockwise Moment: <strong>${momCW.toFixed(1)} N·m</strong><br>
+                            • Unbalanced Torque (Δτ): <strong style="color:var(--neon-rose)">${netDiff.toFixed(1)} N·m</strong><br><br>
+                            <em>Adjust sliders or click 'Auto-Bal' to establish static balance and unlock the step-by-step breakdown!</em>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = `
+                    <div class="balanced-notice">
+                        <strong>Equilibrium Attained!</strong> Sum of clockwise moments equals sum of anti-clockwise moments (Στ = 0).
+                    </div>
+
+                    <div class="calc-section">
+                        <div class="calc-title">Step 1: Weight Calculation (W = m · g)</div>
+                        <div class="formula-row">W = mass × 9.8 m/s²</div>
+                        <div class="calc-step">
+                            <div>• Load 1 (W₁): ${leverState.m1} kg × 9.8 = ${createRevealSpan(w1.toFixed(1), 'N')}</div>
+                            <div>• Load 2 (W₂): ${leverState.m2} kg × 9.8 = ${createRevealSpan(w2.toFixed(1), 'N')}</div>
+                            <div>• Beam Weight: ${leverState.beamMass} kg × 9.8 = ${createRevealSpan(wBeam.toFixed(1), 'N')}</div>
+                        </div>
+                    </div>
+
+                    <div class="calc-section">
+                        <div class="calc-title">Step 2: Translational Equilibrium (ΣF_y = 0)</div>
+                        <div class="formula-row">ΣF_upward - ΣF_downward = 0</div>
+                        <div class="calc-step">
+                            <div>Total Downward Force = W₁ + W₂ + W_beam = ${createRevealSpan(totalR.toFixed(1), 'N')}</div>
+                            <div>Upward Fulcrum Reaction (R) = ${createRevealSpan(totalR.toFixed(1), 'N [Upward]')}</div>
+                        </div>
+                    </div>
+
+                    <div class="calc-section">
+                        <div class="calc-title">Step 3: Principle of Moments (Στ_ACW = Στ_CW)</div>
+                        <div class="formula-row">Moment = Force × Perpendicular Distance (F × d)</div>
+                        <div class="calc-step">
+                            <div>• Anti-Clockwise (Στ_ACW): ${w1.toFixed(1)} N × ${arm1.toFixed(2)} m = ${createRevealSpan(momACW.toFixed(1), 'N·m')}</div>
+                            <div>• Clockwise (Στ_CW): ${w2.toFixed(1)} N × ${arm2.toFixed(2)} m = ${createRevealSpan(momCW.toFixed(1), 'N·m')}</div>
+                            <div style="margin-top:4px; font-weight:700; color:var(--neon-green)">Result: ${momACW.toFixed(1)} N·m ≈ ${momCW.toFixed(1)} N·m ⇒ System is Balanced</div>
+                        </div>
+                    </div>
+                `;
+            } else if (currentMode === 'string') {
+                const t = calcSuspendedTensions();
+                const d_span = stringState.string2Pos - stringState.string1Pos;
+                const isLevel = Math.abs(t.T1 - t.T2) < 5.0 && !stringState.isSlack1 && !stringState.isSlack2;
+
+                container.innerHTML = `
+                    <div class="${isLevel ? 'balanced-notice' : 'unbalanced-warning'}">
+                        ${isLevel 
+                            ? '<strong>Level Equilibrium Attained:</strong> Cable tensions are balanced (T₁ ≈ T₂).' 
+                            : '<strong>Uneven Load Distribution:</strong> One cable supports more load, causing asymmetric sag and tilt.'}
+                    </div>
+
+                    <div class="calc-section">
+                        <div class="calc-title">Step 1: Weight Calculation (W = m · g)</div>
+                        <div class="formula-row">W = mass × 9.8 m/s²</div>
+                        <div class="calc-step">
+                            <div>• Load 1: ${stringState.m1} × 9.8 = ${createRevealSpan(t.w1.toFixed(1), 'N')}</div>
+                            <div>• Load 2: ${stringState.m2} × 9.8 = ${createRevealSpan(t.w2.toFixed(1), 'N')}</div>
+                            <div>• Beam Weight: ${stringState.beamMass} × 9.8 = ${createRevealSpan(t.wBeam.toFixed(1), 'N')}</div>
+                        </div>
+                    </div>
+
+                    <div class="calc-section">
+                        <div class="calc-title">Step 2: Translational Equilibrium (ΣF_y = 0)</div>
+                        <div class="formula-row">T₁ + T₂ = Total Downward Weight</div>
+                        <div class="calc-step">
+                            <div>Total Weight = ${createRevealSpan(t.totalW.toFixed(1), 'N')}</div>
+                            <div>T₁ + T₂ = ${createRevealSpan(t.totalW.toFixed(1), 'N')}</div>
+                        </div>
+                    </div>
+
+                    <div class="calc-section">
+                        <div class="calc-title">Step 3: Rotational Equilibrium (Moments about Cable 1)</div>
+                        <div class="formula-row">T₂ × L_span = Σ(W_i × d_i)</div>
+                        <div class="calc-step">
+                            <div>Distance between cables = ${d_span.toFixed(1)} m</div>
+                            <div>Tension T₂ = ${createRevealSpan(t.T2.toFixed(1), 'N')}</div>
+                            <div>Tension T₁ = Total W - T₂ = ${createRevealSpan(t.T1.toFixed(1), 'N')}</div>
+                        </div>
+                    </div>
+                `;
+            } else if (currentMode === 'box') {
+                const W = boxState.mass * g;
+                const restoringMom = W * (boxState.width / 2);
+                const overturnMom = boxState.pushForce * boxState.pushHeight;
+                const willTip = overturnMom > restoringMom;
+
+                container.innerHTML = `
+                    <div class="${willTip ? 'unbalanced-warning' : 'balanced-notice'}">
+                        ${willTip 
+                            ? '<strong>Toppling Forward:</strong> Overturning moment exceeds restoring moment!' 
+                            : '<strong>Stable Equilibrium:</strong> Restoring moment keeps the base grounded.'}
+                    </div>
+
+                    <div class="calc-section">
+                        <div class="calc-title">Step 1: Weights & Base Geometry</div>
+                        <div class="formula-row">W = mass × g &bull; Pivot at bottom-right corner edge</div>
+                        <div class="calc-step">
+                            <div>Box Mass (m) = ${boxState.mass} kg</div>
+                            <div>Box Weight (W = m · g) = ${boxState.mass} kg × 9.8 = ${createRevealSpan(W.toFixed(1), 'N')}</div>
+                            <div>Restoring Lever Arm = Base Width / 2 = ${(boxState.width / 2).toFixed(1)} m</div>
+                        </div>
+                    </div>
+
+                    <div class="calc-section">
+                        <div class="calc-title">Step 2: Principle of Moments about Edge Pivot</div>
+                        <div class="formula-row">Restoring Moment vs Overturning Moment</div>
+                        <div class="calc-step">
+                            <div>Restoring Moment (W × half-width):<br>
+                                ${W.toFixed(1)} N × ${(boxState.width / 2).toFixed(1)} m = ${createRevealSpan(restoringMom.toFixed(1), 'N·m')}</div>
+                            <div style="margin-top:4px;">Overturning Moment (F_push × height):<br>
+                                ${boxState.pushForce} N × ${boxState.pushHeight} m = ${createRevealSpan(overturnMom.toFixed(1), 'N·m')}</div>
+                            <div style="margin-top:5px; font-weight:700; color:var(--neon-green)">Critical push force before tipping: ${createRevealSpan((restoringMom / boxState.pushHeight).toFixed(1), 'N')}</div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Controls Render
+        function renderControls() {
+            const grid = document.getElementById('controlsGrid');
+            grid.innerHTML = '';
+
+            if (currentMode === 'lever') {
+                grid.innerHTML = `
+                    <div class="control-group">
+                        <label>Mass 1 (Left): <span class="val" id="lbl_m1">${leverState.m1} kg</span></label>
+                        <input type="range" min="1" max="60" step="0.5" value="${leverState.m1}" oninput="leverState.m1=+this.value; document.getElementById('lbl_m1').innerText=this.value+' kg'; updateCalculations();">
+                    </div>
+                    <div class="control-group">
+                        <label>Position 1: <span class="val" id="lbl_d1">${leverState.d1.toFixed(2)} m</span></label>
+                        <input type="range" min="-4.8" max="-0.2" step="0.01" value="${leverState.d1}" oninput="leverState.d1=+this.value; document.getElementById('lbl_d1').innerText=(+this.value).toFixed(2)+' m'; updateCalculations();">
+                    </div>
+                    <div class="control-group">
+                        <label>Mass 2 (Right): <span class="val" id="lbl_m2">${leverState.m2} kg</span></label>
+                        <input type="range" min="1" max="60" step="0.5" value="${leverState.m2}" oninput="leverState.m2=+this.value; document.getElementById('lbl_m2').innerText=this.value+' kg'; updateCalculations();">
+                    </div>
+                    <div class="control-group">
+                        <label>Position 2: <span class="val" id="lbl_d2">${leverState.d2.toFixed(2)} m</span></label>
+                        <input type="range" min="0.2" max="4.8" step="0.01" value="${leverState.d2}" oninput="leverState.d2=+this.value; document.getElementById('lbl_d2').innerText=(+this.value).toFixed(2)+' m'; updateCalculations();">
+                    </div>
+                    <div class="control-group">
+                        <label>Pivot Pos: <span class="val" id="lbl_pivot">${leverState.pivotPos.toFixed(1)} m</span></label>
+                        <input type="range" min="-2.0" max="2.0" step="0.05" value="${leverState.pivotPos}" oninput="leverState.pivotPos=+this.value; document.getElementById('lbl_pivot').innerText=(+this.value).toFixed(1)+' m'; updateCalculations();">
+                    </div>
+                    <div class="control-group">
+                        <label>Beam Mass: <span class="val" id="lbl_bm">${leverState.beamMass} kg</span></label>
+                        <input type="range" min="0" max="20" step="1" value="${leverState.beamMass}" oninput="leverState.beamMass=+this.value; document.getElementById('lbl_bm').innerText=this.value+' kg'; updateCalculations();">
+                    </div>
+                `;
+            } else if (currentMode === 'string') {
+                grid.innerHTML = `
+                    <div class="control-group">
+                        <label>Load 1 Mass: <span class="val" id="lbl_sm1">${stringState.m1} kg</span></label>
+                        <input type="range" min="2" max="40" step="1" value="${stringState.m1}" oninput="stringState.m1=+this.value; document.getElementById('lbl_sm1').innerText=this.value+' kg'; updateCalculations();">
+                    </div>
+                    <div class="control-group">
+                        <label>Load 1 Pos: <span class="val" id="lbl_sd1">${stringState.d1} m</span></label>
+                        <input type="range" min="-4.5" max="4.5" step="0.1" value="${stringState.d1}" oninput="stringState.d1=+this.value; document.getElementById('lbl_sd1').innerText=this.value+' m'; updateCalculations();">
+                    </div>
+                    <div class="control-group">
+                        <label>Load 2 Mass: <span class="val" id="lbl_sm2">${stringState.m2} kg</span></label>
+                        <input type="range" min="2" max="40" step="1" value="${stringState.m2}" oninput="stringState.m2=+this.value; document.getElementById('lbl_sm2').innerText=this.value+' kg'; updateCalculations();">
+                    </div>
+                    <div class="control-group">
+                        <label>Load 2 Pos: <span class="val" id="lbl_sd2">${stringState.d2} m</span></label>
+                        <input type="range" min="-4.5" max="4.5" step="0.1" value="${stringState.d2}" oninput="stringState.d2=+this.value; document.getElementById('lbl_sd2').innerText=this.value+' m'; updateCalculations();">
+                    </div>
+                    <div class="control-group">
+                        <label>Left String: <span class="val" id="lbl_st1">${stringState.string1Pos} m</span></label>
+                        <input type="range" min="-4.8" max="-1.0" step="0.1" value="${stringState.string1Pos}" oninput="stringState.string1Pos=+this.value; document.getElementById('lbl_st1').innerText=this.value+' m'; updateCalculations();">
+                    </div>
+                    <div class="control-group">
+                        <label>Right String: <span class="val" id="lbl_st2">${stringState.string2Pos} m</span></label>
+                        <input type="range" min="1.0" max="4.8" step="0.1" value="${stringState.string2Pos}" oninput="stringState.string2Pos=+this.value; document.getElementById('lbl_st2').innerText=this.value+' m'; updateCalculations();">
+                    </div>
+                `;
+            } else if (currentMode === 'box') {
+                grid.innerHTML = `
+                    <div class="control-group">
+                        <label>Box Mass: <span class="val" id="lbl_bmass">${boxState.mass} kg</span></label>
+                        <input type="range" min="10" max="150" step="5" value="${boxState.mass}" oninput="boxState.mass=+this.value; document.getElementById('lbl_bmass').innerText=this.value+' kg'; updateCalculations();">
+                    </div>
+                    <div class="control-group">
+                        <label>Push Force: <span class="val" id="lbl_bforce">${boxState.pushForce} N</span></label>
+                        <input type="range" min="0" max="500" step="10" value="${boxState.pushForce}" oninput="boxState.pushForce=+this.value; document.getElementById('lbl_bforce').innerText=this.value+' N'; updateCalculations();">
+                    </div>
+                    <div class="control-group">
+                        <label>Push Height: <span class="val" id="lbl_bh">${boxState.pushHeight} m</span></label>
+                        <input type="range" min="0.5" max="3.8" step="0.1" value="${boxState.pushHeight}" oninput="boxState.pushHeight=+this.value; document.getElementById('lbl_bh').innerText=this.value+' m'; updateCalculations();">
+                    </div>
+                    <div class="control-group">
+                        <label>Base Width: <span class="val" id="lbl_bw">${boxState.width} m</span></label>
+                        <input type="range" min="1.0" max="3.5" step="0.2" value="${boxState.width}" oninput="boxState.width=+this.value; document.getElementById('lbl_bw').innerText=this.value+' m'; updateCalculations();">
+                    </div>
+                `;
+            }
+        }
+
+        renderControls();
+        updateCalculations();
+        requestAnimationFrame(physicsLoop);
+    </script>
+</body>
+</html>

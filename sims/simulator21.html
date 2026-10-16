@@ -1,0 +1,3490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Interactive virtual laboratory for Joule's law of electric heating, calorimeter thermodynamics, cartridge fuse protection, and incandescent tungsten lamp physics - LuyaliSims STEM Labs.">
+    <title>Heating Effect of Electric Current, Fuse & Incandescent Bulb Simulator - LuyaliSims</title>
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    
+    <!-- Import Futuristic Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Base Reset & Variables */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --neon-cyan: #00f3ff;
+            --neon-magenta: #bc13fe;
+            --neon-green: #00ff88;
+            --neon-amber: #facc15;
+            --neon-red: #ef4444;
+            --bg-dark: #070a12;
+            --panel-bg: rgba(16, 24, 43, 0.85);
+            --border-glow: rgba(0, 243, 255, 0.35);
+            --wire-color: #38bdf8;
+            --text-main: #f1f5f9;
+            --text-dim: #94a3b8;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 85% 15%, rgba(0, 243, 255, 0.08), transparent 45%),
+                radial-gradient(circle at 15% 85%, rgba(188, 19, 254, 0.08), transparent 45%),
+                linear-gradient(180deg, #05070e 0%, #0a0e1a 100%);
+            color: #e2e8f0;
+            padding: 16px 20px;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* 1. HEADER & TOP NAVIGATION */
+        header {
+            max-width: 1260px;
+            margin: 0 auto 15px auto;
+        }
+
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 18px;
+            background: rgba(16, 24, 43, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(188, 19, 254, 0.5);
+            color: #e580ff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(188, 19, 254, 0.2);
+            border-color: var(--neon-magenta);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
+            transform: translateX(-3px);
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+            margin: 6px 0 10px 0;
+            font-size: clamp(1.35rem, 3.2vw, 2.15rem);
+            letter-spacing: 1.5px;
+            text-align: center;
+        }
+
+        .lead-summary {
+            max-width: 960px;
+            margin: 0 auto 18px auto;
+            text-align: center;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: #cbd5e1;
+        }
+
+        main {
+            max-width: 1260px;
+            margin: 0 auto;
+        }
+
+        /* 2. SIMULATOR WORKSPACE CONTAINER */
+        #simulator-container {
+            background: linear-gradient(135deg, rgba(16, 24, 43, 0.88) 0%, rgba(8, 12, 22, 0.94) 100%);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-glow);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 25px rgba(0, 243, 255, 0.12);
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        #simulator-container:fullscreen {
+            padding: 20px;
+            overflow-y: auto;
+            border-radius: 0;
+            border: none;
+            background: #070a12;
+        }
+
+        #simulator-container:-webkit-full-screen {
+            padding: 20px;
+            overflow-y: auto;
+            border-radius: 0;
+            border: none;
+            background: #070a12;
+        }
+
+        .hud-telemetry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(4, 8, 16, 0.88);
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            border-radius: 10px;
+            padding: 10px 16px;
+            margin-bottom: 16px;
+            font-family: 'Share Tech Mono', monospace;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .telemetry-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.92rem;
+        }
+
+        .tele-label {
+            color: #8da4be;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .tele-val {
+            color: var(--neon-cyan);
+            font-weight: 700;
+        }
+
+        .tele-val.pink { color: #ff55bb; }
+        .tele-val.green { color: var(--neon-green); }
+        .tele-val.amber { color: var(--neon-amber); }
+        .tele-val.red { color: var(--neon-red); }
+
+        /* Mode Switch & Global Bar */
+        .mode-bar-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 16px;
+            background: rgba(7, 12, 22, 0.7);
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .mode-switch-group {
+            display: flex;
+            background: #050912;
+            padding: 4px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            gap: 6px;
+        }
+
+        .mode-btn {
+            background: transparent;
+            color: #94a3b8;
+            border: none;
+            padding: 7px 16px;
+            border-radius: 6px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(135deg, rgba(0, 243, 255, 0.25) 0%, rgba(188, 19, 254, 0.3) 100%);
+            color: #fff;
+            border: 1px solid var(--neon-cyan);
+            box-shadow: 0 0 14px rgba(0, 243, 255, 0.45);
+        }
+
+        .top-action-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .sim-btn {
+            background: linear-gradient(180deg, rgba(16, 28, 54, 0.9) 0%, rgba(8, 14, 28, 0.95) 100%);
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            color: var(--neon-cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 8px 14px;
+            border-radius: 7px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .sim-btn:hover {
+            border-color: var(--neon-cyan);
+            color: #fff;
+            box-shadow: 0 0 14px rgba(0, 243, 255, 0.5);
+            transform: translateY(-1px);
+        }
+
+        .sim-btn.secondary {
+            border-color: rgba(188, 19, 254, 0.5);
+            color: #e580ff;
+        }
+
+        .sim-btn.secondary:hover {
+            border-color: var(--neon-magenta);
+            color: #fff;
+            box-shadow: 0 0 14px rgba(188, 19, 254, 0.6);
+        }
+
+        .sim-btn.success {
+            border-color: rgba(0, 255, 136, 0.5);
+            color: var(--neon-green);
+        }
+
+        .sim-btn.success:hover {
+            border-color: var(--neon-green);
+            color: #fff;
+            box-shadow: 0 0 14px rgba(0, 255, 136, 0.6);
+        }
+
+        .sim-btn.danger {
+            border-color: rgba(239, 68, 68, 0.5);
+            color: #fca5a5;
+        }
+
+        .sim-btn.danger:hover {
+            border-color: var(--neon-red);
+            color: #fff;
+            box-shadow: 0 0 14px rgba(239, 68, 68, 0.6);
+        }
+
+        .sim-btn.active-speed {
+            background: rgba(0, 243, 255, 0.22);
+            border-color: var(--neon-cyan);
+            color: #fff;
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.4);
+        }
+
+        /* WORKSPACE PANELS & SCHEMATIC DISPLAY */
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: 1.6fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .card-panel {
+            background: linear-gradient(145deg, rgba(11, 17, 30, 0.9) 0%, rgba(6, 9, 16, 0.95) 100%);
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+        }
+
+        .card-panel-header {
+            background: rgba(4, 8, 16, 0.9);
+            padding: 8px 14px;
+            border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.78rem;
+            color: var(--neon-cyan);
+            letter-spacing: 1px;
+        }
+
+        .bench-viewport {
+            position: relative;
+            height: 440px;
+            background: radial-gradient(circle at 50% 50%, #08171a 0%, #02070a 100%);
+            overflow: hidden;
+            border-bottom: 1px solid rgba(0, 243, 255, 0.15);
+        }
+
+        svg#schematic-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+        }
+
+        #calorimeter-assembly {
+            position: absolute;
+            top: 150px;
+            left: 130px;
+            width: 320px;
+            height: 270px;
+            z-index: 4;
+        }
+
+        .cal-lagging-outer {
+            position: absolute;
+            top: 25px;
+            left: 20px;
+            right: 20px;
+            bottom: 10px;
+            background: #78350f;
+            background-image: radial-gradient(#fde68a 12%, transparent 14%);
+            background-size: 10px 10px;
+            border: 2px dashed #b45309;
+            border-radius: 0 0 16px 16px;
+        }
+
+        .cal-cup-inner {
+            position: absolute;
+            top: 40px;
+            left: 45px;
+            right: 45px;
+            bottom: 22px;
+            background: #1e293b;
+            border: 2px solid #475569;
+            border-radius: 0 0 12px 12px;
+            overflow: hidden;
+        }
+
+        .water-level-scale {
+            position: absolute;
+            top: 0;
+            right: 6px;
+            bottom: 0;
+            width: 28px;
+            z-index: 3;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 12px 0 18px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 8px;
+            color: #cbd5e1;
+            font-weight: 700;
+            text-align: right;
+        }
+        .scale-mark {
+            border-bottom: 1.5px solid rgba(255,255,255,0.45);
+            padding-bottom: 1px;
+        }
+
+        .cal-water-fluid {
+            position: absolute;
+            left: 4px;
+            right: 4px;
+            bottom: 4px;
+            height: 110px;
+            background: rgba(14, 165, 233, 0.45);
+            border-radius: 0 0 8px 8px;
+            overflow: hidden;
+            transition: height 0.4s ease, background 0.5s ease;
+            border-top: 2px solid var(--neon-cyan);
+        }
+
+        canvas#particle-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+        }
+
+        .cal-lid-wood {
+            position: absolute;
+            top: 8px;
+            left: 10px;
+            right: 10px;
+            height: 20px;
+            background: #451a03;
+            border: 2px solid #78350f;
+            border-radius: 4px;
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fde68a;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 1.2px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .convection-shimmer {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 50px;
+            background: radial-gradient(ellipse at bottom, rgba(239, 68, 68, 0.45), transparent 75%);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s;
+            z-index: 3;
+        }
+
+        #digital-thermometer-unit {
+            position: absolute;
+            top: 180px;
+            left: 490px;
+            width: 130px;
+            height: 145px;
+            background: linear-gradient(145deg, #4a044e, #2e0854);
+            border: 2px solid var(--neon-magenta);
+            border-radius: 10px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.6), 0 0 15px rgba(188, 19, 254, 0.3);
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 6;
+        }
+
+        .thermo-screen {
+            background: #1e1b4b;
+            color: #00ff88;
+            font-family: 'Share Tech Mono', monospace;
+            font-weight: 900;
+            font-size: 1.2rem;
+            padding: 6px 10px;
+            border-radius: 4px;
+            border: 1.5px solid var(--neon-green);
+            margin-top: 10px;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.7), 0 0 10px rgba(0, 255, 136, 0.3);
+        }
+
+        .wire-line {
+            fill: none;
+            stroke: var(--wire-color);
+            stroke-width: 3;
+            stroke-linecap: square;
+        }
+
+        .wire-pulse {
+            fill: none;
+            stroke: var(--neon-amber);
+            stroke-width: 3;
+            stroke-dasharray: 6 16;
+            animation: flowPulse 0.45s linear infinite;
+            stroke-linecap: round;
+            display: none;
+        }
+
+        @keyframes flowPulse {
+            from { stroke-dashoffset: 22; }
+            to { stroke-dashoffset: 0; }
+        }
+
+        /* CONTROLS SIDEBAR */
+        .controls-panel {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow-y: auto;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .control-group label {
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: #cbd5e1;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .control-group label span {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--neon-cyan);
+            font-weight: 700;
+        }
+
+        select, input[type="range"] {
+            min-height: 40px;
+        }
+
+        select {
+            background: #060c18;
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            color: #e2e8f0;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding: 6px 10px;
+            border-radius: 8px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        select:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.4);
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            background: #0c1527;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            height: 7px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 6px 0;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #00f3ff 30%, #0088aa 100%);
+            border: 2px solid #fff;
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.8);
+            cursor: pointer;
+        }
+
+        .telemetry-box {
+            background: rgba(4, 9, 20, 0.8);
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            border-radius: 8px;
+            padding: 10px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.82rem;
+        }
+
+        .tele-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* DATA RECORDING TABLE & GRAPH SPLIT */
+        .bottom-workspace-grid {
+            display: grid;
+            grid-template-columns: 1.6fr 1fr;
+            gap: 16px;
+        }
+
+        .table-scroll {
+            flex: 1;
+            overflow-y: auto;
+            max-height: 260px;
+        }
+
+        table.data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.76rem;
+            text-align: center;
+        }
+
+        table.data-table th {
+            background: #081120;
+            color: var(--neon-cyan);
+            padding: 8px 6px;
+            position: sticky;
+            top: 0;
+            border-bottom: 1.5px solid rgba(0, 243, 255, 0.3);
+            font-weight: 700;
+        }
+
+        table.data-table td {
+            padding: 6px 6px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            color: #cbd5e1;
+        }
+
+        table.data-table tr:hover {
+            background: rgba(0, 243, 255, 0.08);
+        }
+
+        .graph-canvas-container {
+            flex: 1;
+            position: relative;
+            background: #040812;
+            padding: 6px;
+            min-height: 230px;
+        }
+
+        canvas#bench-graph-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* INCANDESCENT BULB & FUSE WORKSPACE */
+        .bulb-workspace {
+            display: none;
+            grid-template-columns: 1.6fr 1fr;
+            gap: 16px;
+        }
+
+        .bulb-bench-container {
+            background: radial-gradient(circle at 50% 40%, #111a2e 0%, #060911 100%);
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 520px;
+        }
+
+        .bulb-light-glow-layer {
+            position: absolute;
+            top: 45%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 520px;
+            height: 520px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(254,240,138,0) 0%, rgba(251,191,36,0) 40%, transparent 70%);
+            pointer-events: none;
+            transition: all 0.15s ease-out;
+            z-index: 2;
+        }
+
+        .bulb-view-canvas-wrap {
+            flex: 1;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        svg#bulb-svg-scene {
+            width: 100%;
+            height: 100%;
+            max-height: 480px;
+            z-index: 5;
+        }
+
+        .bulb-wire-pulse {
+            fill: none;
+            stroke: var(--neon-amber);
+            stroke-width: 3.5;
+            stroke-dasharray: 6 16;
+            animation: flowPulse 0.45s linear infinite;
+            stroke-linecap: round;
+            display: none;
+        }
+
+        canvas#bulb-smoke-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 4;
+            pointer-events: none;
+        }
+
+        .bulb-status-banner {
+            background: rgba(4, 8, 16, 0.95);
+            border-top: 1px solid rgba(0, 243, 255, 0.2);
+            padding: 8px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            z-index: 10;
+        }
+
+        .gas-pill {
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .gas-pill.noble {
+            background: rgba(0, 255, 136, 0.15);
+            color: var(--neon-green);
+            border: 1px solid var(--neon-green);
+        }
+
+        .gas-pill.air {
+            background: rgba(239, 68, 68, 0.18);
+            color: #fca5a5;
+            border: 1px solid var(--neon-red);
+        }
+
+        /* MODAL POPUPS (GRAPH + POLICIES) */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(4, 7, 15, 0.92);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            padding: 20px;
+        }
+
+        .modal-backdrop.active {
+            display: flex;
+        }
+
+        .modal-box {
+            background: linear-gradient(145deg, #0b111e 0%, #060913 100%);
+            border: 2px solid var(--neon-cyan);
+            border-radius: 16px;
+            width: 88vw;
+            max-width: 980px;
+            height: 80vh;
+            min-height: 520px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 45px rgba(0, 243, 255, 0.25);
+            overflow: hidden;
+        }
+
+        .modal-header {
+            background: rgba(4, 8, 16, 0.95);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0, 243, 255, 0.3);
+            flex-shrink: 0;
+        }
+
+        .modal-body-graph {
+            flex: 1;
+            min-height: 0;
+            position: relative;
+            padding: 14px;
+            background: #040812;
+        }
+
+        canvas#modal-graph-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* 3. POLICY-COMPLIANT AD CONTAINER */
+        .ad-slot-wrapper {
+            margin: 30px auto;
+            text-align: center;
+            clear: both;
+        }
+
+        .ad-disclaimer {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: #64748b;
+            margin-bottom: 6px;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .ad-box-placeholder {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            min-height: 90px;
+            max-width: 970px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #475569;
+            font-size: 0.85rem;
+            border-radius: 8px;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        /* 4. EDUCATIONAL CONTENT SECTION */
+        .educational-content {
+            line-height: 1.75;
+            font-size: 1.05rem;
+            color: #94a3b8;
+            background: rgba(10, 14, 23, 0.85);
+            padding: 30px;
+            border-radius: 16px;
+            border-left: 4px solid var(--neon-cyan);
+            border-top: 1px solid rgba(0, 243, 255, 0.2);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin-bottom: 35px;
+        }
+
+        .educational-content h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-magenta);
+            border-bottom: 1px solid rgba(188, 19, 254, 0.3);
+            padding-bottom: 8px;
+            margin-top: 1.8em;
+            margin-bottom: 0.6em;
+            font-size: 1.45rem;
+        }
+
+        .educational-content h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: #38bdf8;
+            margin-top: 1.4em;
+            margin-bottom: 0.4em;
+            font-size: 1.15rem;
+        }
+
+        .formula-box {
+            background: rgba(4, 9, 20, 0.8);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-left: 3px solid var(--neon-green);
+            padding: 14px 18px;
+            margin: 14px 0;
+            border-radius: 8px;
+            font-family: 'Share Tech Mono', monospace;
+            color: #a7f3d0;
+            font-size: 1.02rem;
+            line-height: 1.6;
+        }
+
+        .task-card {
+            background: rgba(15, 23, 42, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 18px 22px;
+            margin-bottom: 18px;
+        }
+
+        .task-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            color: var(--neon-cyan);
+            margin-bottom: 8px;
+        }
+
+        details {
+            margin-top: 25px;
+            background: rgba(5, 10, 20, 0.85);
+            border: 1px solid rgba(188, 19, 254, 0.4);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+
+        summary {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            color: #e580ff;
+            cursor: pointer;
+            padding: 6px 0;
+            user-select: none;
+            outline: none;
+        }
+
+        .solution-step {
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+            padding: 14px 0;
+            font-size: 0.98rem;
+            line-height: 1.7;
+        }
+
+        .solution-step:last-child {
+            border-bottom: none;
+        }
+
+        /* 5. FOOTER & COMPLIANCE MODALS */
+        footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px 20px 20px 20px;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .footer-nav {
+            display: flex;
+            justify-content: center;
+            gap: 22px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .footer-nav a, .footer-modal-trigger {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.2s, text-shadow 0.2s;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .footer-nav a:hover, .footer-modal-trigger:hover {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
+        }
+
+        .policy-modal {
+            position: fixed !important;
+            top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
+            width: 100vw !important; height: 100vh !important;
+            background: rgba(4, 7, 15, 0.92) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 99999 !important;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-body {
+            background: linear-gradient(145deg, #0b111e 0%, #060913 100%);
+            border: 2px solid var(--neon-cyan);
+            border-radius: 16px;
+            max-width: 820px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 35px 30px;
+            color: #cbd5e1;
+            box-shadow: 0 0 40px rgba(0, 243, 255, 0.25);
+            line-height: 1.75;
+            position: relative;
+            text-align: left;
+        }
+
+        .modal-body h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-cyan);
+            margin-top: 0;
+            font-size: 1.6rem;
+        }
+
+        .modal-body h3 {
+            color: var(--neon-magenta);
+            font-family: 'Orbitron', sans-serif;
+            margin-top: 24px;
+            margin-bottom: 8px;
+            font-size: 1.15rem;
+        }
+
+        .modal-date {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--neon-green);
+            font-size: 0.9rem;
+            margin-top: -6px;
+            margin-bottom: 16px;
+        }
+
+        .modal-close-btn {
+            background: linear-gradient(180deg, rgba(188, 19, 254, 0.4), rgba(188, 19, 254, 0.15));
+            border: 1px solid var(--neon-magenta);
+            color: #fff;
+            padding: 8px 18px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            float: right;
+            margin-bottom: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close-btn:hover {
+            background: var(--neon-magenta);
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.8);
+        }
+
+        @media (max-width: 900px) {
+            body { padding: 10px; }
+            #simulator-container, .educational-content { padding: 14px; }
+            .workspace-grid, .bottom-workspace-grid, .bulb-workspace { grid-template-columns: 1fr; }
+            .hud-telemetry { flex-direction: column; align-items: flex-start; }
+            .bench-viewport { height: 380px; }
+            #digital-thermometer-unit { left: auto; right: 15px; top: 120px; }
+            #calorimeter-assembly { left: 50%; transform: translateX(-50%); }
+            .modal-box { width: 95vw; height: 90vh; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. HEADER & TOP NAVIGATION -->
+    <header>
+        <nav class="top-nav">
+            <a href="../index.html" class="back-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Back to LuyaliSims
+            </a>
+            <span style="font-family: 'Share Tech Mono', monospace; font-size: 0.85rem; color: #64748b;">
+                MODULE ID: PHYS-JOULE-04
+            </span>
+        </nav>
+        
+        <h1>HEATING EFFECT OF ELECTRIC CURRENT SIMULATOR</h1>
+        
+        <!-- Contextual Summary: Ensures substantial educational text above the fold -->
+        <p class="lead-summary">
+            Investigate Joule's law of electric heating (H = I²Rt), calorimeter heat capacities, and electrical thermal dissipation. Explore dual interactive workstations: measure water temperature rises with immersed Nichrome heating elements to verify direct proportionality curves, and evaluate domestic cartridge fuse protection and incandescent lamp physics under varying voltages, materials, and gaseous atmospheres.
+        </p>
+    </header>
+
+    <main>
+        <!-- 2. SIMULATOR APP WORKSPACE -->
+        <section id="simulator-container" aria-label="Interactive Simulator Workspace">
+            
+            <!-- Real-Time Telemetry Status Bar -->
+            <div class="hud-telemetry">
+                <div class="telemetry-item">
+                    <span class="tele-label">Circuit Status:</span>
+                    <span id="tele-status" class="tele-val green">● CLOSED (ACTIVE)</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Live Current:</span>
+                    <span id="tele-readout-i" class="tele-val">1.31 A</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Dissipated Power:</span>
+                    <span id="tele-readout-p" class="tele-val amber">6.9 W</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="tele-label">Thermal Rise (Δθ):</span>
+                    <span id="tele-readout-th" class="tele-val pink">0.00 °C</span>
+                </div>
+            </div>
+
+            <!-- Global Mode Switch & Universal Toolbar -->
+            <div class="mode-bar-container">
+                <div class="mode-switch-group">
+                    <button class="mode-btn active" id="tab-calorimeter" onclick="switchSimulatorMode('calorimeter')">
+                        🔬 Joule's Law Calorimeter
+                    </button>
+                    <button class="mode-btn" id="tab-bulb" onclick="switchSimulatorMode('bulb')">
+                        💡 Incandescent Bulb & Fuse
+                    </button>
+                </div>
+
+                <div class="top-action-bar" id="calorimeter-header-controls">
+                    <button class="sim-btn success" onclick="toggleSwitch()" id="btn-switch-toggle">Switch: [CLOSED]</button>
+                    <span style="font-family:'Share Tech Mono', monospace; font-size:0.8rem; color:#94a3b8; margin-left:6px;">Speed:</span>
+                    <button class="sim-btn" onclick="setSpeed(1)" id="spd-1">1x</button>
+                    <button class="sim-btn active-speed" onclick="setSpeed(5)" id="spd-5">5x</button>
+                    <button class="sim-btn" onclick="setSpeed(15)" id="spd-15">15x</button>
+                    
+                    <!-- Functional Fullscreen Button -->
+                    <button id="fullscreenBtn" class="sim-btn secondary">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                        </svg>
+                        Fullscreen
+                    </button>
+                </div>
+            </div>
+
+            <!-- =========================================================
+                 WORKSTATION 1: JOULE'S LAW CALORIMETER
+                 ========================================================= -->
+            <div id="window-calorimeter">
+                <div class="workspace-grid">
+                    
+                    <!-- Viewport Bench: Schematic Circuit + Lagged Calorimeter Can -->
+                    <div class="card-panel">
+                        <div class="card-panel-header">
+                            <span>CIRCUIT SCHEMATIC & IMMERSED CALORIMETER</span>
+                            <span id="circuit-status-badge" style="color:var(--neon-green); font-weight:bold;">● Current Flowing</span>
+                        </div>
+
+                        <div class="bench-viewport" id="viewport-bench">
+                            <!-- Lagged Calorimeter Container Assembly -->
+                            <div id="calorimeter-assembly">
+                                <div class="cal-lagging-outer" title="Thermal Lagging (Felt/Cotton Wool)"></div>
+                                <div class="cal-cup-inner">
+                                    <div class="water-level-scale">
+                                        <span class="scale-mark">200 ml</span>
+                                        <span class="scale-mark">150 ml</span>
+                                        <span class="scale-mark">100 ml</span>
+                                    </div>
+                                    <div class="cal-water-fluid" id="water-fluid">
+                                        <canvas id="particle-canvas"></canvas>
+                                    </div>
+                                </div>
+                                <div class="convection-shimmer" id="convection-shimmer"></div>
+                                <div class="cal-lid-wood">INSULATING WOOD LID</div>
+                            </div>
+
+                            <!-- Digital Thermometer Sensor -->
+                            <div id="digital-thermometer-unit">
+                                <div style="font-size:9px; font-weight:800; color:#fde047; text-align:center; font-family:'Orbitron', sans-serif;">DIGITAL THERMOMETER</div>
+                                <div class="thermo-screen" id="thermo-display">20.0 °C</div>
+                                <div style="width:12px; height:12px; border-radius:50%; background:#f59e0b; margin-top:14px; border:1.5px solid #fff;"></div>
+                                <div style="font-size:8px; color:#e2e8f0; margin-top:4px; font-family:'Share Tech Mono', monospace;">WATER SENSOR PROBE</div>
+                            </div>
+
+                            <!-- Interactive Scalable SVG Circuit Schematic -->
+                            <svg id="schematic-svg">
+                                <defs>
+                                    <filter id="glow-heat" x="-50%" y="-50%" width="200%" height="200%">
+                                        <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"/>
+                                        <feMerge>
+                                            <feMergeNode in="blur"/>
+                                            <feMergeNode in="SourceGraphic"/>
+                                        </feMerge>
+                                    </filter>
+                                </defs>
+
+                                <path class="wire-line" d="M 230,345 L 230,110 L 65,110 L 65,55 L 125,55" />
+                                <path id="pulse-seg1" class="wire-pulse" d="M 230,345 L 230,110 L 65,110 L 65,55 L 125,55" />
+
+                                <path class="wire-line" d="M 165,55 L 210,55" />
+                                <path id="pulse-seg2" class="wire-pulse" d="M 165,55 L 210,55" />
+
+                                <path class="wire-line" d="M 290,55 L 340,55" />
+                                <path id="pulse-seg3" class="wire-pulse" d="M 290,55 L 340,55" />
+
+                                <path class="wire-line" d="M 380,55 L 430,55" />
+                                <path id="pulse-seg4" class="wire-pulse" d="M 380,55 L 430,55" />
+
+                                <path class="wire-line" d="M 465,55 L 475,55 L 475,110 L 310,110 L 310,345" />
+                                <path id="pulse-seg5" class="wire-pulse" d="M 465,55 L 475,55 L 475,110 L 310,110 L 310,345" />
+
+                                <!-- Ammeter -->
+                                <g transform="translate(145, 55)">
+                                    <circle cx="0" cy="0" r="18" fill="#0f172a" stroke="#38bdf8" stroke-width="2.5"/>
+                                    <text x="0" y="5" font-size="13" font-weight="bold" fill="#38bdf8" text-anchor="middle" font-family="'Orbitron', sans-serif">A</text>
+                                    <text x="0" y="-22" font-size="9" font-weight="bold" fill="#38bdf8" text-anchor="middle" id="schem-amm-val" font-family="'Share Tech Mono', monospace">0.00 A</text>
+                                </g>
+
+                                <!-- Rheostat -->
+                                <g transform="translate(210, 43)">
+                                    <rect x="0" y="4" width="80" height="16" fill="#1e293b" stroke="#38bdf8" stroke-width="2" rx="2"/>
+                                    <path d="M 12,28 L 68,-4" stroke="#f59e0b" stroke-width="2.5"/>
+                                    <polygon points="68,-4 60,-3 65,3" fill="#f59e0b"/>
+                                    <text x="40" y="-8" font-size="9" font-weight="bold" fill="#f59e0b" text-anchor="middle" id="schem-rheo-val" font-family="'Share Tech Mono', monospace">5.0 Ω</text>
+                                </g>
+
+                                <!-- DC Power Supply -->
+                                <g transform="translate(340, 40)">
+                                    <line x1="10" y1="2" x2="10" y2="28" stroke="#ef4444" stroke-width="3.5"/>
+                                    <line x1="18" y1="7" x2="18" y2="23" stroke="#94a3b8" stroke-width="5"/>
+                                    <line x1="26" y1="2" x2="26" y2="28" stroke="#ef4444" stroke-width="3.5"/>
+                                    <line x1="34" y1="7" x2="34" y2="23" stroke="#94a3b8" stroke-width="5"/>
+                                    <text x="7" y="0" font-size="10" font-weight="bold" fill="#ef4444">+</text>
+                                    <text x="34" y="0" font-size="10" font-weight="bold" fill="#94a3b8">-</text>
+                                    <text x="22" y="-8" font-size="9" font-weight="bold" fill="#38bdf8" text-anchor="middle" id="schem-ps-val" font-family="'Share Tech Mono', monospace">12.0 V</text>
+                                </g>
+
+                                <!-- Key Switch -->
+                                <g transform="translate(430, 55)" style="cursor:pointer;" onclick="toggleSwitch()">
+                                    <circle cx="0" cy="0" r="3.5" fill="#f59e0b"/>
+                                    <circle cx="35" cy="0" r="3.5" fill="#f59e0b"/>
+                                    <line id="switch-blade-line" x1="0" y1="0" x2="35" y2="0" stroke="#f59e0b" stroke-width="3" stroke-linecap="round"/>
+                                    <text x="18" y="-18" font-size="8" font-weight="bold" fill="#f59e0b" text-anchor="middle" font-family="'Orbitron', sans-serif">SWITCH</text>
+                                </g>
+
+                                <!-- Immersed Heating Coil Element -->
+                                <g transform="translate(230, 345)">
+                                    <path id="nichrome-coil-element"
+                                          d="M 0,0 L 10,0 Q 18,-24 26,0 Q 34,24 42,0 Q 50,-24 58,0 Q 66,24 74,0 L 80,0"
+                                          fill="none" stroke="#64748b" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </g>
+
+                                <text id="coil-spec-label" x="270" y="372" font-size="8.5" font-weight="bold" fill="#93c5fd" text-anchor="middle" font-family="'Share Tech Mono', monospace">4.0 Ω (Medium Gauge)</text>
+
+                                <text x="172" y="350" font-size="10" font-weight="bold" fill="#f1f5f9">Heating Coil</text>
+                                <line x1="228" y1="347" x2="215" y2="347" stroke="#94a3b8" stroke-width="1"/>
+
+                                <text x="250" y="270" font-size="11" font-weight="bold" fill="#bae6fd">Water</text>
+
+                                <text x="105" y="240" font-size="10" font-weight="bold" fill="#f1f5f9">Calorimeter</text>
+                                <line x1="145" y1="237" x2="190" y2="237" stroke="#94a3b8" stroke-width="1"/>
+
+                                <text x="120" y="395" font-size="10" font-weight="bold" fill="#fcd34d">Lagging</text>
+                                <line x1="150" y1="392" x2="175" y2="392" stroke="#94a3b8" stroke-width="1"/>
+
+                                <text x="125" y="165" font-size="10" font-weight="bold" fill="#fed7aa">Lid</text>
+                                <line x1="140" y1="162" x2="160" y2="162" stroke="#94a3b8" stroke-width="1"/>
+
+                                <!-- Probe -->
+                                <g transform="translate(375, 150)">
+                                    <rect x="-4" y="0" width="8" height="15" fill="#dc2626" rx="2"/>
+                                    <rect x="-3" y="15" width="6" height="145" fill="#e2e8f0" stroke="#475569" stroke-width="1.2" rx="2"/>
+                                    <rect id="probe-liquid-indicator" x="-2" y="100" width="4" height="58" fill="#ef4444" rx="1.5"/>
+                                    <line x1="3" y1="90" x2="35" y2="90" stroke="#94a3b8" stroke-width="1"/>
+                                    <text x="40" y="93" font-size="8.5" font-weight="bold" fill="#f8fafc">Sensor Probe</text>
+                                </g>
+
+                                <path d="M 375,150 C 375,120 480,120 540,185" fill="none" stroke="#c084fc" stroke-width="4" stroke-linecap="round"/>
+                                <text x="445" y="132" font-size="8.5" font-weight="bold" fill="#d8b4fe">Sensor Cable</text>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Calorimeter Controls Sidebar Console -->
+                    <div class="card-panel controls-panel">
+                        <h3 class="panel-heading" style="font-family:'Orbitron', sans-serif; font-size:0.82rem; color:var(--neon-cyan); letter-spacing:1.2px; border-bottom:1px solid rgba(0, 243, 255, 0.25); padding-bottom:6px;">
+                            EXPERIMENT PARAMETERS
+                        </h3>
+
+                        <div class="control-group">
+                            <label for="range-v">DC Supply Voltage: <span id="lbl-v">12.0 V</span></label>
+                            <input type="range" id="range-v" min="2" max="24" step="0.5" value="12" oninput="applyControls()">
+                        </div>
+
+                        <div class="control-group">
+                            <label for="range-rh">Rheostat Resistance (R_rh): <span id="lbl-rh">5.0 Ω</span></label>
+                            <input type="range" id="range-rh" min="0" max="20" step="0.5" value="5" oninput="applyControls()">
+                        </div>
+
+                        <div class="control-group">
+                            <label for="select-coil-r">Coil Resistance (R): <span id="lbl-coil-r">4.0 Ω</span></label>
+                            <select id="select-coil-r" onchange="applyControls()">
+                                <option value="2.0">Nichrome (Short & Thick) - 2.0 Ω</option>
+                                <option value="4.0" selected>Nichrome (Medium Gauge) - 4.0 Ω</option>
+                                <option value="6.0">Nichrome (Long Coiled) - 6.0 Ω</option>
+                                <option value="8.0">Nichrome (Thin Gauge) - 8.0 Ω</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group">
+                            <label for="select-water-m">Water Mass in Cup: <span id="lbl-water-m">150 g</span></label>
+                            <select id="select-water-m" onchange="applyControls()">
+                                <option value="100">100 g (Low Level - 100 ml)</option>
+                                <option value="150" selected>150 g (Medium Level - 150 ml)</option>
+                                <option value="200">200 g (High Level - 200 ml)</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group" style="margin-top:2px;">
+                            <label>Stopwatch (Heating Time t): <span id="timer-display" style="color:var(--neon-green); font-size:0.95rem;">00:00.0</span></label>
+                            <div style="display:flex; gap:8px; margin-top:4px;">
+                                <button class="sim-btn success" style="flex:1;" onclick="toggleStopwatch()" id="btn-timer-run">Start Timer</button>
+                                <button class="sim-btn" style="flex:1;" onclick="resetStopwatch()">Reset</button>
+                            </div>
+                        </div>
+
+                        <div class="telemetry-box">
+                            <div class="tele-row">
+                                <span style="color:var(--text-dim);">Current (I):</span>
+                                <span style="color:var(--neon-cyan); font-weight:bold;" id="live-i-val">1.31 A</span>
+                            </div>
+                            <div class="tele-row">
+                                <span style="color:var(--text-dim);">Power (P = I²R):</span>
+                                <span style="color:var(--neon-amber); font-weight:bold;" id="live-p-val">6.9 W</span>
+                            </div>
+                            <div class="tele-row">
+                                <span style="color:var(--text-dim);">Rise (Δθ = θ₂ - θ₁):</span>
+                                <span style="color:var(--neon-red); font-weight:bold;" id="live-dth-val">0.00 °C</span>
+                            </div>
+                            <div class="tele-row">
+                                <span style="color:var(--text-dim);">Heat Input (H = I²Rt):</span>
+                                <span style="color:var(--neon-magenta); font-weight:bold;" id="live-h-val">0 J</span>
+                            </div>
+                        </div>
+
+                        <button class="sim-btn" onclick="recordRow()">
+                            + Record Trial Reading
+                        </button>
+                        <button class="sim-btn danger" onclick="resetTempWater()" title="Restores 20°C ambient fresh water for next trial">
+                            ↻ New Trial (Fresh Water at 20°C)
+                        </button>
+                    </div>
+
+                </div>
+
+                <!-- Bottom Row: Experimental Recordings Table & Graph View -->
+                <div class="bottom-workspace-grid">
+                    
+                    <div class="card-panel">
+                        <div class="card-panel-header">
+                            <span>EXPERIMENTAL RECORDINGS & FORMULA CALCULATIONS</span>
+                            <div style="display:flex; gap:6px;">
+                                <button class="sim-btn success" style="padding:4px 8px; font-size:0.68rem;" onclick="downloadDataCSV()">📥 Export CSV</button>
+                                <button class="sim-btn danger" style="padding:4px 8px; font-size:0.68rem;" onclick="clearTable()">Clear</button>
+                            </div>
+                        </div>
+                        <div class="table-scroll">
+                            <table class="data-table" id="exp-table">
+                                <thead>
+                                    <tr>
+                                        <th>Trial</th>
+                                        <th>I (A)</th>
+                                        <th>I² (A²)</th>
+                                        <th>R (Ω)</th>
+                                        <th>t (s)</th>
+                                        <th>θ₁ (°C)</th>
+                                        <th>θ₂ (°C)</th>
+                                        <th>Δθ (°C)</th>
+                                        <th>H = I²Rt (J)</th>
+                                        <th>Q = mcΔθ (J)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="card-panel">
+                        <div class="card-panel-header">
+                            <select id="graph-type-select" style="padding:2px 6px; font-size:0.7rem;" onchange="onGraphTypeChanged()">
+                                <option value="theta_vs_i2">Δθ vs Current² (I²)</option>
+                                <option value="theta_vs_i">Δθ vs Current (I)</option>
+                                <option value="theta_vs_t">Δθ vs Heating Time (t)</option>
+                                <option value="theta_vs_r">Δθ vs Resistance (R)</option>
+                            </select>
+                            <button class="sim-btn" style="padding:4px 8px; font-size:0.68rem;" onclick="openGraphPopUp()">⤢ Expand</button>
+                        </div>
+                        <div class="graph-canvas-container">
+                            <canvas id="bench-graph-canvas"></canvas>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- =========================================================
+                 WORKSTATION 2: INCANDESCENT BULB & FUSE PROTECTION
+                 ========================================================= -->
+            <div class="bulb-workspace" id="window-bulb">
+
+                <div class="bulb-bench-container">
+                    <div class="card-panel-header">
+                        <span>INCANDESCENT LAMP, LIVE-WIRE SWITCH & FUSE PROTECTION</span>
+                        <div id="bulb-atmosphere-badge" class="gas-pill noble">🛡️ Inert Gas: Argon / Nitrogen</div>
+                    </div>
+
+                    <div class="bulb-view-canvas-wrap">
+                        <div class="bulb-light-glow-layer" id="bulb-radial-glow"></div>
+                        <canvas id="bulb-smoke-canvas"></canvas>
+
+                        <svg id="bulb-svg-scene" viewBox="0 0 600 450">
+                            <defs>
+                                <radialGradient id="glass-specular" cx="35%" cy="30%" r="65%">
+                                    <stop offset="0%" stop-color="#ffffff" stop-opacity="0.25"/>
+                                    <stop offset="60%" stop-color="#38bdf8" stop-opacity="0.05"/>
+                                    <stop offset="100%" stop-color="#0284c7" stop-opacity="0.15"/>
+                                </radialGradient>
+                                <filter id="filament-glow-filter" x="-100%" y="-100%" width="300%" height="300%">
+                                    <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur1"/>
+                                    <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur2"/>
+                                    <feMerge>
+                                        <feMergeNode in="blur2"/>
+                                        <feMergeNode in="blur1"/>
+                                        <feMergeNode in="SourceGraphic"/>
+                                    </feMerge>
+                                </filter>
+                            </defs>
+
+                            <!-- Circuit Connections -->
+                            <path d="M 280,335 L 280,380 L 130,380" fill="none" stroke="#38bdf8" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path id="bulb-pulse-neg" class="bulb-wire-pulse" d="M 280,335 L 280,380 L 130,380"/>
+
+                            <path d="M 130,412 L 165,412" fill="none" stroke="#ef4444" stroke-width="4" stroke-linecap="round"/>
+                            <path id="bulb-pulse-live-a" class="bulb-wire-pulse" d="M 130,412 L 165,412"/>
+
+                            <path d="M 235,412 L 275,412" fill="none" stroke="#ef4444" stroke-width="4" stroke-linecap="round"/>
+                            <path id="bulb-pulse-live-b" class="bulb-wire-pulse" d="M 235,412 L 275,412"/>
+
+                            <path d="M 330,412 L 400,412 L 400,335 L 320,335" fill="none" stroke="#ef4444" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path id="bulb-pulse-live-c" class="bulb-wire-pulse" d="M 330,412 L 400,412 L 400,335 L 320,335"/>
+
+                            <circle cx="280" cy="335" r="4.5" fill="#38bdf8" stroke="#ffffff" stroke-width="1.5"/>
+                            <circle cx="320" cy="335" r="4.5" fill="#ef4444" stroke="#ffffff" stroke-width="1.5"/>
+
+                            <!-- DC Voltage Source -->
+                            <g id="dc-source-unit">
+                                <rect x="40" y="360" width="90" height="65" rx="6" fill="#1e293b" stroke="#475569" stroke-width="2"/>
+                                <text x="85" y="377" font-size="8.5" font-weight="bold" fill="#94a3b8" text-anchor="middle" font-family="'Orbitron', sans-serif">DC POWER</text>
+                                <text x="85" y="400" font-size="13" font-weight="bold" fill="#38bdf8" text-anchor="middle" id="bulb-ps-display" font-family="'Share Tech Mono', monospace">0.0 V</text>
+
+                                <circle cx="130" cy="380" r="5" fill="#0f172a" stroke="#38bdf8" stroke-width="2"/>
+                                <text x="120" y="384" font-size="10" font-weight="bold" fill="#38bdf8">-</text>
+
+                                <circle cx="130" cy="412" r="5" fill="#ef4444" stroke="#fecaca" stroke-width="2"/>
+                                <text x="120" y="416" font-size="10" font-weight="bold" fill="#ef4444">+</text>
+                            </g>
+
+                            <!-- Cartridge Fuse with Melting Filament & Color Bands -->
+                            <g id="fuse-assembly" transform="translate(165, 397)">
+                                <rect x="-4" y="24" width="78" height="6" fill="#334155" rx="2"/>
+                                <text x="35" y="37" font-size="7.5" font-weight="bold" fill="#94a3b8" text-anchor="middle" id="fuse-rating-text" font-family="'Share Tech Mono', monospace">FUSE: 3.0 A (Standard)</text>
+
+                                <rect x="8" y="7" width="54" height="16" fill="rgba(224, 242, 254, 0.25)" stroke="#64748b" stroke-width="1.2" rx="3"/>
+                                <ellipse id="fuse-burn-mark" cx="35" cy="15" rx="14" ry="7" fill="rgba(15, 23, 42, 0.85)" opacity="0"/>
+
+                                <rect id="fuse-band-left" x="8" y="7" width="6" height="16" fill="#0284c7" opacity="0.85"/>
+                                <rect id="fuse-band-right" x="48" y="7" width="6" height="16" fill="#0284c7" opacity="0.85"/>
+
+                                <rect x="0" y="5" width="10" height="20" fill="#94a3b8" stroke="#475569" stroke-width="1" rx="2"/>
+                                <rect x="60" y="5" width="10" height="20" fill="#94a3b8" stroke="#475569" stroke-width="1" rx="2"/>
+
+                                <path id="fuse-wire-path" d="M 8,15 L 30,15 Q 35,12 40,15 L 62,15" fill="none" stroke="#f8fafc" stroke-width="2.6" stroke-linecap="round"/>
+                                <circle id="fuse-spark" cx="35" cy="15" r="0" fill="#facc15" opacity="0"/>
+                            </g>
+
+                            <!-- Live Wire Knife Switch -->
+                            <g id="live-knife-switch" transform="translate(275, 412)" style="cursor:pointer;" onclick="toggleBulbSwitch()">
+                                <rect x="-8" y="-7" width="16" height="14" fill="#334155" rx="2"/>
+                                <rect x="47" y="-7" width="16" height="14" fill="#334155" rx="2"/>
+                                <circle cx="0" cy="0" r="4" fill="#f59e0b"/>
+                                <circle cx="55" cy="0" r="4" fill="#f59e0b"/>
+                                <line id="bulb-switch-blade" x1="0" y1="0" x2="55" y2="0" stroke="#f59e0b" stroke-width="4.5" stroke-linecap="round"/>
+                                <text x="27" y="20" font-size="8" font-weight="bold" fill="#4ade80" text-anchor="middle" id="bulb-switch-label" font-family="'Orbitron', sans-serif">SWITCH [CLOSED]</text>
+                            </g>
+
+                            <!-- Lamp Base & Brass Screw Mount -->
+                            <g transform="translate(300, 310)">
+                                <ellipse cx="0" cy="24" rx="14" ry="5" fill="#475569"/>
+                                <rect x="-16" y="20" width="32" height="4" fill="#0f172a" rx="2"/>
+                                <path d="M -22,0 C -22,12 -20,22 0,22 C 20,22 22,12 22,0 Z" fill="#b45309" stroke="#78350f" stroke-width="2"/>
+                                <line x1="-22" y1="5" x2="22" y2="5" stroke="#d97706" stroke-width="2"/>
+                                <line x1="-22" y1="11" x2="22" y2="11" stroke="#d97706" stroke-width="2"/>
+                                <line x1="-21" y1="17" x2="21" y2="17" stroke="#d97706" stroke-width="2"/>
+                            </g>
+
+                            <path d="M 288,310 L 293,220 L 307,220 L 312,310 Z" fill="#64748b" opacity="0.4"/>
+                            <ellipse cx="300" cy="220" rx="14" ry="4" fill="#94a3b8" opacity="0.6"/>
+
+                            <line x1="292" y1="220" x2="280" y2="160" stroke="#cbd5e1" stroke-width="2"/>
+                            <line x1="308" y1="220" x2="320" y2="160" stroke="#cbd5e1" stroke-width="2"/>
+                            <line x1="300" y1="220" x2="300" y2="148" stroke="#64748b" stroke-width="1.2"/>
+                            <path d="M 300,148 Q 300,140 305,144" fill="none" stroke="#64748b" stroke-width="1.2"/>
+
+                            <!-- Filament Element -->
+                            <g id="filament-container">
+                                <path id="filament-path-left"
+                                      d="M 280,160 Q 285,150 290,146 Q 295,142 300,144"
+                                      fill="none" stroke="#64748b" stroke-width="3.5" stroke-linecap="round"/>
+                                <path id="filament-path-right"
+                                      d="M 300,144 Q 305,142 310,146 Q 315,150 320,160"
+                                      fill="none" stroke="#64748b" stroke-width="3.5" stroke-linecap="round"/>
+                            </g>
+
+                            <circle id="filament-burn-spark" cx="300" cy="144" r="0" fill="#fef08a" opacity="0"/>
+
+                            <!-- Glass Bulb Outline -->
+                            <path d="M 278,310
+                                     C 265,290 230,250 225,190
+                                     C 220,120 250,70 300,70
+                                     C 350,70 380,120 375,190
+                                     C 370,250 335,290 322,310 Z"
+                                  fill="url(#glass-specular)" stroke="rgba(255,255,255,0.4)" stroke-width="2.5"/>
+
+                            <path d="M 245,130 C 240,165 248,210 260,240" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="3.5" stroke-linecap="round"/>
+
+                            <g id="gas-particles-visual" opacity="0.6">
+                                <circle cx="260" cy="170" r="2" fill="#38bdf8"/>
+                                <circle cx="340" cy="150" r="2" fill="#38bdf8"/>
+                                <circle cx="300" cy="105" r="2" fill="#38bdf8"/>
+                                <circle cx="270" cy="225" r="2" fill="#38bdf8"/>
+                                <circle cx="330" cy="235" r="2" fill="#38bdf8"/>
+                            </g>
+                        </svg>
+                    </div>
+
+                    <div class="bulb-status-banner">
+                        <div>
+                            <span style="color:var(--text-dim);">Filament State:</span>
+                            <strong id="bulb-state-text" style="color:var(--neon-green); margin-left:4px;">Normal (Cold)</strong>
+                        </div>
+                        <div>
+                            <span style="color:var(--text-dim);">Luminous Output:</span>
+                            <strong id="bulb-lumen-text" style="color:var(--neon-amber); margin-left:4px;">0 lm (Off)</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bulb Controls Console -->
+                <div class="card-panel controls-panel">
+                    <h3 class="panel-heading" style="font-family:'Orbitron', sans-serif; font-size:0.82rem; color:var(--neon-amber); letter-spacing:1.2px; border-bottom:1px solid rgba(250, 204, 21, 0.3); padding-bottom:6px;">
+                        BULB CONTROLS & FUSE SETUP
+                    </h3>
+
+                    <div class="control-group">
+                        <label>Live Wire Knife Switch:</label>
+                        <button class="sim-btn success" id="btn-bulb-switch" onclick="toggleBulbSwitch()">
+                            ⚡ Knife Switch: [CLOSED / ON]
+                        </button>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="select-fuse-rating">Cartridge Fuse Rating: <span id="lbl-fuse-val" style="color:var(--neon-amber);">3.0 A</span></label>
+                        <select id="select-fuse-rating" onchange="changeFuseRating()">
+                            <option value="1.0">1.0 A Fast-Blow Fuse (Ultra-Thin Wire)</option>
+                            <option value="2.0">2.0 A Protection Fuse (Thin Conductor)</option>
+                            <option value="3.0" selected>3.0 A Standard Fuse (Medium Wire)</option>
+                            <option value="5.0">5.0 A High-Current Fuse (Heavy Strip)</option>
+                            <option value="8.0">8.0 A Heavy-Duty Fuse (Extra-Heavy Ribbon)</option>
+                        </select>
+                        <button class="sim-btn" id="btn-replace-fuse" onclick="replaceFuseOnly()" style="margin-top:4px;">
+                            🛡️ Replace / Reset Fuse
+                        </button>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="slider-bulb-v">Filament Voltage (V): <span id="lbl-bulb-v">0.0 V</span></label>
+                        <input type="range" id="slider-bulb-v" min="0" max="15" step="0.2" value="0" oninput="updateBulbSimulation()">
+                    </div>
+
+                    <div class="control-group">
+                        <label>Bulb Envelope Atmosphere:</label>
+                        <button class="sim-btn success" id="btn-toggle-gas" onclick="toggleBulbAtmosphere()">
+                            🛡️ Inert Gas: [ON] (Argon / N₂)
+                        </button>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="select-filament-mat">Filament Conductor:</label>
+                        <select id="select-filament-mat" onchange="changeFilamentMaterial()">
+                            <option value="tungsten" selected>Tungsten (W) - M.P. 3422°C [Standard]</option>
+                            <option value="copper">Copper (Cu) - M.P. 1085°C [Low M.P.]</option>
+                            <option value="iron">Iron (Fe) - M.P. 1538°C [Moderate M.P.]</option>
+                            <option value="nichrome">Nichrome (NiCr) - M.P. 1400°C [Heating Wire]</option>
+                            <option value="carbon">Carbon (C) - Historic Edison Filament</option>
+                        </select>
+                    </div>
+
+                    <button class="sim-btn" onclick="resetBulbFilament()">
+                        ↻ Replace Filament & Clean Bulb
+                    </button>
+
+                    <div class="telemetry-box">
+                        <div class="tele-row">
+                            <span style="color:var(--text-dim);">Filament Current:</span>
+                            <span style="color:var(--neon-cyan); font-weight:bold;" id="bulb-read-i">0.00 A</span>
+                        </div>
+                        <div class="tele-row">
+                            <span style="color:var(--text-dim);">Hot Resistance:</span>
+                            <span style="color:var(--neon-cyan); font-weight:bold;" id="bulb-read-r">2.50 Ω</span>
+                        </div>
+                        <div class="tele-row">
+                            <span style="color:var(--text-dim);">Electrical Power (P):</span>
+                            <span style="color:var(--neon-amber); font-weight:bold;" id="bulb-read-p">0.0 W</span>
+                        </div>
+                        <div class="tele-row">
+                            <span style="color:var(--text-dim);">Core Temperature:</span>
+                            <span style="color:var(--neon-red); font-weight:bold;" id="bulb-read-temp">20 °C</span>
+                        </div>
+                    </div>
+
+                    <div style="background:rgba(4, 9, 20, 0.7); border:1px solid rgba(0, 243, 255, 0.25); border-radius:8px; padding:10px; font-size:0.8rem; line-height:1.5;">
+                        <strong style="color:var(--neon-cyan);" id="mat-card-title">Tungsten Specifications:</strong>
+                        <p id="mat-card-desc" style="color:#cbd5e1; margin-top:4px;">
+                            Tungsten possesses the highest melting point of all refractory metals (3422°C) and low vapor pressure, operating at 2500°C incandescence without fusing.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- 3. SAFE AD PLACEMENT SLOT -->
+        <div class="ad-slot-wrapper">
+            <div class="ad-disclaimer">Advertisement</div>
+            <div class="ad-box-placeholder">
+                <!-- Google AdSense Responsive Display Unit -->
+                <span>[AdSense Responsive Display Unit]</span>
+            </div>
+        </div>
+
+        <!-- 4. EDUCATIONAL REFERENCE ARTICLE -->
+        <article class="educational-content">
+            <section>
+                <h2>How to Operate the Simulator</h2>
+                <p>
+                    This dual-station physics laboratory enables comprehensive quantitative exploration of electric heating, electrical calorimetry, safety fusing, and incandescent optical radiators:
+                </p>
+                <ol style="margin-left: 24px; margin-top: 8px;">
+                    <li><strong>Calorimeter Workstation:</strong> Adjust the DC power supply voltage and rheostat to calibrate the target circuit current (I). Choose a Nichrome coil gauge (2.0 Ω to 8.0 Ω) and select the initial mass of water inside the lagged calorimeter container.</li>
+                    <li><strong>Conducting Quantitative Heating Trials:</strong> Click <em>Start Timer</em> to commence current dissipation. As electrical work is transferred into thermal energy, observe the molecular agitation of water particles and the digital thermometer readout. Click <em>+ Record Trial Reading</em> at predetermined time intervals to log current squared, resistance, heating time, and temperature rise into the data table.</li>
+                    <li><strong>Verifying Joule's Laws:</strong> Use the graph selector to plot Δθ vs I², Δθ vs I, Δθ vs t, or Δθ vs R. Click <em>Expand</em> to launch the high-resolution regression canvas with calculated trendline slopes and proportionality proof badges. Export clean datasets using <em>Export CSV</em> or save graph figures as PNGs.</li>
+                    <li><strong>Incandescent Lamp & Fuse Workstation:</strong> Switch to Station 2 to investigate current overloads. Adjust the DC voltage across various filament materials. Observe why placing the knife switch and fuse in the live lead protects against electrical hazards, and examine how inert gas envelopes prevent rapid oxidation burnout.</li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>Scientific Theory & Working Principles</h2>
+                <p>
+                    When an electromotive force establishes a potential difference across a solid electrical conductor, mobile charge carriers (free conduction electrons) accelerate along the electric field gradient. As these electrons drift, they repeatedly collide with the fixed lattice ions of the conductor. In each inelastic collision, kinetic energy is transferred to the lattice vibrations (phonons), increasing internal energy and elevating the macroscopic temperature of the conductor. This conversion of electrical potential energy into thermal energy is known as <strong>Joule heating</strong> or the <strong>ohmic heating effect</strong>.
+                </p>
+                <p>
+                    <strong>Joule's Three Laws of Electric Heating:</strong>
+                </p>
+                <ul style="margin-left: 24px; margin-top: 6px;">
+                    <li><strong>1st Law:</strong> The rate of thermal generation in a constant resistance is directly proportional to the square of the electric current (H ∝ I²). Doubling the circuit current quadruples the generated heat per second.</li>
+                    <li><strong>2nd Law:</strong> The quantity of heat produced is directly proportional to the resistance of the conductor (H ∝ R) for a given sustained current.</li>
+                    <li><strong>3rd Law:</strong> The generated heat is directly proportional to the time duration of current conduction (H ∝ t).</li>
+                </ul>
+                <p style="margin-top: 10px;">
+                    <strong>Calorimeter Thermal Conservation:</strong> In an ideal, fully lagged calorimeter, heat lost to the ambient surroundings is negligible. Thus, electrical energy input (H = I²Rt) equals the total thermal energy absorbed by the liquid and its container: Q = (m_w · c_w + C_cal) · Δθ, where m_w is water mass, c_w is specific heat capacity (4184 J/(kg·K)), and C_cal is the calorimeter cup's heat capacity.
+                </p>
+                <p>
+                    <strong>Safety Fuses & Incandescent Radiators:</strong>
+                    A cartridge fuse is a deliberate sacrificial weak point in an electrical circuit. Composed of an alloy conductor with a calibrated cross-sectional area and a low melting point (e.g., tin-lead alloy), excessive current generates Joule heat faster than natural dissipation, causing the fuse link to melt and physically break the live circuit. Conversely, an incandescent lamp filament requires an extremely refractory material like Tungsten (melting point 3422°C). Operating at approximately 2500°C produces blackbody radiation across the visible spectrum. If exposed to atmospheric oxygen, tungsten rapidly oxidizes into volatile tungsten trioxide smoke and burns out; filling the glass envelope with an inert gas (argon and nitrogen) suppresses sublimation while preventing chemical oxidation.
+                </p>
+            </section>
+
+            <section>
+                <h2>Mathematical Foundations & Formulas</h2>
+                <p>
+                    Quantitative analyses across electrical heating and calorimetry rely on the fundamental relationships below:
+                </p>
+                <div class="formula-box">
+                    Formula 1: Electrical Energy / Joule Heat (H)<br>
+                    H = V · I · t = I² · R · t = (V² / R) · t<br><br>
+                    Formula 2: Electric Power Dissipated (P)<br>
+                    P = dH / dt = V · I = I² · R = V² / R<br><br>
+                    Formula 3: Calorimetric Thermal Absorption (Q)<br>
+                    Q = (m_water · c_water + C_calorimeter) · Δθ = (m_water · c_water + C_calorimeter) · (θ₂ - θ₁)<br><br>
+                    Formula 4: Temperature Dependence of Electrical Resistance<br>
+                    R(T) = R₀ · [1 + α · (T - T₀)]<br>
+                    where α is the temperature coefficient of resistance (for tungsten, α ≈ 0.0045 K⁻¹).<br><br>
+                    Formula 5: Electrical Thermal Efficiency (η)<br>
+                    Efficiency η = (Useful Heat Absorbed Q / Electrical Energy Supplied H) · 100%
+                </div>
+            </section>
+
+            <section>
+                <h2>Real-World Engineering & Industrial Applications</h2>
+                <p>
+                    Joule heating principles govern both deliberate electrothermal engineering and protective circuit design:
+                </p>
+                <ul style="margin-left: 24px; margin-top: 8px;">
+                    <li><strong>Domestic Electrothermal Appliances:</strong> Immersion heaters, storage geysers, electric kettles, radiant space heaters, and hair dryers utilize high-resistivity Nichrome alloys (80% Nickel, 20% Chromium). Nichrome maintains mechanical rigidity at high temperatures and forms a protective, non-flaking chromium oxide layer that halts internal oxidation.</li>
+                    <li><strong>Domestic & Automotive Overcurrent Protection:</strong> Cartridge fuses, rewirable fuse links, and thermal bimetallic circuit breakers protect distribution wiring from catastrophic insulation melting and electrical fires caused by short circuits (I = V / R_near_zero) or branch overloads.</li>
+                    <li><strong>High-Temperature Incandescent Lighting & Vacuum Halogen Systems:</strong> Incandescent bulbs, halogen quartz heaters, and infrared medical radiators operate tungsten coils at extreme temperatures. Halogen cycles re-deposit evaporated tungsten atoms back onto the hot filament, significantly extending service life.</li>
+                    <li><strong>Industrial Electric Arc Furnaces & Resistance Welding:</strong> Spot welding machines pass massive currents (thousands of amperes) across small contact interfaces for milliseconds. The contact interface resistance generates local melting temperatures that forge structural steel sheets together without filler rod material.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Practice Problems & Diagnostic Tasks</h2>
+                <p>Test your quantitative comprehension using the five senior secondary level laboratory exercises below:</p>
+
+                <div class="task-card">
+                    <div class="task-title">Task 1: Calorimeter Thermal Absorption & Temperature Rise</div>
+                    <p>
+                        An immersion heating coil of resistance 5.0 Ω is immersed in 200 g of water contained inside an insulated copper calorimeter of heat capacity 45 J/K. A constant direct current of 2.4 A flows through the coil for 5.0 minutes (300 s). Assuming heat losses to the room are negligible and the specific heat capacity of water is 4184 J/(kg·K), determine:
+                        <br>(a) The total electrical energy dissipated by the coil.
+                        <br>(b) The final temperature rise (Δθ) of the water-calorimeter system.
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 2: Supply Voltage Manipulation & Power Dissipation</div>
+                    <p>
+                        A domestic radiant heating element rated at 240 V delivers an output thermal power of 1200 W under nominal mains supply. 
+                        <br>(a) Calculate the operational resistance of the heating element.
+                        <br>(b) During a severe electrical brownout, the supply voltage drops by 15% to 204 V. Assuming the element's resistance remains essentially constant, calculate the new power dissipated and determine the percentage reduction in heat output.
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 3: Cartridge Fuse Sizing & Multi-Appliance Branch Circuits</div>
+                    <p>
+                        A 230 V domestic branch circuit is protected by a cartridge fuse. A consumer connects a 2.0 kW electric kettle, an 800 W microwave oven, and two 100 W incandescent lamps simultaneously across this single branch circuit.
+                        <br>(a) Calculate the total steady-state operational current drawn by all four appliances.
+                        <br>(b) Standard cartridge fuses are available in commercial ratings of 5 A, 10 A, 13 A, and 15 A. Identify the most suitable fuse rating for this circuit, and explain why choosing a 5 A or a 30 A fuse would be hazardous or inappropriate.
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 4: Hot vs. Cold Filament Resistance of an Incandescent Lamp</div>
+                    <p>
+                        An automotive incandescent headlamp bulb is rated at 12.0 V, 60.0 W. At its normal operating temperature of 2450°C, the tungsten filament glows with white incandescence.
+                        <br>(a) Calculate the operating hot resistance of the filament.
+                        <br>(b) The temperature coefficient of resistivity for tungsten is α = 0.0045 K⁻¹. Given an ambient room temperature of 20°C, determine the cold resistance (R_cold) of the filament before the lamp switch is closed.
+                        <br>(c) Deduce the instantaneous inrush current drawn at the exact microsecond the bulb is turned on.
+                    </p>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-title">Task 5: Experimental Calorimetry with Systematic Heat Loss</div>
+                    <p>
+                        A student performs Joule's law verification in an unlagged metal calorimeter containing 150 g of water (water specific heat c = 4184 J/(kg·K), calorimeter heat capacity C = 40 J/K). The electric coil dissipates 18.0 W for a duration of 10.0 minutes (600 s). An accurate digital thermometer measures a net temperature rise of only 14.80 °C.
+                        <br>(a) Calculate the theoretical temperature rise in the absence of heat losses.
+                        <br>(b) Determine the quantity of thermal energy lost to the ambient atmosphere during the experiment.
+                        <br>(c) Calculate the percentage thermal efficiency (η) of this heating apparatus.
+                    </p>
+                </div>
+
+                <!-- Collapsible Step-by-Step Solutions -->
+                <details>
+                    <summary>Click to Reveal Solutions and Step-by-Step Proofs</summary>
+                    
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 1:</strong></p>
+                        <p>
+                            (a) Electrical energy dissipated (Joule heat):<br>
+                            H = I² · R · t<br>
+                            H = (2.4 A)² · 5.0 Ω · 300 s = 5.76 A² · 5.0 Ω · 300 s = <strong>8640 J</strong> (or 8.64 kJ).
+                        </p>
+                        <p>
+                            (b) Thermal capacity of the combined system:<br>
+                            C_total = m_w · c_w + C_cal<br>
+                            m_w = 200 g = 0.200 kg<br>
+                            C_total = (0.200 kg · 4184 J/(kg·K)) + 45 J/K = 836.8 J/K + 45 J/K = 881.8 J/K.<br>
+                            By conservation of energy (H = Q = C_total · Δθ):<br>
+                            Δθ = H / C_total = 8640 J / 881.8 J/K = <strong>9.80 °C</strong>.
+                        </p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 2:</strong></p>
+                        <p>
+                            (a) Nominal resistance of the heating element:<br>
+                            P = V² / R  ⟹  R = V² / P<br>
+                            R = (240 V)² / 1200 W = 57600 / 1200 = <strong>48.0 Ω</strong>.
+                        </p>
+                        <p>
+                            (b) Power at the reduced voltage (V_new = 204 V):<br>
+                            P_new = (V_new)² / R = (204 V)² / 48.0 Ω = 41616 / 48.0 = <strong>867.0 W</strong>.<br>
+                            Percentage reduction in heating power:<br>
+                            Reduction = [(P_initial - P_new) / P_initial] · 100%<br>
+                            Reduction = [(1200 W - 867.0 W) / 1200 W] · 100% = (333.0 / 1200) · 100% = <strong>27.75%</strong>.<br>
+                            <em>Notice that a 15% voltage drop produces approximately a 27.8% drop in thermal output because power is proportional to the square of voltage (P ∝ V²).</em>
+                        </p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 3:</strong></p>
+                        <p>
+                            (a) Total power consumed by appliances connected in parallel:<br>
+                            P_total = 2000 W (kettle) + 800 W (microwave) + 2 · 100 W (lamps) = 3000 W.<br>
+                            Total operational load current:<br>
+                            I_total = P_total / V = 3000 W / 230 V = <strong>13.04 A</strong>.
+                        </p>
+                        <p>
+                            (b) Selecting the appropriate cartridge fuse rating:<br>
+                            • A <strong>15 A fuse</strong> is the correct standard choice because it safely exceeds the normal continuous running current of 13.04 A without nuisance tripping.<br>
+                            • A 5 A or 10 A fuse would blow instantly upon turning on the kettle, as 13.04 A severely exceeds their trip thresholds.<br>
+                            • A 30 A fuse would provide dangerously inadequate fire protection; in the event of an appliance insulation fault or partial short circuit drawing 20 A to 25 A, the wiring inside walls would overheat and ignite before the 30 A fuse could melt.
+                        </p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 4:</strong></p>
+                        <p>
+                            (a) Operating hot resistance:<br>
+                            R_hot = V² / P = (12.0 V)² / 60.0 W = 144 / 60 = <strong>2.40 Ω</strong>.
+                        </p>
+                        <p>
+                            (b) Cold resistance calculation:<br>
+                            Temperature differential: ΔT = 2450°C - 20°C = 2430 K.<br>
+                            Using R_hot = R_cold · [1 + α · ΔT]:<br>
+                            1 + α · ΔT = 1 + (0.0045 K⁻¹ · 2430 K) = 1 + 10.935 = 11.935.<br>
+                            R_cold = R_hot / 11.935 = 2.40 Ω / 11.935 = <strong>0.201 Ω</strong>.
+                        </p>
+                        <p>
+                            (c) Instantaneous inrush current:<br>
+                            I_inrush = V / R_cold = 12.0 V / 0.201 Ω = <strong>59.7 A</strong>.<br>
+                            <em>Physical insight: The cold filament draws almost 12 times its normal running current (5.0 A) during the initial few milliseconds. This explains why incandescent light bulbs almost always burn out at the exact moment the light switch is toggled on.</em>
+                        </p>
+                    </div>
+
+                    <div class="solution-step">
+                        <p><strong>Solution to Task 5:</strong></p>
+                        <p>
+                            (a) Total electrical energy input:<br>
+                            H = P · t = 18.0 W · 600 s = 10800 J.<br>
+                            System heat capacity: C_total = (0.150 kg · 4184 J/(kg·K)) + 40 J/K = 627.6 + 40 = 667.6 J/K.<br>
+                            Theoretical temperature rise (zero losses):<br>
+                            Δθ_theoretical = H / C_total = 10800 J / 667.6 J/K = <strong>16.18 °C</strong>.
+                        </p>
+                        <p>
+                            (b) Useful heat absorbed by water and can:<br>
+                            Q_absorbed = C_total · Δθ_actual = 667.6 J/K · 14.80 °C = 9880.5 J.<br>
+                            Thermal energy lost to ambient air:<br>
+                            Q_lost = H - Q_absorbed = 10800 J - 9880.5 J = <strong>919.5 J</strong>.
+                        </p>
+                        <p>
+                            (c) Thermal efficiency:<br>
+                            Efficiency η = (Q_absorbed / H) · 100% = (9880.5 J / 10800 J) · 100% = <strong>91.49%</strong>.
+                        </p>
+                    </div>
+
+                </details>
+            </section>
+        </article>
+    </main>
+
+    <!-- EXPANDED GRAPH POPUP MODAL -->
+    <div class="modal-backdrop" id="graph-modal-dialog">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                    <h3 style="font-size:1rem; color:var(--neon-cyan); font-family:'Orbitron', sans-serif;">Graph Analysis & Verification of Joule's Law</h3>
+                    <select id="modal-graph-type-select" style="padding:4px 8px; font-size:0.75rem;" onchange="onModalGraphTypeChanged()">
+                        <option value="theta_vs_i2">Δθ vs Current² (I²)</option>
+                        <option value="theta_vs_i">Δθ vs Current (I)</option>
+                        <option value="theta_vs_t">Δθ vs Heating Time (t)</option>
+                        <option value="theta_vs_r">Δθ vs Resistance (R)</option>
+                    </select>
+                </div>
+                <div style="display:flex; gap:8px;">
+                    <button class="sim-btn success" onclick="downloadGraphImage()">📷 Download PNG</button>
+                    <button class="sim-btn danger" onclick="closeGraphPopUp()">✕ Close</button>
+                </div>
+            </div>
+            <div class="modal-body-graph">
+                <canvas id="modal-graph-canvas"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. SYNCHRONIZED COMPLIANCE FOOTER -->
+    <footer>
+        <nav class="footer-nav">
+            <a href="../index.html">Home</a>
+            <a href="../index.html#about-section">About Us</a>
+            <button type="button" class="footer-modal-trigger" onclick="openSimModal('simPrivacyModal')">Privacy Policy</button>
+            <button type="button" class="footer-modal-trigger" onclick="openSimModal('simTermsModal')">Terms of Service</button>
+            <a href="../index.html#contact-section">Contact Us</a>
+            <a href="https://forms.gle/fYxxaNKAh21dPUoBA" target="_blank" rel="noopener noreferrer">Simulator Suggestions</a>
+        </nav>
+        <p>&copy; 2026 LuyaliSims | Engineered by Click & Draft | Dedicated to Open STEM Education</p>
+    </footer>
+
+    <!-- 6. IDENTICAL PRIVACY POLICY MODAL -->
+    <div id="simPrivacyModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="privacyTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeSimModal('simPrivacyModal')">Close [✕]</button>
+            <h2 id="privacyTitle">Privacy Policy</h2>
+            <p class="modal-date">Last Updated: September 2026</p>
+            <p>Welcome to LuyaliSims. We respect your privacy and are committed to protecting your personal data. This privacy policy explains how we treat information when you interact with our educational simulators.</p>
+            
+            <h3>1. Educational Purpose & Information Collection</h3>
+            <p>LuyaliSims is a free educational portal. We do not require account registration, passwords, or personal login information to run any simulation. All simulation calculations occur locally within your browser using client-side JavaScript.</p>
+
+            <h3>2. Google AdSense & Third-Party Cookies</h3>
+            <p>We may display advertisements served by Google AdSense to fund our free educational tools. Google, as a third-party vendor, uses cookies to serve ads on our site based on users' visits to this and other sites on the Internet.</p>
+            <ul style="margin-left: 20px;">
+                <li>Google's use of advertising cookies enables it and its partners to serve ads based on your visit to LuyaliSims and other sites.</li>
+                <li>Users may opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" style="color: var(--neon-cyan);">Google Ads Settings</a>.</li>
+            </ul>
+
+            <h3>3. Log Files & Analytics</h3>
+            <p>Like standard websites, our hosting servers collect anonymous log records (including IP addresses, browser types, and timestamp references) to monitor server uptime, fix script errors, and optimize simulator performance.</p>
+
+            <h3>4. Children's Online Privacy (COPPA Compliance)</h3>
+            <p>Our educational simulators are built for students and educators of all ages. We do not knowingly solicit or collect personally identifiable information from children under 13.</p>
+
+            <h3>5. Contact Regarding Privacy</h3>
+            <p>If you have any questions regarding this policy, contact us at: <a href="mailto:luyashliz@gmail.com" style="color: var(--neon-cyan);">luyashliz@gmail.com</a>.</p>
+        </div>
+    </div>
+
+    <!-- 7. IDENTICAL TERMS OF SERVICE MODAL -->
+    <div id="simTermsModal" class="policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="termsTitle">
+        <div class="modal-body">
+            <button class="modal-close-btn" onclick="closeSimModal('simTermsModal')">Close [✕]</button>
+            <h2 id="termsTitle">Terms of Service</h2>
+            <p class="modal-date">Effective Date: September 2026</p>
+
+            <h3>1. Permitted Educational Use</h3>
+            <p>All interactive models, simulations, practice problems, and laboratory worksheets on LuyaliSims are made freely available for classroom demonstrations, academic study, tutoring, and self-paced individual learning.</p>
+
+            <h3>2. Intellectual Property</h3>
+            <p>The code architecture, layout designs, and custom interactive engines are the intellectual property of Ian Luyali and Click & Draft. You may use our simulators online in academic settings, but mirroring or re-hosting our code for commercial resale without permission is prohibited.</p>
+
+            <h3>3. Disclaimer of Scientific Warranty</h3>
+            <p>While simulations are engineered to accurately replicate classical mechanics, thermodynamics, and electronics, they are provided as conceptual learning aids. LuyaliSims is not liable for outcomes in real-world high-voltage or hazardous laboratory environments constructed without professional teacher supervision.</p>
+
+            <h3>4. Updates to Terms</h3>
+            <p>We reserve the right to refine these terms as new laboratory modules and features are introduced.</p>
+        </div>
+    </div>
+
+    <!-- 8. SIMULATOR CORE SCRIPT & MODAL LOGIC -->
+    <script>
+    /* =====================================================================
+       POLICY MODAL & FULLSCREEN LOGIC
+       ===================================================================== */
+    function openSimModal(id) {
+        const m = document.getElementById(id);
+        if (m) {
+            m.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    function closeSimModal(id) {
+        const m = document.getElementById(id);
+        if (m) {
+            m.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+    }
+
+    window.addEventListener('click', (e) => {
+        if (e.target.classList.contains('policy-modal')) {
+            closeSimModal(e.target.id);
+        }
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' || e.key === 'Esc') {
+            document.querySelectorAll('.policy-modal').forEach(m => {
+                m.style.display = 'none';
+            });
+            closeGraphPopUp();
+            document.body.style.overflow = 'auto';
+        }
+    });
+
+    // Functional Fullscreen Controller
+    const simContainer = document.getElementById('simulator-container');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+    if (fullscreenBtn) {
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                if (simContainer.requestFullscreen) {
+                    simContainer.requestFullscreen();
+                } else if (simContainer.webkitRequestFullscreen) {
+                    simContainer.webkitRequestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                }
+            }
+        });
+    }
+
+    function handleFullscreenChange() {
+        const isFull = !!(document.fullscreenElement || document.webkitFullscreenElement);
+        if (fullscreenBtn) {
+            fullscreenBtn.innerHTML = isFull ?
+                `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"></path></svg> Exit Screen` :
+                `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg> Fullscreen`;
+        }
+    }
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+
+    /* =====================================================================
+       PART 1: JOULE'S LAW CALORIMETER SIMULATION ENGINE
+       ===================================================================== */
+    const lab = {
+        switchClosed: true,
+        psVoltage: 12.0,
+        rheoR: 5.0,
+        coilR: 4.0,
+        waterM: 0.150,
+        tempAmbient: 20.0,
+        tempCurrent: 20.0,
+        tempInitial: 20.0,
+        simTime: 0,
+        timerRunning: false,
+        simSpeed: 5,
+        current: 0.0,
+        power: 0.0
+    };
+
+    const SPECIFIC_HEAT_WATER = 4184;
+    const CALORIMETER_HEAT_CAP = 40;
+    let recordedTrials = [];
+
+    window.addEventListener('DOMContentLoaded', () => {
+        initWaterMolecules();
+        applyControls();
+        plotGraph(false);
+
+        initBulbSmoke();
+        changeFilamentMaterial();
+        changeFuseRating();
+
+        window.addEventListener('resize', () => {
+            initWaterMolecules();
+            plotGraph(false);
+            if (document.getElementById('graph-modal-dialog').classList.contains('active')) {
+                plotGraph(true);
+            }
+        });
+
+        let lastTimestamp = performance.now();
+        function animationLoop(now) {
+            const dt = Math.min(0.1, (now - lastTimestamp) / 1000);
+            lastTimestamp = now;
+
+            runPhysicsTick(dt);
+            renderWaterMolecules();
+
+            stepBulbPhysics(dt);
+            renderBulbSmoke();
+
+            requestAnimationFrame(animationLoop);
+        }
+        requestAnimationFrame(animationLoop);
+    });
+
+    function solveElectricalNetwork() {
+        const statusBadge = document.getElementById('circuit-status-badge');
+        const teleStatus = document.getElementById('tele-status');
+
+        if (lab.switchClosed) {
+            const totalR = lab.rheoR + lab.coilR + 0.12;
+            lab.current = lab.psVoltage / totalR;
+            lab.power = Math.pow(lab.current, 2) * lab.coilR;
+
+            if (statusBadge) {
+                statusBadge.style.color = "var(--neon-green)";
+                statusBadge.textContent = `● Circuit Closed (${lab.current.toFixed(2)} A)`;
+            }
+            if (teleStatus) {
+                teleStatus.className = "tele-val green";
+                teleStatus.textContent = `● ACTIVE (${lab.current.toFixed(2)} A)`;
+            }
+        } else {
+            lab.current = 0.0;
+            lab.power = 0.0;
+
+            if (statusBadge) {
+                statusBadge.style.color = "var(--neon-red)";
+                statusBadge.textContent = "● Key Switch Open";
+            }
+            if (teleStatus) {
+                teleStatus.className = "tele-val red";
+                teleStatus.textContent = "● SWITCH OPEN";
+            }
+        }
+
+        updateSchematicReadouts();
+        updateCoilIncandescence();
+        updateCurrentPulses();
+    }
+
+    function runPhysicsTick(dt) {
+        solveElectricalNetwork();
+
+        if (lab.timerRunning) {
+            const simDt = dt * lab.simSpeed;
+            lab.simTime += simDt;
+            updateStopwatchLabel();
+
+            if (lab.power > 0) {
+                const heatCapacity = (lab.waterM * SPECIFIC_HEAT_WATER) + CALORIMETER_HEAT_CAP;
+                const heatLoss = 0.04 * (lab.tempCurrent - lab.tempAmbient);
+                const netPower = Math.max(0, lab.power - heatLoss);
+
+                const dTemp = (netPower * simDt) / heatCapacity;
+                lab.tempCurrent += dTemp;
+                if (lab.tempCurrent > 100) lab.tempCurrent = 100.0;
+            }
+        }
+
+        updateDigitalReadouts();
+    }
+
+    function updateWaterLevelVisual() {
+        const waterFluid = document.getElementById('water-fluid');
+        if (!waterFluid) return;
+        let h = 110;
+        if (lab.waterM <= 0.11) h = 75;
+        else if (lab.waterM >= 0.19) h = 140;
+
+        waterFluid.style.height = `${h}px`;
+        setTimeout(initWaterMolecules, 30);
+    }
+
+    function updateCoilGeometryVisual() {
+        const coil = document.getElementById('nichrome-coil-element');
+        const specLabel = document.getElementById('coil-spec-label');
+        if (!coil || !specLabel) return;
+        const R = lab.coilR;
+
+        if (R === 2.0) {
+            coil.setAttribute('d', 'M 0,0 L 12,0 Q 23,-28 34,0 Q 45,28 56,0 Q 67,-28 78,0 L 80,0');
+            coil.setAttribute('stroke-width', '6.5');
+            specLabel.textContent = '2.0 Ω (Thick Gauge, Short)';
+        } else if (R === 4.0) {
+            coil.setAttribute('d', 'M 0,0 L 8,0 Q 16,-24 24,0 Q 32,24 40,0 Q 48,-24 56,0 Q 64,24 72,0 L 80,0');
+            coil.setAttribute('stroke-width', '4.2');
+            specLabel.textContent = '4.0 Ω (Medium Gauge)';
+        } else if (R === 6.0) {
+            coil.setAttribute('d', 'M 0,0 L 6,0 Q 12,-20 18,0 Q 24,20 30,0 Q 36,-20 42,0 Q 48,20 54,0 Q 60,-20 66,0 Q 72,20 76,0 L 80,0');
+            coil.setAttribute('stroke-width', '3.2');
+            specLabel.textContent = '6.0 Ω (Long & Dense Coil)';
+        } else if (R === 8.0) {
+            coil.setAttribute('d', 'M 0,0 L 4,0 Q 9,-18 14,0 Q 19,18 24,0 Q 29,-18 34,0 Q 39,18 44,0 Q 49,-18 54,0 Q 59,18 64,0 Q 69,-18 74,0 L 80,0');
+            coil.setAttribute('stroke-width', '2.0');
+            specLabel.textContent = '8.0 Ω (Fine Thin Gauge)';
+        }
+    }
+
+    function updateCoilIncandescence() {
+        const coil = document.getElementById('nichrome-coil-element');
+        const shimmer = document.getElementById('convection-shimmer');
+        if (!coil || !shimmer) return;
+        const I = lab.current;
+
+        let baseColor = lab.coilR === 8.0 ? '#475569' : (lab.coilR === 2.0 ? '#94a3b8' : '#64748b');
+
+        if (I <= 0.1) {
+            coil.setAttribute('stroke', baseColor);
+            coil.removeAttribute('filter');
+            shimmer.style.opacity = '0';
+        } else if (I < 1.4) {
+            coil.setAttribute('stroke', '#b45309');
+            coil.removeAttribute('filter');
+            shimmer.style.opacity = '0.25';
+        } else if (I < 2.5) {
+            coil.setAttribute('stroke', '#ea580c');
+            coil.setAttribute('filter', 'url(#glow-heat)');
+            shimmer.style.opacity = '0.55';
+        } else {
+            coil.setAttribute('stroke', '#ef4444');
+            coil.setAttribute('filter', 'url(#glow-heat)');
+            shimmer.style.opacity = '0.9';
+        }
+    }
+
+    function updateCurrentPulses() {
+        const pulses = ['pulse-seg1', 'pulse-seg2', 'pulse-seg3', 'pulse-seg4', 'pulse-seg5'];
+        const I = lab.current;
+
+        pulses.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                if (I > 0.08) {
+                    el.style.display = 'block';
+                    const dur = Math.max(0.12, 0.55 / I);
+                    el.style.animationDuration = `${dur}s`;
+                } else {
+                    el.style.display = 'none';
+                }
+            }
+        });
+    }
+
+    function updateSchematicReadouts() {
+        const amm = document.getElementById('schem-amm-val');
+        const ps = document.getElementById('schem-ps-val');
+        const rh = document.getElementById('schem-rheo-val');
+        if (amm) amm.textContent = lab.current.toFixed(2) + " A";
+        if (ps) ps.textContent = lab.psVoltage.toFixed(1) + " V";
+        if (rh) rh.textContent = lab.rheoR.toFixed(1) + " Ω";
+    }
+
+    function updateDigitalReadouts() {
+        const thermo = document.getElementById('thermo-display');
+        if (thermo) thermo.textContent = lab.tempCurrent.toFixed(1) + " °C";
+
+        const ratio = Math.min(1, Math.max(0, (lab.tempCurrent - 15) / 65));
+        const probe = document.getElementById('probe-liquid-indicator');
+        if (probe) {
+            const h = 25 + ratio * 85;
+            probe.setAttribute('height', h);
+            probe.setAttribute('y', 158 - h);
+        }
+
+        const dTh = Math.max(0, lab.tempCurrent - lab.tempInitial);
+        const H = Math.pow(lab.current, 2) * lab.coilR * lab.simTime;
+
+        const li = document.getElementById('live-i-val');
+        const lp = document.getElementById('live-p-val');
+        const ld = document.getElementById('live-dth-val');
+        const lh = document.getElementById('live-h-val');
+
+        if (li) li.textContent = lab.current.toFixed(2) + " A";
+        if (lp) lp.textContent = lab.power.toFixed(1) + " W";
+        if (ld) ld.textContent = dTh.toFixed(2) + " °C";
+        if (lh) lh.textContent = Math.round(H) + " J";
+
+        // HUD Telemetry
+        const tI = document.getElementById('tele-readout-i');
+        const tP = document.getElementById('tele-readout-p');
+        const tTh = document.getElementById('tele-readout-th');
+        if (tI) tI.textContent = lab.current.toFixed(2) + " A";
+        if (tP) tP.textContent = lab.power.toFixed(1) + " W";
+        if (tTh) tTh.textContent = dTh.toFixed(2) + " °C";
+    }
+
+    let molecules = [];
+    function initWaterMolecules() {
+        const canvas = document.getElementById('particle-canvas');
+        if (!canvas) return;
+        const parent = canvas.parentElement;
+        canvas.width = (parent && parent.clientWidth > 0) ? parent.clientWidth : 220;
+        canvas.height = (parent && parent.clientHeight > 0) ? parent.clientHeight : 110;
+
+        molecules = [];
+        const N = Math.floor(canvas.width * canvas.height / 500) || 35;
+        for (let i = 0; i < N; i++) {
+            molecules.push({
+                x: Math.random() * (canvas.width - 16) + 8,
+                y: Math.random() * (canvas.height - 16) + 8,
+                vx: (Math.random() - 0.5) * 1.6,
+                vy: (Math.random() - 0.5) * 1.6,
+                r: 3.2
+            });
+        }
+    }
+
+    function renderWaterMolecules() {
+        const canvas = document.getElementById('particle-canvas');
+        if (!canvas || !canvas.getContext) return;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const T_factor = (lab.tempCurrent + 273.15) / 293.15;
+        const speed = Math.pow(T_factor, 4);
+
+        const norm = Math.min(1, Math.max(0, (lab.tempCurrent - 20) / 60));
+        const r = Math.round(56 + norm * (239 - 56));
+        const g = Math.round(189 - norm * 125);
+        const b = Math.round(248 - norm * 200);
+        const color = `rgb(${r}, ${g}, ${b})`;
+
+        molecules.forEach(m => {
+            m.x += m.vx * speed;
+            m.y += m.vy * speed;
+
+            if (m.x <= m.r) { m.x = m.r; m.vx *= -1; }
+            if (m.x >= canvas.width - m.r) { m.x = canvas.width - m.r; m.vx *= -1; }
+            if (m.y <= m.r) { m.y = m.r; m.vy *= -1; }
+            if (m.y >= canvas.height - m.r) { m.y = canvas.height - m.r; m.vy *= -1; }
+
+            ctx.beginPath();
+            ctx.arc(m.x, m.y, m.r, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.shadowBlur = norm * 5;
+            ctx.shadowColor = '#ef4444';
+            ctx.fill();
+            ctx.shadowBlur = 0;
+        });
+
+        const waterFluid = document.getElementById('water-fluid');
+        if (waterFluid) {
+            waterFluid.style.background = `rgba(${14 + norm * 80}, ${165 - norm * 60}, ${233 - norm * 130}, 0.52)`;
+        }
+    }
+
+    function toggleSwitch() {
+        lab.switchClosed = !lab.switchClosed;
+        const blade = document.getElementById('switch-blade-line');
+        const btn = document.getElementById('btn-switch-toggle');
+
+        if (lab.switchClosed) {
+            if (blade) blade.setAttribute('y2', '0');
+            if (btn) {
+                btn.textContent = "Switch: [CLOSED]";
+                btn.className = "sim-btn success";
+            }
+        } else {
+            if (blade) blade.setAttribute('y2', '-18');
+            if (btn) {
+                btn.textContent = "Switch: [OPEN]";
+                btn.className = "sim-btn danger";
+            }
+        }
+        solveElectricalNetwork();
+    }
+
+    function applyControls() {
+        const rv = document.getElementById('range-v');
+        const rrh = document.getElementById('range-rh');
+        const rcoil = document.getElementById('select-coil-r');
+        const rwater = document.getElementById('select-water-m');
+
+        if (rv) lab.psVoltage = parseFloat(rv.value);
+        if (rrh) lab.rheoR = parseFloat(rrh.value);
+        if (rcoil) lab.coilR = parseFloat(rcoil.value);
+        if (rwater) lab.waterM = parseFloat(rwater.value) / 1000.0;
+
+        const lblv = document.getElementById('lbl-v');
+        const lblrh = document.getElementById('lbl-rh');
+        const lblcoil = document.getElementById('lbl-coil-r');
+        const lblwater = document.getElementById('lbl-water-m');
+
+        if (lblv) lblv.textContent = lab.psVoltage.toFixed(1) + " V";
+        if (lblrh) lblrh.textContent = lab.rheoR.toFixed(1) + " Ω";
+        if (lblcoil) lblcoil.textContent = lab.coilR.toFixed(1) + " Ω";
+        if (lblwater) lblwater.textContent = (lab.waterM * 1000).toFixed(0) + " g";
+
+        updateWaterLevelVisual();
+        updateCoilGeometryVisual();
+        solveElectricalNetwork();
+    }
+
+    function toggleStopwatch() {
+        lab.timerRunning = !lab.timerRunning;
+        const btn = document.getElementById('btn-timer-run');
+        if (btn) {
+            if (lab.timerRunning) {
+                btn.textContent = "Pause Timer";
+                btn.className = "sim-btn danger";
+            } else {
+                btn.textContent = "Start Timer";
+                btn.className = "sim-btn success";
+            }
+        }
+    }
+
+    function resetStopwatch() {
+        lab.simTime = 0;
+        updateStopwatchLabel();
+    }
+
+    function updateStopwatchLabel() {
+        const tot = Math.floor(lab.simTime);
+        const m = Math.floor(tot / 60);
+        const s = tot % 60;
+        const tenth = Math.floor((lab.simTime % 1) * 10);
+        const td = document.getElementById('timer-display');
+        if (td) {
+            td.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${tenth}`;
+        }
+    }
+
+    function resetTempWater() {
+        lab.tempCurrent = lab.tempAmbient;
+        lab.tempInitial = lab.tempAmbient;
+        resetStopwatch();
+        updateDigitalReadouts();
+    }
+
+    function setSpeed(spd) {
+        lab.simSpeed = spd;
+        const s1 = document.getElementById('spd-1');
+        const s5 = document.getElementById('spd-5');
+        const s15 = document.getElementById('spd-15');
+        if (s1) s1.className = spd === 1 ? 'sim-btn active-speed' : 'sim-btn';
+        if (s5) s5.className = spd === 5 ? 'sim-btn active-speed' : 'sim-btn';
+        if (s15) s15.className = spd === 15 ? 'sim-btn active-speed' : 'sim-btn';
+    }
+
+    function recordRow() {
+        const I = lab.current;
+        const I2 = I * I;
+        const R = lab.coilR;
+        const t = Math.max(1, Math.round(lab.simTime));
+        const th1 = lab.tempInitial;
+        const th2 = lab.tempCurrent;
+        const dTh = Math.max(0, th2 - th1);
+
+        const H = I2 * R * t;
+        const Q = ((lab.waterM * SPECIFIC_HEAT_WATER) + CALORIMETER_HEAT_CAP) * dTh;
+
+        const trial = {
+            num: recordedTrials.length + 1,
+            i: parseFloat(I.toFixed(2)),
+            i2: parseFloat(I2.toFixed(2)),
+            r: parseFloat(R.toFixed(1)),
+            t: t,
+            th1: parseFloat(th1.toFixed(1)),
+            th2: parseFloat(th2.toFixed(1)),
+            dTh: parseFloat(dTh.toFixed(2)),
+            h: Math.round(H),
+            q: Math.round(Q)
+        };
+
+        recordedTrials.push(trial);
+        renderTable();
+        plotGraph(false);
+        if (document.getElementById('graph-modal-dialog').classList.contains('active')) {
+            plotGraph(true);
+        }
+    }
+
+    function renderTable() {
+        const tbody = document.getElementById('table-body');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        recordedTrials.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${row.num}</strong></td>
+                <td>${row.i.toFixed(2)}</td>
+                <td>${row.i2.toFixed(2)}</td>
+                <td>${row.r.toFixed(1)}</td>
+                <td>${row.t}</td>
+                <td>${row.th1.toFixed(1)}</td>
+                <td>${row.th2.toFixed(1)}</td>
+                <td style="color:var(--neon-cyan); font-weight:bold;">${row.dTh.toFixed(2)}</td>
+                <td style="color:var(--neon-magenta);">${row.h}</td>
+                <td style="color:var(--neon-green);">${row.q}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function clearTable() {
+        if (confirm("Clear all recorded experimental data?")) {
+            recordedTrials = [];
+            renderTable();
+            plotGraph(false);
+            if (document.getElementById('graph-modal-dialog').classList.contains('active')) {
+                plotGraph(true);
+            }
+        }
+    }
+
+    function downloadDataCSV() {
+        if (recordedTrials.length === 0) {
+            alert("No data recorded yet. Run trials and record measurements first.");
+            return;
+        }
+
+        let csv = "Trial,Current_I(A),Current_Squared_I2(A2),Resistance_R(Ohm),Time_t(s),Initial_Temp_degC,Final_Temp_degC,Temp_Rise_DeltaTheta_degC,Electrical_Heat_H(J),Absorbed_Heat_Q(J)\n";
+        recordedTrials.forEach(r => {
+            csv += `${r.num},${r.i},${r.i2},${r.r},${r.t},${r.th1},${r.th2},${r.dTh},${r.h},${r.q}\n`;
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `joules_law_data_${Date.now()}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    /* =====================================================================
+       GRAPH ENGINE & JOULE'S LAW PLOTTER
+       ===================================================================== */
+    function onGraphTypeChanged() {
+        const gts = document.getElementById('graph-type-select');
+        const mgts = document.getElementById('modal-graph-type-select');
+        if (gts && mgts) mgts.value = gts.value;
+        plotGraph(false);
+        if (document.getElementById('graph-modal-dialog').classList.contains('active')) {
+            plotGraph(true);
+        }
+    }
+
+    function onModalGraphTypeChanged() {
+        const gts = document.getElementById('graph-type-select');
+        const mgts = document.getElementById('modal-graph-type-select');
+        if (gts && mgts) gts.value = mgts.value;
+        plotGraph(false);
+        plotGraph(true);
+    }
+
+    function calculateNiceAxisLimits(maxVal, targetDivs) {
+        if (maxVal <= 0.05) maxVal = 1.0;
+        const roughStep = maxVal / Math.max(3, targetDivs);
+        const pow10 = Math.pow(10, Math.floor(Math.log10(roughStep)));
+        const frac = roughStep / pow10;
+        let step = 1 * pow10;
+
+        if (frac <= 1.2) step = 1 * pow10;
+        else if (frac <= 2.8) step = 2 * pow10;
+        else if (frac <= 6.5) step = 5 * pow10;
+        else step = 10 * pow10;
+
+        const niceMax = Math.ceil((maxVal * 1.08) / step) * step;
+        const ticks = [];
+        for (let val = 0; val <= niceMax + (step * 0.001); val += step) {
+            ticks.push(parseFloat(val.toFixed(4)));
+        }
+        return { ticks, max: niceMax, step };
+    }
+
+    function getGraphDataset(factor) {
+        let xLabel = "Current Squared, I² (A²)";
+        let yLabel = "Temperature Rise, Δθ (°C)";
+        let lawTitle = "Joule's 1st Law: Δθ ∝ I² (Linear)";
+        let subtitle = "Direct Proportionality: Straight Line through Origin (0,0)";
+        let fitType = "linear";
+        let points = [];
+
+        if (recordedTrials.length === 0) {
+            return { points: [], xLabel, yLabel, lawTitle, subtitle, fitType, hasData: false };
+        }
+
+        const refR = recordedTrials[recordedTrials.length - 1].r || 4.0;
+        let refT = recordedTrials[recordedTrials.length - 1].t || 180;
+        if (refT < 10) refT = 180;
+        let refI = recordedTrials[recordedTrials.length - 1].i || 2.0;
+        if (refI < 0.2) refI = 2.0;
+
+        const totalHeatCap = (lab.waterM * SPECIFIC_HEAT_WATER) + CALORIMETER_HEAT_CAP;
+
+        if (factor === 'theta_vs_i2') {
+            xLabel = "Current Squared, I² (A²)";
+            yLabel = "Temperature Rise, Δθ (°C)";
+            lawTitle = "Joule's 1st Law: Δθ ∝ I²";
+            subtitle = `Controlled: R = ${refR.toFixed(1)} Ω, t = ${refT} s (Linear fit through origin)`;
+            fitType = "linear";
+
+            recordedTrials.forEach(d => {
+                const scale = (d.r > 0 && d.t > 0) ? (refR * refT) / (d.r * d.t) : 1.0;
+                const yVal = parseFloat((d.dTh * scale).toFixed(2));
+                points.push({ x: d.i2, y: yVal });
+            });
+        } 
+        else if (factor === 'theta_vs_i') {
+            xLabel = "Current, I (A)";
+            yLabel = "Temperature Rise, Δθ (°C)";
+            lawTitle = "Heating Effect: Δθ vs Current (I)";
+            subtitle = `Controlled: R = ${refR.toFixed(1)} Ω, t = ${refT} s (Smooth Parabolic Curve)`;
+            fitType = "parabolic";
+
+            recordedTrials.forEach(d => {
+                const scale = (d.r > 0 && d.t > 0) ? (refR * refT) / (d.r * d.t) : 1.0;
+                const yVal = parseFloat((d.dTh * scale).toFixed(2));
+                points.push({ x: d.i, y: yVal });
+            });
+        } 
+        else if (factor === 'theta_vs_t') {
+            xLabel = "Heating Time, t (s)";
+            yLabel = "Temperature Rise, Δθ (°C)";
+            lawTitle = "Joule's 2nd Law: Δθ ∝ t";
+            subtitle = `Controlled: I = ${refI.toFixed(2)} A, R = ${refR.toFixed(1)} Ω (Linear fit through origin)`;
+            fitType = "linear";
+
+            recordedTrials.forEach(d => {
+                const normRatio = (d.i2 > 0 && d.r > 0) ? (Math.pow(refI, 2) * refR) / (d.i2 * d.r) : 1.0;
+                const yVal = parseFloat((d.dTh * normRatio).toFixed(2));
+                points.push({ x: d.t, y: yVal });
+            });
+        } 
+        else if (factor === 'theta_vs_r') {
+            xLabel = "Coil Resistance, R (Ω)";
+            yLabel = "Temperature Rise, Δθ (°C)";
+            lawTitle = "Joule's 3rd Law: Δθ ∝ R";
+            subtitle = `Controlled: I = ${refI.toFixed(2)} A, t = ${refT} s (Linear fit through origin)`;
+            fitType = "linear";
+
+            const distinctR = new Set(recordedTrials.map(d => d.r));
+
+            if (distinctR.size >= 2) {
+                recordedTrials.forEach(d => {
+                    const normRatio = (d.i2 > 0 && d.t > 0) ? (Math.pow(refI, 2) * refT) / (d.i2 * d.t) : 1.0;
+                    const yVal = parseFloat((d.dTh * normRatio).toFixed(2));
+                    points.push({ x: d.r, y: yVal });
+                });
+            } else {
+                const standardCoils = [2.0, 4.0, 6.0, 8.0];
+                const slopeK = (Math.pow(refI, 2) * refT) / totalHeatCap;
+                standardCoils.forEach(rVal => {
+                    const yVal = parseFloat((slopeK * rVal).toFixed(2));
+                    points.push({ x: rVal, y: yVal });
+                });
+                subtitle += " [Coil Set Verification: 2.0 Ω, 4.0 Ω, 6.0 Ω, 8.0 Ω]";
+            }
+        }
+
+        points.sort((a, b) => a.x - b.x);
+        return { points, xLabel, yLabel, lawTitle, subtitle, fitType, hasData: true };
+    }
+
+    function plotGraph(isModal = false) {
+        const canvasId = isModal ? 'modal-graph-canvas' : 'bench-graph-canvas';
+        const canvas = document.getElementById(canvasId);
+        if (!canvas || !canvas.getContext) return;
+        const ctx = canvas.getContext('2d');
+
+        const rect = canvas.getBoundingClientRect();
+        const W = Math.max(260, rect.width || (isModal ? 840 : 300));
+        const H = Math.max(180, rect.height || (isModal ? 480 : 220));
+
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = Math.floor(W * dpr);
+        canvas.height = Math.floor(H * dpr);
+
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        const pad = isModal 
+            ? { t: 40, r: 35, b: 62, l: 64 } 
+            : { t: 24, r: 16, b: 36, l: 44 };
+
+        const pw = Math.max(50, W - pad.l - pad.r);
+        const ph = Math.max(50, H - pad.t - pad.b);
+
+        ctx.clearRect(0, 0, W, H);
+
+        ctx.fillStyle = "#040812";
+        ctx.fillRect(pad.l, pad.t, pw, ph);
+
+        const gts = document.getElementById(isModal ? 'modal-graph-type-select' : 'graph-type-select');
+        const factor = gts ? gts.value : 'theta_vs_i2';
+        const dataset = getGraphDataset(factor);
+
+        if (!dataset.hasData) {
+            ctx.strokeStyle = "rgba(0, 243, 255, 0.15)";
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 4; i++) {
+                const gx = pad.l + (i / 4) * pw;
+                const gy = pad.t + (i / 4) * ph;
+                ctx.beginPath(); ctx.moveTo(gx, pad.t); ctx.lineTo(gx, pad.t + ph); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(pad.l, gy); ctx.lineTo(pad.l + pw, gy); ctx.stroke();
+            }
+            ctx.strokeStyle = "rgba(0, 243, 255, 0.4)";
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(pad.l, pad.t);
+            ctx.lineTo(pad.l, pad.t + ph);
+            ctx.lineTo(pad.l + pw, pad.t + ph);
+            ctx.stroke();
+
+            ctx.fillStyle = "#64748b";
+            ctx.font = isModal ? "14px Rajdhani" : "11px Rajdhani";
+            ctx.textAlign = "center";
+            ctx.fillText("Record experimental readings to generate verification plot", pad.l + pw / 2, pad.t + ph / 2);
+            return;
+        }
+
+        let rawMaxX = 0, rawMaxY = 0;
+        dataset.points.forEach(p => {
+            if (p.x > rawMaxX) rawMaxX = p.x;
+            if (p.y > rawMaxY) rawMaxY = p.y;
+        });
+
+        const numDivs = isModal ? 8 : 4;
+        const xLimits = calculateNiceAxisLimits(rawMaxX, numDivs);
+        const yLimits = calculateNiceAxisLimits(rawMaxY, numDivs);
+
+        const maxX = xLimits.max;
+        const maxY = yLimits.max;
+
+        const toX = v => pad.l + (v / maxX) * pw;
+        const toY = v => pad.t + ph - (v / maxY) * ph;
+
+        // Gridlines
+        ctx.strokeStyle = "rgba(0, 243, 255, 0.1)";
+        ctx.lineWidth = 1;
+        xLimits.ticks.forEach(tx => {
+            const gx = toX(tx);
+            ctx.beginPath(); ctx.moveTo(gx, pad.t); ctx.lineTo(gx, pad.t + ph); ctx.stroke();
+        });
+        yLimits.ticks.forEach(ty => {
+            const gy = toY(ty);
+            ctx.beginPath(); ctx.moveTo(pad.l, gy); ctx.lineTo(pad.l + pw, gy); ctx.stroke();
+        });
+
+        // Axes Borders
+        ctx.strokeStyle = "rgba(0, 243, 255, 0.5)";
+        ctx.lineWidth = 1.6;
+        ctx.beginPath();
+        ctx.moveTo(pad.l, pad.t);
+        ctx.lineTo(pad.l, pad.t + ph);
+        ctx.lineTo(pad.l + pw, pad.t + ph);
+        ctx.stroke();
+
+        // Ticks
+        ctx.fillStyle = "#94a3b8";
+        ctx.font = isModal ? "12px 'Share Tech Mono'" : "9px 'Share Tech Mono'";
+        ctx.textAlign = "center";
+
+        xLimits.ticks.forEach(tx => {
+            const gx = toX(tx);
+            ctx.fillText(tx >= 100 ? tx.toString() : (tx % 1 === 0 ? tx.toString() : tx.toFixed(1)), gx, pad.t + ph + (isModal ? 18 : 12));
+        });
+
+        ctx.textAlign = "right";
+        yLimits.ticks.forEach(ty => {
+            const gy = toY(ty);
+            ctx.fillText(ty % 1 === 0 ? ty.toString() : ty.toFixed(1), pad.l - 6, gy + 3);
+        });
+
+        // Axis Titles
+        ctx.font = isModal ? "bold 13px 'Orbitron'" : "bold 9px 'Orbitron'";
+        ctx.fillStyle = "var(--neon-cyan)";
+        ctx.textAlign = "center";
+        ctx.fillText(dataset.xLabel, pad.l + pw / 2, pad.t + ph + (isModal ? 44 : 28));
+
+        ctx.save();
+        ctx.translate(isModal ? 18 : 12, pad.t + ph / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillText(dataset.yLabel, 0, 0);
+        ctx.restore();
+
+        // Clipping Rect
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(pad.l, pad.t, pw, ph);
+        ctx.clip();
+
+        let lineEquation = "";
+        let rSquared = "0.999";
+
+        if (dataset.points.length >= 2) {
+            if (dataset.fitType === 'parabolic') {
+                let sX4 = 0, sX2Y = 0;
+                dataset.points.forEach(p => {
+                    const x2 = p.x * p.x;
+                    sX4 += x2 * x2;
+                    sX2Y += x2 * p.y;
+                });
+
+                const coeffA = sX4 > 0 ? (sX2Y / sX4) : 0;
+                lineEquation = `Δθ = ${coeffA.toFixed(3)} · I²`;
+
+                ctx.strokeStyle = "var(--neon-cyan)";
+                ctx.lineWidth = isModal ? 2.6 : 2.0;
+                ctx.beginPath();
+
+                const curveSteps = 70;
+                for (let s = 0; s <= curveSteps; s++) {
+                    const currX = (s / curveSteps) * maxX;
+                    const currY = coeffA * currX * currX;
+                    const px = toX(currX);
+                    const py = toY(currY);
+                    if (s === 0) ctx.moveTo(px, py);
+                    else ctx.lineTo(px, py);
+                }
+                ctx.stroke();
+
+            } else {
+                let sXX = 0, sXY = 0;
+                dataset.points.forEach(p => {
+                    sXX += p.x * p.x;
+                    sXY += p.x * p.y;
+                });
+
+                const slopeM = sXX > 0 ? (sXY / sXX) : 0;
+                const varSymbol = factor === 'theta_vs_i2' ? 'I²' : (factor === 'theta_vs_t' ? 't' : 'R');
+                lineEquation = `Δθ = ${slopeM.toFixed(3)} · ${varSymbol}`;
+
+                ctx.strokeStyle = "var(--neon-cyan)";
+                ctx.lineWidth = isModal ? 2.4 : 1.8;
+                ctx.setLineDash([5, 4]);
+                ctx.beginPath();
+                ctx.moveTo(toX(0), toY(0));
+                ctx.lineTo(toX(maxX), toY(slopeM * maxX));
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+        }
+
+        // Draw Data Points
+        dataset.points.forEach(p => {
+            const px = toX(p.x);
+            const py = toY(p.y);
+            const ptRadius = isModal ? 5.5 : 3.8;
+
+            ctx.beginPath();
+            ctx.arc(px, py, ptRadius, 0, Math.PI * 2);
+            ctx.fillStyle = "var(--neon-red)";
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = "rgba(239, 68, 68, 0.8)";
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            ctx.strokeStyle = "#ffffff";
+            ctx.lineWidth = 1.4;
+            ctx.stroke();
+        });
+
+        ctx.restore();
+
+        // Badge
+        if (dataset.points.length >= 2) {
+            const badgeW = isModal ? 300 : 170;
+            const badgeH = isModal ? 50 : 36;
+            const badgeX = pad.l + 10;
+            const badgeY = pad.t + 8;
+
+            ctx.fillStyle = "rgba(4, 9, 20, 0.9)";
+            ctx.strokeStyle = "rgba(0, 243, 255, 0.4)";
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.roundRect ? ctx.roundRect(badgeX, badgeY, badgeW, badgeH, 6) : ctx.rect(badgeX, badgeY, badgeW, badgeH);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = "var(--neon-cyan)";
+            ctx.font = isModal ? "bold 11px 'Orbitron'" : "bold 7.5px 'Orbitron'";
+            ctx.textAlign = "left";
+            ctx.fillText(`${dataset.lawTitle}`, badgeX + 8, badgeY + (isModal ? 18 : 13));
+
+            ctx.fillStyle = "var(--neon-green)";
+            ctx.font = isModal ? "11px 'Share Tech Mono'" : "7.5px 'Share Tech Mono'";
+            ctx.fillText(`Fit: ${lineEquation}  (R² ≈ ${rSquared})`, badgeX + 8, badgeY + (isModal ? 36 : 26));
+        }
+    }
+
+    function openGraphPopUp() {
+        const modal = document.getElementById('graph-modal-dialog');
+        const gts = document.getElementById('graph-type-select');
+        const mgts = document.getElementById('modal-graph-type-select');
+        if (gts && mgts) mgts.value = gts.value;
+
+        if (!modal) return;
+        modal.classList.add('active');
+        setTimeout(() => {
+            plotGraph(true);
+        }, 40);
+    }
+
+    function closeGraphPopUp() {
+        const modal = document.getElementById('graph-modal-dialog');
+        if (modal) modal.classList.remove('active');
+    }
+
+    function downloadGraphImage() {
+        const canvas = document.getElementById('modal-graph-canvas');
+        if (!canvas) return;
+        const a = document.createElement('a');
+        a.href = canvas.toDataURL('image/png');
+        a.download = `joules_law_verification_${Date.now()}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+
+    /* =====================================================================
+       PART 2: INCANDESCENT BULB & FUSE PROTECTION ENGINE
+       ===================================================================== */
+    const bulbState = {
+        voltage: 0.0,
+        current: 0.0,
+        resistance: 2.5,
+        power: 0.0,
+        tempC: 20.0,
+        nobleGasOn: true,
+        material: 'tungsten',
+        isBroken: false,
+        breakReason: null,
+        oxidationTimer: 0.0,
+
+        switchClosed: true,
+        fuseRating: 3.0,
+        fuseBlown: false,
+        fuseMeltTimer: 0.0
+    };
+
+    const MATERIALS = {
+        tungsten: {
+            name: 'Tungsten (W)',
+            meltingPoint: 3422,
+            baseR: 2.5,
+            tempCoeff: 0.0045,
+            strokeWidth: 3.2,
+            desc: 'Tungsten has the highest melting point of all metals (3422°C) and very low vapor pressure. It glows with brilliant incandescence (~2500°C) without melting.'
+        },
+        copper: {
+            name: 'Copper (Cu)',
+            meltingPoint: 1085,
+            baseR: 0.35,
+            tempCoeff: 0.0039,
+            strokeWidth: 4.5,
+            desc: 'Copper has a low melting point (1085°C) and extremely low resistance. It draws massive current, quickly blowing protective fuses or fusing before emitting meaningful light.'
+        },
+        iron: {
+            name: 'Iron (Fe)',
+            meltingPoint: 1538,
+            baseR: 1.2,
+            tempCoeff: 0.0050,
+            strokeWidth: 3.5,
+            desc: 'Iron melts at 1538°C. It glows dull cherry-orange at medium voltage, but promptly fuses and melts well before reaching white-hot incandescence.'
+        },
+        nichrome: {
+            name: 'Nichrome (NiCr)',
+            meltingPoint: 1400,
+            baseR: 4.0,
+            tempCoeff: 0.0004,
+            strokeWidth: 3.8,
+            desc: 'Nichrome is ideal for toaster heating coils, but its melting point (1400°C) is too low for a lamp filament; it fuses before reaching incandescent white.'
+        },
+        carbon: {
+            name: 'Carbon (C)',
+            meltingPoint: 3550,
+            baseR: 5.5,
+            tempCoeff: -0.0005,
+            strokeWidth: 4.0,
+            desc: 'Historic Edison filament! Carbon has a high sublimation point (3550°C), but vaporizes rapidly and burns in seconds if atmospheric oxygen is present.'
+        }
+    };
+
+    const FUSE_SPECS = {
+        1.0: { width: 1.0, wireColor: '#94a3b8', bandColor: '#475569', label: 'FUSE: 1.0 A (Ultra-Thin)' },
+        2.0: { width: 1.8, wireColor: '#cbd5e1', bandColor: '#ea580c', label: 'FUSE: 2.0 A (Thin Conductor)' },
+        3.0: { width: 2.6, wireColor: '#f8fafc', bandColor: '#0284c7', label: 'FUSE: 3.0 A (Standard Wire)' },
+        5.0: { width: 3.8, wireColor: '#fef08a', bandColor: '#16a34a', label: 'FUSE: 5.0 A (Heavy Strip)' },
+        8.0: { width: 5.2, wireColor: '#fed7aa', bandColor: '#d97706', label: 'FUSE: 8.0 A (Extra-Heavy Ribbon)' }
+    };
+
+    let smokeParticles = [];
+
+    function switchSimulatorMode(mode) {
+        const tabCal = document.getElementById('tab-calorimeter');
+        const tabBulb = document.getElementById('tab-bulb');
+        const winCal = document.getElementById('window-calorimeter');
+        const winBulb = document.getElementById('window-bulb');
+        const calHeaderControls = document.getElementById('calorimeter-header-controls');
+
+        if (mode === 'calorimeter') {
+            if (tabCal) tabCal.classList.add('active');
+            if (tabBulb) tabBulb.classList.remove('active');
+            if (winCal) winCal.style.display = 'block';
+            if (winBulb) winBulb.style.display = 'none';
+            if (calHeaderControls) calHeaderControls.style.display = 'flex';
+            setTimeout(() => {
+                initWaterMolecules();
+                plotGraph(false);
+            }, 30);
+        } else {
+            if (tabCal) tabCal.classList.remove('active');
+            if (tabBulb) tabBulb.classList.add('active');
+            if (winCal) winCal.style.display = 'none';
+            if (winBulb) winBulb.style.display = 'grid';
+            if (calHeaderControls) calHeaderControls.style.display = 'none';
+            setTimeout(() => {
+                initBulbSmoke();
+                updateBulbSimulation();
+            }, 30);
+        }
+    }
+
+    function initBulbSmoke() {
+        const canvas = document.getElementById('bulb-smoke-canvas');
+        if (!canvas) return;
+        const parent = canvas.parentElement;
+        canvas.width = (parent && parent.clientWidth > 0) ? parent.clientWidth : 500;
+        canvas.height = (parent && parent.clientHeight > 0) ? parent.clientHeight : 450;
+        smokeParticles = [];
+    }
+
+    function toggleBulbSwitch() {
+        bulbState.switchClosed = !bulbState.switchClosed;
+        const blade = document.getElementById('bulb-switch-blade');
+        const label = document.getElementById('bulb-switch-label');
+        const btn = document.getElementById('btn-bulb-switch');
+
+        if (bulbState.switchClosed) {
+            if (blade) blade.setAttribute('y2', '0');
+            if (label) {
+                label.textContent = "SWITCH [CLOSED]";
+                label.setAttribute('fill', '#4ade80');
+            }
+            if (btn) {
+                btn.className = "sim-btn success";
+                btn.textContent = "⚡ Knife Switch: [CLOSED / ON]";
+            }
+        } else {
+            if (blade) blade.setAttribute('y2', '-25');
+            if (label) {
+                label.textContent = "SWITCH [OPEN]";
+                label.setAttribute('fill', '#f59e0b');
+            }
+            if (btn) {
+                btn.className = "sim-btn danger";
+                btn.textContent = "⚡ Knife Switch: [OPEN / OFF]";
+            }
+        }
+        updateBulbSimulation();
+    }
+
+    function changeFuseRating() {
+        const sel = document.getElementById('select-fuse-rating');
+        if (sel) bulbState.fuseRating = parseFloat(sel.value);
+        const lbl = document.getElementById('lbl-fuse-val');
+        if (lbl) lbl.textContent = bulbState.fuseRating.toFixed(1) + " A";
+        replaceFuseOnly();
+    }
+
+    function replaceFuseOnly() {
+        bulbState.fuseBlown = false;
+        bulbState.fuseMeltTimer = 0.0;
+
+        const wirePath = document.getElementById('fuse-wire-path');
+        const burnMark = document.getElementById('fuse-burn-mark');
+        const spark = document.getElementById('fuse-spark');
+        const leftBand = document.getElementById('fuse-band-left');
+        const rightBand = document.getElementById('fuse-band-right');
+        const ratingText = document.getElementById('fuse-rating-text');
+        const replaceBtn = document.getElementById('btn-replace-fuse');
+
+        const spec = FUSE_SPECS[bulbState.fuseRating] || FUSE_SPECS[3.0];
+
+        if (wirePath) {
+            wirePath.setAttribute('d', 'M 8,15 L 30,15 Q 35,12 40,15 L 62,15');
+            wirePath.setAttribute('stroke', spec.wireColor);
+            wirePath.setAttribute('stroke-width', spec.width);
+            wirePath.removeAttribute('filter');
+        }
+        if (burnMark) burnMark.setAttribute('opacity', '0');
+        if (spark) { spark.setAttribute('r', '0'); spark.setAttribute('opacity', '0'); }
+
+        if (leftBand) leftBand.setAttribute('fill', spec.bandColor);
+        if (rightBand) rightBand.setAttribute('fill', spec.bandColor);
+        if (ratingText) ratingText.textContent = spec.label;
+
+        if (replaceBtn) {
+            replaceBtn.className = "sim-btn";
+            replaceBtn.textContent = "🛡️ Replace / Reset Fuse";
+        }
+
+        updateBulbSimulation();
+    }
+
+    function blowFuse() {
+        bulbState.fuseBlown = true;
+        bulbState.fuseMeltTimer = 0.0;
+
+        const spark = document.getElementById('fuse-spark');
+        if (spark) {
+            spark.setAttribute('r', '14');
+            spark.setAttribute('opacity', '1');
+            setTimeout(() => {
+                spark.setAttribute('r', '0');
+                spark.setAttribute('opacity', '0');
+            }, 250);
+        }
+
+        const wirePath = document.getElementById('fuse-wire-path');
+        const burnMark = document.getElementById('fuse-burn-mark');
+        const replaceBtn = document.getElementById('btn-replace-fuse');
+
+        if (wirePath) {
+            wirePath.setAttribute('d', 'M 8,15 L 25,15 M 45,15 L 62,15');
+            wirePath.setAttribute('stroke', '#475569');
+            wirePath.removeAttribute('filter');
+        }
+        if (burnMark) burnMark.setAttribute('opacity', '0.88');
+
+        if (replaceBtn) {
+            replaceBtn.className = "sim-btn danger";
+            replaceBtn.textContent = "⚠️ Fuse Blown! Click to Replace";
+        }
+
+        for (let i = 0; i < 16; i++) {
+            spawnSmokeAt(200, 412);
+        }
+    }
+
+    function toggleBulbAtmosphere() {
+        bulbState.nobleGasOn = !bulbState.nobleGasOn;
+        const btn = document.getElementById('btn-toggle-gas');
+        const badge = document.getElementById('bulb-atmosphere-badge');
+        const gasVis = document.getElementById('gas-particles-visual');
+
+        if (bulbState.nobleGasOn) {
+            if (btn) btn.className = "sim-btn success";
+            if (btn) btn.textContent = "🛡️ Inert Gas: [ON] (Argon / N₂)";
+            if (badge) badge.className = "gas-pill noble";
+            if (badge) badge.textContent = "🛡️ Inert Gas: Argon / Nitrogen";
+            if (gasVis) gasVis.style.display = "block";
+        } else {
+            if (btn) btn.className = "sim-btn danger";
+            if (btn) btn.textContent = "⚠️ Inert Gas: [OFF] (Air Present)";
+            if (badge) badge.className = "gas-pill air";
+            if (badge) badge.textContent = "⚠️ Atmosphere: Oxygen Present!";
+            if (gasVis) gasVis.style.display = "none";
+        }
+        updateBulbSimulation();
+    }
+
+    function changeFilamentMaterial() {
+        const sel = document.getElementById('select-filament-mat');
+        const matKey = sel ? sel.value : 'tungsten';
+        bulbState.material = matKey;
+        const mat = MATERIALS[matKey];
+
+        const title = document.getElementById('mat-card-title');
+        const desc = document.getElementById('mat-card-desc');
+        if (title) title.textContent = `${mat.name} Specifications:`;
+        if (desc) desc.innerHTML = `${mat.desc}<br><strong style="color:var(--neon-amber);">Melting Point: ${mat.meltingPoint}°C</strong>`;
+
+        resetBulbFilament();
+    }
+
+    function resetBulbFilament() {
+        bulbState.isBroken = false;
+        bulbState.breakReason = null;
+        bulbState.oxidationTimer = 0.0;
+        smokeParticles = [];
+
+        const spark = document.getElementById('filament-burn-spark');
+        if (spark) { spark.setAttribute('r', '0'); spark.setAttribute('opacity', '0'); }
+
+        const leftPath = document.getElementById('filament-path-left');
+        const rightPath = document.getElementById('filament-path-right');
+        const mat = MATERIALS[bulbState.material];
+
+        if (leftPath) {
+            leftPath.setAttribute('d', 'M 280,160 Q 285,150 290,146 Q 295,142 300,144');
+            leftPath.setAttribute('stroke-width', mat.strokeWidth);
+        }
+        if (rightPath) {
+            rightPath.setAttribute('d', 'M 300,144 Q 305,142 310,146 Q 315,150 320,160');
+            rightPath.setAttribute('stroke-width', mat.strokeWidth);
+        }
+
+        updateBulbSimulation();
+    }
+
+    function updateBulbSimulation() {
+        const s = document.getElementById('slider-bulb-v');
+        if (s) bulbState.voltage = parseFloat(s.value);
+
+        const lbl = document.getElementById('lbl-bulb-v');
+        const ps = document.getElementById('bulb-ps-display');
+        if (lbl) lbl.textContent = bulbState.voltage.toFixed(1) + " V";
+        if (ps) ps.textContent = bulbState.voltage.toFixed(1) + " V";
+
+        const mat = MATERIALS[bulbState.material] || MATERIALS.tungsten;
+        const deltaT = Math.max(0, bulbState.tempC - 20.0);
+        bulbState.resistance = Math.max(0.15, mat.baseR * (1 + mat.tempCoeff * deltaT));
+        const totalR = bulbState.resistance + 0.05;
+
+        const br = document.getElementById('bulb-read-r');
+        if (br) br.textContent = bulbState.resistance.toFixed(2) + " Ω";
+
+        if (bulbState.switchClosed && !bulbState.fuseBlown && !bulbState.isBroken && bulbState.voltage > 0) {
+            bulbState.current = bulbState.voltage / totalR;
+            bulbState.power = Math.pow(bulbState.current, 2) * bulbState.resistance;
+        } else {
+            bulbState.current = 0.0;
+            bulbState.power = 0.0;
+        }
+    }
+
+    function stepBulbPhysics(dt) {
+        const mat = MATERIALS[bulbState.material] || MATERIALS.tungsten;
+
+        const deltaT = Math.max(0, bulbState.tempC - 20.0);
+        bulbState.resistance = Math.max(0.15, mat.baseR * (1 + mat.tempCoeff * deltaT));
+        const totalR = bulbState.resistance + 0.05;
+
+        const switchOpen = !bulbState.switchClosed;
+        const fuseBlown = bulbState.fuseBlown;
+        const filamentBroken = bulbState.isBroken;
+
+        if (switchOpen || fuseBlown || filamentBroken || bulbState.voltage <= 0) {
+            bulbState.current = 0.0;
+            bulbState.power = 0.0;
+            bulbState.tempC += (20.0 - bulbState.tempC) * Math.min(1, dt * 3.5);
+            updateBulbVisuals(mat);
+            return;
+        }
+
+        bulbState.current = bulbState.voltage / totalR;
+        bulbState.power = Math.pow(bulbState.current, 2) * bulbState.resistance;
+
+        const fuseWire = document.getElementById('fuse-wire-path');
+        if (bulbState.current > bulbState.fuseRating) {
+            const overloadRatio = bulbState.current / bulbState.fuseRating;
+            if (fuseWire && !bulbState.fuseBlown) {
+                fuseWire.setAttribute('stroke', '#ef4444');
+                fuseWire.setAttribute('filter', 'url(#glow-heat)');
+            }
+            bulbState.fuseMeltTimer += dt * Math.min(3.0, Math.pow(overloadRatio, 1.2));
+            if (bulbState.fuseMeltTimer >= 1.0) {
+                blowFuse();
+                updateBulbVisuals(mat);
+                return;
+            }
+        } else {
+            bulbState.fuseMeltTimer = Math.max(0, bulbState.fuseMeltTimer - dt * 2);
+            if (fuseWire && !bulbState.fuseBlown) {
+                const spec = FUSE_SPECS[bulbState.fuseRating] || FUSE_SPECS[3.0];
+                fuseWire.setAttribute('stroke', spec.wireColor);
+                fuseWire.removeAttribute('filter');
+            }
+        }
+
+        const targetTemp = 20.0 + Math.pow(bulbState.power * 280, 0.78);
+        bulbState.tempC += (targetTemp - bulbState.tempC) * Math.min(1, dt * 4.5);
+
+        if (bulbState.tempC >= mat.meltingPoint) {
+            breakFilament('melted', mat);
+            return;
+        }
+
+        if (!bulbState.nobleGasOn && bulbState.tempC > 400.0) {
+            bulbState.oxidationTimer += dt;
+            spawnSmokeAt(300, 144);
+            if (bulbState.oxidationTimer >= 0.85) {
+                breakFilament('oxidized', mat);
+                return;
+            }
+        } else {
+            bulbState.oxidationTimer = Math.max(0, bulbState.oxidationTimer - dt);
+        }
+
+        updateBulbVisuals(mat);
+    }
+
+    function breakFilament(reason, mat) {
+        bulbState.isBroken = true;
+        bulbState.breakReason = reason;
+
+        const spark = document.getElementById('filament-burn-spark');
+        if (spark) {
+            spark.setAttribute('r', '14');
+            spark.setAttribute('opacity', '1');
+            setTimeout(() => {
+                spark.setAttribute('r', '0');
+                spark.setAttribute('opacity', '0');
+            }, 250);
+        }
+
+        const leftPath = document.getElementById('filament-path-left');
+        const rightPath = document.getElementById('filament-path-right');
+
+        if (reason === 'melted') {
+            if (leftPath) leftPath.setAttribute('d', 'M 280,160 Q 285,155 292,154');
+            if (rightPath) rightPath.setAttribute('d', 'M 308,154 Q 315,155 320,160');
+        } else {
+            if (leftPath) leftPath.setAttribute('d', 'M 280,160 Q 284,152 288,148');
+            if (rightPath) rightPath.setAttribute('d', 'M 312,148 Q 316,152 320,160');
+            for (let i = 0; i < 35; i++) spawnSmokeAt(300, 144);
+        }
+    }
+
+    function updateBulbVisuals(mat) {
+        const bi = document.getElementById('bulb-read-i');
+        const br = document.getElementById('bulb-read-r');
+        const bp = document.getElementById('bulb-read-p');
+        const bt = document.getElementById('bulb-read-temp');
+
+        if (bi) {
+            if (bulbState.fuseBlown) {
+                bi.textContent = "0.00 A (Fuse Blown)";
+            } else if (!bulbState.switchClosed) {
+                bi.textContent = "0.00 A (Switch Open)";
+            } else if (bulbState.isBroken) {
+                bi.textContent = "0.00 A (Filament Broken)";
+            } else {
+                bi.textContent = bulbState.current.toFixed(2) + " A";
+            }
+        }
+        if (br) br.textContent = bulbState.resistance.toFixed(2) + " Ω";
+        if (bp) bp.textContent = bulbState.power.toFixed(1) + " W";
+        if (bt) bt.textContent = Math.round(bulbState.tempC) + " °C";
+
+        const stateText = document.getElementById('bulb-state-text');
+        const lumenText = document.getElementById('bulb-lumen-text');
+        const glowLayer = document.getElementById('bulb-radial-glow');
+        const leftPath = document.getElementById('filament-path-left');
+        const rightPath = document.getElementById('filament-path-right');
+
+        const pulses = [
+            document.getElementById('bulb-pulse-neg'),
+            document.getElementById('bulb-pulse-live-a'),
+            document.getElementById('bulb-pulse-live-b'),
+            document.getElementById('bulb-pulse-live-c')
+        ];
+
+        if (bulbState.fuseBlown) {
+            if (stateText) {
+                stateText.textContent = `⚡ FUSE BLOWN! Exceeded ${bulbState.fuseRating.toFixed(1)} A rating.`;
+                stateText.style.color = "var(--neon-red)";
+            }
+            if (lumenText) lumenText.textContent = "0 lm (Off - Fuse Blown)";
+            if (glowLayer) glowLayer.style.background = "radial-gradient(circle, transparent 0%, transparent 100%)";
+            pulses.forEach(p => { if (p) p.style.display = "none"; });
+            return;
+        }
+
+        if (!bulbState.switchClosed) {
+            if (stateText) {
+                stateText.textContent = "Switch Open (Circuit Inactive)";
+                stateText.style.color = "var(--neon-amber)";
+            }
+            if (lumenText) lumenText.textContent = "0 lm (Off)";
+            if (glowLayer) glowLayer.style.background = "radial-gradient(circle, transparent 0%, transparent 100%)";
+            pulses.forEach(p => { if (p) p.style.display = "none"; });
+            return;
+        }
+
+        if (bulbState.isBroken) {
+            if (stateText) {
+                if (bulbState.breakReason === 'melted') {
+                    stateText.textContent = `❌ ${mat.name} MELTED! Exceeded M.P. (${mat.meltingPoint}°C). Click Replace Filament.`;
+                } else {
+                    stateText.textContent = `⚠️ OXIDIZED & BURNED OUT in Air! Click Replace Filament.`;
+                }
+                stateText.style.color = "var(--neon-red)";
+            }
+            if (lumenText) lumenText.textContent = "0 lm (Damaged)";
+            if (glowLayer) glowLayer.style.background = "radial-gradient(circle, transparent 0%, transparent 100%)";
+            if (leftPath) leftPath.setAttribute('stroke', '#334155');
+            if (rightPath) rightPath.setAttribute('stroke', '#334155');
+            if (leftPath) leftPath.removeAttribute('filter');
+            if (rightPath) rightPath.removeAttribute('filter');
+            pulses.forEach(p => { if (p) p.style.display = "none"; });
+            return;
+        }
+
+        if (bulbState.current > 0.05) {
+            const dur = Math.max(0.12, 0.55 / bulbState.current);
+            pulses.forEach(p => {
+                if (p) {
+                    p.style.display = "block";
+                    p.style.animationDuration = `${dur}s`;
+                }
+            });
+        } else {
+            pulses.forEach(p => { if (p) p.style.display = "none"; });
+        }
+
+        const T = bulbState.tempC;
+        let filamentStroke = "#64748b";
+        let filterAttr = null;
+        let lumens = 0;
+        let glowOpacity = 0;
+
+        if (T < 450) {
+            filamentStroke = "#64748b";
+            if (stateText) {
+                stateText.textContent = bulbState.voltage > 0 ? "Warming Up (Below Red Heat)" : "Normal (Cold)";
+                stateText.style.color = "#94a3b8";
+            }
+            glowOpacity = 0;
+            lumens = 0;
+        } else if (T < 800) {
+            filamentStroke = "#b91c1c";
+            filterAttr = "url(#filament-glow-filter)";
+            if (stateText) {
+                stateText.textContent = "Dull Red Heat (Low Lumens)";
+                stateText.style.color = "#f97316";
+            }
+            glowOpacity = 0.2;
+            lumens = Math.round((T - 450) * 0.15);
+        } else if (T < 1500) {
+            filamentStroke = "#ea580c";
+            filterAttr = "url(#filament-glow-filter)";
+            if (stateText) {
+                stateText.textContent = "Bright Orange Heat (Incandescing)";
+                stateText.style.color = "#fbbf24";
+            }
+            glowOpacity = 0.5;
+            lumens = Math.round(50 + (T - 800) * 0.45);
+        } else if (T < 2400) {
+            filamentStroke = "#fef08a";
+            filterAttr = "url(#filament-glow-filter)";
+            if (stateText) {
+                stateText.textContent = "Incandescent Yellow-White Glow";
+                stateText.style.color = "#fef08a";
+            }
+            glowOpacity = 0.8;
+            lumens = Math.round(400 + (T - 1500) * 0.95);
+        } else {
+            filamentStroke = "#ffffff";
+            filterAttr = "url(#filament-glow-filter)";
+            if (stateText) {
+                stateText.textContent = "Brilliant White Incandescence (High Efficiency)";
+                stateText.style.color = "#ffffff";
+            }
+            glowOpacity = 1.0;
+            lumens = Math.round(1200 + (T - 2400) * 1.5);
+        }
+
+        if (lumenText) lumenText.textContent = `${lumens} lm`;
+
+        if (leftPath) leftPath.setAttribute('stroke', filamentStroke);
+        if (rightPath) rightPath.setAttribute('stroke', filamentStroke);
+
+        if (filterAttr) {
+            if (leftPath) leftPath.setAttribute('filter', filterAttr);
+            if (rightPath) rightPath.setAttribute('filter', filterAttr);
+        } else {
+            if (leftPath) leftPath.removeAttribute('filter');
+            if (rightPath) rightPath.removeAttribute('filter');
+        }
+
+        if (glowLayer) {
+            if (glowOpacity > 0.05) {
+                glowLayer.style.background = `radial-gradient(circle, rgba(254, 240, 138, ${glowOpacity * 0.7}) 0%, rgba(245, 158, 11, ${glowOpacity * 0.4}) 42%, transparent 72%)`;
+            } else {
+                glowLayer.style.background = "radial-gradient(circle, transparent 0%, transparent 100%)";
+            }
+        }
+    }
+
+    function spawnSmokeAt(svgX, svgY) {
+        const canvas = document.getElementById('bulb-smoke-canvas');
+        if (!canvas) return;
+        const scaleX = canvas.width / 600;
+        const scaleY = canvas.height / 450;
+
+        smokeParticles.push({
+            x: svgX * scaleX + (Math.random() - 0.5) * 12,
+            y: svgY * scaleY + (Math.random() - 0.5) * 8,
+            vx: (Math.random() - 0.5) * 1.2,
+            vy: -1.2 - Math.random() * 1.8,
+            radius: 3.5 + Math.random() * 4,
+            alpha: 0.85
+        });
+    }
+
+    function renderBulbSmoke() {
+        const canvas = document.getElementById('bulb-smoke-canvas');
+        if (!canvas || !canvas.getContext) return;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        for (let i = smokeParticles.length - 1; i >= 0; i--) {
+            const p = smokeParticles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+            p.radius += 0.18;
+            p.alpha -= 0.016;
+
+            if (p.alpha <= 0) {
+                smokeParticles.splice(i, 1);
+                continue;
+            }
+
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(148, 163, 184, ${p.alpha})`;
+            ctx.fill();
+        }
+    }
+    </script>
+</body>
+</html>
